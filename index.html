@@ -2133,17 +2133,18 @@ function _fbWithTimeout(promise, fallback){
 // Drop-in replacement for window.storage, backed by Firebase Realtime Database, so every
 // admin change is saved centrally and every visitor reads the same live data. Every call is
 // guarded so a missing/failed connection resolves safely instead of hanging the app.
+let _fbLastError = '';
 window.storage = {
   async get(key, shared){
-    if(!_fbDb) return null;
+    if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
     try{
       const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).once('value'), null);
       if(!snap || !snap.exists()) return null;
       return { key, value: snap.val(), shared: !!shared };
-    }catch(e){ console.error('storage.get error', key, e); return null; }
+    }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.get error', key, e); return null; }
   },
   async set(key, value, shared){
-    if(!_fbDb) return null;
+    if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
     try{
       const TIMED_OUT = Symbol('timeout');
       const result = await _fbWithTimeout(
@@ -2151,11 +2152,12 @@ window.storage = {
         TIMED_OUT
       );
       if(result === TIMED_OUT){
+        _fbLastError = 'انتهت المهلة (15 ثانية) قبل تأكيد الحفظ — الاتصال بسيرفر Firebase بطيء جدًا أو محجوب';
         console.error('storage.set timed out (network too slow) — NOT confirmed saved', key);
         return null;
       }
       return { key, value, shared: !!shared };
-    }catch(e){ console.error('storage.set error', key, e); return null; }
+    }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.set error', key, e); return null; }
   },
   async delete(key, shared){
     if(!_fbDb) return null;
@@ -8940,7 +8942,7 @@ async function doGeneratePointCodes(){
     POINT_CODES[code] = { value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId:null };
   }
   const ok = await savePointCodes(POINT_CODES);
-  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — تحقق من الاتصال بالإنترنت وحاول تاني', true); render(); return; }
+  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true); render(); return; }
   showToast(`اتولدت ${qty} كود بقيمة ${value} نقطة`);
   render();
 }
@@ -8983,7 +8985,7 @@ async function doGenerateSessionPointCodes(sessionId){
     POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId };
   }
   const ok = await savePointCodes(POINT_CODES);
-  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — تحقق من الاتصال بالإنترنت وحاول تاني', true); render(); return; }
+  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true); render(); return; }
   showToast(`اتولدت ${qty} كود خاص بهذه الفقرة بقيمة ${value} نقطة`);
   if(valEl) valEl.value = '';
   if(qtyEl) qtyEl.value = '';
