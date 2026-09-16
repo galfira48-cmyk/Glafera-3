@@ -6039,6 +6039,23 @@ function renderAdminParticipantDetail(p){
   const teamOptions = TEAMS.map(t=>`<option value="${t.id}" ${t.id===p.teamId?'selected':''}>${escapeHtml(t.name)}</option>`).join('');
   const myRank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
   const attendedCount = DAYS.reduce((sum,d)=>sum+d.sessions.filter(s=>CHECKINS[p.id+'__'+s.id]).length, 0);
+  const attendedRows = [];
+  DAYS.forEach(d=>d.sessions.forEach(s=>{
+    const c = CHECKINS[p.id+'__'+s.id];
+    if(!c) return;
+    const info = SESSION_INFO[s.id] || {};
+    attendedRows.push(`<div class="admin-meta-chip" style="justify-content:space-between;width:100%;padding:9px 12px;margin-top:6px;">
+      <span>✅ ${escapeHtml(info.name||s.name)} — <b>${c.points}</b> نقطة</span>
+      <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:10.5px;color:var(--danger);" data-action="admin-cancel-checkin" data-pid="${p.id}" data-session="${s.id}">إلغاء الحضور</button>
+    </div>`);
+  }));
+  const attendanceBlock = `
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <div class="admin-session-name" style="margin-bottom:4px;">📋 الفقرات اللي حضرها (${attendedCount})</div>
+      <div class="hint" style="margin:0 0 8px;">إلغاء الحضور بيمسح نقاط الفقرة دي بس من رصيد المشارك، وبيسيبه يقدر يمسح كود QR جديد لنفس الفقرة تاني</div>
+      ${attendedRows.join('') || `<div class="hint">لسه معملش أي حضور</div>`}
+    </div>
+  `;
   return `
     <button type="button" class="admin-back-link" data-action="cancel-edit-participant">${ICO.back} كل المشاركين</button>
     <div class="card">
@@ -6076,6 +6093,7 @@ function renderAdminParticipantDetail(p){
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-edit-participant">إلغاء</button>
       </div>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="delete-participant" data-pid="${p.id}">🗑️ حذف المشارك نهائيًا</button>
+      ${attendanceBlock}
     </div>
   `;
 }
@@ -7424,6 +7442,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='download-all-qr'){ doDownloadAllQR(); }
   else if(action==='cancel-edit-participant'){ state.editingParticipantId = null; render(); }
   else if(action==='save-participant'){ doSaveParticipant(el.dataset.pid); }
+  else if(action==='admin-cancel-checkin'){ confirmCancelCheckin(el.dataset.pid, el.dataset.session); }
   else if(action==='delete-participant'){ confirmDeleteParticipant(el.dataset.pid); }
   else if(action==='apply-participant-bonus'){ doApplyParticipantBonus(el.dataset.pid, parseInt(el.dataset.sign,10)); }
   else if(action==='open-edit-team'){ state.editingTeamId = el.dataset.tid; render(); }
@@ -8313,6 +8332,26 @@ async function doDownloadAllQR(){
 function confirmDeleteParticipant(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
   showConfirmDialog(`حذف "${escapeHtml(p?p.name:pid)}"؟`, ()=>doDeleteParticipant(pid), {sub:'هينقل لسلة المهملات وتقدر تسترجعه منها.'});
+}
+function confirmCancelCheckin(pid, sessionId){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  const found = findSessionById(sessionId);
+  const sName = found ? (SESSION_INFO[sessionId]||{}).name || found.session.name : sessionId;
+  showConfirmDialog(`إلغاء حضور "${escapeHtml(p?p.name:pid)}" في "${escapeHtml(sName)}"؟`, ()=>doAdminCancelCheckin(pid, sessionId), {icon:'↩️', sub:'هتتمسح نقاط هذه الفقرة بس من رصيده، وهيقدر يمسح كود QR جديد لنفس الفقرة تاني.', confirmLabel:'إلغاء الحضور'});
+}
+async function doAdminCancelCheckin(pid, sessionId){
+  const key = pid+'__'+sessionId;
+  if(!CHECKINS[key]){ showToast('المشارك ده أصلاً معملش حضور في هذه الفقرة', true); return; }
+  const prev = CHECKINS[key];
+  delete CHECKINS[key];
+  const saved = await saveCheckins(CHECKINS);
+  if(saved===false){
+    CHECKINS[key] = prev;
+    showToast('تعذر الحفظ على السيرفر — تحقق من الاتصال وحاول مرة أخرى', true);
+    return;
+  }
+  showToast('اتلغى الحضور والنقاط بتاعت الفقرة دي');
+  render();
 }
 async function doDeleteParticipant(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
