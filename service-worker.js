@@ -1,4 +1,4 @@
-const CACHE_NAME = 'glavera3-v1';
+const CACHE_NAME = 'glavera3-v2';
 const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
 
 self.addEventListener('install', (event) => {
@@ -18,10 +18,12 @@ self.addEventListener('activate', (event) => {
 });
 
 // Network-first so admin changes and live data are never served stale from cache.
+// cache:'no-store' forces every fetch to skip the browser's own HTTP cache too,
+// so a fresh index.html is always requested instead of a stale disk-cached copy.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: 'no-store' })
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
