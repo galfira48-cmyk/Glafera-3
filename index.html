@@ -9727,8 +9727,12 @@ function startLivePolling(){
       }
     }catch(e){}
     try{
+      const beforePc = JSON.stringify(POINT_CODES);
       const freshPointCodes = await loadPointCodes();
-      if(freshPointCodes && Object.keys(freshPointCodes).length){ POINT_CODES = freshPointCodes; }
+      if(freshPointCodes && Object.keys(freshPointCodes).length && JSON.stringify(freshPointCodes) !== beforePc){
+        POINT_CODES = freshPointCodes;
+        if(state.view==='session' || (state.view==='admin' && state.adminTab==='pointcodes')){ render(); }
+      }
     }catch(e){}
     try{
       if(state.view==='wall'){
