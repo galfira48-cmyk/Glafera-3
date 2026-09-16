@@ -2270,7 +2270,10 @@ async function loadPointCodes(){
   }catch(e){ return {}; }
 }
 async function savePointCodes(obj){
-  try{ await window.storage.set('glavera-point-codes', JSON.stringify(obj), true); }catch(e){}
+  try{
+    const r = await window.storage.set('glavera-point-codes', JSON.stringify(obj), true);
+    return r ? true : false;
+  }catch(e){ return false; }
 }
 async function loadParticipantOverrides(){
   try{
@@ -8920,7 +8923,8 @@ async function doGeneratePointCodes(){
     const code = `G${value}-${String(num).padStart(3,'0')}`;
     POINT_CODES[code] = { value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId:null };
   }
-  await savePointCodes(POINT_CODES);
+  const ok = await savePointCodes(POINT_CODES);
+  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — تحقق من الاتصال بالإنترنت وحاول تاني', true); render(); return; }
   showToast(`اتولدت ${qty} كود بقيمة ${value} نقطة`);
   render();
 }
@@ -8962,7 +8966,8 @@ async function doGenerateSessionPointCodes(sessionId){
     const storageKey = sessionId+':'+code;
     POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId };
   }
-  await savePointCodes(POINT_CODES);
+  const ok = await savePointCodes(POINT_CODES);
+  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — تحقق من الاتصال بالإنترنت وحاول تاني', true); render(); return; }
   showToast(`اتولدت ${qty} كود خاص بهذه الفقرة بقيمة ${value} نقطة`);
   if(valEl) valEl.value = '';
   if(qtyEl) qtyEl.value = '';
