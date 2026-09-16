@@ -7065,6 +7065,14 @@ async function tryCheckin(codeRaw, targetSessionId){
   if((SESSION_INFO[session.id]||{}).pointsEnabled===false){ showToast('لا يوجد نقاط في هذه الفقرة', true); return false; }
   if(CHECKINS[state.pid+'__'+session.id]){ showToast('خدت نقاط هذه الفقرة قبل كده — مينفعش تاخد تاني', true); return false; }
 
+  /* أكواد النقاط ممكن المنظم يكون ولّدها بعد ما فتحت الصفحة، فالنسخة المحفوظة في
+     الذاكرة (POINT_CODES) ممكن تكون قديمة. نجيب أحدث نسخة من Firebase قبل ما نتأكد
+     من صحة الكود، عشان منرفضش كود صحيح لمجرد إنه اتولد بعد فتح الصفحة. */
+  try{
+    const freshPointCodes = await loadPointCodes();
+    if(freshPointCodes && Object.keys(freshPointCodes).length){ POINT_CODES = freshPointCodes; }
+  }catch(e){}
+
   let pc = POINT_CODES[session.id+':'+code];
   if(!pc) pc = POINT_CODES[code];
   if(!pc){ showToast('كود النقاط غير صحيح', true); return false; }
@@ -9712,6 +9720,10 @@ function startLivePolling(){
         CHECKINS = fresh;
         updateLiveWidgetsInPlace();
       }
+    }catch(e){}
+    try{
+      const freshPointCodes = await loadPointCodes();
+      if(freshPointCodes && Object.keys(freshPointCodes).length){ POINT_CODES = freshPointCodes; }
     }catch(e){}
     try{
       if(state.view==='wall'){
