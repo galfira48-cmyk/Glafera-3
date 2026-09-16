@@ -2119,7 +2119,7 @@ try{
   }
 }catch(e){ console.error('Firebase init failed', e); }
 const _FB_ROOT = 'glavera_data';
-const _FB_TIMEOUT_MS = 6000;
+const _FB_TIMEOUT_MS = 15000;
 
 function _fbEncodeKey(k){ return encodeURIComponent(String(k)).replace(/\./g, '%2E'); }
 function _fbDecodeKey(k){ return decodeURIComponent(k.replace(/%2E/g, '.')); }
@@ -2145,14 +2145,30 @@ window.storage = {
   async set(key, value, shared){
     if(!_fbDb) return null;
     try{
-      await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).set(value), null);
+      const TIMED_OUT = Symbol('timeout');
+      const result = await _fbWithTimeout(
+        _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).set(value).then(()=> 'done'),
+        TIMED_OUT
+      );
+      if(result === TIMED_OUT){
+        console.error('storage.set timed out (network too slow) — NOT confirmed saved', key);
+        return null;
+      }
       return { key, value, shared: !!shared };
     }catch(e){ console.error('storage.set error', key, e); return null; }
   },
   async delete(key, shared){
     if(!_fbDb) return null;
     try{
-      await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).remove(), null);
+      const TIMED_OUT = Symbol('timeout');
+      const result = await _fbWithTimeout(
+        _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).remove().then(()=> 'done'),
+        TIMED_OUT
+      );
+      if(result === TIMED_OUT){
+        console.error('storage.delete timed out (network too slow) — NOT confirmed deleted', key);
+        return null;
+      }
       return { key, deleted: true, shared: !!shared };
     }catch(e){ console.error('storage.delete error', key, e); return null; }
   },
