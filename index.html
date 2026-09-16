@@ -5399,7 +5399,7 @@ function renderAdminDayDetail(dayId){
   body += `
     <div class="card" style="margin:14px 0;">
       <div class="admin-session-name" style="margin-bottom:4px;">🎟️ توليد أكواد QR لكل فقرات هذا اليوم دفعة واحدة</div>
-      <div class="hint" style="margin:0 0 10px;">هيولّد لكل فقرة من فقرات اليوم ده مجموعة أكواد QR خاصة بيها بس (زي لو ولّدتها من داخل كل فقرة لوحدها). العدد اللي تكتبه هيتولّد كامل لكل قيمة نقطة من الحد الأدنى للحد الأقصى — مثلاً لو حددت أقل قيمة 0 وأعلى قيمة 10 وكتبت 40 في "عدد الأكواد"، هيتولّد 40 كود بقيمة 0 و40 كود بقيمة 1 وهكذا لحد 40 كود بقيمة 10، لكل فقرة على حدة (يعني 440 كود لكل فقرة).</div>
+      <div class="hint" style="margin:0 0 10px;">العدد اللي تكتبه هيتولّد لكل قيمة من الحد الأدنى للأقصى، لكل فقرة على حدة. مثال: 0-10 وعدد 40 = 40 كود لكل قيمة (440 كود لكل فقرة).</div>
       <div class="admin-edit-row">
         <div style="flex:1;"><label>أقل قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-min-${day.id}" placeholder="مثال: 0" /></div>
         <div style="flex:1;"><label>أعلى قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-max-${day.id}" placeholder="مثال: 10" /></div>
@@ -5407,6 +5407,7 @@ function renderAdminDayDetail(dayId){
       <div style="margin-top:8px;"><label>عدد الأكواد لكل قيمة (لكل فقرة)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-qty-${day.id}" placeholder="مثال: 40" /></div>
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-day-point-codes" data-day="${day.id}">توليد الأكواد لكل فقرات اليوم</button>
       <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="download-all-day-point-codes" data-day="${day.id}">⬇️ تحميل/طباعة كل أكواد QR الخاصة بفقرات اليوم مرة واحدة</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;padding:7px;font-size:11.5px;color:var(--danger);" data-action="confirm-delete-all-day-point-codes" data-day="${day.id}">🗑️ حذف كل أكواد QR الخاصة بكل فقرات اليوم</button>
     </div>
   `;
 
@@ -5488,7 +5489,7 @@ function renderAdminSessionDetail(sessionId){
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-session-point-codes" data-session="${sessionId}">توليد الأكواد لهذه الفقرة</button>
       `}
       ${denomRows}
-      ${sessionCodes.length ? `<button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;color:var(--danger);" data-action="confirm-delete-session-point-codes" data-session="${sessionId}">🗑️ إزالة كل أكواد QR المتولدة لهذه الفقرة (${sessionCodes.length})</button>` : ''}
+      ${sessionCodes.length ? `<button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;padding:7px;font-size:11.5px;color:var(--danger);" data-action="confirm-delete-session-point-codes" data-session="${sessionId}">🗑️ إزالة كل أكواد QR المتولدة لهذه الفقرة (${sessionCodes.length})</button>` : ''}
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
         <div class="admin-session-name" style="margin-bottom:4px;">🔳 توليد كود QR بنص مخصص</div>
         <div class="hint" style="margin:0 0 10px;">اكتب أي جملة أو نص تحبه (مش بالضرورة كود نقاط) وهيتحول لكود QR خاص بهذه الفقرة، تقدر تطبعه أو تعرضه زي ما تحب</div>
@@ -7506,6 +7507,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='confirm-delete-session-point-codes'){ confirmDeleteAllSessionPointCodes(el.dataset.session); }
   else if(action==='generate-day-point-codes'){ doGenerateDayPointCodes(el.dataset.day); }
   else if(action==='download-all-day-point-codes'){ doDownloadAllDayPointCodes(el.dataset.day); }
+  else if(action==='confirm-delete-all-day-point-codes'){ confirmDeleteAllDayPointCodes(el.dataset.day); }
   else if(action==='generate-custom-session-qr'){ doGenerateCustomSessionQr(el.dataset.session); }
   else if(action==='print-session-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10), el.dataset.session); }
   else if(action==='rate-session'){ doRateSession(el.dataset.session, parseInt(el.dataset.star,10)); }
@@ -9062,6 +9064,32 @@ async function doGenerateDayPointCodes(dayId){
   if(minEl) minEl.value = '';
   if(maxEl) maxEl.value = '';
   if(qtyEl) qtyEl.value = '';
+  render();
+}
+function confirmDeleteAllDayPointCodes(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  if(!day) return;
+  const sessionIds = new Set(day.sessions.map(s=>s.id));
+  const count = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId)).length;
+  if(!count){ showToast('لا يوجد أكواد لحذفها في فقرات هذا اليوم', true); return; }
+  showConfirmDialog(`حذف كل أكواد QR (${count}) الخاصة بكل فقرات "${escapeHtml(day.label)}"؟`, ()=>doDeleteAllDayPointCodes(dayId), {icon:'🗑️', sub:'هيتشال كل الأكواد المتولدة لكل فقرات اليوم ده نهائيًا (المستخدمة وغير المستخدمة)، ومينفعش ترجعها تاني.', confirmLabel:'حذف الكل'});
+}
+async function doDeleteAllDayPointCodes(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  if(!day) return;
+  const sessionIds = new Set(day.sessions.map(s=>s.id));
+  const keysToDelete = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId));
+  if(!keysToDelete.length){ showToast('لا يوجد أكواد لحذفها', true); return; }
+  const backup = {};
+  keysToDelete.forEach(k=>{ backup[k] = POINT_CODES[k]; delete POINT_CODES[k]; });
+  const ok = await savePointCodes(POINT_CODES);
+  if(!ok){
+    Object.keys(backup).forEach(k=>{ POINT_CODES[k] = backup[k]; });
+    showToast('تعذر الحذف على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true);
+    render();
+    return;
+  }
+  showToast(`اتحذف ${keysToDelete.length} كود من كل فقرات "${day.label}"`);
   render();
 }
 async function doDownloadAllDayPointCodes(dayId){
