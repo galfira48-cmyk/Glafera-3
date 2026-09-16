@@ -5488,6 +5488,7 @@ function renderAdminSessionDetail(sessionId){
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-session-point-codes" data-session="${sessionId}">توليد الأكواد لهذه الفقرة</button>
       `}
       ${denomRows}
+      ${sessionCodes.length ? `<button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;color:var(--danger);" data-action="confirm-delete-session-point-codes" data-session="${sessionId}">🗑️ إزالة كل أكواد QR المتولدة لهذه الفقرة (${sessionCodes.length})</button>` : ''}
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
         <div class="admin-session-name" style="margin-bottom:4px;">🔳 توليد كود QR بنص مخصص</div>
         <div class="hint" style="margin:0 0 10px;">اكتب أي جملة أو نص تحبه (مش بالضرورة كود نقاط) وهيتحول لكود QR خاص بهذه الفقرة، تقدر تطبعه أو تعرضه زي ما تحب</div>
@@ -7502,6 +7503,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='generate-point-codes'){ doGeneratePointCodes(); }
   else if(action==='print-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10)); }
   else if(action==='generate-session-point-codes'){ doGenerateSessionPointCodes(el.dataset.session); }
+  else if(action==='confirm-delete-session-point-codes'){ confirmDeleteAllSessionPointCodes(el.dataset.session); }
   else if(action==='generate-day-point-codes'){ doGenerateDayPointCodes(el.dataset.day); }
   else if(action==='download-all-day-point-codes'){ doDownloadAllDayPointCodes(el.dataset.day); }
   else if(action==='generate-custom-session-qr'){ doGenerateCustomSessionQr(el.dataset.session); }
@@ -9196,6 +9198,28 @@ async function doDownloadAllDayPointCodes(dayId){
 <\/script>
 </body></html>`);
   w.document.close();
+}
+function confirmDeleteAllSessionPointCodes(sessionId){
+  const found = findSessionById(sessionId);
+  const info = found ? (SESSION_INFO[sessionId] || {}) : {};
+  const sName = found ? (info.name || found.session.name) : sessionId;
+  const count = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId).length;
+  showConfirmDialog(`حذف كل أكواد QR (${count}) الخاصة بـ"${escapeHtml(sName)}"؟`, ()=>doDeleteAllSessionPointCodes(sessionId), {icon:'🗑️', sub:'هيتشال كل الأكواد المتولدة لهذه الفقرة نهائيًا (المستخدمة وغير المستخدمة)، ومينفعش ترجعها تاني.', confirmLabel:'حذف الكل'});
+}
+async function doDeleteAllSessionPointCodes(sessionId){
+  const keysToDelete = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId);
+  if(!keysToDelete.length){ showToast('لا يوجد أكواد لحذفها', true); return; }
+  const backup = {};
+  keysToDelete.forEach(k=>{ backup[k] = POINT_CODES[k]; delete POINT_CODES[k]; });
+  const ok = await savePointCodes(POINT_CODES);
+  if(!ok){
+    Object.keys(backup).forEach(k=>{ POINT_CODES[k] = backup[k]; });
+    showToast('تعذر الحذف على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true);
+    render();
+    return;
+  }
+  showToast(`اتحذف ${keysToDelete.length} كود من هذه الفقرة`);
+  render();
 }
 async function doGenerateSessionPointCodes(sessionId){
   const info = SESSION_INFO[sessionId] || {};
