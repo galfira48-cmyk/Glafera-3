@@ -5399,13 +5399,14 @@ function renderAdminDayDetail(dayId){
   body += `
     <div class="card" style="margin:14px 0;">
       <div class="admin-session-name" style="margin-bottom:4px;">🎟️ توليد أكواد QR لكل فقرات هذا اليوم دفعة واحدة</div>
-      <div class="hint" style="margin:0 0 10px;">هيولّد لكل فقرة من فقرات اليوم ده مجموعة أكواد QR خاصة بيها بس (زي لو ولّدتها من داخل كل فقرة لوحدها)، وكل كود قيمته نقطة عشوائية بين الحد الأدنى والأقصى اللي تحددهم.</div>
+      <div class="hint" style="margin:0 0 10px;">هيولّد لكل فقرة من فقرات اليوم ده مجموعة أكواد QR خاصة بيها بس (زي لو ولّدتها من داخل كل فقرة لوحدها). العدد اللي تكتبه هيتولّد كامل لكل قيمة نقطة من الحد الأدنى للحد الأقصى — مثلاً لو حددت أقل قيمة 0 وأعلى قيمة 10 وكتبت 40 في "عدد الأكواد"، هيتولّد 40 كود بقيمة 0 و40 كود بقيمة 1 وهكذا لحد 40 كود بقيمة 10، لكل فقرة على حدة (يعني 440 كود لكل فقرة).</div>
       <div class="admin-edit-row">
         <div style="flex:1;"><label>أقل قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-min-${day.id}" placeholder="مثال: 0" /></div>
         <div style="flex:1;"><label>أعلى قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-max-${day.id}" placeholder="مثال: 10" /></div>
       </div>
-      <div style="margin-top:8px;"><label>عدد الأكواد لكل فقرة</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-qty-${day.id}" placeholder="مثال: 40" /></div>
+      <div style="margin-top:8px;"><label>عدد الأكواد لكل قيمة (لكل فقرة)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-qty-${day.id}" placeholder="مثال: 40" /></div>
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-day-point-codes" data-day="${day.id}">توليد الأكواد لكل فقرات اليوم</button>
+      <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="download-all-day-point-codes" data-day="${day.id}">⬇️ تحميل/طباعة كل أكواد QR الخاصة بفقرات اليوم مرة واحدة</button>
     </div>
   `;
 
@@ -7502,6 +7503,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='print-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10)); }
   else if(action==='generate-session-point-codes'){ doGenerateSessionPointCodes(el.dataset.session); }
   else if(action==='generate-day-point-codes'){ doGenerateDayPointCodes(el.dataset.day); }
+  else if(action==='download-all-day-point-codes'){ doDownloadAllDayPointCodes(el.dataset.day); }
   else if(action==='generate-custom-session-qr'){ doGenerateCustomSessionQr(el.dataset.session); }
   else if(action==='print-session-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10), el.dataset.session); }
   else if(action==='rate-session'){ doRateSession(el.dataset.session, parseInt(el.dataset.star,10)); }
@@ -9028,32 +9030,172 @@ async function doGenerateDayPointCodes(dayId){
   if(!minEl || !maxEl || !qtyEl) return;
   const minVal = parseInt(normalizeDigits(minEl.value),10);
   const maxVal = parseInt(normalizeDigits(maxEl.value),10);
-  const qty = Math.min(300, parseInt(normalizeDigits(qtyEl.value),10)||0);
+  const qtyPerValue = Math.min(300, parseInt(normalizeDigits(qtyEl.value),10)||0);
   if(isNaN(minVal) || minVal<0){ showToast('اكتب أقل قيمة نقاط صحيحة (تقدر تكون صفر)', true); return; }
   if(isNaN(maxVal) || maxVal<minVal){ showToast('أعلى قيمة لازم تكون أكبر من أو تساوي أقل قيمة', true); return; }
-  if(!qty || qty<=0){ showToast('اكتب عدد أكواد صحيح لكل فقرة', true); return; }
+  if(!qtyPerValue || qtyPerValue<=0){ showToast('اكتب عدد أكواد صحيح لكل قيمة في كل فقرة', true); return; }
   const eligibleSessions = day.sessions.filter(s=>(SESSION_INFO[s.id]||{}).pointsEnabled!==false);
   if(!eligibleSessions.length){ showToast('كل فقرات اليوم ده متوقف فيها النقاط', true); return; }
+
+  const valuesRange = [];
+  for(let v=minVal; v<=maxVal; v++) valuesRange.push(v);
 
   eligibleSessions.forEach(s=>{
     const existingKeys = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===s.id);
     const existingSet = new Set(existingKeys.map(k=>POINT_CODES[k].code));
-    for(let i=0;i<qty;i++){
-      const code = genSecureSessionCode(existingSet);
-      existingSet.add(code);
-      const value = minVal + Math.floor(Math.random()*(maxVal-minVal+1));
-      const storageKey = s.id+':'+code;
-      POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId:s.id };
-    }
+    valuesRange.forEach(value=>{
+      for(let i=0;i<qtyPerValue;i++){
+        const code = genSecureSessionCode(existingSet);
+        existingSet.add(code);
+        const storageKey = s.id+':'+code;
+        POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId:s.id };
+      }
+    });
   });
 
+  const totalPerSession = qtyPerValue * valuesRange.length;
   const ok = await savePointCodes(POINT_CODES);
   if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true); render(); return; }
-  showToast(`اتولدت ${qty} كود لكل فقرة من فقرات "${day.label}" (${eligibleSessions.length} فقرة) بقيم من ${minVal} لـ ${maxVal} نقطة`, false, 3600);
+  showToast(`اتولد ${qtyPerValue} كود لكل قيمة من ${minVal} لـ ${maxVal} (إجمالي ${totalPerSession} كود) لكل فقرة من فقرات "${day.label}" (${eligibleSessions.length} فقرة)`, false, 3600);
   if(minEl) minEl.value = '';
   if(maxEl) maxEl.value = '';
   if(qtyEl) qtyEl.value = '';
   render();
+}
+async function doDownloadAllDayPointCodes(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  if(!day) return;
+  const sessionIds = new Set(day.sessions.map(s=>s.id));
+  const allKeys = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId));
+  if(!allKeys.length){ showToast('لسه مفيش أكواد QR اتولدت لفقرات هذا اليوم', true); return; }
+
+  const w = window.open('', '_blank');
+  if(!w){ showToast('يرجى السماح بالنوافذ المنبثقة للتحميل', true); return; }
+
+  // group codes by session, then sort by value within each session
+  const bySession = {};
+  allKeys.forEach(k=>{
+    const pc = POINT_CODES[k];
+    (bySession[pc.sessionId] = bySession[pc.sessionId] || []).push({ code: pc.code || k, value: pc.value, used: pc.used });
+  });
+
+  let globalIdx = 0;
+  const allItems = []; // flat list in render order, used for QR generation
+  const sectionsHtml = day.sessions.filter(s=>bySession[s.id] && bySession[s.id].length).map(s=>{
+    const info = SESSION_INFO[s.id] || {};
+    const sName = info.name || s.name;
+    const items = bySession[s.id].slice().sort((a,b)=>a.value-b.value || a.code.localeCompare(b.code));
+    const cardsHtml = items.map(it=>{
+      const i = globalIdx++;
+      allItems.push(it);
+      return `
+      <div class="tk ${it.used?'used':''}">
+        <div class="tk-top">
+          <div class="tk-brand">GLAVERA<span>III</span></div>
+          <div class="tk-serial">${String(i+1).padStart(4,'0')}</div>
+        </div>
+        <div class="tk-qr" id="qrc-${i}"></div>
+        <div class="tk-value"><span class="num">${it.value}</span><span class="lbl">نقطة</span></div>
+        <div class="tk-perf"></div>
+        <div class="tk-code">${it.code}</div>
+        ${it.used?'<div class="tk-stamp">مُستخدم</div>':''}
+      </div>`;
+    }).join('');
+    return `
+      <div class="doc-session-name" style="margin:26px auto 14px;">📌 ${escapeHtml(sName)} — ${items.length} كود</div>
+      <div class="grid">${cardsHtml}</div>
+    `;
+  }).join('');
+
+  w.document.open();
+  w.document.write(`<!DOCTYPE html>
+<html dir="rtl" lang="ar"><head><meta charset="utf-8">
+<title>كل أكواد QR — ${escapeHtml(day.label)} — جلافيرا 3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Cormorant+Garamond:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#171449; --gold:#B8892E; --gold-2:#E8C874; --paper:#FBF8F1; --line:#DDD3B8; }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:34px 26px 60px; background:var(--paper);
+    font-family:'Cairo',Tahoma,sans-serif; color:var(--ink);
+    background-image: radial-gradient(circle at 50% 0%, rgba(184,137,46,.08), transparent 55%);
+  }
+  .doc-header{ text-align:center; margin-bottom:10px; }
+  .doc-session-name{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; color:var(--ink);
+    background:linear-gradient(120deg,#FFF4DC,#FBF0D8); border:1.5px solid var(--gold); border-radius:14px;
+    padding:10px 18px; max-width:520px; text-align:center; }
+  .doc-eyebrow{ font-size:11px; letter-spacing:4px; color:var(--gold); font-weight:800; }
+  .doc-title{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    font-size:36px; margin:6px 0 4px; color:var(--ink); }
+  .doc-rule{ width:120px; height:2px; margin:10px auto 14px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+  .doc-meta{ font-size:12.5px; color:#7a7566; display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
+  .doc-meta b{ color:var(--ink); }
+
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; max-width:1000px; margin:0 auto; }
+
+  .tk{ position:relative; background:#fff; border:1px solid var(--line); border-radius:4px;
+    padding:16px 12px 14px; text-align:center; box-shadow:0 1px 0 rgba(0,0,0,.03);
+    break-inside:avoid; page-break-inside:avoid; }
+  .tk::before, .tk::after{ content:""; position:absolute; width:14px; height:14px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--line); top:50%; margin-top:-7px; }
+  .tk::before{ left:-8px; } .tk::after{ right:-8px; }
+
+  .tk-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .tk-brand{ font-size:9.5px; font-weight:900; letter-spacing:1.5px; color:var(--gold); }
+  .tk-brand span{ color:#c8bda1; margin-right:2px; }
+  .tk-serial{ font-size:9px; color:#b3ac97; direction:ltr; font-weight:700; }
+
+  .tk-qr{ display:flex; align-items:center; justify-content:center; padding:6px;
+    border:1px solid var(--line); border-radius:3px; margin:0 auto 10px; width:118px; }
+  .tk-qr canvas, .tk-qr img{ display:block; width:100px; height:100px; }
+
+  .tk-value{ display:flex; align-items:baseline; justify-content:center; gap:5px; margin-bottom:8px; }
+  .tk-value .num{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:26px; color:var(--ink); }
+  .tk-value .lbl{ font-size:11px; color:#8a8368; }
+
+  .tk-perf{ border-top:1.5px dashed var(--line); margin:0 0 8px; }
+  .tk-code{ font-size:11.5px; font-weight:800; letter-spacing:.5px; direction:ltr; color:#5c5745; }
+
+  .tk.used{ opacity:.45; }
+  .tk-stamp{ position:absolute; top:38%; left:50%; transform:translate(-50%,-50%) rotate(-18deg);
+    border:2.5px solid #b23b3b; color:#b23b3b; font-weight:900; font-size:15px; letter-spacing:2px;
+    padding:3px 10px; border-radius:6px; opacity:.75; }
+
+  .print-bar{ max-width:1000px; margin:0 auto 22px; display:flex; justify-content:center; position:sticky; top:0; z-index:5; }
+  .print-btn{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:#fff;
+    background:linear-gradient(135deg,var(--ink),#2a2470); border:none; padding:11px 26px;
+    border-radius:30px; cursor:pointer; box-shadow:0 6px 16px rgba(23,20,73,.25); }
+
+  @media print{
+    .print-bar{ display:none; }
+    body{ padding:10px 14px; background:#fff; }
+    .tk{ box-shadow:none; }
+  }
+</style></head>
+<body>
+  <div class="doc-header">
+    <div class="doc-eyebrow">GLAVERA III &nbsp;·&nbsp; POINT VOUCHERS</div>
+    <div class="doc-title">كل أكواد نقاط "${escapeHtml(day.label)}"</div>
+    <div class="doc-rule"></div>
+    <div class="doc-meta">
+      <span>عدد الفقرات: <b>${Object.keys(bySession).length}</b></span>
+      <span>إجمالي الأكواد: <b>${allItems.length}</b></span>
+    </div>
+  </div>
+  <div class="print-bar"><button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ الكل PDF</button></div>
+  ${sectionsHtml}
+<script>${QR_LIB_SRC}<\/script>
+<script>
+  var DATA = ${JSON.stringify(allItems)};
+  DATA.forEach(function(it, i){
+    var el = document.getElementById('qrc-'+i);
+    if(el){ new QRCode(el, {text: it.code, width:100, height:100, colorDark:'#171449', colorLight:'#ffffff'}); }
+  });
+<\/script>
+</body></html>`);
+  w.document.close();
 }
 async function doGenerateSessionPointCodes(sessionId){
   const info = SESSION_INFO[sessionId] || {};
