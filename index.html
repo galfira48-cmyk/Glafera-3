@@ -2914,6 +2914,42 @@ async function doToggleLang(){
   await saveProfileExtra(PROFILE_EXTRA);
   render();
 }
+async function doToggleSessionReminders(){
+  const extra = myExtra(state.pid);
+  extra.reminders = !extra.reminders;
+  if(extra.reminders && typeof Notification !== 'undefined' && Notification.permission==='default'){
+    try{ await Notification.requestPermission(); }catch(e){}
+  }
+  await saveProfileExtra(PROFILE_EXTRA);
+  showToast(extra.reminders ? '🔔 هيتم تذكيرك بمواعيد الفقرات لما الموقع يبقى مفتوح' : 'تم إيقاف تذكير الفقرات');
+  render();
+}
+let _remindedSessionIds = new Set();
+function checkSessionReminders(){
+  if(!state.pid) return;
+  const extra = myExtra(state.pid);
+  if(!extra.reminders) return;
+  const nowMin = nowMinutes();
+  DAYS.forEach(day=>{
+    if(day.locked) return; // بنذكّر بس بفقرات اليوم المفتوح حاليًا
+    day.sessions.forEach(s=>{
+      if(_remindedSessionIds.has(s.id)) return;
+      const info = SESSION_INFO[s.id] || {};
+      const startMin = parseArabicTime(info.timeFrom);
+      if(startMin===null) return;
+      const diff = startMin - nowMin;
+      if(diff>0 && diff<=15){
+        _remindedSessionIds.add(s.id);
+        const label = info.name || s.name;
+        showToast(`⏰ فقرة "${label}" هتبدأ بعد ${diff} دقيقة`);
+        if(typeof Notification !== 'undefined' && Notification.permission==='granted'){
+          try{ new Notification('جلافيرا 3', { body:`فقرة "${label}" هتبدأ بعد ${diff} دقيقة`, icon:'icon-192.png' }); }catch(e){}
+        }
+      }
+    });
+  });
+}
+if(typeof window !== 'undefined'){ setInterval(checkSessionReminders, 60000); }
 function logisticsOf(pid){ return LOGISTICS[pid] || (LOGISTICS[pid] = {}); }
 const KIT_ITEMS = [
   {key:'badge', ico:'🪪', lab:'Badge'},
@@ -3662,6 +3698,11 @@ function renderQuestsPage(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">التحديات</div>
     </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">🎯</div>
+      <div class="opinion-hero-title">التحديات</div>
+      <div class="opinion-hero-sub">${escapeHtml(qDay.label)} — أنجز المهام واستلم مكافآت فورية</div>
+    </div>
     <div class="section-title">تحديات ${qDay.label} <span class="sub">${ICO.target} إنجازات سريعة بمكافآت فورية</span></div>
     <div class="quest-list">${questsHtml}</div>
     <div class="section-title">إنجازات الرحلة الكاملة</div>
@@ -4196,6 +4237,11 @@ function renderGamesHub(){
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">الألعاب</div>
+    </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">🎮</div>
+      <div class="opinion-hero-title">استراحة تفاعلية</div>
+      <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
     </div>
     <div class="section-title">استراحة تفاعلية 🎮 <span class="sub">العب وأنت مستني الفقرة الجاية</span></div>
     <div class="game-hub-list">${roomsCard}${cards}</div>
@@ -4887,6 +4933,11 @@ function renderSettingsPage(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">${tr('settings_title')}</div>
     </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">⚙️</div>
+      <div class="opinion-hero-title">${tr('settings_title')}</div>
+      <div class="opinion-hero-sub">الثيم، الصوت، التذكيرات، والبيانات</div>
+    </div>
     <div class="section-title">ألوان التطبيق</div>
     <div class="card">
       <div class="hint" style="margin:0 0 12px;">اختر الثيم اللي يعجبك — الشكل بيتغير بالكامل فورًا</div>
@@ -4909,6 +4960,14 @@ function renderSettingsPage(){
     <div class="card">
       <button type="button" class="btn btn-ghost" data-action="export-pdf">${ICO.download} ${tr('settings_export_pdf')}</button>
     </div>
+    <div class="section-title">🔔 تذكير بمواعيد الفقرات</div>
+    <div class="card">
+      <div class="settings-row">
+        <span>تفعيل تذكير قبل بداية الفقرة بـ15 دقيقة</span>
+        <button type="button" class="switch ${extra.reminders?'on':''}" data-action="toggle-session-reminders"></button>
+      </div>
+      <div class="hint" style="margin-top:10px;">التذكير بيشتغل بس لما تطبيق الموقع مفتوح قدامك (مش إشعار خارجي زي واتساب)، وبيدّيك تنبيه لكل فقرة من فقرات اليوم المفتوح حاليًا قبل ميعادها بربع ساعة</div>
+    </div>
     <div class="section-title">${tr('settings_report')}</div>
     <div class="card report-box">
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${tr('settings_report_hint')}</div>
@@ -4922,6 +4981,19 @@ function renderSettingsPage(){
 function renderOpinionPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const mine = p ? OPINIONS.find(o=>o.pid===p.id) : null;
+  // نبض المؤتمر: أكتر فقرة اتذكرت كمفضلة لحد دلوقتي — بيظهر فقط لو وصل عدد كافٍ من الآراء (3+) عشان يفضل مجهول الهوية
+  let pulseHtml = '';
+  if(OPINIONS.length >= 3){
+    const favTally = {};
+    OPINIONS.forEach(o=>{ const fv=(o.favoriteSession||'').trim(); if(fv) favTally[fv]=(favTally[fv]||0)+1; });
+    const top = Object.entries(favTally).sort((a,b)=>b[1]-a[1])[0];
+    if(top){
+      pulseHtml = `<div class="card" style="margin-bottom:14px;text-align:center;">
+        <div style="font-size:11.5px;color:var(--text-muted);">🔥 نبض المؤتمر لحد دلوقتي</div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;margin-top:4px;">أكتر فقرة عجبت الحضور: ${escapeHtml(top[0])}</div>
+      </div>`;
+    }
+  }
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -4933,6 +5005,7 @@ function renderOpinionPage(){
       <div class="opinion-hero-sub">${tr('opinion_hint')}</div>
       ${mine ? `<div class="opinion-hero-edit">✏️ ${tr('opinion_edit_hint')}</div>` : ''}
     </div>
+    ${pulseHtml}
     <div class="opinion-field" style="--op-accent:#3FDCC9;">
       <div class="opinion-field-head">
         <span class="opinion-field-ico">✅</span>
@@ -5565,10 +5638,16 @@ function renderAdminDayDetail(dayId){
   </div>`;
   if(day.locked) body += `<div class="hint" style="color:var(--danger);margin-bottom:10px;">هذا اليوم مقفول بالكامل — المشاركين مش هيقدروا يسجلوا حضور في أي فقرة فيه لحد ما تفتحه</div>`;
 
+  const daySessionIds = new Set(day.sessions.map(s=>s.id));
+  const dayCodes = Object.keys(POINT_CODES).filter(c=>daySessionIds.has(POINT_CODES[c].sessionId));
+  const dayUsed = dayCodes.filter(c=>POINT_CODES[c].used).length;
+  const dayUsagePct = dayCodes.length ? Math.round((dayUsed/dayCodes.length)*100) : 0;
+
   body += `
     <div class="card" style="margin:14px 0;">
       <div class="admin-session-name" style="margin-bottom:4px;">🎟️ توليد أكواد QR لكل فقرات هذا اليوم دفعة واحدة</div>
       <div class="hint" style="margin:0 0 10px;">العدد اللي تكتبه هيتولّد لكل قيمة من الحد الأدنى للأقصى، لكل فقرة على حدة. مثال: 0-10 وعدد 40 = 40 كود لكل قيمة (440 كود لكل فقرة).</div>
+      ${dayCodes.length ? `<div class="hint" style="margin:0 0 10px;">📈 نسبة استخدام أكواد كل فقرات اليوم ده: <b>${dayUsagePct}%</b> (${dayUsed} من ${dayCodes.length})</div>` : ''}
       <div class="admin-edit-row">
         <div style="flex:1;"><label>أقل قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-min-${day.id}" placeholder="مثال: 0" /></div>
         <div style="flex:1;"><label>أعلى قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-max-${day.id}" placeholder="مثال: 10" /></div>
@@ -5625,10 +5704,14 @@ function renderAdminSessionDetail(sessionId){
     if(pc.used) denominations[pc.value].used++;
   });
   const denomKeys = Object.keys(denominations).map(Number).sort((a,b)=>a-b);
+  const totalCodes = sessionCodes.length;
+  const totalUsed = sessionCodes.filter(c=>POINT_CODES[c].used).length;
+  const usagePct = totalCodes ? Math.round((totalUsed/totalCodes)*100) : 0;
   const denomRows = denomKeys.map(v=>{
     const d = denominations[v];
+    const vPct = d.total ? Math.round((d.used/d.total)*100) : 0;
     return `<div class="admin-meta-chip" style="justify-content:space-between;width:100%;padding:9px 12px;margin-top:6px;">
-      <span>🪙 ${v} نقطة — ${d.total} كود (${d.total-d.used} متبقي)</span>
+      <span>🪙 ${v} نقطة — ${d.total} كود (${d.total-d.used} متبقي، استخدام ${vPct}%)</span>
       <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:10.5px;" data-action="print-session-point-codes" data-value="${v}" data-session="${sessionId}">🖨️ طباعة</button>
     </div>`;
   }).join('') || `<div class="hint" style="margin:6px 0 0;">لسه مفيش أكواد QR اتولدت لهذه الفقرة</div>`;
@@ -5657,6 +5740,7 @@ function renderAdminSessionDetail(sessionId){
       </div>
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-session-point-codes" data-session="${sessionId}">توليد الأكواد لهذه الفقرة</button>
       `}
+      ${totalCodes>0 ? `<div class="hint" style="margin:8px 0 0;">📈 نسبة استخدام أكواد هذه الفقرة: <b>${usagePct}%</b> (${totalUsed} من ${totalCodes})</div>` : ''}
       ${denomRows}
       ${sessionCodes.length ? `<button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;padding:7px;font-size:11.5px;color:var(--danger);" data-action="confirm-delete-session-point-codes" data-session="${sessionId}">🗑️ إزالة كل أكواد QR المتولدة لهذه الفقرة (${sessionCodes.length})</button>` : ''}
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
@@ -5949,6 +6033,11 @@ function renderAdminSettingsTab(){
         <button type="button" class="btn btn-primary" data-action="save-admin-passcode" style="flex:1;">حفظ الكود الجديد</button>
       </div>
     </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">💾 نسخة احتياطية كاملة</div>
+      <div class="hint" style="margin:2px 0 12px;">بتحمّل ملف واحد (JSON) فيه كل بيانات المؤتمر (المشاركين، النقاط، الحضور، الأكواد، الآراء، البلاغات، الصور... إلخ) على جهازك، تحسبًا لأي مشكلة. احتفظ بالملف في مكان آمن.</div>
+      <button type="button" class="btn btn-primary" style="width:100%;" data-action="export-full-backup">⬇️ تحميل نسخة احتياطية كاملة (JSON)</button>
+    </div>
   `;
 }
 
@@ -6088,11 +6177,13 @@ function renderAdminQuestionsTab(){
 function renderAdminReportsTab(){
   const rs = REPORTS.slice().sort((a,b)=>b.ts-a.ts);
   if(!rs.length) return `<div class="empty-note">🛠️ مفيش بلاغات مشاكل حاليًا</div>`;
-  return rs.map(r=>`<div class="card" style="margin-bottom:10px;">
+  const search = rs.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".report-row" placeholder="🔍 دور بالاسم أو محتوى البلاغ..." style="margin-bottom:10px;" />` : '';
+  const rows = rs.map(r=>`<div class="card report-row" style="margin-bottom:10px;" data-search="${escapeHtml((r.name+' '+r.text).toLowerCase())}">
     <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.name)} — ${timeAgoAr(r.ts)}</div>
     <div style="font-size:13.5px;margin-top:6px;line-height:1.6;">${escapeHtml(r.text)}</div>
     <button type="button" class="btn btn-ghost" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-delete-report" data-id="${r.id}">✕ حذف البلاغ</button>
   </div>`).join('');
+  return search + rows;
 }
 function renderAdminOpinionsTab(){
   if(state.viewingOpinionId){
@@ -6116,8 +6207,31 @@ function renderAdminOpinionsTab(){
   }
   const os = OPINIONS.slice().sort((a,b)=>b.ts-a.ts);
   if(!os.length) return `<div class="empty-note">📝 لسه محدش بعت رأيه</div>`;
+  // ---- ملخص سريع: أكتر الفقرات المفضلة ذكرًا، وعدد الآراء اللي فيها كل بند ----
+  const favTally = {};
+  let posCount=0, negCount=0, sugCount=0;
+  os.forEach(o=>{
+    if(o.positives && o.positives.trim()) posCount++;
+    if(o.negatives && o.negatives.trim()) negCount++;
+    if(o.suggestions && o.suggestions.trim()) sugCount++;
+    const fv = (o.favoriteSession||'').trim();
+    if(fv) favTally[fv] = (favTally[fv]||0)+1;
+  });
+  const topFav = Object.entries(favTally).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const summary = `
+    <div class="card" style="margin-bottom:14px;">
+      <div class="admin-session-name" style="margin-bottom:10px;">📊 ملخص سريع</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="admin-meta-chip">📝 ${os.length} رأي وصل</span>
+        <span class="admin-meta-chip">✅ ${posCount} كتبوا إيجابيات</span>
+        <span class="admin-meta-chip">⚠️ ${negCount} كتبوا سلبيات</span>
+        <span class="admin-meta-chip">💡 ${sugCount} كتبوا اقتراحات</span>
+      </div>
+      ${topFav.length ? `<div style="margin-top:10px;font-size:12px;color:var(--text-muted);">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : ''}
+    </div>`;
+  const search = os.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".op-admin-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" />` : '';
   const rows = os.map(o=>`
-    <button type="button" class="op-admin-row" data-action="view-opinion" data-id="${o.id}">
+    <button type="button" class="op-admin-row" data-action="view-opinion" data-id="${o.id}" data-search="${escapeHtml((o.name||'').toLowerCase())}">
       <span class="op-admin-row-avatar">${escapeHtml((o.name||'?').trim().charAt(0))}</span>
       <span class="op-admin-row-body">
         <span class="op-admin-row-name">${escapeHtml(o.name||'مجهول')}</span>
@@ -6125,7 +6239,7 @@ function renderAdminOpinionsTab(){
       </span>
       <span class="op-admin-row-chev">${ICO.chev}</span>
     </button>`).join('');
-  return `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">${os.length} مشارك بعت رأيه — دوس على أي اسم عشان تقرا رأيه بالتفصيل</div>${rows}`;
+  return summary + search + rows;
 }
 function renderAdminTrashTab(){
   if(!TRASH.length) return `<div class="empty-note">🗑️ سلة المهملات فاضية</div>`;
@@ -6198,7 +6312,7 @@ function renderAdminParticipantsTab(){
   const justAdded = PARTICIPANTS.find(p=>p.id===state.justAddedParticipantId);
   const tiles = PARTICIPANTS.map(p=>{
     const team = teamOf(p.teamId);
-    return `<div class="admin-participant-tile" data-action="edit-participant" data-pid="${p.id}">
+    return `<div class="admin-participant-tile" data-action="edit-participant" data-pid="${p.id}" data-search="${escapeHtml((p.name+' '+p.id).toLowerCase())}">
       <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
       <span class="pt-name">${escapeHtml(p.name)}</span>
       <span class="pt-code">#${escapeHtml(p.id)}</span>
@@ -6216,7 +6330,8 @@ function renderAdminParticipantsTab(){
   return `
     ${justAddedCard}
     <button type="button" class="btn btn-primary" style="margin-bottom:14px;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
-    <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته</div>
+    <input type="text" class="field admin-search-input" data-filter-target=".admin-participant-tile" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />
+    <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته — عددهم: ${PARTICIPANTS.length}</div>
     <div class="admin-participant-grid">${tiles}</div>
     <button type="button" class="btn btn-outline" style="margin-top:16px;width:100%;" data-action="download-all-qr">⬇️ تحميل كل أكواد QR الخاصة بالمشاركين</button>
     <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="export-participants-xlsx">📊 تصدير تقرير Excel (الأسماء، الفرق، النقاط، الحضور)</button>
@@ -7791,11 +7906,13 @@ document.addEventListener('click', (e)=>{
   }
   else if(action==='toggle-theme'){ doToggleTheme(); }
   else if(action==='toggle-lang'){ doToggleLang(); }
+  else if(action==='toggle-session-reminders'){ doToggleSessionReminders(); }
   else if(action==='toggle-music'){ doToggleMusic(); }
   else if(action==='submit-wall-post'){ doSubmitWallPost(); }
   else if(action==='admin-delete-wall-post'){ confirmAdminDeleteWallPost(el.dataset.id); }
   else if(action==='submit-report'){ doSubmitReport(); }
   else if(action==='submit-opinion'){ doSubmitOpinion(); }
+  else if(action==='export-full-backup'){ doExportFullBackup(); }
   else if(action==='submit-question'){ doSubmitQuestion(el.dataset.session); }
   else if(action==='admin-toggle-ask'){ doAdminToggleAsk(el.dataset.session); }
   else if(action==='admin-toggle-points-enabled'){ doAdminTogglePointsEnabled(el.dataset.session); }
@@ -7820,6 +7937,17 @@ document.addEventListener('change', (e)=>{
   }
 });
 document.addEventListener('input', (e)=>{
+  if(e.target.classList && e.target.classList.contains('admin-search-input')){
+    const q = e.target.value.trim().toLowerCase();
+    const sel = e.target.dataset.filterTarget;
+    if(sel){
+      document.querySelectorAll(sel).forEach(item=>{
+        const hay = (item.dataset.search||'').toLowerCase();
+        item.style.display = (!q || hay.includes(q)) ? '' : 'none';
+      });
+    }
+    return;
+  }
   if(e.target.id==='music-volume-slider'){
     doSetMusicVolume(e.target.value);
     const labelRow = e.target.previousElementSibling;
@@ -9943,6 +10071,41 @@ async function doAdminTogglePointsEnabled(sessionId){
   render();
 }
 
+async function doExportFullBackup(){
+  showToast('بيتم تجهيز النسخة الاحتياطية...');
+  try{
+    const galleryPhotos = {};
+    const allPids = new Set();
+    GALLERY_ALBUMS.forEach(a=>(a.photoIds||[]).forEach(pid=>allPids.add(pid)));
+    allPids.forEach(pid=>{ if(GALLERY_PHOTO_CACHE[pid]) galleryPhotos[pid] = GALLERY_PHOTO_CACHE[pid]; });
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      app: 'glavera3',
+      version: 1,
+      data: {
+        CHECKINS, SESSION_INFO, PROFILE_EXTRA, CHEERS, BONUS, GIFT_POINTS,
+        GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
+        POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES,
+        SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS,
+        CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos
+      }
+    };
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], { type:'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `glavera3-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    showToast('✅ اتحمّلت النسخة الاحتياطية');
+  }catch(e){
+    console.error('backup export failed', e);
+    showToast('⚠️ حصلت مشكلة في تجهيز النسخة الاحتياطية', true);
+  }
+}
 function doExportResults(){
   const rows = [['الترتيب','الاسم','الكود','الفريق','مجموع النقاط']];
   rankedParticipants().forEach((p,i)=>{
