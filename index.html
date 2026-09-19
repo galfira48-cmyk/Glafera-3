@@ -1648,6 +1648,26 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .nav-tile{ position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:flex-start; gap:8px;
     padding:16px 14px; border-radius:18px; background:linear-gradient(160deg,var(--surface),var(--surface-2));
     border:1px solid var(--border); text-align:right; transition:transform .2s cubic-bezier(.22,.9,.28,1), border-color .3s ease; }
+
+  /* ---------- capabilities page (glass squares grid) ---------- */
+  .cap-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px; }
+  .cap-tile{ position:relative; aspect-ratio:1/1; border-radius:22px; overflow:hidden; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:0 8px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+    transition:transform .18s cubic-bezier(.22,.9,.28,1), border-color .25s ease, box-shadow .25s ease; }
+  .cap-tile::before{ content:""; position:absolute; inset:0; opacity:.16; background:var(--cap-color, linear-gradient(145deg,#3FDCC9,#845EC2)); z-index:0; }
+  .cap-tile::after{ content:""; position:absolute; top:-40%; left:-20%; width:70%; height:70%; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.22), transparent 70%); pointer-events:none; z-index:0; }
+  .cap-tile:active{ transform:scale(.95); }
+  .cap-tile-ico{ position:relative; z-index:1; width:50px; height:50px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:24px; background:var(--cap-color, linear-gradient(145deg,#3FDCC9,#845EC2));
+    box-shadow:0 8px 18px rgba(0,0,0,.28); }
+  .cap-tile-lab{ position:relative; z-index:1; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#fff; line-height:1.3; }
+  .cap-tile-sub{ position:relative; z-index:1; font-size:10.5px; color:rgba(255,255,255,.68); line-height:1.4; }
+
   .nav-tile:active{ transform:scale(.96); }
   .nav-tile:active .nt-ico{ animation:iconWobble .45s ease; }
   @keyframes iconWobble{ 0%,100%{ transform:rotate(0) scale(1);} 25%{ transform:rotate(-12deg) scale(1.08);} 50%{ transform:rotate(10deg) scale(1.08);} 75%{ transform:rotate(-6deg) scale(1.04);} }
@@ -3331,6 +3351,28 @@ function renderNavTiles(){
     </button>`).join('');
   return `<div class="nav-tile-grid">${items}</div>`;
 }
+/* ============================= RENDER: CAPABILITIES (ALL FEATURES) PAGE ============================= */
+function renderCapabilitiesPage(){
+  const all = [...NAV_TILE_ITEMS, ...NAV_DOCK_ITEMS];
+  const tiles = all.map(it=>{
+    const bg = (!it.color || it.color==='transparent') ? 'linear-gradient(145deg,#FFB86B,#FF6B9D)' : it.color;
+    const sub = it.subKey ? tr(it.subKey) : '';
+    return `
+    <button type="button" class="cap-tile" style="--cap-color:${bg}" data-action="tile-nav" data-page="${it.page}">
+      <span class="cap-tile-ico">${it.icon}</span>
+      <span class="cap-tile-lab">${tr(it.labelKey)}</span>
+      ${sub ? `<span class="cap-tile-sub">${sub}</span>` : ''}
+    </button>`;
+  }).join('');
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${tr('conf_capabilities_title')}</div>
+    </div>
+    <div class="hint" style="margin:0 0 14px;">${tr('conf_capabilities_sub')}</div>
+    <div class="cap-grid">${tiles}</div>
+  `;
+}
 function renderProNavList(){
   const mainItems = [...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS];
   const rows = mainItems.map((it,i)=>`
@@ -3527,10 +3569,9 @@ function renderProfile(){
 
     <div class="section-title">${tr('conf_capabilities_title')} <span class="sub">${tr('conf_capabilities_sub')}</span></div>
     <div class="radial-launcher">
-      <button type="button" class="radial-fab ${state.radialMenuOpen?'is-open':''}" data-action="toggle-radial-menu" aria-label="${tr('conf_capabilities_title')}">
+      <button type="button" class="radial-fab" data-action="tile-nav" data-page="capabilities" aria-label="${tr('conf_capabilities_title')}">
         <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
       </button>
-      ${state.radialMenuOpen ? renderRadialMenu() : ''}
     </div>
 
     <div class="brand-signature">te-epistoly</div>
@@ -6457,6 +6498,7 @@ function render(){
   else if(state.view==='share') html = renderSharePage();
   else if(state.view==='wall') html = renderWallPage();
   else if(state.view==='opinion') html = renderOpinionPage();
+  else if(state.view==='capabilities') html = renderCapabilitiesPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
