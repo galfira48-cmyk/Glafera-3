@@ -1936,6 +1936,57 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     padding:12px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:13.5px; resize:vertical; outline:none;}
   .report-box textarea:focus{border-color:var(--danger);}
 
+  /* ---------- opinion / feedback page ---------- */
+  .opinion-hero{position:relative; overflow:hidden; border-radius:20px; padding:22px 18px;
+    background:linear-gradient(150deg,#241D4A,#3A2E6E 55%,#241D4A); border:1px solid rgba(255,255,255,.08);
+    text-align:center; margin-bottom:16px;}
+  .opinion-hero::before{content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 20% 0%, rgba(63,220,201,.16), transparent 55%),
+               radial-gradient(circle at 85% 100%, rgba(155,140,255,.16), transparent 55%);}
+  .opinion-hero-ico{position:relative; z-index:1; width:52px; height:52px; margin:0 auto 10px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:linear-gradient(145deg,#3FDCC9,#845EC2); box-shadow:0 8px 20px rgba(63,220,201,.28);}
+  .opinion-hero-title{position:relative; z-index:1; font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#fff;}
+  .opinion-hero-sub{position:relative; z-index:1; font-size:12.5px; color:rgba(255,255,255,.72); margin-top:6px; line-height:1.6;}
+  .opinion-hero-edit{position:relative; z-index:1; display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+    font-size:11px; font-weight:800; color:#1a1633; background:var(--gold, #F4B740); border-radius:20px; padding:5px 12px;}
+
+  .opinion-field{border-radius:18px; padding:16px; margin-bottom:12px; background:var(--surface);
+    border:1.5px solid var(--border); border-inline-start:4px solid var(--op-accent, var(--teal));
+    transition:border-color .2s ease;}
+  .opinion-field:focus-within{border-color:var(--op-accent, var(--teal));}
+  .opinion-field-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .opinion-field-ico{width:34px; height:34px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-size:16px; background:rgba(63,220,201,.16); background:color-mix(in srgb, var(--op-accent, var(--teal)) 18%, transparent);}
+  .opinion-field-lab{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--text);}
+  .opinion-field textarea, .opinion-field input[type="text"]{width:100%; background:var(--bg-2); border:1.5px solid var(--border);
+    border-radius:13px; padding:12px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:13.5px;
+    resize:vertical; outline:none; box-sizing:border-box; transition:border-color .2s ease, box-shadow .2s ease;}
+  .opinion-field textarea{min-height:84px;}
+  .opinion-field textarea:focus, .opinion-field input[type="text"]:focus{
+    border-color:var(--op-accent, var(--teal)); box-shadow:0 0 0 3px rgba(63,220,201,.18);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--op-accent, var(--teal)) 18%, transparent);}
+  .opinion-send-btn{width:100%; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px;}
+
+  /* ---------- admin: opinions list + detail ---------- */
+  .op-admin-row{width:100%; display:flex; align-items:center; gap:12px; padding:13px 14px; margin-bottom:9px;
+    background:var(--surface); border:1px solid var(--border); border-radius:15px; cursor:pointer; text-align:right;
+    font-family:'Tajawal',sans-serif; transition:border-color .2s ease, transform .15s ease;}
+  .op-admin-row:active{transform:scale(.98);}
+  .op-admin-row-avatar{width:38px; height:38px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:14px; color:#1a1633;
+    background:linear-gradient(145deg,#3FDCC9,#845EC2);}
+  .op-admin-row-body{flex:1; min-width:0;}
+  .op-admin-row-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--text);}
+  .op-admin-row-time{font-size:10.5px; color:var(--text-muted); margin-top:2px;}
+  .op-admin-row-chev{flex:none; color:var(--text-muted); transform:scaleX(-1);}
+  .op-admin-back-link{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:800; color:var(--teal);
+    margin-bottom:14px; cursor:pointer;}
+  .op-admin-detail-field{border-radius:16px; padding:14px; margin-bottom:10px; background:var(--surface);
+    border:1.5px solid var(--border); border-inline-start:4px solid var(--op-accent, var(--teal));}
+  .op-admin-detail-lab{font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:var(--op-accent, var(--teal)); margin-bottom:6px;}
+  .op-admin-detail-val{font-size:13.5px; line-height:1.7; color:var(--text); white-space:pre-wrap;}
+
   /* ---------- photo crop modal ---------- */
   .crop-modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.72); backdrop-filter:blur(4px);
     display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px; }
@@ -4834,27 +4885,41 @@ function renderOpinionPage(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">${tr('opinion_title')}</div>
     </div>
-    <div class="card" style="margin-bottom:14px;">
-      <div class="hint" style="margin:0;">${tr('opinion_hint')}</div>
-      ${mine ? `<div class="hint" style="margin:8px 0 0;color:var(--gold, #F4B740);">${tr('opinion_edit_hint')}</div>` : ''}
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">📝</div>
+      <div class="opinion-hero-title">${tr('opinion_title')}</div>
+      <div class="opinion-hero-sub">${tr('opinion_hint')}</div>
+      ${mine ? `<div class="opinion-hero-edit">✏️ ${tr('opinion_edit_hint')}</div>` : ''}
     </div>
-    <div class="card" style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_positives_label')}</label>
+    <div class="opinion-field" style="--op-accent:#3FDCC9;">
+      <div class="opinion-field-head">
+        <span class="opinion-field-ico">✅</span>
+        <span class="opinion-field-lab">${tr('opinion_positives_label').replace('✅ ','')}</span>
+      </div>
       <textarea id="opinion-positives" placeholder="${tr('opinion_positives_ph')}">${mine?escapeHtml(mine.positives||''):''}</textarea>
     </div>
-    <div class="card" style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_negatives_label')}</label>
+    <div class="opinion-field" style="--op-accent:#FF7A59;">
+      <div class="opinion-field-head">
+        <span class="opinion-field-ico">⚠️</span>
+        <span class="opinion-field-lab">${tr('opinion_negatives_label').replace('⚠️ ','')}</span>
+      </div>
       <textarea id="opinion-negatives" placeholder="${tr('opinion_negatives_ph')}">${mine?escapeHtml(mine.negatives||''):''}</textarea>
     </div>
-    <div class="card" style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_suggestions_label')}</label>
+    <div class="opinion-field" style="--op-accent:#F4B740;">
+      <div class="opinion-field-head">
+        <span class="opinion-field-ico">💡</span>
+        <span class="opinion-field-lab">${tr('opinion_suggestions_label').replace('💡 ','')}</span>
+      </div>
       <textarea id="opinion-suggestions" placeholder="${tr('opinion_suggestions_ph')}">${mine?escapeHtml(mine.suggestions||''):''}</textarea>
     </div>
-    <div class="card" style="margin-bottom:16px;">
-      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_favorite_label')}</label>
-      <input type="text" class="field" id="opinion-favorite" placeholder="${tr('opinion_favorite_ph')}" value="${mine?escapeHtml(mine.favoriteSession||''):''}" />
+    <div class="opinion-field" style="--op-accent:#9B8CFF;">
+      <div class="opinion-field-head">
+        <span class="opinion-field-ico">⭐</span>
+        <span class="opinion-field-lab">${tr('opinion_favorite_label').replace('⭐ ','')}</span>
+      </div>
+      <input type="text" id="opinion-favorite" placeholder="${tr('opinion_favorite_ph')}" value="${mine?escapeHtml(mine.favoriteSession||''):''}" />
     </div>
-    <button type="button" class="btn btn-primary" style="width:100%;" data-action="submit-opinion">${tr('opinion_send')}</button>
+    <button type="button" class="btn btn-primary opinion-send-btn" data-action="submit-opinion">📨 ${tr('opinion_send')}</button>
   `;
 }
 
@@ -5955,6 +6020,11 @@ function renderAdmin(){
       const p = PARTICIPANTS.find(x=>x.id===state.editingParticipantId);
       if(p) pageTitle = p.name;
     }
+  } else if(tab==='opinions'){
+    if(state.viewingOpinionId){
+      const o = OPINIONS.find(x=>x.id===state.viewingOpinionId);
+      if(o) pageTitle = o.name;
+    }
   }
   return `
     <div class="back-row">
@@ -5983,17 +6053,37 @@ function renderAdminReportsTab(){
   </div>`).join('');
 }
 function renderAdminOpinionsTab(){
+  if(state.viewingOpinionId){
+    const o = OPINIONS.find(x=>x.id===state.viewingOpinionId);
+    if(!o){ state.viewingOpinionId = null; }
+    else {
+      const field = (accent, lab, val)=> val ? `<div class="op-admin-detail-field" style="--op-accent:${accent};">
+        <div class="op-admin-detail-lab">${lab}</div>
+        <div class="op-admin-detail-val">${escapeHtml(val)}</div>
+      </div>` : '';
+      return `
+        <div class="op-admin-back-link" data-action="admin-opinions-back">${ICO.back} رجوع لقائمة الآراء</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">بعت رأيه ${timeAgoAr(o.ts)}</div>
+        ${field('#3FDCC9','✅ الإيجابيات', o.positives)}
+        ${field('#FF7A59','⚠️ السلبيات', o.negatives)}
+        ${field('#F4B740','💡 اقتراحات', o.suggestions)}
+        ${field('#9B8CFF','⭐ أكتر فقرة عجبته', o.favoriteSession)}
+        <button type="button" class="btn btn-ghost" style="margin-top:6px;width:100%;color:var(--danger);" data-action="admin-delete-opinion" data-id="${o.id}">✕ حذف هذا الرأي</button>
+      `;
+    }
+  }
   const os = OPINIONS.slice().sort((a,b)=>b.ts-a.ts);
   if(!os.length) return `<div class="empty-note">📝 لسه محدش بعت رأيه</div>`;
-  const row = (label, val)=> val ? `<div style="margin-top:8px;"><div style="font-size:11px;font-weight:800;color:var(--text-muted);">${label}</div><div style="font-size:13.5px;margin-top:2px;line-height:1.6;">${escapeHtml(val)}</div></div>` : '';
-  return os.map(o=>`<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(o.name)} — ${timeAgoAr(o.ts)}</div>
-    ${row('✅ الإيجابيات', o.positives)}
-    ${row('⚠️ السلبيات', o.negatives)}
-    ${row('💡 اقتراحات', o.suggestions)}
-    ${row('⭐ أكتر فقرة عجبته', o.favoriteSession)}
-    <button type="button" class="btn btn-ghost" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-delete-opinion" data-id="${o.id}">✕ حذف الرأي</button>
-  </div>`).join('');
+  const rows = os.map(o=>`
+    <button type="button" class="op-admin-row" data-action="view-opinion" data-id="${o.id}">
+      <span class="op-admin-row-avatar">${escapeHtml((o.name||'?').trim().charAt(0))}</span>
+      <span class="op-admin-row-body">
+        <span class="op-admin-row-name">${escapeHtml(o.name||'مجهول')}</span>
+        <span class="op-admin-row-time">${timeAgoAr(o.ts)}</span>
+      </span>
+      <span class="op-admin-row-chev">${ICO.chev}</span>
+    </button>`).join('');
+  return `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">${os.length} مشارك بعت رأيه — دوس على أي اسم عشان تقرا رأيه بالتفصيل</div>${rows}`;
 }
 function renderAdminTrashTab(){
   if(!TRASH.length) return `<div class="empty-note">🗑️ سلة المهملات فاضية</div>`;
@@ -7512,11 +7602,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='submit-fallback-code'){ doFallbackSubmit(); }
   else if(action==='reset-demo'){ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }
   else if(action==='submit-admin-pass'){ doAdminUnlock(); }
-  else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; render(); }
-  else if(action==='admin-hub-tile'){ state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; render(); }
+  else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; state.viewingOpinionId = null; render(); }
+  else if(action==='admin-hub-tile'){ state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
-  else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; render(); }
+  else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
   else if(action==='edit-participant'){ state.editingParticipantId = el.dataset.pid; render(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
   else if(action==='close-add-participant'){ state.addingParticipant = false; render(); }
@@ -7669,6 +7759,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-mark-question-answered'){ doAdminMarkQuestionAnswered(el.dataset.id); }
   else if(action==='admin-delete-report'){ confirmAdminDeleteReport(el.dataset.id); }
   else if(action==='admin-delete-opinion'){ confirmAdminDeleteOpinion(el.dataset.id); }
+  else if(action==='view-opinion'){ state.viewingOpinionId = el.dataset.id; render(); }
+  else if(action==='admin-opinions-back'){ state.viewingOpinionId = null; render(); }
   else if(action==='restore-trash-item'){ confirmRestoreTrashItem(el.dataset.id); }
   else if(action==='perma-delete-trash-item'){ confirmPermaDeleteTrashItem(el.dataset.id); }
   else if(action==='empty-trash'){ confirmEmptyTrash(); }
