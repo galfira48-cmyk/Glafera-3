@@ -2143,16 +2143,17 @@ window.storage = {
       return { key, value: snap.val(), shared: !!shared };
     }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.get error', key, e); return null; }
   },
-  async set(key, value, shared){
+  async set(key, value, shared, timeoutMs){
     if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
+    const useTimeout = timeoutMs || _FB_TIMEOUT_MS;
     try{
       const TIMED_OUT = Symbol('timeout');
-      const result = await _fbWithTimeout(
+      const result = await Promise.race([
         _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).set(value).then(()=> 'done'),
-        TIMED_OUT
-      );
+        new Promise((resolve)=> setTimeout(()=> resolve(TIMED_OUT), useTimeout))
+      ]);
       if(result === TIMED_OUT){
-        _fbLastError = 'انتهت المهلة (15 ثانية) قبل تأكيد الحفظ — الاتصال بسيرفر Firebase بطيء جدًا أو محجوب';
+        _fbLastError = `انتهت المهلة (${Math.round(useTimeout/1000)} ثانية) قبل تأكيد الحفظ — الاتصال بسيرفر Firebase بطيء جدًا أو محجوب`;
         console.error('storage.set timed out (network too slow) — NOT confirmed saved', key);
         return null;
       }
@@ -2409,6 +2410,15 @@ async function loadReports(){
 async function saveReports(obj){
   try{ await window.storage.set('glavera-reports', JSON.stringify(obj), true); }catch(e){}
 }
+async function loadOpinions(){
+  try{
+    const r = await window.storage.get('glavera-opinions', true);
+    return r ? JSON.parse(r.value) : [];
+  }catch(e){ return []; }
+}
+async function saveOpinions(obj){
+  try{ await window.storage.set('glavera-opinions', JSON.stringify(obj), true); }catch(e){}
+}
 /* ---- gallery albums (admin-managed slots, each holding multiple photos) ---- */
 const GALLERY_DEFAULT_COUNT = 7;
 const GALLERY_PHOTO_CACHE = {};
@@ -2438,7 +2448,8 @@ async function saveGalleryAlbumsWithRetry(arr, attempt){
 async function saveGalleryPhoto(photoId, dataUrl, attempt){
   attempt = attempt || 1;
   try{
-    await window.storage.set('glavera-gallery-photo-'+photoId, dataUrl, true);
+    const r = await window.storage.set('glavera-gallery-photo-'+photoId, dataUrl, true, 45000); // مهلة أطول (45 ثانية) لأن الصور أكبر بكتير من باقي البيانات، خصوصًا على نت ضعيف
+    if(!r) throw new Error(_fbLastError||'save failed');
     return true;
   }catch(e){
     console.error('saveGalleryPhoto failed (attempt '+attempt+'):', e);
@@ -2681,6 +2692,7 @@ let POINT_CODES = {};
 let WALL_POSTS = [];
 let QUESTIONS = [];
 let REPORTS = [];
+let OPINIONS = [];
 let DAY_OVERRIDES = {};
 let SESSION_OVERRIDES = {};
 let CUSTOM_SESSIONS = {};
@@ -2706,6 +2718,14 @@ const TRANSLATIONS = {
     nav_journey:'رحلة الأيام', nav_journey_sub:'الأجندة وفقراتك يوم بيوم',
     nav_quests:'التحديات', nav_quests_sub:'مهام يومية بمكافآت فورية',
     nav_wall:'حائط جلافيرا 3', nav_wall_sub:'شارك رأيك عن المؤتمر',
+    nav_opinion:'رأيك', nav_opinion_sub:'إيجابيات، سلبيات، واقتراحاتك',
+    opinion_title:'رأيك', opinion_hint:'رأيك بيهمنا فعلاً — اكتب اللي حابب تقوله وهيوصل للمنظمين مباشرة',
+    opinion_positives_label:'✅ الإيجابيات', opinion_positives_ph:'إيه اللي عجبك في المؤتمر؟',
+    opinion_negatives_label:'⚠️ السلبيات', opinion_negatives_ph:'إيه اللي ممكن يتحسن؟',
+    opinion_suggestions_label:'💡 اقتراحاتك', opinion_suggestions_ph:'عندك اقتراح نطبقه المرة الجاية؟',
+    opinion_favorite_label:'⭐ أكتر فقرة عجبتك', opinion_favorite_ph:'اكتب اسم الفقرة اللي عجبتك أكتر',
+    opinion_send:'إرسال رأيك', opinion_sent_toast:'وصلنا رأيك، شكرًا ليك 🙏', opinion_empty_err:'اكتب حاجة في خانة واحدة على الأقل',
+    opinion_edit_hint:'ده رأيك اللي بعتّه قبل كده — تقدر تعدّله وتبعته تاني',
     nav_pass:'بطاقتي الرقمية', nav_pass_sub:'كود QR الخاص بك للتحقق',
     nav_certificate:'الشهادة', nav_certificate_sub:'حمّل شهادة مشاركتك',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
@@ -2753,6 +2773,14 @@ const TRANSLATIONS = {
     nav_journey:'Day by Day', nav_journey_sub:'Agenda and your sessions, day by day',
     nav_quests:'Quests', nav_quests_sub:'Daily tasks with instant rewards',
     nav_wall:'Glavera 3 Wall', nav_wall_sub:'Share your thoughts about the conference',
+    nav_opinion:'Feedback', nav_opinion_sub:'Positives, negatives, and your suggestions',
+    opinion_title:'Feedback', opinion_hint:'Your feedback matters to us — write what you\u2019d like to say and it goes straight to the organizers',
+    opinion_positives_label:'✅ Positives', opinion_positives_ph:'What did you like about the conference?',
+    opinion_negatives_label:'⚠️ Negatives', opinion_negatives_ph:'What could be improved?',
+    opinion_suggestions_label:'💡 Suggestions', opinion_suggestions_ph:'Any suggestion for next time?',
+    opinion_favorite_label:'⭐ Favorite session', opinion_favorite_ph:'Which session did you like the most?',
+    opinion_send:'Send Feedback', opinion_sent_toast:'Thanks, we got your feedback 🙏', opinion_empty_err:'Write something in at least one field',
+    opinion_edit_hint:'This is the feedback you sent before — you can edit and resend it',
     nav_pass:'My Digital Pass', nav_pass_sub:'Your verification QR code',
     nav_certificate:'Certificate', nav_certificate_sub:'Download your participation certificate',
     nav_settings:'Settings', nav_settings_sub:'Identity, sound, and export',
@@ -3227,6 +3255,7 @@ const NAV_TILE_ITEMS = [
   {page:'gallery', icon:ICO.gallery, labelKey:'nav_gallery', subKey:'nav_gallery_sub', color:'transparent'},
   {page:'games',   icon:'🎮', labelKey:'nav_games',   subKey:'nav_games_sub',   color:'linear-gradient(145deg,#FF6B9D,#845EC2)'},
   {page:'wall',    icon:'💬', labelKey:'nav_wall',    subKey:'nav_wall_sub',    color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
+  {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {page:'pass',    icon:'🪪', labelKey:'nav_pass',    subKey:'nav_pass_sub',    color:'linear-gradient(145deg,#FFDE94,#3FDCC9)'},
   {page:'certificate',icon:'🎓', labelKey:'nav_certificate', subKey:'nav_certificate_sub', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'},
   {page:'settings',icon:'⚙️', labelKey:'nav_settings', subKey:'nav_settings_sub', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
@@ -4796,6 +4825,39 @@ function renderSettingsPage(){
   `;
 }
 
+/* ============================= RENDER: OPINION (FEEDBACK) PAGE ============================= */
+function renderOpinionPage(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  const mine = p ? OPINIONS.find(o=>o.pid===p.id) : null;
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${tr('opinion_title')}</div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="hint" style="margin:0;">${tr('opinion_hint')}</div>
+      ${mine ? `<div class="hint" style="margin:8px 0 0;color:var(--gold, #F4B740);">${tr('opinion_edit_hint')}</div>` : ''}
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_positives_label')}</label>
+      <textarea id="opinion-positives" placeholder="${tr('opinion_positives_ph')}">${mine?escapeHtml(mine.positives||''):''}</textarea>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_negatives_label')}</label>
+      <textarea id="opinion-negatives" placeholder="${tr('opinion_negatives_ph')}">${mine?escapeHtml(mine.negatives||''):''}</textarea>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_suggestions_label')}</label>
+      <textarea id="opinion-suggestions" placeholder="${tr('opinion_suggestions_ph')}">${mine?escapeHtml(mine.suggestions||''):''}</textarea>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <label style="display:block;font-size:13px;font-weight:800;margin-bottom:8px;">${tr('opinion_favorite_label')}</label>
+      <input type="text" class="field" id="opinion-favorite" placeholder="${tr('opinion_favorite_ph')}" value="${mine?escapeHtml(mine.favoriteSession||''):''}" />
+    </div>
+    <button type="button" class="btn btn-primary" style="width:100%;" data-action="submit-opinion">${tr('opinion_send')}</button>
+  `;
+}
+
 /* ============================= RENDER: DIGITAL PASS PAGE ============================= */
 function renderPassPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -5833,6 +5895,7 @@ const ADMIN_HUB_ITEMS = [
   {tab:'audit',      icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
   {tab:'analytics',  icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
   {tab:'questions',  icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
+  {tab:'opinions',   icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {tab:'reports',    icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {tab:'trash',      icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
@@ -5873,6 +5936,7 @@ function renderAdmin(){
   else if(tab==='teams') body = renderAdminTeamsTab();
   else if(tab==='alerts') body = renderAdminAlertsTab();
   else if(tab==='questions') body = renderAdminQuestionsTab();
+  else if(tab==='opinions') body = renderAdminOpinionsTab();
   else if(tab==='reports') body = renderAdminReportsTab();
   else if(tab==='trash') body = renderAdminTrashTab();
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
@@ -5916,6 +5980,19 @@ function renderAdminReportsTab(){
     <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.name)} — ${timeAgoAr(r.ts)}</div>
     <div style="font-size:13.5px;margin-top:6px;line-height:1.6;">${escapeHtml(r.text)}</div>
     <button type="button" class="btn btn-ghost" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-delete-report" data-id="${r.id}">✕ حذف البلاغ</button>
+  </div>`).join('');
+}
+function renderAdminOpinionsTab(){
+  const os = OPINIONS.slice().sort((a,b)=>b.ts-a.ts);
+  if(!os.length) return `<div class="empty-note">📝 لسه محدش بعت رأيه</div>`;
+  const row = (label, val)=> val ? `<div style="margin-top:8px;"><div style="font-size:11px;font-weight:800;color:var(--text-muted);">${label}</div><div style="font-size:13.5px;margin-top:2px;line-height:1.6;">${escapeHtml(val)}</div></div>` : '';
+  return os.map(o=>`<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(o.name)} — ${timeAgoAr(o.ts)}</div>
+    ${row('✅ الإيجابيات', o.positives)}
+    ${row('⚠️ السلبيات', o.negatives)}
+    ${row('💡 اقتراحات', o.suggestions)}
+    ${row('⭐ أكتر فقرة عجبته', o.favoriteSession)}
+    <button type="button" class="btn btn-ghost" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-delete-opinion" data-id="${o.id}">✕ حذف الرأي</button>
   </div>`).join('');
 }
 function renderAdminTrashTab(){
@@ -6287,6 +6364,7 @@ function render(){
   else if(state.view==='dna') html = renderDnaPage();
   else if(state.view==='share') html = renderSharePage();
   else if(state.view==='wall') html = renderWallPage();
+  else if(state.view==='opinion') html = renderOpinionPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
@@ -7247,7 +7325,7 @@ async function addToTrash(type, label, data){
   if(TRASH.length>200) TRASH = TRASH.slice(0,200);
   await saveTrash(TRASH);
 }
-const TRASH_TYPE_LABELS = { participant:'مشارك', session:'فقرة', wall_post:'رأي على الحائط', report:'بلاغ' };
+const TRASH_TYPE_LABELS = { participant:'مشارك', session:'فقرة', wall_post:'رأي على الحائط', report:'بلاغ', opinion:'رأي (استبيان)' };
 async function doRestoreTrashItem(trashId){
   const idx = TRASH.findIndex(t=>t.id===trashId);
   if(idx<0) return;
@@ -7268,6 +7346,9 @@ async function doRestoreTrashItem(trashId){
   } else if(item.type==='report'){
     if(!REPORTS.some(r=>r.id===item.data.id)) REPORTS.push(item.data);
     await saveReports(REPORTS);
+  } else if(item.type==='opinion'){
+    if(!OPINIONS.some(o=>o.id===item.data.id)) OPINIONS.push(item.data);
+    await saveOpinions(OPINIONS);
   }
   TRASH.splice(idx,1);
   await saveTrash(TRASH);
@@ -7580,12 +7661,14 @@ document.addEventListener('click', (e)=>{
   else if(action==='submit-wall-post'){ doSubmitWallPost(); }
   else if(action==='admin-delete-wall-post'){ confirmAdminDeleteWallPost(el.dataset.id); }
   else if(action==='submit-report'){ doSubmitReport(); }
+  else if(action==='submit-opinion'){ doSubmitOpinion(); }
   else if(action==='submit-question'){ doSubmitQuestion(el.dataset.session); }
   else if(action==='admin-toggle-ask'){ doAdminToggleAsk(el.dataset.session); }
   else if(action==='admin-toggle-points-enabled'){ doAdminTogglePointsEnabled(el.dataset.session); }
   else if(action==='remove-session-logo'){ confirmRemoveSessionLogo(el.dataset.session); }
   else if(action==='admin-mark-question-answered'){ doAdminMarkQuestionAnswered(el.dataset.id); }
   else if(action==='admin-delete-report'){ confirmAdminDeleteReport(el.dataset.id); }
+  else if(action==='admin-delete-opinion'){ confirmAdminDeleteOpinion(el.dataset.id); }
   else if(action==='restore-trash-item'){ confirmRestoreTrashItem(el.dataset.id); }
   else if(action==='perma-delete-trash-item'){ confirmPermaDeleteTrashItem(el.dataset.id); }
   else if(action==='empty-trash'){ confirmEmptyTrash(); }
@@ -7965,6 +8048,17 @@ async function doAdminDeleteReport(id){
   showToast('تم نقل البلاغ لسلة المهملات');
   render();
 }
+function confirmAdminDeleteOpinion(id){
+  showConfirmDialog('حذف هذا الرأي؟', ()=>doAdminDeleteOpinion(id));
+}
+async function doAdminDeleteOpinion(id){
+  const o = OPINIONS.find(x=>x.id===id);
+  if(o) await addToTrash('opinion', (o.name?o.name+': ':'')+(o.positives||o.negatives||o.suggestions||''), Object.assign({}, o));
+  OPINIONS = OPINIONS.filter(x=>x.id!==id);
+  await saveOpinions(OPINIONS);
+  showToast('تم نقل الرأي لسلة المهملات');
+  render();
+}
 async function doSubmitQuestion(sessionId){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   if(!p) return;
@@ -7977,6 +8071,27 @@ async function doSubmitQuestion(sessionId){
   await saveQuestions(QUESTIONS);
   if(ta) ta.value = '';
   showToast('اتبعت سؤالك للمتحدث ✋');
+  render();
+}
+async function doSubmitOpinion(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p) return;
+  const positives = (document.getElementById('opinion-positives')||{}).value || '';
+  const negatives = (document.getElementById('opinion-negatives')||{}).value || '';
+  const suggestions = (document.getElementById('opinion-suggestions')||{}).value || '';
+  const favoriteSession = (document.getElementById('opinion-favorite')||{}).value || '';
+  if(![positives, negatives, suggestions, favoriteSession].some(v=>v.trim())){
+    showToast(tr('opinion_empty_err'), true);
+    return;
+  }
+  const existing = OPINIONS.find(o=>o.pid===p.id);
+  if(existing){
+    Object.assign(existing, { name:p.name, positives:positives.trim(), negatives:negatives.trim(), suggestions:suggestions.trim(), favoriteSession:favoriteSession.trim(), ts:Date.now() });
+  } else {
+    OPINIONS.push({ id:'op'+Date.now(), pid:p.id, name:p.name, positives:positives.trim(), negatives:negatives.trim(), suggestions:suggestions.trim(), favoriteSession:favoriteSession.trim(), ts:Date.now() });
+  }
+  await saveOpinions(OPINIONS);
+  showToast(tr('opinion_sent_toast'));
   render();
 }
 async function doAdminToggleAsk(sessionId){
@@ -8112,7 +8227,7 @@ function readImageFileObjectToDataUrl(file, maxSize){
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.92));
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
       };
       img.onerror = ()=>resolve(null);
       img.src = reader.result;
@@ -8151,7 +8266,7 @@ async function doAdminUploadGalleryPhotos(idx, files, inputEl){
      مرة واحدة، وأحياناً بيعطل رفع الصور في ألبوم تاني كمان لحد ما الضغط يخف. */
   for(let i=0;i<files.length;i++){
     showToast(`جاري رفع الصورة ${i+1} من ${files.length}...`);
-    const dataUrl = await readImageFileObjectToDataUrl(files[i], 1600);
+    const dataUrl = await readImageFileObjectToDataUrl(files[i], 1400);
     if(!dataUrl){ console.error('تعذّر قراءة/تصغير الصورة رقم', i+1); continue; }
     const pid = 'gp'+Date.now()+Math.random().toString(36).slice(2,7);
     const saved = await saveGalleryPhoto(pid, dataUrl);
@@ -9888,13 +10003,13 @@ async function refreshAllData(){
   let customAdminHash;
   [CHECKINS, customAdminHash, SESSION_INFO, PROFILE_EXTRA, CHEERS, BONUS, GIFT_POINTS,
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
-   POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
+   POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
    CUSTOM_TEAMS, GALLERY_ALBUMS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadTeamMessages(), loadDailyMessage(),
-    loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadTrash(),
+    loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
     loadGalleryAlbums()
@@ -10028,11 +10143,12 @@ function startLivePolling(){
       }
     }catch(e){}
     try{
-      const beforePc = JSON.stringify(POINT_CODES);
-      const freshPointCodes = await loadPointCodes();
-      if(freshPointCodes && Object.keys(freshPointCodes).length && JSON.stringify(freshPointCodes) !== beforePc){
-        POINT_CODES = freshPointCodes;
-        if(state.view==='session' || (state.view==='admin' && state.adminTab==='pointcodes')){ render(); }
+      if(state.view==='session' || (state.view==='admin' && state.adminTab==='pointcodes')){
+        const freshPointCodes = await loadPointCodes();
+        if(freshPointCodes && Object.keys(freshPointCodes).length){
+          POINT_CODES = freshPointCodes;
+          render();
+        }
       }
     }catch(e){}
     try{
@@ -10043,6 +10159,10 @@ function startLivePolling(){
       if(state.view==='admin' && (state.adminTab==='questions' || state.adminTab==='reports')){
         QUESTIONS = await loadQuestions();
         REPORTS = await loadReports();
+      }
+      if(state.view==='admin' && state.adminTab==='opinions'){
+        OPINIONS = await loadOpinions();
+        render();
       }
     }catch(e){}
   }, 6000);
