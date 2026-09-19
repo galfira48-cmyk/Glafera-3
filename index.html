@@ -2754,6 +2754,7 @@ let TEAM_OVERRIDES = {};
 let PARTICIPANT_OVERRIDES = {};
 let TEAM_BONUS = {};
 let GALLERY_ALBUMS = [];
+let PENDING_GALLERY_UPLOADS = []; // صور فشل رفعها بسبب ضعف/انقطاع النت، بتتحفظ هنا وبترفع تلقائي أول ما الاتصال يرجع
 const SOCIAL_LINKS = [
   {key:'facebook', label:'فيسبوك', cls:'facebook', url:'https://www.facebook.com/share/1BQxTZtP3o/',
     svg:`<svg viewBox="0 0 24 24"><path class="st-fill" d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>`},
@@ -6127,6 +6128,7 @@ function renderAdminGalleryTab(){
         </div>
         <input type="text" placeholder="عنوان المجموعة (اختياري)" value="${escapeHtml(album.title||'')}" id="gallery-admin-title-${idx}" style="margin-top:8px;" />
         <div class="gallery-admin-grid">${thumbs || '<div class="empty-note" style="padding:6px 0;width:100%;">لسه مفيش صور هنا</div>'}</div>
+        ${pendingUploadsCountForAlbum(idx)>0 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(244,183,64,.12);border:1px solid rgba(244,183,64,.35);font-size:11.5px;color:var(--gold,#F4B740);">⏳ ${pendingUploadsCountForAlbum(idx)} صورة مستنية رجوع الاتصال وهترفع تلقائي — سيب الصفحة مفتوحة</div>` : ''}
         <label class="btn btn-ghost gallery-admin-upload-label">
           ➕ إضافة صور لخانة ${idx+1}
           <input type="file" accept="image/*" multiple id="gallery-admin-upload-${idx}" style="display:none;" />
@@ -8353,6 +8355,7 @@ async function doAdminUploadGalleryPhotos(idx, files, inputEl){
   const album = GALLERY_ALBUMS[idx];
   if(!album) return;
   let okCount = 0;
+  let queuedCount = 0;
   /* بنرفع كل صورة لوحدها وبفاصل بسيط بينهم، وبنحفظ قائمة الألبومات مرة واحدة بعد ما نخلص كل الصور
      (مش بعد كل صورة) عشان منضغطش على التخزين بطلبات كتير ورا بعض — ده كان بيسبب فشل رفع أكتر من صورة
      مرة واحدة، وأحياناً بيعطل رفع الصور في ألبوم تاني كمان لحد ما الضغط يخف. */
@@ -8361,22 +8364,71 @@ async function doAdminUploadGalleryPhotos(idx, files, inputEl){
     const dataUrl = await readImageFileObjectToDataUrl(files[i], 1400);
     if(!dataUrl){ console.error('تعذّر قراءة/تصغير الصورة رقم', i+1); continue; }
     const pid = 'gp'+Date.now()+Math.random().toString(36).slice(2,7);
-    const saved = await saveGalleryPhoto(pid, dataUrl);
+    const saved = (navigator.onLine === false) ? false : await saveGalleryPhoto(pid, dataUrl);
     if(saved){
       GALLERY_PHOTO_CACHE[pid] = dataUrl;
       album.photoIds.push(pid);
       okCount++;
     } else {
-      console.error('فشل حفظ الصورة رقم', i+1, '— جرّب اتصال أقوى أو صورة أصغر');
+      // بدل ما نسيبها تفشل نهائي، بنحطها في قائمة انتظار وهترفع تلقائي لما الاتصال يرجع
+      GALLERY_PHOTO_CACHE[pid] = dataUrl;
+      PENDING_GALLERY_UPLOADS.push({ pid, dataUrl, albumIdx: idx, ts: Date.now() });
+      queuedCount++;
+      console.error('فشل حفظ الصورة رقم', i+1, '— اتحطت في قائمة الانتظار هترفع تلقائي');
     }
     if(i < files.length-1) await sleep(450); // فاصل بسيط بين كل صورة والتانية
   }
   if(okCount>0) await saveGalleryAlbumsWithRetry(GALLERY_ALBUMS);
   if(inputEl) inputEl.value = '';
-  if(okCount === files.length) showToast(`تمت إضافة ${okCount} صورة ✅`);
-  else if(okCount > 0) showToast(`اتضافت ${okCount} من ${files.length} بس — ${files.length-okCount} فشلت (استنى شوية وجرّب تاني)`, true);
-  else showToast('⚠️ حصلت مشكلة في رفع الصور — استنى شوية وجرّب تاني (ممكن يكون في ضغط مؤقت على التخزين)', true);
+  if(okCount === files.length){
+    showToast(`تمت إضافة ${okCount} صورة ✅`);
+  } else if(queuedCount>0 && okCount>0){
+    showToast(`اتضافت ${okCount} صورة، و${queuedCount} في قائمة الانتظار هترفع تلقائي أول ما الاتصال يتحسّن ⏳`, true);
+  } else if(queuedCount>0){
+    showToast(`📵 النت ضعيف/مقطوع دلوقتي — ${queuedCount} صورة اتحطت في قائمة الانتظار وهترفع تلقائي لوحدها أول ما الاتصال يرجع، سيب الصفحة مفتوحة`, true);
+  } else {
+    showToast('⚠️ حصلت مشكلة في رفع الصور — جرّب تاني', true);
+  }
   render();
+  scheduleGalleryUploadRetry();
+}
+function pendingUploadsCountForAlbum(idx){
+  return PENDING_GALLERY_UPLOADS.filter(x=>x.albumIdx===idx).length;
+}
+let _galleryRetryTimer = null;
+function scheduleGalleryUploadRetry(){
+  if(_galleryRetryTimer) return; // فيه محاولة شغالة أو متجدولة بالفعل
+  if(!PENDING_GALLERY_UPLOADS.length) return;
+  _galleryRetryTimer = setTimeout(async ()=>{
+    _galleryRetryTimer = null;
+    await processPendingGalleryUploads();
+    if(PENDING_GALLERY_UPLOADS.length) scheduleGalleryUploadRetry(); // لسه فيه صور مستنية، جدول محاولة تانية
+  }, 20000); // يحاول تاني كل 20 ثانية
+}
+async function processPendingGalleryUploads(){
+  if(!PENDING_GALLERY_UPLOADS.length) return;
+  if(navigator.onLine === false) return; // متضيعش وقت لو الجهاز نفسه شايف إنه Offline
+  const queue = PENDING_GALLERY_UPLOADS.slice();
+  let doneAny = false;
+  for(const item of queue){
+    const saved = await saveGalleryPhoto(item.pid, item.dataUrl, 1);
+    if(saved){
+      const album = GALLERY_ALBUMS[item.albumIdx];
+      if(album && !album.photoIds.includes(item.pid)) album.photoIds.push(item.pid);
+      PENDING_GALLERY_UPLOADS = PENDING_GALLERY_UPLOADS.filter(x=>x.pid!==item.pid);
+      doneAny = true;
+    }
+    // لو فشلت لسه، بتفضل في القائمة عشان المحاولة الجاية
+  }
+  if(doneAny){
+    await saveGalleryAlbumsWithRetry(GALLERY_ALBUMS);
+    showToast(`✅ اترفعت الصور اللي كانت مستنية (${queue.length - PENDING_GALLERY_UPLOADS.length}) بعد رجوع الاتصال`);
+    render();
+  }
+}
+if(typeof window !== 'undefined'){
+  window.addEventListener('online', ()=>{ processPendingGalleryUploads(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) processPendingGalleryUploads(); });
 }
 async function doAdminSaveGalleryTitle(idx, title){
   const album = GALLERY_ALBUMS[idx];
