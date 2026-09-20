@@ -2102,6 +2102,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes xoMarkPop{0%{transform:scale(.3) rotate(-15deg); opacity:0;} 70%{transform:scale(1.15) rotate(4deg); opacity:1;} 100%{transform:scale(1) rotate(0);}}
   @keyframes xoWinPulse{0%,100%{box-shadow:0 0 0 2px var(--gold) inset, 0 0 18px rgba(244,183,64,.35);} 50%{box-shadow:0 0 0 2px var(--gold) inset, 0 0 30px rgba(244,183,64,.6);}}
 
+  .c4-board{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; max-width:370px; margin:0 auto;
+    background:linear-gradient(180deg, var(--surface-2), var(--surface)); padding:10px; border-radius:18px; border:1px solid var(--border);}
+  .c4-cell{aspect-ratio:1/1; border-radius:50%; background:var(--bg); border:none; padding:0; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .c4-cell:disabled{cursor:default;}
+  .c4-cell:not(:disabled):active{transform:scale(.9);}
+  .c4-disc{width:82%; height:82%; border-radius:50%; background:transparent; transition:background .15s;}
+  .c4-cell.c4-r{animation:xoMarkPop .28s cubic-bezier(.34,1.56,.64,1);}
+  .c4-cell.c4-y{animation:xoMarkPop .28s cubic-bezier(.34,1.56,.64,1);}
+  .c4-cell.c4-r .c4-disc{background:linear-gradient(145deg,#FF7A59,#D6473A); box-shadow:inset 0 -3px 4px rgba(0,0,0,.28);}
+  .c4-cell.c4-y .c4-disc{background:linear-gradient(145deg,#FFDE94,#F4B740); box-shadow:inset 0 -3px 4px rgba(0,0,0,.28);}
+  .c4-cell.c4-win{animation:xoWinPulse 1s ease-in-out infinite;}
+  .c4-cell.c4-win .c4-disc{box-shadow:0 0 0 3px var(--gold) inset, 0 0 14px rgba(244,183,64,.55);}
+
   .memory-stats-row{display:flex; gap:8px; margin-bottom:14px;}
   .memory-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:360px; margin:0 auto;}
   .memory-card{aspect-ratio:1/1; perspective:600px; background:transparent; border:none; padding:0;}
@@ -4389,6 +4402,7 @@ function myGameStats(pid){ return GAME_STATS[pid] || (GAME_STATS[pid] = {}); }
 /* ============================= GAMES: HUB ============================= */
 const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {id:'connect4', icon:'🔴', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'فكرنا في رقم من 1 لـ100، خمنه بأقل محاولات', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
@@ -4827,6 +4841,194 @@ function renderMathGame(){
     </div>`}
     <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
     <button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="math-reset">🔄 لعبة جديدة</button>
+  `;
+}
+
+/* ============================= GAMES: CONNECT FOUR ============================= */
+function newC4Board(){ return Array.from({length:7}, ()=>[]); } // each column: array of 'R'/'Y', index 0 = bottom
+function c4CellAt(board, col, row){
+  if(col<0||col>6||row<0||row>5) return null;
+  return board[col][row] || null;
+}
+function c4ValidCols(board){ const r=[]; for(let c=0;c<7;c++) if(board[c].length<6) r.push(c); return r; }
+function c4CheckWinner(board){
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+  for(let col=0;col<7;col++){
+    for(let row=0;row<6;row++){
+      const p = c4CellAt(board,col,row);
+      if(!p) continue;
+      for(let d=0;d<dirs.length;d++){
+        const dc=dirs[d][0], dr=dirs[d][1];
+        const cells=[[col,row]];
+        let ok=true;
+        for(let k=1;k<4;k++){
+          const c2=col+dc*k, r2=row+dr*k;
+          if(c4CellAt(board,c2,r2)!==p){ ok=false; break; }
+          cells.push([c2,r2]);
+        }
+        if(ok) return {winner:p, cells};
+      }
+    }
+  }
+  if(board.every(c=>c.length===6)) return {winner:'draw', cells:null};
+  return null;
+}
+function c4EvalWindow(win, piece){
+  const opp = piece==='Y'?'R':'Y';
+  const countP = win.filter(c=>c===piece).length;
+  const countE = win.filter(c=>c===null).length;
+  const countO = win.filter(c=>c===opp).length;
+  let score=0;
+  if(countP===4) score+=100;
+  else if(countP===3 && countE===1) score+=5;
+  else if(countP===2 && countE===2) score+=2;
+  if(countO===3 && countE===1) score-=4;
+  return score;
+}
+function c4ScorePosition(board, piece){
+  let score=0;
+  score += board[3].filter(c=>c===piece).length*3;
+  for(let row=0;row<6;row++){
+    const rowArr=[]; for(let col=0;col<7;col++) rowArr.push(c4CellAt(board,col,row));
+    for(let c=0;c<4;c++) score += c4EvalWindow(rowArr.slice(c,c+4), piece);
+  }
+  for(let col=0;col<7;col++){
+    const colArr=[]; for(let row=0;row<6;row++) colArr.push(c4CellAt(board,col,row));
+    for(let r=0;r<3;r++) score += c4EvalWindow(colArr.slice(r,r+4), piece);
+  }
+  for(let row=0;row<3;row++){
+    for(let col=0;col<4;col++){ const w=[0,1,2,3].map(i=>c4CellAt(board,col+i,row+i)); score += c4EvalWindow(w, piece); }
+  }
+  for(let row=3;row<6;row++){
+    for(let col=0;col<4;col++){ const w=[0,1,2,3].map(i=>c4CellAt(board,col+i,row-i)); score += c4EvalWindow(w, piece); }
+  }
+  return score;
+}
+function c4Minimax(board, depth, alpha, beta, maximizing){
+  const res = c4CheckWinner(board);
+  const valid = c4ValidCols(board);
+  if(res || depth===0 || valid.length===0){
+    if(res){
+      if(res.winner==='Y') return {score:1000000+depth};
+      if(res.winner==='R') return {score:-1000000-depth};
+      return {score:0};
+    }
+    return {score:c4ScorePosition(board,'Y')};
+  }
+  const order=[3,2,4,1,5,0,6].filter(c=>valid.indexOf(c)>-1);
+  if(maximizing){
+    let value=-Infinity, bestCol=order[0];
+    for(let i=0;i<order.length;i++){
+      const col=order[i];
+      board[col].push('Y');
+      const r = c4Minimax(board, depth-1, alpha, beta, false);
+      board[col].pop();
+      if(r.score>value){ value=r.score; bestCol=col; }
+      alpha=Math.max(alpha,value);
+      if(alpha>=beta) break;
+    }
+    return {score:value, col:bestCol};
+  } else {
+    let value=Infinity, bestCol=order[0];
+    for(let i=0;i<order.length;i++){
+      const col=order[i];
+      board[col].push('R');
+      const r = c4Minimax(board, depth-1, alpha, beta, true);
+      board[col].pop();
+      if(r.score<value){ value=r.score; bestCol=col; }
+      beta=Math.min(beta,value);
+      if(alpha>=beta) break;
+    }
+    return {score:value, col:bestCol};
+  }
+}
+function c4BestMove(board){
+  const r = c4Minimax(board, 4, -Infinity, Infinity, true);
+  return typeof r.col==='number' ? r.col : c4ValidCols(board)[0];
+}
+function initConnect4Game(){
+  const prevMode = state.connect4 ? state.connect4.mode : 'ai';
+  const prevScore = state.connect4 ? {r:state.connect4.scoreR, y:state.connect4.scoreY, d:state.connect4.scoreD} : {r:0,y:0,d:0};
+  state.connect4 = { board:newC4Board(), turn:'R', mode:prevMode, winner:null, winCells:null,
+    scoreR:prevScore.r, scoreY:prevScore.y, scoreD:prevScore.d, busy:false };
+}
+function c4EndRound(res){
+  const g = state.connect4;
+  g.winner = res.winner; g.winCells = res.cells;
+  if(res.winner==='draw'){ g.scoreD++; SND.click(); }
+  else{
+    if(res.winner==='R') g.scoreR++; else g.scoreY++;
+    vibrate([20,20,30]);
+    SND.coinChime();
+    if(res.winner==='R' || g.mode==='2p'){ launchConfetti(); }
+  }
+}
+function doConnect4Move(col){
+  const g = state.connect4;
+  if(!g || g.busy || g.winner) return;
+  if(!g.board[col] || g.board[col].length>=6) return;
+  if(g.mode==='ai' && g.turn==='Y') return;
+  g.board[col].push(g.turn);
+  SND.click();
+  let res = c4CheckWinner(g.board);
+  if(res){ c4EndRound(res); render(); return; }
+  g.turn = g.turn==='R' ? 'Y' : 'R';
+  render();
+  if(g.mode==='ai' && g.turn==='Y'){
+    g.busy = true;
+    render();
+    setTimeout(()=>{
+      const g2 = state.connect4;
+      if(!g2) return;
+      const colAi = c4BestMove(g2.board);
+      if(colAi>-1 && g2.board[colAi].length<6){
+        g2.board[colAi].push('Y');
+        const res2 = c4CheckWinner(g2.board);
+        if(res2){ g2.busy=false; c4EndRound(res2); render(); return; }
+        g2.turn = 'R';
+      }
+      g2.busy = false;
+      render();
+    }, 550);
+  }
+}
+function renderConnect4Game(){
+  if(!state.connect4) initConnect4Game();
+  const g = state.connect4;
+  let cellsHtml = '';
+  for(let row=5; row>=0; row--){
+    for(let col=0; col<7; col++){
+      const v = g.board[col][row] || null;
+      const isWin = g.winCells && g.winCells.some(cc=>cc[0]===col && cc[1]===row);
+      const cls = (v?('c4-'+v.toLowerCase()):'') + (isWin?' c4-win':'');
+      const full = g.board[col].length>=6;
+      const disabled = (g.winner || full || (g.mode==='ai' && g.turn==='Y')) ? 'disabled' : '';
+      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="c4-col" data-col="${col}" ${disabled}><span class="c4-disc"></span></button>`;
+    }
+  }
+  let statusText;
+  if(g.winner==='draw') statusText = '🤝 تعادل!';
+  else if(g.winner==='R') statusText = '🎉 فزت!';
+  else if(g.winner==='Y') statusText = g.mode==='ai' ? '🤖 فاز الجهاز، حظ أوفر!' : '🎉 فاز اللاعب 🟡';
+  else if(g.mode==='ai' && g.turn==='Y') statusText = '🤖 الجهاز بيفكر...';
+  else statusText = `دور اللاعب ${g.turn==='R'?'🔴':'🟡'}`;
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">كونكت فور</div>
+    </div>
+    <div class="game-mode-switch">
+      <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="c4-mode" data-mode="ai">🤖 ضد الجهاز</button>
+      <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="c4-mode" data-mode="2p">👥 لاعبين اتنين</button>
+    </div>
+    <div class="xo-score-row">
+      <div class="xo-score-pill"><span>🔴 انت</span><b>${g.scoreR}</b></div>
+      <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
+      <div class="xo-score-pill o"><span>${g.mode==='ai'?'🤖 الجهاز':'🟡'}</span><b>${g.scoreY}</b></div>
+    </div>
+    <div class="xo-status">${statusText}</div>
+    <div class="c4-board">${cellsHtml}</div>
+    <button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="c4-reset">🔄 جولة جديدة</button>
   `;
 }
 
@@ -7091,6 +7293,7 @@ function render(){
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='game-xo') html = renderXoGame();
+  else if(state.view==='game-connect4') html = renderConnect4Game();
   else if(state.view==='game-memory') html = renderMemoryGame();
   else if(state.view==='game-rps') html = renderRpsGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
@@ -8341,6 +8544,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-game'){
     const gid = el.dataset.game;
     if(gid==='xo') initXoGame();
+    else if(gid==='connect4') initConnect4Game();
     else if(gid==='memory') initMemoryGame();
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
     else if(gid==='numguess') initNumberGame();
@@ -8374,6 +8578,23 @@ document.addEventListener('click', (e)=>{
   }
   else if(action==='xo-reset'){
     if(state.xo){ state.xo.board = newXoBoard(); state.xo.turn = 'X'; state.xo.winner = null; state.xo.line = null; }
+    render();
+  }
+  else if(action==='c4-col'){ doConnect4Move(parseInt(el.dataset.col,10)); }
+  else if(action==='c4-mode'){
+    const m = el.dataset.mode;
+    if(state.connect4 && state.connect4.mode!==m){
+      state.connect4.mode = m;
+      state.connect4.board = newC4Board();
+      state.connect4.turn = 'R';
+      state.connect4.winner = null;
+      state.connect4.winCells = null;
+      state.connect4.scoreR = 0; state.connect4.scoreY = 0; state.connect4.scoreD = 0;
+    }
+    render();
+  }
+  else if(action==='c4-reset'){
+    if(state.connect4){ state.connect4.board = newC4Board(); state.connect4.turn = 'R'; state.connect4.winner = null; state.connect4.winCells = null; }
     render();
   }
   else if(action==='memory-card'){ doMemoryFlip(parseInt(el.dataset.idx,10)); }
