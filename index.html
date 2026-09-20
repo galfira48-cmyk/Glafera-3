@@ -3687,7 +3687,7 @@ function renderProfile(){
     ${verseCardHtml()}
 
     <div class="id-card-glass">
-      <div class="id-photo" style="${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}box-shadow:0 8px 20px rgba(0,0,0,.3), 0 0 0 2px ${accent};">${p.photo?'':`<span class="id-photo-fallback">${initials(p.name)}</span>`}</div>
+      <div class="id-photo" data-action="open-my-avatar" style="cursor:pointer;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}box-shadow:0 8px 20px rgba(0,0,0,.3), 0 0 0 2px ${accent};">${p.photo?'':`<span class="id-photo-fallback">${initials(p.name)}</span>`}</div>
       <div class="id-info">
         <div class="id-row"><span class="id-label">Name</span><span class="id-value id-value-name" style="--name-font-size:${(CONF_SETTINGS.nameFontSize||15)}px;--name-font-family:'${CONF_SETTINGS.nameFontFamily||'Tajawal'}';">${escapeHtml(p.name)}</span></div>
         <div class="id-row"><span class="id-label">Code</span><span class="id-value">#${escapeHtml(p.id)}</span></div>
@@ -4307,7 +4307,7 @@ async function doDownloadGalleryPhoto(){
   const pid = LIGHTBOX_STATE.photoIds[LIGHTBOX_STATE.i];
   const dataUrl = pid && (LIGHTBOX_STATE.cache||GALLERY_PHOTO_CACHE)[pid];
   if(!dataUrl){ showToast('تعذّر تجهيز الصورة', true); return; }
-  const filename = `glavera3-photo-${LIGHTBOX_STATE.i+1}.jpg`;
+  const filename = pid==='myavatar' ? 'my-photo.jpg' : `glavera3-photo-${LIGHTBOX_STATE.i+1}.jpg`;
   try{
     const res = await fetch(dataUrl);
     const blob = await res.blob();
@@ -5333,6 +5333,24 @@ function stopChatVoiceRecording(){
   if(_chatRecorder && _chatRecorder.state==='recording') _chatRecorder.stop();
   state.chatRecording = false;
   render();
+}
+function openMyAvatarLightbox(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p || !p.photo){ showToast('لسه مفيش صورة شخصية مضافة'); return; }
+  const cache = { myavatar: p.photo };
+  LIGHTBOX_STATE = { photoIds:['myavatar'], i:0, cache };
+  const backdrop = document.createElement('div');
+  backdrop.className = 'lightbox-backdrop';
+  backdrop.id = 'gallery-lightbox';
+  backdrop.innerHTML = `
+    <button type="button" class="lightbox-close" data-lb-close>${ICO.back}</button>
+    <div class="lightbox-img-wrap"><img id="lb-img" src="${p.photo}" alt="صورتك الشخصية" /></div>
+    <button type="button" class="lightbox-download-btn" data-lb-download title="تحميل الصورة">${ICO.download}</button>
+  `;
+  document.body.appendChild(backdrop);
+  backdrop.querySelector('[data-lb-close]').addEventListener('click', ()=>{ backdrop.remove(); LIGHTBOX_STATE = null; });
+  backdrop.querySelector('[data-lb-download]').addEventListener('click', (e)=>{ e.stopPropagation(); doDownloadGalleryPhoto(); });
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop){ backdrop.remove(); LIGHTBOX_STATE = null; } });
 }
 function openChatImageLightbox(mediaId){
   const url = CHAT_MEDIA_CACHE[mediaId];
@@ -8230,6 +8248,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='chat-insert-emoji'){ doChatInsertEmoji(el.dataset.emoji); }
   else if(action==='toggle-chat-voice'){ toggleChatVoiceRecording(); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
+  else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
   else if(action==='close-add-participant'){ state.addingParticipant = false; render(); }
   else if(action==='regen-new-code'){ state._suggestedNewCode = null; render(); }
