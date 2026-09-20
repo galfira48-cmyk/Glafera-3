@@ -2344,6 +2344,175 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   body.data-saver .gh-tile{-webkit-backdrop-filter:none; backdrop-filter:none; background:linear-gradient(180deg, var(--surface), var(--surface-2));}
   body.data-saver .gh-tile::before{display:none;}
 
+  /* ============================= CHEF RATING ============================= */
+  .chef-tile{gap:7px;}
+  .chef-photo{width:46%; max-width:88px; aspect-ratio:1/1; border-radius:50%; background-size:cover; background-position:center; background:var(--g);
+    background-size:cover; display:flex; align-items:center; justify-content:center; font-size:34px; flex-shrink:0;
+    border:3px solid rgba(255,255,255,.55); box-shadow:0 0 0 3px var(--gold), 0 10px 22px rgba(0,0,0,.35);}
+  .chef-tile .gh-title{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  .chef-count{display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:20px;
+    background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.16); color:var(--text);}
+  .chef-hero{display:flex; align-items:center; gap:14px; padding:14px; margin-bottom:16px; border-radius:24px;
+    background:linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.16);
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:0 12px 28px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.25);}
+  .chef-hero .chef-photo{width:68px; max-width:68px;}
+  .chef-hero-name{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px;}
+  .chef-hero-meta{font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.6;}
+  .dish-tile{justify-content:flex-start; padding-top:16px; gap:7px;}
+  .dish-emoji{width:38px; height:38px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:20px;
+    background:var(--g); box-shadow:0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.4); flex-shrink:0;}
+  .dish-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; line-height:1.35; max-width:100%;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word;}
+  .dish-stars{display:flex; justify-content:center; width:100%; margin-top:auto; padding-bottom:4px;}
+  .chef-star{flex:1 1 0; min-width:0; text-align:center; font-size:clamp(13px, 4.6vw, 18px); line-height:1; color:rgba(255,255,255,.20);}
+  .chef-star.on{color:#FFC93C; text-shadow:0 0 10px rgba(255,201,60,.65);
+    animation:chefStarIn .55s cubic-bezier(.2,.9,.3,1.25) backwards; animation-delay:calc(var(--i,0) * 70ms + 380ms + var(--k,0) * 85ms);}
+  @keyframes chefStarIn{0%{transform:scale(0) rotate(-50deg); opacity:0;} 65%{transform:scale(1.45) rotate(10deg); opacity:1;} 100%{transform:scale(1) rotate(0);}}
+  .dish-score{position:absolute; top:10px; inset-inline-start:10px; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:20px;
+    background:rgba(0,0,0,.28); color:#FFE08A; border:1px solid rgba(255,255,255,.14);}
+  .dish-tile.is-top{border-color:rgba(255,201,60,.75); box-shadow:0 14px 32px rgba(0,0,0,.30), 0 0 0 1px rgba(255,201,60,.35), 0 0 26px rgba(255,201,60,.28), inset 0 1px 0 rgba(255,255,255,.30);}
+  .dish-crown{position:absolute; top:6px; inset-inline-end:9px; font-size:17px; animation:crownBob 2.4s ease-in-out infinite;}
+  @keyframes crownBob{0%,100%{transform:translateY(0) rotate(-6deg);}50%{transform:translateY(-3px) rotate(6deg);}}
+  html[data-theme="light"] .chef-star{color:rgba(30,24,10,.16);}
+  html[data-theme="light"] .chef-star.on{color:#F0A500; text-shadow:0 0 8px rgba(240,165,0,.45);}
+  html[data-theme="light"] .dish-score{background:rgba(30,24,10,.07); color:#9A6A00; border-color:rgba(30,24,10,.10);}
+  html[data-theme="light"] .chef-count{background:rgba(30,24,10,.05); border-color:rgba(30,24,10,.10);}
+  html[data-theme="light"] .chef-hero{background:linear-gradient(145deg, rgba(255,255,255,.9), rgba(255,255,255,.5)); border-color:rgba(30,24,10,.10); box-shadow:0 12px 28px rgba(30,24,10,.12);}
+  body.data-saver .chef-hero{-webkit-backdrop-filter:none; backdrop-filter:none;}
+  body.data-saver .chef-star.on{animation:none;}
+  /* admin */
+  .sp-picker{display:flex; gap:2px; margin:6px 0 2px;}
+  .sp-star{background:none; border:0; padding:2px 3px; font-size:28px; line-height:1; color:rgba(140,140,170,.40); cursor:pointer; transition:transform .12s ease, color .15s ease;}
+  .sp-star.on{color:#F4B740; text-shadow:0 0 8px rgba(244,183,64,.5);}
+  .sp-star:active{transform:scale(1.25);}
+  .chef-admin-row{display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:10px;}
+  .chef-admin-row .avatar{width:48px; height:48px; flex-shrink:0; background-size:cover; background-position:center;}
+  .chef-admin-info{flex:1; min-width:0;}
+  .chef-admin-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .chef-admin-meta{font-size:11px; color:var(--text-muted); margin-top:2px;}
+  .dish-admin-card{margin-bottom:10px;}
+  .dish-admin-actions{display:flex; gap:8px; margin-top:8px;}
+  .dish-admin-actions .btn{flex:1; padding:9px; font-size:12px;}
+
+  /* ============================= DISH REVIEWS SHEET ============================= */
+  .dish-meta{font-size:10.5px; font-weight:700; color:var(--text-muted); display:flex; align-items:center; justify-content:center; gap:5px; min-height:14px;}
+  .dish-meta b{color:#FFC93C; font-weight:800;}
+  .dish-tile .dish-stars{margin-top:auto; padding-bottom:0;}
+  #dish-sheet-root{position:fixed; inset:0; z-index:58; display:flex; align-items:flex-end; justify-content:center;}
+  .ds-backdrop{position:absolute; inset:0; background:rgba(6,5,20,.62); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); animation:dsFade .3s ease;}
+  @keyframes dsFade{from{opacity:0;}to{opacity:1;}}
+  .ds-panel{position:relative; width:100%; max-width:520px; max-height:92vh; overflow-y:auto; overscroll-behavior:contain;
+    border-radius:30px 30px 0 0; padding:10px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    background:linear-gradient(180deg, var(--surface-2), var(--bg-2)); border:1px solid rgba(255,255,255,.16); border-bottom:0;
+    box-shadow:0 -18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.22);
+    animation:dsUp .42s cubic-bezier(.2,.9,.25,1);}
+  .ds-panel::before{content:""; position:absolute; top:-60px; inset-inline-end:-40px; width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,201,60,.22), transparent 70%); pointer-events:none;}
+  #dish-sheet-root.is-closing .ds-panel{animation:dsDown .28s ease forwards;}
+  #dish-sheet-root.is-closing .ds-backdrop{animation:dsFade .28s ease reverse forwards;}
+  @keyframes dsUp{from{transform:translateY(100%);}to{transform:none;}}
+  @keyframes dsDown{to{transform:translateY(100%);}}
+  .ds-grab{width:44px; height:5px; border-radius:5px; background:rgba(255,255,255,.28); margin:2px auto 12px;}
+  .ds-close{position:absolute; top:14px; inset-inline-end:14px; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:var(--text); font-size:14px; z-index:2;}
+  .ds-head{display:flex; align-items:center; gap:12px; margin:4px 0 14px; padding-inline-end:38px;}
+  .ds-head .dish-emoji{width:50px; height:50px; font-size:26px; border-radius:16px;}
+  .ds-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; line-height:1.3; word-break:break-word;}
+  .ds-sub{font-size:12px; color:var(--text-muted); margin-top:3px;}
+  .ds-card{border-radius:22px; padding:14px; margin-bottom:12px; position:relative;
+    background:linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+  .ds-sum{display:flex; gap:14px; align-items:center;}
+  .ds-avg{text-align:center; min-width:96px;}
+  .ds-avg-num{direction:ltr; font-family:'Cairo',sans-serif; font-weight:900; font-size:40px; line-height:1; color:#FFC93C; text-shadow:0 0 18px rgba(255,201,60,.4);}
+  .ds-avg-num small{font-size:14px; color:var(--text-muted); font-weight:700; text-shadow:none;}
+  .ds-fstars{position:relative; display:inline-block; font-size:15px; letter-spacing:1px; line-height:1; margin-top:6px; direction:ltr;}
+  .ds-fstars .bg{color:rgba(255,255,255,.18);}
+  .ds-fstars .fg{position:absolute; top:0; left:0; overflow:hidden; white-space:nowrap; color:#FFC93C; transition:width .9s cubic-bezier(.2,.9,.3,1);}
+  .ds-count{font-size:11.5px; color:var(--text-muted); margin-top:5px;}
+  .ds-dist{flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .ds-drow{display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--text-muted); direction:ltr;}
+  .ds-drow .lab{width:16px; text-align:right; font-weight:800;}
+  .ds-drow .bar{flex:1; height:7px; border-radius:7px; background:rgba(255,255,255,.10); overflow:hidden;}
+  .ds-drow .bar i{display:block; height:100%; width:0; border-radius:7px; background:linear-gradient(90deg,#FFC93C,#FF9A3C); animation:dsBar .9s cubic-bezier(.2,.9,.3,1) forwards; animation-delay:.25s;}
+  @keyframes dsBar{to{width:var(--w);}}
+  .ds-drow .num{width:20px; font-weight:700;}
+  .ds-official{display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:5px 11px; border-radius:20px; font-size:11.5px; font-weight:700;
+    background:rgba(255,201,60,.12); border:1px solid rgba(255,201,60,.30); color:#FFE08A;}
+  .ds-rate-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; margin-bottom:2px;}
+  .ds-rate-hint{font-size:11.5px; color:var(--text-muted);}
+  .ds-stars{display:flex; justify-content:center; gap:2px; margin:12px 0 4px; direction:rtl;}
+  .ds-star{background:none; border:0; padding:2px 3px; font-size:clamp(28px, 9vw, 38px); line-height:1; color:rgba(255,255,255,.20); cursor:pointer; transition:transform .15s ease, color .15s ease;}
+  .ds-star.on{color:#FFC93C; text-shadow:0 0 14px rgba(255,201,60,.6);}
+  .ds-star.pop{animation:dsStarPop .38s cubic-bezier(.2,.9,.3,1.4);}
+  @keyframes dsStarPop{0%{transform:scale(.6);}60%{transform:scale(1.35);}100%{transform:scale(1);}}
+  .ds-star-label{text-align:center; min-height:22px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#FFE08A;}
+  .ds-star-label.pop{animation:dsFade .3s ease;}
+  .ds-text{width:100%; box-sizing:border-box; margin-top:10px; padding:11px 13px; border-radius:16px; min-height:64px; resize:none; font-family:inherit; font-size:14px; line-height:1.6;
+    color:var(--text); background:rgba(0,0,0,.20); border:1.5px solid rgba(255,255,255,.16); outline:none; transition:border-color .2s ease;}
+  .ds-text:focus{border-color:var(--gold);}
+  .ds-text::placeholder{color:var(--text-muted); opacity:.7;}
+  .ds-counter{font-size:10.5px; color:var(--text-muted); text-align:left; margin-top:3px; direction:ltr;}
+  .ds-actions{display:flex; gap:8px; margin-top:8px;}
+  .ds-actions .btn{padding:12px 16px; font-size:13.5px; width:auto; flex:0 0 auto;}
+  .ds-actions .btn-primary{flex:1 1 auto;}
+  .ds-login-note{text-align:center; font-size:12.5px; color:var(--text-muted); padding:6px 0;}
+  .ds-rev-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:16px 2px 10px;}
+  .ds-rev-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px;}
+  .ds-sorts{display:flex; gap:6px;}
+  .ds-sort{padding:5px 11px; border-radius:20px; font-size:11.5px; font-weight:800; font-family:'Cairo',sans-serif; color:var(--text-muted);
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); transition:all .2s ease;}
+  .ds-sort.active{color:#1a1633; background:linear-gradient(135deg,var(--gold-2),var(--gold)); border-color:transparent;}
+  .ds-rev{display:flex; gap:11px; padding:12px; margin-bottom:9px; border-radius:20px; position:relative;
+    background:linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12);
+    animation:dsCardIn .45s cubic-bezier(.2,.9,.3,1) backwards; animation-delay:calc(var(--i,0) * 55ms);}
+  .ds-rev.mine{border-color:rgba(255,201,60,.55); box-shadow:0 0 0 1px rgba(255,201,60,.25), 0 8px 22px rgba(255,201,60,.10);}
+  @keyframes dsCardIn{from{opacity:0; transform:translateY(16px) scale(.97);}to{opacity:1; transform:none;}}
+  .ds-av{width:42px; height:42px; min-width:42px; border-radius:50%; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center;
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#fff; box-shadow:0 4px 10px rgba(0,0,0,.28); border:2px solid rgba(255,255,255,.25);}
+  .ds-rev-body{flex:1; min-width:0;}
+  .ds-rev-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .ds-rev-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px;}
+  .ds-mine-badge{font-size:10px; font-weight:800; padding:1px 8px; border-radius:20px; background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:#1a1633;}
+  .ds-rev-time{font-size:10.5px; color:var(--text-muted); margin-inline-start:auto;}
+  .ds-rev-stars{font-size:13px; letter-spacing:1px; margin-top:3px; direction:ltr; text-align:right; white-space:nowrap;}
+  .ds-rev-stars .on{color:#FFC93C;} .ds-rev-stars .off{color:rgba(255,255,255,.16);}
+  .ds-rev-text{font-size:13.5px; line-height:1.7; margin-top:6px; word-break:break-word; white-space:pre-wrap;}
+  .ds-empty{text-align:center; padding:22px 10px; color:var(--text-muted); font-size:13px; line-height:1.8;}
+  html[data-theme="light"] .ds-panel{border-color:rgba(30,24,10,.10); box-shadow:0 -18px 50px rgba(30,24,10,.25), inset 0 1px 0 #fff;}
+  html[data-theme="light"] .ds-grab{background:rgba(30,24,10,.18);}
+  html[data-theme="light"] .ds-close{background:rgba(30,24,10,.06); border-color:rgba(30,24,10,.12);}
+  html[data-theme="light"] .ds-card, html[data-theme="light"] .ds-rev{background:linear-gradient(145deg,#fff,rgba(255,255,255,.6)); border-color:rgba(30,24,10,.10); box-shadow:0 4px 14px rgba(30,24,10,.06);}
+  html[data-theme="light"] .ds-star, html[data-theme="light"] .ds-fstars .bg, html[data-theme="light"] .ds-rev-stars .off{color:rgba(30,24,10,.16);}
+  html[data-theme="light"] .ds-star.on{color:#F0A500; text-shadow:0 0 10px rgba(240,165,0,.4);}
+  html[data-theme="light"] .ds-fstars .fg, html[data-theme="light"] .ds-rev-stars .on, html[data-theme="light"] .ds-avg-num{color:#E09A00;}
+  html[data-theme="light"] .ds-text{background:rgba(30,24,10,.04); border-color:rgba(30,24,10,.14);}
+  html[data-theme="light"] .ds-drow .bar{background:rgba(30,24,10,.08);}
+  html[data-theme="light"] .ds-sort{background:rgba(30,24,10,.04); border-color:rgba(30,24,10,.10);}
+  html[data-theme="light"] .ds-sort.active{background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:#fff; border-color:transparent;}
+  html[data-theme="light"] .ds-official{color:#8A5A00; background:rgba(240,165,0,.12);}
+  html[data-theme="light"] .ds-star-label{color:#B27600;}
+  html[data-theme="light"] .dish-meta b{color:#C98500;}
+  body.data-saver .ds-backdrop, body.data-saver .chef-hero{-webkit-backdrop-filter:none; backdrop-filter:none;}
+  body.data-saver .ds-rev{animation:none;}
+  .dish-rev-admin{margin-top:8px; font-size:12px;}
+  .dish-rev-admin summary{cursor:pointer; color:var(--text-muted); font-weight:700; padding:4px 0;}
+  .dish-rev-admin-row{display:flex; align-items:flex-start; gap:8px; padding:8px 0; border-top:1px solid var(--border);}
+  .dish-rev-admin-row .t{flex:1; min-width:0; line-height:1.6; word-break:break-word;}
+  .dish-rev-admin-row button{background:none; border:0; color:var(--danger); font-size:15px; padding:2px 6px;}
+
+  /* ============================= CHEF MEALS ============================= */
+  .meal-tile .gh-ico{width:72px; height:72px; min-width:72px; border-radius:24px; font-size:38px;}
+  .meal-tile .gh-title{font-size:17px;}
+  .meal-picker{display:flex; gap:6px; margin:6px 0 2px; flex-wrap:wrap;}
+  .meal-chip{padding:7px 14px; border-radius:20px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--text-muted);
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); transition:all .18s ease; cursor:pointer;}
+  .meal-chip.on{color:#1a1633; background:linear-gradient(135deg,var(--gold-2),var(--gold)); border-color:transparent; box-shadow:0 6px 14px rgba(244,183,64,.28);}
+  .meal-chip:active{transform:scale(.94);}
+  .meal-warn{font-size:11px; color:var(--danger); margin-top:2px;}
+  html[data-theme="light"] .meal-chip{background:rgba(30,24,10,.04); border-color:rgba(30,24,10,.12);}
+  html[data-theme="light"] .meal-chip.on{color:#fff;}
+
 </style>
 </head>
 <body>
@@ -2468,6 +2637,19 @@ window.storage = {
       }
       return { key, value, shared: !!shared };
     }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.set error', key, e); return null; }
+  },
+  // قراءة-تعديل-كتابة بشكل ذرّي (Firebase transaction) عشان لو أكتر من مشارك كتبوا في نفس اللحظة محدش يمسح رأي التاني
+  async update(key, fn, shared, timeoutMs){
+    if(!_fbDb) return null;
+    try{
+      const TIMED_OUT = Symbol('timeout');
+      const res = await Promise.race([
+        _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).transaction((cur)=> fn(cur===undefined ? null : cur)),
+        new Promise((resolve)=> setTimeout(()=> resolve(TIMED_OUT), timeoutMs || _FB_TIMEOUT_MS))
+      ]);
+      if(res === TIMED_OUT || !res || !res.committed) return null;
+      return { key, value: res.snapshot.val(), shared: !!shared };
+    }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.update error', key, e); return null; }
   },
   async delete(key, shared){
     if(!_fbDb) return null;
@@ -3139,6 +3321,7 @@ const TRANSLATIONS = {
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
     nav_gallery:'معرض الصور', nav_gallery_sub:'أجمل لحظات المؤتمر',
     nav_games:'الألعاب', nav_games_sub:'العب وأنت مستني الفقرة الجاية 🎮',
+    nav_chefs:'تقييم الشيف', nav_chefs_sub:'شيفات المؤتمر وأكلاتهم بالنجوم ⭐',
     gallery_title:'معرض صور المؤتمر', gallery_sub:'مرّر أو اسحب لاستعراض الصور',
     gallery_hint:'اسحب يمين أو شمال، أو دوس على الصورة اللي في النص عشان تفتح الألبوم',
     gallery_album_empty:'لسه الأدمن مضافش صور في الخانة دي',
@@ -3182,6 +3365,7 @@ const TRANSLATIONS = {
     nav_quests:'Quests', nav_quests_sub:'Daily tasks with instant rewards',
     nav_wall:'Glavera 3 Wall', nav_wall_sub:'Share your thoughts about the conference',
     nav_opinion:'Feedback', nav_opinion_sub:'Positives, negatives, and your suggestions',
+    nav_chefs:'Chef Ratings', nav_chefs_sub:'Our chefs and their dishes, rated in stars ⭐',
     opinion_title:'Feedback', opinion_hint:'Your feedback matters to us — write what you\u2019d like to say and it goes straight to the organizers',
     opinion_positives_label:'✅ Positives', opinion_positives_ph:'What did you like about the conference?',
     opinion_negatives_label:'⚠️ Negatives', opinion_negatives_ph:'What could be improved?',
@@ -3553,6 +3737,7 @@ function go(view, extra={}){
   render();
 }
 function goBack(){
+  if(typeof closeDishSheet==='function') closeDishSheet(true);
   const prev = state.history.pop();
   state.navDir = 'back';
   SND.whoosh(true);
@@ -3699,6 +3884,7 @@ const NAV_TILE_ITEMS = [
   {page:'journey', icon:'🗓️', labelKey:'nav_journey', subKey:'nav_journey_sub', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
   {page:'gallery', icon:ICO.gallery, labelKey:'nav_gallery', subKey:'nav_gallery_sub', color:'transparent'},
   {page:'games',   icon:'🎮', labelKey:'nav_games',   subKey:'nav_games_sub',   color:'linear-gradient(145deg,#FF6B9D,#845EC2)'},
+  {page:'chefs',   icon:'👨‍🍳', labelKey:'nav_chefs',   subKey:'nav_chefs_sub',   color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {page:'myphotos', icon:'📷', labelKey:'nav_myphotos', subKey:'nav_myphotos_sub', color:'linear-gradient(145deg,#FF9A8B,#FF6A88)'},
   {page:'chat', icon:'💬', labelKey:'nav_chat', subKey:'nav_chat_sub', color:'linear-gradient(145deg,#43E97B,#38F9D7)'},
@@ -4569,6 +4755,646 @@ function renderSharePage(){
       <button type="button" class="btn btn-outline" style="max-width:260px;margin:0 auto;" data-action="share-card">مشاركة البطاقة 📤</button>
     </div>
   `;
+}
+
+/* ============================= CHEF DISH REVIEWS (آراء المشاركين) ============================= */
+const DISH_STAR_LABELS = ['', 'ضعيفة 😕', 'مقبولة 🙂', 'كويسة 👍', 'حلوة 😋', 'جميلة جدًا 🤩', 'رائعة 🔥', 'أسطورية 👑'];
+const DISH_REVIEW_MAX_CHARS = 200;
+let CHEF_REVIEWS = {};            // chefId -> { dishId -> { participantId -> {s, t, ts} } }
+let CHEF_REVIEWS_LOADING = {};
+let dishSheet = null;             // { cid, did, stars, text, sort }
+async function loadChefReviews(cid){
+  try{ const r = await window.storage.get('glavera-chef-reviews-'+cid, true); const v = r ? JSON.parse(r.value) : {}; return (v && typeof v==='object') ? v : {}; }
+  catch(e){ return {}; }
+}
+async function chefReviewsUpdate(cid, mutator){
+  const key = 'glavera-chef-reviews-'+cid;
+  const apply = (curStr)=>{
+    let o = {};
+    try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+    if(!o || typeof o!=='object') o = {};
+    mutator(o);
+    return JSON.stringify(o);
+  };
+  let res = null;
+  if(window.storage && window.storage.update){
+    res = await window.storage.update(key, apply, true);
+  } else {
+    const cur = await window.storage.get(key, true);
+    res = await window.storage.set(key, apply(cur ? cur.value : null), true);
+  }
+  if(!res) return false;
+  try{ CHEF_REVIEWS[cid] = JSON.parse(res.value) || {}; }catch(e){ CHEF_REVIEWS[cid] = await loadChefReviews(cid); }
+  return true;
+}
+async function ensureChefReviews(cid, force){
+  if(!cid || CHEF_REVIEWS_LOADING[cid]) return;
+  if(CHEF_REVIEWS[cid] && !force) return;
+  CHEF_REVIEWS_LOADING[cid] = true;
+  try{ CHEF_REVIEWS[cid] = await loadChefReviews(cid); }catch(e){ CHEF_REVIEWS[cid] = CHEF_REVIEWS[cid] || {}; }
+  CHEF_REVIEWS_LOADING[cid] = false;
+  if((state.view==='chef-dishes' && state.chefId===cid) || (state.view==='admin' && state.adminTab==='chefs')) render();
+}
+function chefDishReviews(cid, did){
+  const m = ((CHEF_REVIEWS[cid]||{})[did]) || {};
+  return Object.keys(m).map(pid=>({pid, s:(m[pid].s|0), t:(m[pid].t||''), ts:(m[pid].ts||0)})).filter(x=>x.s>=1 && x.s<=CHEF_MAX_STARS);
+}
+function chefDishStats(cid, did){
+  const r = chefDishReviews(cid, did);
+  const dist = new Array(CHEF_MAX_STARS+1).fill(0);
+  r.forEach(x=>{ dist[x.s]++; });
+  const n = r.length;
+  return { n, avg: n ? r.reduce((a,x)=>a+x.s,0)/n : 0, dist };
+}
+function dishMetaHtml(cid, did){
+  const st = chefDishStats(cid, did);
+  if(!st.n) return '✨ كن أول من يقيّم';
+  return `👥 ${st.n} ${st.n===1?'رأي':'آراء'} • <b>${(Math.round(st.avg*10)/10)}</b> ★`;
+}
+function updateDishMetaInPlace(){
+  document.querySelectorAll('.dish-meta[data-did]').forEach(el=>{
+    const c = CHEFS.find(x=>x.id===state.chefId);
+    if(c) el.innerHTML = dishMetaHtml(c.id, el.dataset.did);
+  });
+}
+function reviewerAvatarHtml(pid){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  if(!p) return `<span class="ds-av" style="background:#6b6a8f;">👤</span>`;
+  const t = teamOf(p.teamId);
+  const style = p.photo ? `background-image:url('${p.photo}');` : `background:${t?t.color:'#F4B740'};`;
+  return `<span class="ds-av" style="${style}">${p.photo ? '' : escapeHtml(initials(p.name))}</span>`;
+}
+function reviewerName(pid){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  return p ? p.name : 'مشارك';
+}
+function dsStarsRowHtml(n){
+  let h = '';
+  for(let i=1;i<=CHEF_MAX_STARS;i++) h += `<span class="${i<=n?'on':'off'}">★</span>`;
+  return h;
+}
+/* ---- sheet ---- */
+function openDishSheet(cid, did){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const d = (c.dishes||[]).find(x=>x.id===did); if(!d) return;
+  const mine = state.pid ? ((CHEF_REVIEWS[cid]||{})[did]||{})[state.pid] : null;
+  closeDishSheet(true);
+  dishSheet = { cid, did, stars: mine ? (mine.s|0) : 0, text: mine ? (mine.t||'') : '', sort:'new' };
+  const root = document.createElement('div');
+  root.id = 'dish-sheet-root';
+  root.innerHTML = `<div class="ds-backdrop" data-action="close-dish-sheet"></div><div class="ds-panel" id="ds-panel"></div>`;
+  document.body.appendChild(root);
+  document.body.style.overflow = 'hidden';
+  renderDishSheet();
+  ensureChefReviews(cid, true).then(()=>{ if(dishSheet) updateDishSheetDynamic(); });
+}
+function closeDishSheet(instant){
+  const root = document.getElementById('dish-sheet-root');
+  if(!root){ if(instant) dishSheet = null; return; }
+  const finish = ()=>{ root.remove(); document.body.style.overflow = ''; };
+  if(instant){ dishSheet = null; finish(); return; }
+  root.classList.add('is-closing');
+  dishSheet = null;
+  setTimeout(finish, 280);
+}
+function renderDishSheet(){
+  const panel = document.getElementById('ds-panel');
+  if(!panel || !dishSheet) return;
+  const c = CHEFS.find(x=>x.id===dishSheet.cid);
+  const d = c && (c.dishes||[]).find(x=>x.id===dishSheet.did);
+  if(!d){ closeDishSheet(); return; }
+  const canRate = !!(state.pid && PARTICIPANTS.find(x=>x.id===state.pid));
+  const official = Math.max(0, Math.min(CHEF_MAX_STARS, parseInt(d.stars,10)||0));
+  let starBtns = '';
+  for(let i=1;i<=CHEF_MAX_STARS;i++) starBtns += `<button type="button" class="ds-star ${i<=dishSheet.stars?'on':''}" data-action="ds-star" data-n="${i}" aria-label="${i}">★</button>`;
+  const rateBox = canRate ? `
+      <div class="ds-rate-title">قيّم الأكلة</div>
+      <div class="ds-rate-hint">من 1 لـ ${CHEF_MAX_STARS} نجوم — رأيك هيظهر لكل المشاركين</div>
+      <div class="ds-stars" id="ds-stars">${starBtns}</div>
+      <div class="ds-star-label" id="ds-star-label">${DISH_STAR_LABELS[dishSheet.stars]||'دوس على النجوم عشان تقيّم'}</div>
+      <textarea class="ds-text" id="ds-text" maxlength="${DISH_REVIEW_MAX_CHARS}" placeholder="اكتب جملة حلوة عن الأكلة... (اختياري)">${escapeHtml(dishSheet.text)}</textarea>
+      <div class="ds-counter" id="ds-counter">${dishSheet.text.length}/${DISH_REVIEW_MAX_CHARS}</div>
+      <div class="ds-actions" id="ds-actions"></div>`
+    : `<div class="ds-login-note">🔐 سجّل دخولك بكودك عشان تقدر تقيّم وتكتب رأيك</div>`;
+  panel.innerHTML = `
+    <div class="ds-grab"></div>
+    <button type="button" class="ds-close" data-action="close-dish-sheet" aria-label="إغلاق">✕</button>
+    <div class="ds-head">
+      <span class="dish-emoji" style="--g:linear-gradient(145deg,#F6D365,#FDA085)">🍽️</span>
+      <div>
+        <div class="ds-title">${escapeHtml(d.name)}</div>
+        <div class="ds-sub">👨‍🍳 ${escapeHtml(c.name)}</div>
+      </div>
+    </div>
+    <div class="ds-card" id="ds-summary"></div>
+    <div class="ds-card">${rateBox}</div>
+    <div id="ds-reviews"></div>
+  `;
+  updateDishSheetDynamic();
+}
+function updateDishSheetDynamic(){
+  if(!dishSheet) return;
+  const { cid, did } = dishSheet;
+  const c = CHEFS.find(x=>x.id===cid);
+  const d = c && (c.dishes||[]).find(x=>x.id===did);
+  if(!d) return;
+  const st = chefDishStats(cid, did);
+  const official = Math.max(0, Math.min(CHEF_MAX_STARS, parseInt(d.stars,10)||0));
+  const sumEl = document.getElementById('ds-summary');
+  if(sumEl){
+    const pct = st.n ? (st.avg/CHEF_MAX_STARS*100) : 0;
+    let rows = '';
+    for(let i=CHEF_MAX_STARS;i>=1;i--){
+      const w = st.n ? Math.round(st.dist[i]/st.n*100) : 0;
+      rows += `<div class="ds-drow"><span class="lab">${i}</span><span class="bar"><i style="--w:${w}%"></i></span><span class="num">${st.dist[i]}</span></div>`;
+    }
+    sumEl.innerHTML = `
+      <div class="ds-sum">
+        <div class="ds-avg">
+          <div class="ds-avg-num">${st.n ? (Math.round(st.avg*10)/10) : '—'}<small> / ${CHEF_MAX_STARS}</small></div>
+          <div class="ds-fstars"><span class="bg">★★★★★★★</span><span class="fg" style="width:${pct}%">★★★★★★★</span></div>
+          <div class="ds-count">${st.n ? st.n+' تقييم' : 'لسه مفيش تقييمات'}</div>
+        </div>
+        <div class="ds-dist">${rows}</div>
+      </div>
+      ${official ? `<div class="ds-official">👨‍🍳 تقييم الأدمن: ${official}/${CHEF_MAX_STARS} ⭐</div>` : ''}`;
+  }
+  // actions (submit / delete mine)
+  const acts = document.getElementById('ds-actions');
+  if(acts){
+    const mine = state.pid ? ((CHEF_REVIEWS[cid]||{})[did]||{})[state.pid] : null;
+    acts.innerHTML = `<button type="button" class="btn btn-primary" data-action="ds-submit">${mine ? '✏️ تحديث تقييمي' : '⭐ إرسال تقييمي'}</button>` +
+      (mine ? `<button type="button" class="btn btn-ghost" style="color:var(--danger);" data-action="ds-delete-mine">حذف</button>` : '');
+  }
+  // reviews list
+  const listEl = document.getElementById('ds-reviews');
+  if(listEl){
+    let revs = chefDishReviews(cid, did);
+    const sort = dishSheet.sort;
+    revs.sort((a,b)=> sort==='top' ? (b.s-a.s || b.ts-a.ts) : sort==='low' ? (a.s-b.s || b.ts-a.ts) : (b.ts-a.ts));
+    // رأيي يظهر أولاً دايمًا
+    const mineIdx = revs.findIndex(r=>r.pid===state.pid);
+    if(mineIdx>0){ const [m] = revs.splice(mineIdx,1); revs.unshift(m); }
+    const sortBtn = (k,l)=>`<button type="button" class="ds-sort ${sort===k?'active':''}" data-action="ds-sort" data-sort="${k}">${l}</button>`;
+    const cards = revs.map((r,i)=>`
+      <div class="ds-rev ${r.pid===state.pid?'mine':''}" style="--i:${Math.min(i,10)}">
+        ${reviewerAvatarHtml(r.pid)}
+        <div class="ds-rev-body">
+          <div class="ds-rev-top">
+            <span class="ds-rev-name">${escapeHtml(reviewerName(r.pid))}</span>
+            ${r.pid===state.pid ? '<span class="ds-mine-badge">رأيك</span>' : ''}
+            <span class="ds-rev-time">${r.ts ? timeAgoAr(r.ts) : ''}</span>
+          </div>
+          <div class="ds-rev-stars">${dsStarsRowHtml(r.s)}</div>
+          ${r.t ? `<div class="ds-rev-text">${escapeHtml(r.t)}</div>` : ''}
+        </div>
+      </div>`).join('');
+    listEl.innerHTML = `
+      <div class="ds-rev-head">
+        <div class="ds-rev-title">💬 آراء المشاركين (${revs.length})</div>
+        ${revs.length>1 ? `<div class="ds-sorts">${sortBtn('new','الأحدث')}${sortBtn('top','الأعلى')}${sortBtn('low','الأقل')}</div>` : ''}
+      </div>
+      ${cards || `<div class="ds-empty">🍽️ لسه محدش قيّم الأكلة دي<br>كن أول واحد يكتب رأيه!</div>`}`;
+  }
+}
+function dsSetStars(n){
+  if(!dishSheet) return;
+  dishSheet.stars = n;
+  document.querySelectorAll('#ds-stars .ds-star').forEach(b=>{
+    const k = parseInt(b.dataset.n,10);
+    b.classList.toggle('on', k<=n);
+    b.classList.remove('pop');
+    if(k<=n){ void b.offsetWidth; b.style.animationDelay = ((k-1)*35)+'ms'; b.classList.add('pop'); }
+  });
+  const lab = document.getElementById('ds-star-label');
+  if(lab){ lab.textContent = DISH_STAR_LABELS[n]||''; lab.classList.remove('pop'); void lab.offsetWidth; lab.classList.add('pop'); }
+  vibrate(10);
+}
+async function dsSubmit(){
+  if(!dishSheet) return;
+  const { cid, did } = dishSheet;
+  if(!state.pid){ showToast('سجّل دخولك الأول', true); return; }
+  if(!dishSheet.stars){ showToast('اختار عدد النجوم الأول ⭐', true); return; }
+  const txtEl = document.getElementById('ds-text');
+  const text = (txtEl ? txtEl.value : dishSheet.text).trim().slice(0, DISH_REVIEW_MAX_CHARS);
+  const stars = dishSheet.stars, pid = state.pid;
+  const btn = document.querySelector('#ds-actions .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = '...بيتم الإرسال'; }
+  const ok = await chefReviewsUpdate(cid, (o)=>{
+    o[did] = o[did] || {};
+    o[did][pid] = { s:stars, t:text, ts:Date.now() };
+  });
+  if(!dishSheet) return;
+  if(ok){
+    showToast(stars===CHEF_MAX_STARS ? 'وصل تقييمك 👑 شكرًا ليك!' : 'وصل تقييمك ⭐ شكرًا ليك!');
+    SND.coinChime && SND.coinChime();
+    if(stars===CHEF_MAX_STARS) launchConfetti();
+    dishSheet.text = text;
+    updateDishSheetDynamic();
+    updateDishMetaInPlace();
+  } else {
+    showToast('⚠️ التقييم ماتبعتش — اتأكد من الإنترنت وجرّب تاني', true);
+    updateDishSheetDynamic();
+  }
+}
+async function dsDeleteMine(){
+  if(!dishSheet || !state.pid) return;
+  const { cid, did } = dishSheet, pid = state.pid;
+  const ok = await chefReviewsUpdate(cid, (o)=>{
+    if(o[did]){ delete o[did][pid]; if(!Object.keys(o[did]).length) delete o[did]; }
+  });
+  if(!dishSheet) return;
+  if(ok){
+    showToast('تم حذف تقييمك');
+    dishSheet.stars = 0; dishSheet.text = '';
+    renderDishSheet();
+    updateDishMetaInPlace();
+  } else showToast('⚠️ الحذف ماتأكدش — جرّب تاني', true);
+}
+function confirmAdminDeleteReview(cid, did, pid){
+  showConfirmDialog(`حذف رأي "${escapeHtml(reviewerName(pid))}"؟`, async ()=>{
+    const ok = await chefReviewsUpdate(cid, (o)=>{
+      if(o[did]){ delete o[did][pid]; if(!Object.keys(o[did]).length) delete o[did]; }
+    });
+    showToast(ok ? 'تم حذف الرأي' : '⚠️ الحذف ماتأكدش — جرّب تاني', !ok);
+    render();
+  });
+}
+
+/* ============================= CHEF RATING (تقييم الشيف) ============================= */
+const CHEF_MAX_STARS = 7;
+let CHEFS = [];            // [{id, name, photoV, dishes:[{id, name, stars}]}]  — الأدمن بس هو اللي بيعدّل
+let CHEF_PHOTOS = {};      // id -> dataURL (بنحمّلها لما الصفحة تتفتح)
+let CHEF_PHOTOS_SIG = null, CHEF_PHOTOS_LOADING = false;
+async function loadChefs(){
+  try{ const r = await window.storage.get('glavera-chefs', true); const v = r ? JSON.parse(r.value) : []; return Array.isArray(v) ? v : []; }
+  catch(e){ return []; }
+}
+async function saveChefs(arr){
+  try{ const r = await window.storage.set('glavera-chefs', JSON.stringify(arr), true); return !!r; }
+  catch(e){ console.error('saveChefs failed', e); return false; }
+}
+async function loadChefPhotos(){
+  try{ const r = await window.storage.get('glavera-chef-photos', true); const v = r ? JSON.parse(r.value) : {}; return (v && typeof v==='object') ? v : {}; }
+  catch(e){ return {}; }
+}
+async function saveChefPhotos(map){
+  try{ const r = await window.storage.set('glavera-chef-photos', JSON.stringify(map), true, 45000); return !!r; }
+  catch(e){ console.error('saveChefPhotos failed', e); return false; }
+}
+function chefSig(){ return CHEFS.map(c=>c.id+':'+(c.photoV||0)).join('|'); }
+async function ensureChefPhotos(){
+  const sig = chefSig();
+  if(!sig || CHEF_PHOTOS_SIG===sig || CHEF_PHOTOS_LOADING) return;
+  CHEF_PHOTOS_LOADING = true;
+  try{ CHEF_PHOTOS = await loadChefPhotos(); CHEF_PHOTOS_SIG = sig; }catch(e){}
+  CHEF_PHOTOS_LOADING = false;
+  if(state.view==='chefs' || state.view==='chef-meals' || state.view==='chef-dishes' || (state.view==='admin' && state.adminTab==='chefs')) render();
+}
+function chefNewId(prefix){ return prefix + Date.now().toString(36) + Math.floor(Math.random()*1296).toString(36); }
+function chefDishesLabel(n){
+  if(n===0) return 'لسه مفيش أكلات';
+  if(n===1) return 'أكلة واحدة';
+  if(n===2) return 'أكلتين';
+  if(n<=10) return n+' أكلات';
+  return n+' أكلة';
+}
+function chefAvg(c){
+  const d = (c.dishes||[]);
+  if(!d.length) return 0;
+  return d.reduce((sum,x)=>sum+(+x.stars||0),0)/d.length;
+}
+const CHEF_GRADS = [
+  'linear-gradient(145deg,#F6D365,#FDA085)', 'linear-gradient(145deg,#FF7A59,#F4B740)', 'linear-gradient(145deg,#3FDCC9,#845EC2)',
+  'linear-gradient(145deg,#FF6B9D,#845EC2)', 'linear-gradient(145deg,#43E97B,#38F9D7)', 'linear-gradient(145deg,#4FACFE,#00F2FE)'
+];
+function chefPhotoHtml(c, cls){
+  const ph = CHEF_PHOTOS[c.id];
+  const grad = CHEF_GRADS[Math.abs(String(c.id).split('').reduce((a,ch)=>a+ch.charCodeAt(0),0)) % CHEF_GRADS.length];
+  return ph ? `<span class="chef-photo ${cls||''}" style="background-image:url('${ph}')"></span>`
+            : `<span class="chef-photo ${cls||''}" style="background:${grad}">👨‍🍳</span>`;
+}
+function chefStarsHtml(n){
+  let h = '';
+  for(let i=1;i<=CHEF_MAX_STARS;i++) h += `<span class="chef-star ${i<=n?'on':''}" style="--k:${i}">★</span>`;
+  return h;
+}
+function renderChefsPage(){
+  ensureChefPhotos();
+  const head = `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${tr('nav_chefs')}</div>
+    </div>`;
+  if(!CHEFS.length){
+    return head + `<div class="empty-note">👨‍🍳 لسه الأدمن مضافش شيفات</div>`;
+  }
+  const tiles = CHEFS.map((c,i)=>{
+    const grad = CHEF_GRADS[i % CHEF_GRADS.length];
+    return `
+    <button type="button" class="gh-tile chef-tile" style="--g:${grad}; --i:${i}" data-action="open-chef" data-id="${c.id}">
+      ${chefPhotoHtml(c)}
+      <span class="gh-title">${escapeHtml(c.name)}</span>
+      <span class="chef-count">🍽️ ${chefDishesLabel((c.dishes||[]).length)}</span>
+    </button>`;
+  }).join('');
+  return head + `
+    <div class="gh-lobby-head">
+      <div class="gh-lobby-title">شيفات المؤتمر 👨‍🍳</div>
+      <div class="gh-lobby-sub">دوس على الشيف عشان تشوف أكلاته وتقييمها</div>
+    </div>
+    <div class="gh-grid">${tiles}</div>`;
+}
+const CHEF_MEALS = [
+  {id:'breakfast', label:'فطار', icon:'🍳', grad:'linear-gradient(145deg,#F6D365,#FDA085)', sub:'بداية اليوم'},
+  {id:'lunch',     label:'غداء', icon:'🍛', grad:'linear-gradient(145deg,#FF7A59,#F4B740)', sub:'الوجبة الرئيسية'},
+  {id:'dinner',    label:'عشاء', icon:'🌙', grad:'linear-gradient(145deg,#845EC2,#4FACFE)', sub:'ختام اليوم'},
+];
+const CHEF_MEAL_OTHER = {id:'other', label:'أخرى', icon:'🍽️', grad:'linear-gradient(145deg,#5FE0A4,#3FDCC9)', sub:'أكلات إضافية'};
+function chefMealOf(d){ return CHEF_MEALS.some(m=>m.id===d.meal) ? d.meal : 'other'; }
+function chefMealInfo(id){ return CHEF_MEALS.find(m=>m.id===id) || CHEF_MEAL_OTHER; }
+function renderChefMealsPage(){
+  ensureChefPhotos();
+  const c = CHEFS.find(x=>x.id===state.chefId);
+  const head = (title)=>`
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${escapeHtml(title)}</div>
+    </div>`;
+  if(!c) return head(tr('nav_chefs')) + `<div class="empty-note">الشيف ده مش موجود</div>`;
+  const dishes = c.dishes || [];
+  const hero = `
+    <div class="chef-hero">
+      ${chefPhotoHtml(c)}
+      <div>
+        <div class="chef-hero-name">${escapeHtml(c.name)}</div>
+        <div class="chef-hero-meta">🍽️ ${chefDishesLabel(dishes.length)}${dishes.length ? `<br>⭐ متوسط تقييم الأدمن ${(Math.round(chefAvg(c)*10)/10)} / ${CHEF_MAX_STARS}` : ''}</div>
+      </div>
+    </div>`;
+  const list = CHEF_MEALS.slice();
+  if(dishes.some(d=>chefMealOf(d)==='other')) list.push(CHEF_MEAL_OTHER);
+  const tiles = list.map((m,i)=>{
+    const n = dishes.filter(d=>chefMealOf(d)===m.id).length;
+    return `
+    <button type="button" class="gh-tile meal-tile" style="--g:${m.grad}; --i:${i}" data-action="open-meal" data-meal="${m.id}">
+      <span class="gh-ico">${m.icon}</span>
+      <span class="gh-title">${m.label}</span>
+      <span class="chef-count">🍽️ ${chefDishesLabel(n)}</span>
+    </button>`;
+  }).join('');
+  return head(c.name) + hero + `
+    <div class="gh-lobby-head" style="margin-top:0;">
+      <div class="gh-lobby-title">اختار الوجبة 🍴</div>
+      <div class="gh-lobby-sub">دوس على الوجبة عشان تشوف الأكلات وتقيّمها</div>
+    </div>
+    <div class="gh-grid">${tiles}</div>`;
+}
+function renderChefDishesPage(){
+  ensureChefPhotos();
+  if(state.chefId) ensureChefReviews(state.chefId);
+  const c = CHEFS.find(x=>x.id===state.chefId);
+  const head = (title)=>`
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${escapeHtml(title)}</div>
+    </div>`;
+  if(!c) return head(tr('nav_chefs')) + `<div class="empty-note">الشيف ده مش موجود</div>`;
+  const meal = chefMealInfo(state.mealId);
+  const dishes = (c.dishes || []).filter(d=>chefMealOf(d)===meal.id);
+  const avg = chefAvg({dishes});
+  const hero = `
+    <div class="chef-hero">
+      ${chefPhotoHtml(c)}
+      <div>
+        <div class="chef-hero-name">${escapeHtml(c.name)}</div>
+        <div class="chef-hero-meta">${meal.icon} ${meal.label} • ${chefDishesLabel(dishes.length)}${dishes.length ? `<br>⭐ متوسط تقييم الأدمن ${(Math.round(avg*10)/10)} / ${CHEF_MAX_STARS}` : ''}</div>
+      </div>
+    </div>`;
+  if(!dishes.length) return head(c.name+' — '+meal.label) + hero + `<div class="empty-note">${meal.icon} لسه الأدمن مضافش أكلات في ${meal.label}</div>`;
+  const DISH_GRADS = ['linear-gradient(145deg,#FF6B6B,#FF9A8B)','linear-gradient(145deg,#FF7A59,#F4B740)','linear-gradient(145deg,#F6D365,#FDA085)',
+    'linear-gradient(145deg,#F4B740,#FFDE94)','linear-gradient(145deg,#5FE0A4,#3FDCC9)','linear-gradient(145deg,#3FDCC9,#4FACFE)','linear-gradient(145deg,#FFD25E,#B58BFF)'];
+  const tiles = dishes.map((d,i)=>{
+    const n = Math.max(0, Math.min(CHEF_MAX_STARS, parseInt(d.stars,10)||0));
+    const top = n===CHEF_MAX_STARS;
+    return `
+    <button type="button" class="gh-tile dish-tile ${top?'is-top':''}" style="--g:${DISH_GRADS[Math.max(0,n-1)]}; --i:${i}" data-action="open-dish" data-cid="${c.id}" data-did="${d.id}">
+      <span class="dish-score">${n}/${CHEF_MAX_STARS}</span>
+      ${top ? '<span class="dish-crown">👑</span>' : ''}
+      <span class="dish-emoji">🍽️</span>
+      <span class="dish-name">${escapeHtml(d.name)}</span>
+      <span class="dish-stars">${chefStarsHtml(n)}</span>
+      <span class="dish-meta" data-did="${d.id}">${dishMetaHtml(c.id, d.id)}</span>
+    </button>`;
+  }).join('');
+  return head(c.name+' — '+meal.label) + hero + `<div class="gh-grid">${tiles}</div>`;
+}
+
+/* ---------- ADMIN: chefs ---------- */
+function chefStarPickerHtml(value, id, action, extraAttrs){
+  let h = `<div class="sp-picker" id="${id||''}" dir="ltr">`;
+  for(let i=1;i<=CHEF_MAX_STARS;i++) h += `<button type="button" class="sp-star ${i<=value?'on':''}" data-action="${action}" data-n="${i}" ${extraAttrs||''}>★</button>`;
+  return h + '</div>';
+}
+function chefMealPickerHtml(value, id, action, extraAttrs){
+  let h = `<div class="meal-picker" id="${id||''}">`;
+  CHEF_MEALS.forEach(m=>{ h += `<button type="button" class="meal-chip ${value===m.id?'on':''}" data-action="${action}" data-meal="${m.id}" ${extraAttrs||''}>${m.icon} ${m.label}</button>`; });
+  return h + '</div>';
+}
+function setMealPickerDom(pickerEl, mealId){
+  if(!pickerEl) return;
+  pickerEl.querySelectorAll('.meal-chip').forEach(b=>b.classList.toggle('on', b.dataset.meal===mealId));
+}
+function setPickerDom(pickerEl, n){
+  if(!pickerEl) return;
+  pickerEl.querySelectorAll('.sp-star').forEach(b=>b.classList.toggle('on', parseInt(b.dataset.n,10)<=n));
+}
+function renderAdminChefsTab(){
+  ensureChefPhotos();
+  if(state.editingChefId){
+    const c = CHEFS.find(x=>x.id===state.editingChefId);
+    if(c) return renderAdminChefEdit(c);
+    state.editingChefId = null;
+  }
+  const rows = CHEFS.map(c=>{
+    const ph = CHEF_PHOTOS[c.id];
+    const n = (c.dishes||[]).length;
+    return `<div class="card chef-admin-row">
+      <div class="avatar" style="${ph?`background-image:url('${ph}');`:'background:linear-gradient(145deg,#F6D365,#FDA085);'}">${ph?'':'👨‍🍳'}</div>
+      <div class="chef-admin-info">
+        <div class="chef-admin-name">${escapeHtml(c.name)}</div>
+        <div class="chef-admin-meta">${chefDishesLabel(n)}${n?` — المتوسط ${Math.round(chefAvg(c)*10)/10}/${CHEF_MAX_STARS}`:''}</div>
+      </div>
+      <button type="button" class="btn btn-primary" style="padding:9px 12px;font-size:12px;" data-action="admin-edit-chef" data-id="${c.id}">إدارة</button>
+    </div>`;
+  }).join('');
+  return `
+    <div class="card">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;margin-bottom:8px;">➕ إضافة شيف جديد</div>
+      <label>اسم الشيف</label>
+      <input class="field" id="new-chef-name" placeholder="مثال: الشيف أحمد" />
+      <label style="margin-top:10px;">صورة الشيف</label>
+      <input type="file" accept="image/*" id="new-chef-photo" style="font-size:11px;" />
+      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-chef">إضافة الشيف</button>
+    </div>
+    <div class="section-title">الشيفات (${CHEFS.length})</div>
+    ${rows || `<div class="empty-note">👨‍🍳 لسه مفيش شيفات — ضيف أول شيف من فوق</div>`}
+  `;
+}
+function renderAdminChefEdit(c){
+  ensureChefReviews(c.id);
+  const ph = CHEF_PHOTOS[c.id];
+  const newStars = state.chefNewStars || 5;
+  const mealOrder = (d)=>{ const i = CHEF_MEALS.findIndex(m=>m.id===d.meal); return i<0 ? 99 : i; };
+  const dishRows = (c.dishes||[]).slice().sort((a,b)=>mealOrder(a)-mealOrder(b)).map(d=>`
+    <div class="card dish-admin-card">
+      <input class="field" id="dish-name-${d.id}" value="${escapeHtml(d.name)}" placeholder="اسم الأكلة" />
+      ${chefMealPickerHtml(chefMealOf(d)==='other' ? '' : d.meal, 'dish-meal-'+d.id, 'admin-dish-meal', `data-cid="${c.id}" data-did="${d.id}"`)}
+      ${chefMealOf(d)==='other' ? '<div class="meal-warn">⚠️ اختار الوجبة — لحد ما تختار هتظهر تحت "أخرى"</div>' : ''}
+      ${chefStarPickerHtml(parseInt(d.stars,10)||0, 'dish-picker-'+d.id, 'admin-dish-stars', `data-cid="${c.id}" data-did="${d.id}"`)}
+      ${(()=>{ const rv = chefDishReviews(c.id, d.id).sort((a,b)=>b.ts-a.ts); const st = chefDishStats(c.id, d.id);
+        return `<details class="dish-rev-admin"><summary>💬 آراء المشاركين (${rv.length})${rv.length?` — المتوسط ${Math.round(st.avg*10)/10}/${CHEF_MAX_STARS}`:''}</summary>` +
+          (rv.map(r=>`<div class="dish-rev-admin-row"><div class="t"><b>${escapeHtml(reviewerName(r.pid))}</b> — ${'★'.repeat(r.s)}${r.t?`<br>${escapeHtml(r.t)}`:''}</div><button type="button" data-action="admin-delete-review" data-cid="${c.id}" data-did="${d.id}" data-pid="${escapeHtml(r.pid)}" aria-label="حذف">✕</button></div>`).join('') || '<div class="hint">لسه مفيش آراء</div>') + `</details>`; })()}
+      <div class="dish-admin-actions">
+        <button type="button" class="btn btn-primary" data-action="admin-save-dish-name" data-cid="${c.id}" data-did="${d.id}">💾 حفظ الاسم</button>
+        <button type="button" class="btn btn-ghost" style="color:var(--danger);" data-action="admin-delete-dish" data-cid="${c.id}" data-did="${d.id}">✕ حذف</button>
+      </div>
+    </div>`).join('');
+  return `
+    <div class="op-admin-back-link" data-action="admin-chef-back">${ICO.back} رجوع لقائمة الشيفات</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="avatar" style="width:56px;height:56px;${ph?`background-image:url('${ph}');background-size:cover;background-position:center;`:'background:linear-gradient(145deg,#F6D365,#FDA085);'}">${ph?'':'👨‍🍳'}</div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;">${escapeHtml(c.name)}</div>
+      </div>
+      <label style="margin-top:12px;">اسم الشيف</label>
+      <input class="field" id="edit-chef-name-${c.id}" value="${escapeHtml(c.name)}" />
+      <label style="margin-top:10px;">تغيير الصورة</label>
+      <input type="file" accept="image/*" id="edit-chef-photo-${c.id}" style="font-size:11px;" />
+      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-save-chef" data-id="${c.id}">حفظ بيانات الشيف</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="admin-delete-chef" data-id="${c.id}">✕ حذف الشيف وكل أكلاته</button>
+    </div>
+    <div class="section-title">➕ إضافة أكلة</div>
+    <div class="card">
+      <label>اسم الأكلة</label>
+      <input class="field" id="new-dish-name" placeholder="مثال: كشري" />
+      <label style="margin-top:10px;">الوجبة</label>
+      ${chefMealPickerHtml(state.chefNewMeal || 'breakfast', 'new-dish-meal', 'chef-new-meal')}
+      <label style="margin-top:10px;">التقييم (من ${CHEF_MAX_STARS} نجوم)</label>
+      ${chefStarPickerHtml(newStars, 'new-dish-picker', 'chef-new-stars')}
+      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-dish" data-cid="${c.id}">إضافة الأكلة</button>
+    </div>
+    <div class="section-title">الأكلات (${(c.dishes||[]).length})</div>
+    ${dishRows || `<div class="empty-note">🍽️ لسه مفيش أكلات للشيف ده</div>`}
+  `;
+}
+async function chefPersist(msgOk){
+  const ok = await saveChefs(CHEFS);
+  if(ok){ if(msgOk) showToast(msgOk); }
+  else showToast('⚠️ الحفظ ماتأكدش — اتأكد من الإنترنت وجرّب تاني', true);
+  return ok;
+}
+async function chefSetPhoto(id, dataUrl){
+  const map = await loadChefPhotos();       // نقرا الأحدث الأول عشان منمسحش صور شيفات تانيين
+  map[id] = dataUrl;
+  const ok = await saveChefPhotos(map);
+  if(ok) CHEF_PHOTOS = map;
+  return ok;
+}
+async function doAdminAddChef(){
+  const nameEl = document.getElementById('new-chef-name');
+  const fileEl = document.getElementById('new-chef-photo');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if(!name){ showToast('اكتب اسم الشيف الأول', true); return; }
+  const c = { id: chefNewId('chef'), name, photoV:0, dishes:[] };
+  const photo = (fileEl && fileEl.files && fileEl.files[0]) ? await readImageFileToDataUrl(fileEl, 360) : null;
+  if(photo){
+    const ok = await chefSetPhoto(c.id, photo);
+    if(!ok){ showToast('⚠️ الصورة ماتحفظتش — جرّب تاني', true); return; }
+    c.photoV = Date.now();
+  }
+  CHEFS.push(c);
+  if(photo) CHEF_PHOTOS_SIG = chefSig();
+  await chefPersist('تمت إضافة الشيف ✅');
+  state.editingChefId = c.id;
+  render();
+}
+async function doAdminSaveChef(id){
+  const c = CHEFS.find(x=>x.id===id); if(!c) return;
+  const nameEl = document.getElementById('edit-chef-name-'+id);
+  const fileEl = document.getElementById('edit-chef-photo-'+id);
+  const name = nameEl ? nameEl.value.trim() : '';
+  if(!name){ showToast('اسم الشيف مينفعش يبقى فاضي', true); return; }
+  c.name = name;
+  if(fileEl && fileEl.files && fileEl.files[0]){
+    const photo = await readImageFileToDataUrl(fileEl, 360);
+    if(photo){
+      const ok = await chefSetPhoto(id, photo);
+      if(!ok){ showToast('⚠️ الصورة ماتحفظتش — جرّب تاني', true); return; }
+      c.photoV = Date.now();
+      CHEF_PHOTOS_SIG = chefSig();
+    }
+  }
+  await chefPersist('تم حفظ بيانات الشيف');
+  render();
+}
+function confirmAdminDeleteChef(id){
+  const c = CHEFS.find(x=>x.id===id); if(!c) return;
+  showConfirmDialog(`حذف الشيف "${escapeHtml(c.name)}"؟`, async ()=>{
+    CHEFS = CHEFS.filter(x=>x.id!==id);
+    state.editingChefId = null;
+    const map = await loadChefPhotos();
+    if(map[id]){ delete map[id]; if(await saveChefPhotos(map)) CHEF_PHOTOS = map; }
+    CHEF_PHOTOS_SIG = chefSig();
+    try{ await window.storage.delete('glavera-chef-reviews-'+id, true); }catch(e){}
+    delete CHEF_REVIEWS[id];
+    await chefPersist('تم حذف الشيف');
+    render();
+  }, {sub:'هيتحذف كمان كل الأكلات المسجلة له'});
+}
+async function doAdminAddDish(cid){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const nameEl = document.getElementById('new-dish-name');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if(!name){ showToast('اكتب اسم الأكلة الأول', true); return; }
+  c.dishes = c.dishes || [];
+  c.dishes.push({ id: chefNewId('d'), name, stars: state.chefNewStars || 5, meal: state.chefNewMeal || 'breakfast' });
+  await chefPersist('تمت إضافة الأكلة 🍽️');
+  render();
+}
+async function doAdminDishMeal(cid, did, meal, el){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const d = (c.dishes||[]).find(x=>x.id===did); if(!d) return;
+  d.meal = meal;
+  setMealPickerDom(el ? el.closest('.meal-picker') : null, meal);
+  const warn = el ? el.closest('.dish-admin-card').querySelector('.meal-warn') : null;
+  if(warn) warn.remove();
+  await chefPersist('تم نقل الأكلة إلى '+chefMealInfo(meal).label);
+}
+async function doAdminDishStars(cid, did, n, el){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const d = (c.dishes||[]).find(x=>x.id===did); if(!d) return;
+  d.stars = n;
+  setPickerDom(el ? el.closest('.sp-picker') : null, n);
+  await chefPersist();
+}
+async function doAdminSaveDishName(cid, did){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const d = (c.dishes||[]).find(x=>x.id===did); if(!d) return;
+  const el = document.getElementById('dish-name-'+did);
+  const name = el ? el.value.trim() : '';
+  if(!name){ showToast('اسم الأكلة مينفعش يبقى فاضي', true); return; }
+  d.name = name;
+  await chefPersist('تم حفظ اسم الأكلة');
+}
+function confirmAdminDeleteDish(cid, did){
+  const c = CHEFS.find(x=>x.id===cid); if(!c) return;
+  const d = (c.dishes||[]).find(x=>x.id===did); if(!d) return;
+  showConfirmDialog(`حذف الأكلة "${escapeHtml(d.name)}"؟`, async ()=>{
+    c.dishes = c.dishes.filter(x=>x.id!==did);
+    await chefReviewsUpdate(cid, (o)=>{ delete o[did]; });
+    await chefPersist('تم حذف الأكلة');
+    render();
+  });
 }
 
 /* ============================= GAMES: STORAGE ============================= */
@@ -7875,6 +8701,7 @@ function renderAdminPointCodesTab(){
 const ADMIN_HUB_ITEMS = [
   {tab:'settings',   icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
   {tab:'gallery',    icon:ICO.gallery, label:'معرض الصور',          color:'transparent'},
+  {tab:'chefs',      icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {tab:'sessions',   icon:'🗓️', label:'الفقرات والأيام',    color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
   {tab:'participants',icon:'👤', label:'المشاركين',          color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
   {tab:'teams',      icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
@@ -7915,6 +8742,7 @@ function renderAdmin(){
   if(tab==='sessions') body = renderAdminSessionsTab();
   else if(tab==='settings') body = renderAdminSettingsTab();
   else if(tab==='gallery') body = renderAdminGalleryTab();
+  else if(tab==='chefs') body = renderAdminChefsTab();
   else if(tab==='pointcodes') body = renderAdminPointCodesTab();
   else if(tab==='rankings') body = renderAdminRankingsTab();
   else if(tab==='audit') body = renderAdminAuditTab();
@@ -7944,6 +8772,8 @@ function renderAdmin(){
       const p = PARTICIPANTS.find(x=>x.id===state.editingParticipantId);
       if(p) pageTitle = p.name;
     }
+  } else if(tab==='chefs'){
+    if(state.editingChefId){ const ch = CHEFS.find(x=>x.id===state.editingChefId); if(ch) pageTitle = ch.name; }
   } else if(tab==='opinions'){
     if(state.viewingOpinionId){
       const o = OPINIONS.find(x=>x.id===state.viewingOpinionId);
@@ -8437,6 +9267,9 @@ function render(){
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='games-solo') html = renderSoloGames();
+  else if(state.view==='chefs') html = renderChefsPage();
+  else if(state.view==='chef-meals') html = renderChefMealsPage();
+  else if(state.view==='chef-dishes') html = renderChefDishesPage();
   else if(state.view==='game-xo') html = renderXoGame();
   else if(state.view==='game-connect4') html = renderConnect4Game();
   else if(state.view==='game-domino') html = renderDominoGame();
@@ -9601,10 +10434,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='reset-demo'){ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }
   else if(action==='submit-admin-pass'){ doAdminUnlock(); }
   else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; state.viewingOpinionId = null; render(); }
-  else if(action==='admin-hub-tile'){ state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); }
+  else if(action==='admin-hub-tile'){ state.editingChefId = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
-  else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
+  else if(action==='admin-hub-back'){ state.editingChefId = null; state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
   else if(action==='edit-participant'){ state.editingParticipantId = el.dataset.pid; render(); preloadParticipantPhotos(el.dataset.pid).then(render); }
   else if(action==='admin-delete-participant-photo'){ doAdminDeleteParticipantPhoto(el.dataset.pid, el.dataset.photo); }
   else if(action==='open-myphoto'){ openMyPhotosLightbox(parseInt(el.dataset.idx,10)||0); }
@@ -9713,6 +10546,27 @@ document.addEventListener('click', (e)=>{
     else if(gid==='math') initMathGame();
     go('game-'+gid);
   }
+  else if(action==='open-dish'){ openDishSheet(el.dataset.cid, el.dataset.did); }
+  else if(action==='close-dish-sheet'){ closeDishSheet(); }
+  else if(action==='ds-star'){ dsSetStars(parseInt(el.dataset.n,10)||0); }
+  else if(action==='ds-submit'){ dsSubmit(); }
+  else if(action==='ds-delete-mine'){ dsDeleteMine(); }
+  else if(action==='ds-sort'){ if(dishSheet){ dishSheet.sort = el.dataset.sort; updateDishSheetDynamic(); } }
+  else if(action==='admin-delete-review'){ confirmAdminDeleteReview(el.dataset.cid, el.dataset.did, el.dataset.pid); }
+  else if(action==='open-chef'){ go('chef-meals', {chefId: el.dataset.id}); }
+  else if(action==='open-meal'){ go('chef-dishes', {mealId: el.dataset.meal}); }
+  else if(action==='admin-add-chef'){ doAdminAddChef(); }
+  else if(action==='admin-edit-chef'){ state.editingChefId = el.dataset.id; state.chefNewStars = 5; state.chefNewMeal = 'breakfast'; render(); }
+  else if(action==='admin-chef-back'){ state.editingChefId = null; render(); }
+  else if(action==='admin-save-chef'){ doAdminSaveChef(el.dataset.id); }
+  else if(action==='admin-delete-chef'){ confirmAdminDeleteChef(el.dataset.id); }
+  else if(action==='admin-add-dish'){ doAdminAddDish(el.dataset.cid); }
+  else if(action==='chef-new-stars'){ state.chefNewStars = parseInt(el.dataset.n,10)||5; setPickerDom(el.closest('.sp-picker'), state.chefNewStars); }
+  else if(action==='chef-new-meal'){ state.chefNewMeal = el.dataset.meal; setMealPickerDom(el.closest('.meal-picker'), state.chefNewMeal); }
+  else if(action==='admin-dish-meal'){ doAdminDishMeal(el.dataset.cid, el.dataset.did, el.dataset.meal, el); }
+  else if(action==='admin-dish-stars'){ doAdminDishStars(el.dataset.cid, el.dataset.did, parseInt(el.dataset.n,10)||0, el); }
+  else if(action==='admin-save-dish-name'){ doAdminSaveDishName(el.dataset.cid, el.dataset.did); }
+  else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='friend-tile-open'){ setFriendTile('menu'); }
@@ -9850,6 +10704,12 @@ document.addEventListener('change', (e)=>{
   }
 });
 document.addEventListener('input', (e)=>{
+  if(e.target && e.target.id==='ds-text'){
+    if(dishSheet) dishSheet.text = e.target.value;
+    const ct = document.getElementById('ds-counter');
+    if(ct) ct.textContent = e.target.value.length+'/'+DISH_REVIEW_MAX_CHARS;
+    return;
+  }
   if(e.target && e.target.id==='room-join-code'){
     const v = ghNormalizeDigits(e.target.value);
     if(e.target.value!==v) e.target.value = v;
@@ -12114,7 +12974,7 @@ async function doExportFullBackup(){
         POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES,
         SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS,
         CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos,
-        PARTICIPANT_PHOTOS, participantPhotos, CHAT_MESSAGES, chatMedia
+        PARTICIPANT_PHOTOS, participantPhotos, CHAT_MESSAGES, chatMedia, CHEFS, CHEF_PHOTOS
       }
     };
     const json = JSON.stringify(backup, null, 2);
@@ -12381,14 +13241,14 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages()
+    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
@@ -12539,6 +13399,22 @@ function startLivePolling(){
       if(state.view==='admin' && state.adminTab==='opinions'){
         OPINIONS = await loadOpinions();
         render();
+      }
+      if(state.view==='chef-dishes' && state.chefId){
+        window.__chefRevTick = (window.__chefRevTick||0)+1;
+        if(dishSheet || window.__chefRevTick%2===0){
+          const cidNow = state.chefId;
+          const freshRev = await loadChefReviews(cidNow);
+          if(JSON.stringify(freshRev) !== JSON.stringify(CHEF_REVIEWS[cidNow]||{})){
+            CHEF_REVIEWS[cidNow] = freshRev;
+            updateDishMetaInPlace();
+            if(dishSheet) updateDishSheetDynamic();
+          }
+        }
+      }
+      if(state.view==='chefs' || state.view==='chef-meals' || state.view==='chef-dishes'){
+        const freshChefs = await loadChefs();
+        if(JSON.stringify(freshChefs) !== JSON.stringify(CHEFS)){ CHEFS = freshChefs; render(); }
       }
       if(state.view==='chat'){
         const fresh = await loadChatMessages();
