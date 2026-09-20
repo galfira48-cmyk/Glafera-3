@@ -1944,6 +1944,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     border:2px solid var(--surface); line-height:1; cursor:pointer;}
   .gallery-admin-upload-label{margin-top:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;}
 
+  /* ---------- admin: private participant photos (Photo) ---------- */
+  .pphoto-grid{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
+  .pphoto-thumb{position:relative; width:74px; height:74px; border-radius:12px; background-size:cover;
+    background-position:center; background-color:var(--surface-2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;}
+  .pphoto-thumb-loading{font-size:18px; opacity:.6;}
+  .pphoto-thumb-del{position:absolute; top:-6px; left:-6px; width:20px; height:20px; border-radius:50%;
+    background:#FF6B6B; color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--surface); line-height:1;}
+
+  /* ---------- participant-facing: my photos (Photo) page ---------- */
+  .myphotos-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+  .myphotos-thumb{position:relative; aspect-ratio:1/1; border-radius:16px; background-size:cover; background-position:center;
+    background-color:var(--surface-2); border:1px solid var(--border); overflow:hidden; cursor:pointer;}
+  .myphotos-thumb-loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:20px; opacity:.5;}
+
   /* ---------- ask a question box (inside session) ---------- */
   .ask-box{padding:14px; border:1.5px dashed var(--teal);}
   .ask-box-title{display:flex; align-items:center; gap:6px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--teal);}
@@ -2541,6 +2557,52 @@ async function preloadGalleryPhotos(albums){
     }catch(e){}
   }));
 }
+
+/* ---- صور خاصة بكل مشارك (Photo) — كل صورة مربوطة بمشارك واحد بس، مش بتظهر لغيره ولا في المعرض العام ---- */
+let PARTICIPANT_PHOTOS = {}; // { [participantId]: [photoId, photoId, ...] }
+const PARTICIPANT_PHOTO_CACHE = {}; // { [photoId]: dataUrl } — بيتحمّل عند الطلب بس، مش لكل الناس مرة واحدة
+async function loadParticipantPhotosIndex(){
+  try{
+    const r = await window.storage.get('glavera-participant-photos-index', true);
+    return r && r.value ? JSON.parse(r.value) : {};
+  }catch(e){ return {}; }
+}
+async function saveParticipantPhotosIndex(obj){
+  try{ await window.storage.set('glavera-participant-photos-index', JSON.stringify(obj), true); return true; }
+  catch(e){ console.error('saveParticipantPhotosIndex failed:', e); return false; }
+}
+async function saveParticipantPhotosIndexWithRetry(obj, attempt){
+  attempt = attempt || 1;
+  const ok = await saveParticipantPhotosIndex(obj);
+  if(ok) return true;
+  if(attempt < 3){ await sleep(800*attempt); return saveParticipantPhotosIndexWithRetry(obj, attempt+1); }
+  return false;
+}
+async function saveParticipantPhoto(photoId, dataUrl, attempt){
+  attempt = attempt || 1;
+  try{
+    const r = await window.storage.set('glavera-participant-photo-'+photoId, dataUrl, true, 45000); // مهلة أطول لأن الصور أكبر بكتير من باقي البيانات
+    if(!r) throw new Error(_fbLastError||'save failed');
+    return true;
+  }catch(e){
+    console.error('saveParticipantPhoto failed (attempt '+attempt+'):', e);
+    if(attempt < 3){ await sleep(900*attempt); return saveParticipantPhoto(photoId, dataUrl, attempt+1); }
+    return false;
+  }
+}
+async function deleteParticipantPhotoBlob(photoId){
+  try{ await window.storage.delete('glavera-participant-photo-'+photoId, true); }catch(e){}
+}
+async function preloadParticipantPhotos(pid){
+  const ids = (PARTICIPANT_PHOTOS[pid]||[]).filter(id=>!PARTICIPANT_PHOTO_CACHE[id]);
+  if(!ids.length) return;
+  await Promise.all(ids.map(async id=>{
+    try{
+      const r = await window.storage.get('glavera-participant-photo-'+id, true);
+      if(r && r.value) PARTICIPANT_PHOTO_CACHE[id] = r.value;
+    }catch(e){}
+  }));
+}
 async function loadTrash(){
   try{
     const r = await window.storage.get('glavera-trash', true);
@@ -2775,6 +2837,7 @@ let PARTICIPANT_OVERRIDES = {};
 let TEAM_BONUS = {};
 let GALLERY_ALBUMS = [];
 let PENDING_GALLERY_UPLOADS = []; // صور فشل رفعها بسبب ضعف/انقطاع النت، بتتحفظ هنا وبترفع تلقائي أول ما الاتصال يرجع
+let PENDING_PARTICIPANT_PHOTO_UPLOADS = []; // نفس الفكرة بس لصور المشاركين الخاصة
 const SOCIAL_LINKS = [
   {key:'facebook', label:'فيسبوك', cls:'facebook', url:'https://www.facebook.com/share/1BQxTZtP3o/',
     svg:`<svg viewBox="0 0 24 24"><path class="st-fill" d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>`},
@@ -2798,6 +2861,8 @@ const TRANSLATIONS = {
     opinion_favorite_label:'⭐ أكتر فقرة عجبتك', opinion_favorite_ph:'اكتب اسم الفقرة اللي عجبتك أكتر',
     opinion_send:'إرسال رأيك', opinion_sent_toast:'وصلنا رأيك، شكرًا ليك 🙏', opinion_empty_err:'اكتب حاجة في خانة واحدة على الأقل',
     opinion_edit_hint:'ده رأيك اللي بعتّه قبل كده — تقدر تعدّله وتبعته تاني',
+    nav_myphotos:'Photo', nav_myphotos_sub:'صورك الخاصة — بس إنت اللي تشوفها',
+    myphotos_hint:'الصور دي خاصة بيك بس، ومش بتظهر لأي مشارك تاني ولا في معرض الصور العام', myphotos_empty:'لسه مفيش صور اتضافتلك',
     nav_pass:'بطاقتي الرقمية', nav_pass_sub:'كود QR الخاص بك للتحقق',
     nav_certificate:'الشهادة', nav_certificate_sub:'حمّل شهادة مشاركتك',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
@@ -2853,6 +2918,8 @@ const TRANSLATIONS = {
     opinion_favorite_label:'⭐ Favorite session', opinion_favorite_ph:'Which session did you like the most?',
     opinion_send:'Send Feedback', opinion_sent_toast:'Thanks, we got your feedback 🙏', opinion_empty_err:'Write something in at least one field',
     opinion_edit_hint:'This is the feedback you sent before — you can edit and resend it',
+    nav_myphotos:'Photo', nav_myphotos_sub:'Your private photos — only you can see them',
+    myphotos_hint:'These photos are private to you and won\u2019t be shown to any other participant or in the public gallery', myphotos_empty:'No photos added for you yet',
     nav_pass:'My Digital Pass', nav_pass_sub:'Your verification QR code',
     nav_certificate:'Certificate', nav_certificate_sub:'Download your participation certificate',
     nav_settings:'Settings', nav_settings_sub:'Identity, sound, and export',
@@ -3364,6 +3431,7 @@ const NAV_TILE_ITEMS = [
   {page:'games',   icon:'🎮', labelKey:'nav_games',   subKey:'nav_games_sub',   color:'linear-gradient(145deg,#FF6B9D,#845EC2)'},
   {page:'wall',    icon:'💬', labelKey:'nav_wall',    subKey:'nav_wall_sub',    color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
   {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
+  {page:'myphotos', icon:'📷', labelKey:'nav_myphotos', subKey:'nav_myphotos_sub', color:'linear-gradient(145deg,#FF9A8B,#FF6A88)'},
   {page:'pass',    icon:'🪪', labelKey:'nav_pass',    subKey:'nav_pass_sub',    color:'linear-gradient(145deg,#FFDE94,#3FDCC9)'},
   {page:'certificate',icon:'🎓', labelKey:'nav_certificate', subKey:'nav_certificate_sub', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'},
   {page:'settings',icon:'⚙️', labelKey:'nav_settings', subKey:'nav_settings_sub', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
@@ -4085,7 +4153,7 @@ function openGalleryLightbox(startIdx){
   const idx = state.galleryAlbumIndex || 0;
   const photoIds = galleryAlbumAt(idx).photoIds || [];
   if(!photoIds.length) return;
-  LIGHTBOX_STATE = { photoIds, i: startIdx || 0 };
+  LIGHTBOX_STATE = { photoIds, i: startIdx || 0, cache: GALLERY_PHOTO_CACHE };
   const backdrop = document.createElement('div');
   backdrop.className = 'lightbox-backdrop';
   backdrop.id = 'gallery-lightbox';
@@ -4103,7 +4171,55 @@ function openGalleryLightbox(startIdx){
   function renderLb(){
     const img = document.getElementById('lb-img');
     const counter = document.getElementById('lb-counter');
-    if(img) img.src = GALLERY_PHOTO_CACHE[LIGHTBOX_STATE.photoIds[LIGHTBOX_STATE.i]] || '';
+    if(img) img.src = (LIGHTBOX_STATE.cache||GALLERY_PHOTO_CACHE)[LIGHTBOX_STATE.photoIds[LIGHTBOX_STATE.i]] || '';
+    if(counter) counter.textContent = `${LIGHTBOX_STATE.i+1} / ${LIGHTBOX_STATE.photoIds.length}`;
+  }
+  function closeLb(){ backdrop.remove(); LIGHTBOX_STATE = null; }
+  function step(dir){
+    const n = LIGHTBOX_STATE.photoIds.length;
+    LIGHTBOX_STATE.i = ((LIGHTBOX_STATE.i + dir) % n + n) % n;
+    renderLb();
+  }
+  backdrop.querySelector('[data-lb-close]').addEventListener('click', closeLb);
+  backdrop.querySelector('[data-lb-prev]').addEventListener('click', ()=>step(-1));
+  backdrop.querySelector('[data-lb-next]').addEventListener('click', ()=>step(1));
+  backdrop.querySelector('[data-lb-download]').addEventListener('click', (e)=>{ e.stopPropagation(); doDownloadGalleryPhoto(); });
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeLb(); });
+  let sx = 0, sMoved = 0, sDragging = false;
+  backdrop.addEventListener('pointerdown', (e)=>{ sDragging = true; sx = e.clientX; sMoved = 0; });
+  backdrop.addEventListener('pointermove', (e)=>{ if(sDragging) sMoved = e.clientX - sx; });
+  backdrop.addEventListener('pointerup', ()=>{
+    if(!sDragging) return;
+    sDragging = false;
+    if(sMoved > 50) step(-1);
+    else if(sMoved < -50) step(1);
+  });
+  renderLb();
+}
+function openMyPhotosLightbox(startIdx){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p) return;
+  const photoIds = PARTICIPANT_PHOTOS[p.id] || [];
+  if(!photoIds.length) return;
+  LIGHTBOX_STATE = { photoIds, i: startIdx || 0, cache: PARTICIPANT_PHOTO_CACHE };
+  const backdrop = document.createElement('div');
+  backdrop.className = 'lightbox-backdrop';
+  backdrop.id = 'gallery-lightbox';
+  backdrop.innerHTML = `
+    <button type="button" class="lightbox-close" data-lb-close>${ICO.back}</button>
+    <div class="lightbox-counter" id="lb-counter"></div>
+    <div class="lightbox-img-wrap"><img id="lb-img" src="" alt="صورة مكبرة" /></div>
+    <div class="lightbox-arrows">
+      <button type="button" class="lightbox-arrow-btn" data-lb-prev>${ICO.chev}</button>
+      <button type="button" class="lightbox-arrow-btn" style="transform:scaleX(-1)" data-lb-next>${ICO.chev}</button>
+    </div>
+    <button type="button" class="lightbox-download-btn" data-lb-download title="تحميل الصورة">${ICO.download}</button>
+  `;
+  document.body.appendChild(backdrop);
+  function renderLb(){
+    const img = document.getElementById('lb-img');
+    const counter = document.getElementById('lb-counter');
+    if(img) img.src = PARTICIPANT_PHOTO_CACHE[LIGHTBOX_STATE.photoIds[LIGHTBOX_STATE.i]] || '';
     if(counter) counter.textContent = `${LIGHTBOX_STATE.i+1} / ${LIGHTBOX_STATE.photoIds.length}`;
   }
   function closeLb(){ backdrop.remove(); LIGHTBOX_STATE = null; }
@@ -4131,7 +4247,7 @@ function openGalleryLightbox(startIdx){
 async function doDownloadGalleryPhoto(){
   if(!LIGHTBOX_STATE) return;
   const pid = LIGHTBOX_STATE.photoIds[LIGHTBOX_STATE.i];
-  const dataUrl = pid && GALLERY_PHOTO_CACHE[pid];
+  const dataUrl = pid && (LIGHTBOX_STATE.cache||GALLERY_PHOTO_CACHE)[pid];
   if(!dataUrl){ showToast('تعذّر تجهيز الصورة', true); return; }
   const filename = `glavera3-photo-${LIGHTBOX_STATE.i+1}.jpg`;
   try{
@@ -4974,6 +5090,36 @@ function renderSettingsPage(){
       <textarea id="report-issue-text" placeholder="${tr('settings_report_placeholder')}"></textarea>
       <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="submit-report">${tr('settings_report_send')}</button>
     </div>
+  `;
+}
+
+/* ============================= RENDER: MY PHOTOS (Photo) PAGE — خاص بكل مشارك ============================= */
+let MY_PHOTOS_LOADING = false;
+function renderMyPhotosPage(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  const ids = p ? (PARTICIPANT_PHOTOS[p.id] || []) : [];
+  const allCached = ids.every(id=>PARTICIPANT_PHOTO_CACHE[id]);
+  if(p && ids.length && !allCached && !MY_PHOTOS_LOADING){
+    MY_PHOTOS_LOADING = true;
+    preloadParticipantPhotos(p.id).then(()=>{ MY_PHOTOS_LOADING = false; render(); });
+  }
+  const thumbs = ids.map((id,i)=>{
+    const url = PARTICIPANT_PHOTO_CACHE[id];
+    return `<div class="myphotos-thumb" style="${url?`background-image:url('${url}');`:''}" data-action="open-myphoto" data-idx="${i}">
+      ${url?'':'<span class="myphotos-thumb-loading">⏳</span>'}
+    </div>`;
+  }).join('');
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${tr('nav_myphotos')}</div>
+    </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">📷</div>
+      <div class="opinion-hero-title">${tr('nav_myphotos')}</div>
+      <div class="opinion-hero-sub">${tr('myphotos_hint')}</div>
+    </div>
+    ${ids.length ? `<div class="myphotos-grid">${thumbs}</div>` : `<div class="empty-note">${tr('myphotos_empty')}</div>`}
   `;
 }
 
@@ -6421,7 +6567,31 @@ function renderAdminParticipantDetail(p){
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-edit-participant">إلغاء</button>
       </div>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="delete-participant" data-pid="${p.id}">🗑️ حذف المشارك نهائيًا</button>
+      ${renderParticipantPrivatePhotosBlock(p.id)}
       ${attendanceBlock}
+    </div>
+  `;
+}
+function renderParticipantPrivatePhotosBlock(pid){
+  const ids = PARTICIPANT_PHOTOS[pid] || [];
+  const thumbs = ids.map(photoId=>{
+    const url = PARTICIPANT_PHOTO_CACHE[photoId];
+    return `<div class="pphoto-thumb" style="${url?`background-image:url('${url}');`:''}">
+      ${url?'':'<span class="pphoto-thumb-loading">⏳</span>'}
+      <button type="button" class="pphoto-thumb-del" data-action="admin-delete-participant-photo" data-pid="${pid}" data-photo="${photoId}">✕</button>
+    </div>`;
+  }).join('');
+  const pendingN = pendingUploadsCountForParticipant(pid);
+  return `
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <div class="admin-session-name" style="margin-bottom:4px;">📷 صور المشارك (Photo) — خاصة بيه بس</div>
+      <div class="hint" style="margin:0 0 10px;">الصور دي هتظهر للمشارك ده بس في خانة "Photo" الخاصة بيه، ومش هتظهر لأي مشارك تاني ولا في المعرض العام</div>
+      ${ids.length ? `<div class="pphoto-grid">${thumbs}</div>` : `<div class="empty-note" style="padding:10px 0;">لسه مفيش صور مرفوعة لهذا المشارك</div>`}
+      ${pendingN>0 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(244,183,64,.12);border:1px solid rgba(244,183,64,.35);font-size:11.5px;color:var(--gold,#F4B740);">⏳ ${pendingN} صورة مستنية رجوع الاتصال وهترفع تلقائي</div>` : ''}
+      <label class="btn btn-ghost gallery-admin-upload-label" style="margin-top:10px;">
+        ➕ إضافة صور لهذا المشارك
+        <input type="file" accept="image/*" multiple id="pphoto-upload-${pid}" style="display:none;" />
+      </label>
     </div>
   `;
 }
@@ -6614,6 +6784,7 @@ function render(){
   else if(state.view==='wall') html = renderWallPage();
   else if(state.view==='opinion') html = renderOpinionPage();
   else if(state.view==='capabilities') html = renderCapabilitiesPage();
+  else if(state.view==='myphotos') html = renderMyPhotosPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
@@ -6673,6 +6844,7 @@ function render(){
   if(state.view==='admin' && !state.adminUnlocked){ attachAdminOtpBoxes(); }
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
+  if(state.view==='admin' && state.adminTab==='participants' && state.editingParticipantId){ attachParticipantPhotoInputs(); }
   if(state.view==='admin' && state.editingSessionId){
     const info = SESSION_INFO[state.editingSessionId] || {};
     if(info.customQrText) drawCustomSessionQr(state.editingSessionId, info.customQrText);
@@ -7766,7 +7938,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
-  else if(action==='edit-participant'){ state.editingParticipantId = el.dataset.pid; render(); }
+  else if(action==='edit-participant'){ state.editingParticipantId = el.dataset.pid; render(); preloadParticipantPhotos(el.dataset.pid).then(render); }
+  else if(action==='admin-delete-participant-photo'){ doAdminDeleteParticipantPhoto(el.dataset.pid, el.dataset.photo); }
+  else if(action==='open-myphoto'){ openMyPhotosLightbox(parseInt(el.dataset.idx,10)||0); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
   else if(action==='close-add-participant'){ state.addingParticipant = false; render(); }
   else if(action==='regen-new-code'){ state._suggestedNewCode = null; render(); }
@@ -8597,8 +8771,96 @@ async function processPendingGalleryUploads(){
   }
 }
 if(typeof window !== 'undefined'){
-  window.addEventListener('online', ()=>{ processPendingGalleryUploads(); });
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) processPendingGalleryUploads(); });
+  window.addEventListener('online', ()=>{ processPendingGalleryUploads(); processPendingParticipantPhotoUploads(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ processPendingGalleryUploads(); processPendingParticipantPhotoUploads(); } });
+}
+
+/* ============================= ADMIN: PARTICIPANT PRIVATE PHOTOS (Photo) ============================= */
+function attachParticipantPhotoInputs(){
+  document.querySelectorAll('input[type="file"][id^="pphoto-upload-"]').forEach(inputEl=>{
+    if(inputEl.dataset.bound) return;
+    inputEl.dataset.bound = '1';
+    inputEl.addEventListener('change', ()=>{
+      const pid = inputEl.id.replace('pphoto-upload-','');
+      const files = Array.from(inputEl.files || []);
+      if(files.length) doAdminUploadParticipantPhotos(pid, files, inputEl);
+    });
+  });
+}
+function pendingUploadsCountForParticipant(pid){
+  return PENDING_PARTICIPANT_PHOTO_UPLOADS.filter(x=>x.pid===pid).length;
+}
+async function doAdminUploadParticipantPhotos(pid, files, inputEl){
+  if(!PARTICIPANT_PHOTOS[pid]) PARTICIPANT_PHOTOS[pid] = [];
+  const list = PARTICIPANT_PHOTOS[pid];
+  let okCount = 0, queuedCount = 0;
+  for(let i=0;i<files.length;i++){
+    showToast(`جاري رفع الصورة ${i+1} من ${files.length}...`);
+    const dataUrl = await readImageFileObjectToDataUrl(files[i], 1400);
+    if(!dataUrl){ console.error('تعذّر قراءة/تصغير الصورة رقم', i+1); continue; }
+    const photoId = 'pp'+Date.now()+Math.random().toString(36).slice(2,7);
+    const saved = (navigator.onLine === false) ? false : await saveParticipantPhoto(photoId, dataUrl);
+    PARTICIPANT_PHOTO_CACHE[photoId] = dataUrl;
+    if(saved){
+      list.push(photoId);
+      okCount++;
+    } else {
+      PENDING_PARTICIPANT_PHOTO_UPLOADS.push({ photoId, dataUrl, pid, ts: Date.now() });
+      queuedCount++;
+    }
+    if(i < files.length-1) await sleep(450);
+  }
+  if(okCount>0) await saveParticipantPhotosIndexWithRetry(PARTICIPANT_PHOTOS);
+  if(inputEl) inputEl.value = '';
+  if(okCount === files.length){
+    showToast(`تمت إضافة ${okCount} صورة ✅`);
+  } else if(queuedCount>0 && okCount>0){
+    showToast(`اتضافت ${okCount} صورة، و${queuedCount} في قائمة الانتظار هترفع تلقائي ⏳`, true);
+  } else if(queuedCount>0){
+    showToast(`📵 النت ضعيف/مقطوع دلوقتي — ${queuedCount} صورة اتحطت في قائمة الانتظار وهترفع تلقائي، سيب الصفحة مفتوحة`, true);
+  } else {
+    showToast('⚠️ حصلت مشكلة في رفع الصور — جرّب تاني', true);
+  }
+  render();
+  scheduleParticipantPhotoUploadRetry();
+}
+let _pPhotoRetryTimer = null;
+function scheduleParticipantPhotoUploadRetry(){
+  if(_pPhotoRetryTimer) return;
+  if(!PENDING_PARTICIPANT_PHOTO_UPLOADS.length) return;
+  _pPhotoRetryTimer = setTimeout(async ()=>{
+    _pPhotoRetryTimer = null;
+    await processPendingParticipantPhotoUploads();
+    if(PENDING_PARTICIPANT_PHOTO_UPLOADS.length) scheduleParticipantPhotoUploadRetry();
+  }, 20000);
+}
+async function processPendingParticipantPhotoUploads(){
+  if(!PENDING_PARTICIPANT_PHOTO_UPLOADS.length) return;
+  if(navigator.onLine === false) return;
+  const queue = PENDING_PARTICIPANT_PHOTO_UPLOADS.slice();
+  let doneAny = false;
+  for(const item of queue){
+    const saved = await saveParticipantPhoto(item.photoId, item.dataUrl, 1);
+    if(saved){
+      if(!PARTICIPANT_PHOTOS[item.pid]) PARTICIPANT_PHOTOS[item.pid] = [];
+      if(!PARTICIPANT_PHOTOS[item.pid].includes(item.photoId)) PARTICIPANT_PHOTOS[item.pid].push(item.photoId);
+      PENDING_PARTICIPANT_PHOTO_UPLOADS = PENDING_PARTICIPANT_PHOTO_UPLOADS.filter(x=>x.photoId!==item.photoId);
+      doneAny = true;
+    }
+  }
+  if(doneAny){
+    await saveParticipantPhotosIndexWithRetry(PARTICIPANT_PHOTOS);
+    showToast(`✅ اترفعت صور المشاركين اللي كانت مستنية بعد رجوع الاتصال`);
+    render();
+  }
+}
+async function doAdminDeleteParticipantPhoto(pid, photoId){
+  if(PARTICIPANT_PHOTOS[pid]) PARTICIPANT_PHOTOS[pid] = PARTICIPANT_PHOTOS[pid].filter(x=>x!==photoId);
+  delete PARTICIPANT_PHOTO_CACHE[photoId];
+  await saveParticipantPhotosIndexWithRetry(PARTICIPANT_PHOTOS);
+  await deleteParticipantPhotoBlob(photoId);
+  showToast('تم حذف الصورة');
+  render();
 }
 async function doAdminSaveGalleryTitle(idx, title){
   const album = GALLERY_ALBUMS[idx];
@@ -10078,6 +10340,16 @@ async function doExportFullBackup(){
     const allPids = new Set();
     GALLERY_ALBUMS.forEach(a=>(a.photoIds||[]).forEach(pid=>allPids.add(pid)));
     allPids.forEach(pid=>{ if(GALLERY_PHOTO_CACHE[pid]) galleryPhotos[pid] = GALLERY_PHOTO_CACHE[pid]; });
+    // صور المشاركين الخاصة (Photo) — لازم نجيبها من التخزين لأنها مش كلها محمّلة في الكاش وقت التصدير
+    const allParticipantPhotoIds = new Set();
+    Object.values(PARTICIPANT_PHOTOS).forEach(ids=>(ids||[]).forEach(id=>allParticipantPhotoIds.add(id)));
+    await Promise.all([...allParticipantPhotoIds].map(async id=>{
+      if(!PARTICIPANT_PHOTO_CACHE[id]){
+        try{ const r = await window.storage.get('glavera-participant-photo-'+id, true); if(r && r.value) PARTICIPANT_PHOTO_CACHE[id] = r.value; }catch(e){}
+      }
+    }));
+    const participantPhotos = {};
+    allParticipantPhotoIds.forEach(id=>{ if(PARTICIPANT_PHOTO_CACHE[id]) participantPhotos[id] = PARTICIPANT_PHOTO_CACHE[id]; });
     const backup = {
       exportedAt: new Date().toISOString(),
       app: 'glavera3',
@@ -10087,7 +10359,8 @@ async function doExportFullBackup(){
         GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
         POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES,
         SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS,
-        CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos
+        CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos,
+        PARTICIPANT_PHOTOS, participantPhotos
       }
     };
     const json = JSON.stringify(backup, null, 2);
@@ -10354,14 +10627,14 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums()
+    loadGalleryAlbums(), loadParticipantPhotosIndex()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
