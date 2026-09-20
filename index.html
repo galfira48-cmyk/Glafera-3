@@ -1954,6 +1954,33 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:#FF6B6B; color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center;
     border:2px solid var(--surface); line-height:1;}
 
+  /* ---------- chat (group chat between all participants) ---------- */
+  .chat-messages{ display:flex; flex-direction:column; gap:10px; max-height:56vh; overflow-y:auto; padding:6px 2px 14px; }
+  .chat-bubble{ max-width:78%; padding:9px 12px; border-radius:16px; position:relative; }
+  .chat-bubble.theirs{ align-self:flex-start; background:var(--surface); border:1px solid var(--border); border-bottom-right-radius:4px; }
+  .chat-bubble.mine{ align-self:flex-end; background:linear-gradient(145deg,#3FDCC9,#2AB8A6); color:#0c2b28; border-bottom-left-radius:4px; }
+  .chat-bubble-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; color:var(--gold,#F4B740); margin-bottom:3px; }
+  .chat-bubble-text{ font-size:13.5px; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+  .chat-bubble-time{ font-size:9px; opacity:.6; margin-top:4px; text-align:left; }
+  .chat-bubble-img{ max-width:100%; border-radius:10px; display:block; cursor:pointer; }
+  .chat-bubble-video{ max-width:100%; border-radius:10px; display:block; }
+  .chat-bubble-audio{ width:200px; max-width:100%; }
+  .chat-voice-dur{ font-size:9.5px; opacity:.7; margin-top:3px; }
+  .chat-media-loading{ font-size:12px; opacity:.7; padding:6px 0; }
+  .chat-input-bar{ position:sticky; bottom:0; background:var(--bg); padding:8px 0 4px; border-top:1px solid var(--border); z-index:5; }
+  .chat-quick-emoji{ display:flex; gap:6px; margin-bottom:6px; overflow-x:auto; }
+  .chat-emoji-btn{ flex:none; background:var(--surface); border:1px solid var(--border); border-radius:10px; font-size:16px; padding:4px 8px; cursor:pointer; }
+  .chat-input-row{ display:flex; align-items:center; gap:6px; }
+  .chat-input-row .field{ flex:1; margin:0; }
+  .chat-attach-btn{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; }
+  .chat-send-btn{ flex:none; width:38px; height:38px; border-radius:50%; border:none; background:linear-gradient(145deg,#3FDCC9,#845EC2);
+    color:#fff; display:flex; align-items:center; justify-content:center; transform:scaleX(-1); }
+  .chat-voice-btn{ flex:none; width:38px; height:38px; border-radius:50%; border:none; background:var(--surface); border:1px solid var(--border);
+    font-size:16px; display:flex; align-items:center; justify-content:center; }
+  .chat-voice-btn.recording{ background:#FF6B6B; color:#fff; animation:chatPulse 1s ease-in-out infinite; }
+  @keyframes chatPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(255,107,107,.5);} 50%{ box-shadow:0 0 0 8px rgba(255,107,107,0);} }
+
   /* ---------- participant-facing: my photos (Photo) page ---------- */
   .myphotos-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
   .myphotos-thumb{position:relative; aspect-ratio:1/1; border-radius:16px; background-size:cover; background-position:center;
@@ -2603,6 +2630,54 @@ async function preloadParticipantPhotos(pid){
     }catch(e){}
   }));
 }
+
+/* ---- شات جماعي بين كل المشاركين — نصوص، صور، رسائل صوتية (ريكورد)، وفيديوهات قصيرة ---- */
+const CHAT_MAX_MESSAGES = 200; // بنحتفظ بآخر 200 رسالة بس عشان الفهرس يفضل خفيف
+let CHAT_MESSAGES = [];
+const CHAT_MEDIA_CACHE = {};
+let PENDING_CHAT_MEDIA_UPLOADS = [];
+async function loadChatMessages(){
+  try{ const r = await window.storage.get('glavera-chat-messages', true); return r && r.value ? JSON.parse(r.value) : []; }
+  catch(e){ return []; }
+}
+async function saveChatMessages(arr){
+  try{ await window.storage.set('glavera-chat-messages', JSON.stringify(arr), true); return true; }
+  catch(e){ console.error('saveChatMessages failed:', e); return false; }
+}
+async function saveChatMessagesWithRetry(arr, attempt){
+  attempt = attempt || 1;
+  const ok = await saveChatMessages(arr);
+  if(ok) return true;
+  if(attempt < 3){ await sleep(800*attempt); return saveChatMessagesWithRetry(arr, attempt+1); }
+  return false;
+}
+async function saveChatMedia(mediaId, dataUrl, attempt){
+  attempt = attempt || 1;
+  try{
+    const r = await window.storage.set('glavera-chat-media-'+mediaId, dataUrl, true, 45000);
+    if(!r) throw new Error(_fbLastError||'save failed');
+    return true;
+  }catch(e){
+    console.error('saveChatMedia failed (attempt '+attempt+'):', e);
+    if(attempt < 3){ await sleep(900*attempt); return saveChatMedia(mediaId, dataUrl, attempt+1); }
+    return false;
+  }
+}
+function trimChatMessages(){
+  if(CHAT_MESSAGES.length > CHAT_MAX_MESSAGES){
+    CHAT_MESSAGES = CHAT_MESSAGES.slice(CHAT_MESSAGES.length - CHAT_MAX_MESSAGES);
+  }
+}
+async function preloadChatMedia(messages){
+  const ids = messages.filter(m=>m.mediaId && !CHAT_MEDIA_CACHE[m.mediaId]).map(m=>m.mediaId);
+  if(!ids.length) return;
+  await Promise.all(ids.map(async id=>{
+    try{
+      const r = await window.storage.get('glavera-chat-media-'+id, true);
+      if(r && r.value) CHAT_MEDIA_CACHE[id] = r.value;
+    }catch(e){}
+  }));
+}
 async function loadTrash(){
   try{
     const r = await window.storage.get('glavera-trash', true);
@@ -2863,6 +2938,7 @@ const TRANSLATIONS = {
     opinion_edit_hint:'ده رأيك اللي بعتّه قبل كده — تقدر تعدّله وتبعته تاني',
     nav_myphotos:'Photo', nav_myphotos_sub:'صورك الخاصة — بس إنت اللي تشوفها',
     myphotos_hint:'الصور دي خاصة بيك بس، ومش بتظهر لأي مشارك تاني ولا في معرض الصور العام', myphotos_empty:'لسه مفيش صور اتضافتلك',
+    nav_chat:'شات المشاركين', nav_chat_sub:'كلم كل المشاركين — نص، صور، صوت، فيديو',
     nav_pass:'بطاقتي الرقمية', nav_pass_sub:'كود QR الخاص بك للتحقق',
     nav_certificate:'الشهادة', nav_certificate_sub:'حمّل شهادة مشاركتك',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
@@ -2920,6 +2996,7 @@ const TRANSLATIONS = {
     opinion_edit_hint:'This is the feedback you sent before — you can edit and resend it',
     nav_myphotos:'Photo', nav_myphotos_sub:'Your private photos — only you can see them',
     myphotos_hint:'These photos are private to you and won\u2019t be shown to any other participant or in the public gallery', myphotos_empty:'No photos added for you yet',
+    nav_chat:'Group Chat', nav_chat_sub:'Chat with everyone — text, photos, voice, video',
     nav_pass:'My Digital Pass', nav_pass_sub:'Your verification QR code',
     nav_certificate:'Certificate', nav_certificate_sub:'Download your participation certificate',
     nav_settings:'Settings', nav_settings_sub:'Identity, sound, and export',
@@ -3420,18 +3497,16 @@ function buildLiveWallHTML(){
 
 /* ============================= RENDER: PROFILE (HOME) ============================= */
 const NAV_DOCK_ITEMS = [
-  {page:'badges',   icon:'🏅', labelKey:'nav_badges',   color:'#F4B740'},
   {page:'team',     icon:'👥', labelKey:'nav_team',     color:'#3FDCC9'},
   {page:'leaderboard', icon:'🏆', labelKey:'nav_leaderboard', color:'#FF7A59'},
 ];
 const NAV_TILE_ITEMS = [
   {page:'journey', icon:'🗓️', labelKey:'nav_journey', subKey:'nav_journey_sub', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
-  {page:'quests',  icon:'🎯', labelKey:'nav_quests',  subKey:'nav_quests_sub',  color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
   {page:'gallery', icon:ICO.gallery, labelKey:'nav_gallery', subKey:'nav_gallery_sub', color:'transparent'},
   {page:'games',   icon:'🎮', labelKey:'nav_games',   subKey:'nav_games_sub',   color:'linear-gradient(145deg,#FF6B9D,#845EC2)'},
-  {page:'wall',    icon:'💬', labelKey:'nav_wall',    subKey:'nav_wall_sub',    color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
   {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {page:'myphotos', icon:'📷', labelKey:'nav_myphotos', subKey:'nav_myphotos_sub', color:'linear-gradient(145deg,#FF9A8B,#FF6A88)'},
+  {page:'chat', icon:'💬', labelKey:'nav_chat', subKey:'nav_chat_sub', color:'linear-gradient(145deg,#43E97B,#38F9D7)'},
   {page:'pass',    icon:'🪪', labelKey:'nav_pass',    subKey:'nav_pass_sub',    color:'linear-gradient(145deg,#FFDE94,#3FDCC9)'},
   {page:'certificate',icon:'🎓', labelKey:'nav_certificate', subKey:'nav_certificate_sub', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'},
   {page:'settings',icon:'⚙️', labelKey:'nav_settings', subKey:'nav_settings_sub', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
@@ -3583,10 +3658,6 @@ function renderProfile(){
   const extra = myExtra(p.id);
   const accent = 'var(--gold)';
   const liveSession = autoDetectLiveSession();
-  const qDay = currentJourneyDay(p.id);
-  const homeQuests = dayQuests(p.id, qDay);
-  const claimableQuests = homeQuests.filter(q=>q.done && !q.claimed);
-  const featuredQuest = claimableQuests[0] || homeQuests.filter(q=>!q.claimed).sort((a,b)=>(b.progress/b.goal)-(a.progress/a.goal))[0];
   const currentDayIdx = DAYS.findIndex(d=>dayTotal(p.id,d)===0);
   const dayProgressPct = DAYS.length>1 ? (Math.max(0,(currentDayIdx<0?DAYS.length:currentDayIdx)-1)/(DAYS.length-1))*100 : 0;
   const dayNodes = DAYS.map((d,idx)=>{
@@ -3652,19 +3723,6 @@ function renderProfile(){
         <div class="lab">ترتيب فريقك من ${teams.length}</div>
       </div>
     </div>
-
-    ${featuredQuest ? `
-    <div class="section-title">${tr('nav_quests')} <span class="sub" style="display:inline-flex;align-items:center;gap:8px;">${tr('nav_quests_sub')}${claimableQuests.length?`<span class="streak-pill" style="font-size:11px;padding:4px 10px;">🎁 ${claimableQuests.length} جاهز للاستلام</span>`:''}</span></div>
-    <div class="card card-sm quest-card" data-action="tile-nav" data-page="quests" style="cursor:pointer;">
-      <div class="quest-top"><span class="quest-ico">${featuredQuest.icon}</span><span class="quest-lab">${escapeHtml(featuredQuest.label)}</span></div>
-      <div class="quest-bar-track"><div class="quest-bar-fill ${featuredQuest.done?'full':''}" style="width:${Math.round(Math.min(1,featuredQuest.progress/featuredQuest.goal)*100)}%"></div></div>
-      <div class="quest-bottom">
-        <span class="quest-progress">${Math.min(featuredQuest.progress,featuredQuest.goal)} / ${featuredQuest.goal}</span>
-        ${featuredQuest.done && !featuredQuest.claimed
-          ? `<button type="button" class="quest-claim-btn" data-action="claim-quest" data-claim="${featuredQuest.claimKey}" data-reward="${featuredQuest.reward}">استلام +${featuredQuest.reward} 🎁</button>`
-          : `<span class="quest-state">+${featuredQuest.reward} نقطة</span>`}
-      </div>
-    </div>` : ''}
 
     <div class="section-title">${tr('conf_journey_title')} <span class="sub">${tr('conf_journey_sub')}</span></div>
     <div class="card journey day-strip"><div class="journey-track"><div class="journey-fill" style="width:${dayProgressPct}%"></div>${dayNodes}</div></div>
@@ -5121,6 +5179,231 @@ function renderMyPhotosPage(){
     </div>
     ${ids.length ? `<div class="myphotos-grid">${thumbs}</div>` : `<div class="empty-note">${tr('myphotos_empty')}</div>`}
   `;
+}
+
+/* ============================= RENDER: CHAT PAGE (شات جماعي بين كل المشاركين) ============================= */
+let CHAT_MEDIA_LOADING = false;
+function formatChatTime(ts){
+  const d = new Date(ts);
+  return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+function chatBubbleBody(m){
+  if(m.type==='text') return `<div class="chat-bubble-text">${escapeHtml(m.text||'')}</div>`;
+  const url = CHAT_MEDIA_CACHE[m.mediaId];
+  if(m.type==='image'){
+    return url ? `<img class="chat-bubble-img" src="${url}" data-action="open-chat-image" data-media="${m.mediaId}" />` : `<div class="chat-media-loading">⏳ صورة...</div>`;
+  }
+  if(m.type==='voice'){
+    return url ? `<audio controls src="${url}" class="chat-bubble-audio"></audio><div class="chat-voice-dur">🎙️ رسالة صوتية — ${m.duration||0} ث</div>` : `<div class="chat-media-loading">⏳ رسالة صوتية...</div>`;
+  }
+  if(m.type==='video'){
+    return url ? `<video controls class="chat-bubble-video" src="${url}"></video>` : `<div class="chat-media-loading">⏳ فيديو...</div>`;
+  }
+  return '';
+}
+function renderChatBubble(m){
+  const mine = m.pid === state.pid;
+  return `<div class="chat-bubble ${mine?'mine':'theirs'}">
+    ${!mine ? `<div class="chat-bubble-name">${escapeHtml(m.name||'')}</div>` : ''}
+    ${chatBubbleBody(m)}
+    <div class="chat-bubble-time">${formatChatTime(m.ts)}</div>
+  </div>`;
+}
+function renderChatPage(){
+  const msgs = CHAT_MESSAGES.slice(-100);
+  if(!CHAT_MEDIA_LOADING){
+    const needsMedia = msgs.some(m=>m.mediaId && !CHAT_MEDIA_CACHE[m.mediaId]);
+    if(needsMedia){
+      CHAT_MEDIA_LOADING = true;
+      preloadChatMedia(msgs).then(()=>{ CHAT_MEDIA_LOADING = false; render(); });
+    }
+  }
+  const bubbles = msgs.map(renderChatBubble).join('');
+  const quickEmoji = ['👍','❤️','😂','🎉','🔥','👏','🙏','😍'].map(e=>`<button type="button" class="chat-emoji-btn" data-action="chat-insert-emoji" data-emoji="${e}">${e}</button>`).join('');
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${tr('nav_chat')}</div>
+    </div>
+    <div class="hint" style="margin:0 0 8px;">شات مشترك بين كل المشاركين — أي حد بيبعت رسالة، الكل بيشوفها</div>
+    <div class="chat-messages" id="chat-messages-list">${bubbles || '<div class="empty-note">لسه محدش كتب حاجة، ابدأ إنت!</div>'}</div>
+    <div class="chat-input-bar">
+      <div class="chat-quick-emoji">${quickEmoji}</div>
+      <div class="chat-input-row">
+        <label class="chat-attach-btn" title="صورة">📷<input type="file" accept="image/*" id="chat-photo-input" style="display:none;" /></label>
+        <label class="chat-attach-btn" title="فيديو">🎥<input type="file" accept="video/*" id="chat-video-input" style="display:none;" /></label>
+        <input type="text" id="chat-text-input" class="field" placeholder="اكتب رسالة..." />
+        <button type="button" class="chat-voice-btn ${state.chatRecording?'recording':''}" data-action="toggle-chat-voice">${state.chatRecording?'⏹️':'🎙️'}</button>
+        <button type="button" class="chat-send-btn" data-action="send-chat-text">${ICO.chev}</button>
+      </div>
+    </div>
+  `;
+}
+function scrollChatToBottom(){
+  const el = document.getElementById('chat-messages-list');
+  if(el) el.scrollTop = el.scrollHeight;
+}
+async function doSendChatText(){
+  const input = document.getElementById('chat-text-input');
+  const text = input ? input.value.trim() : '';
+  if(!text) return;
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p) return;
+  const msg = { id:'cm'+Date.now()+Math.random().toString(36).slice(2,6), pid:p.id, name:p.name, type:'text', text, ts:Date.now() };
+  CHAT_MESSAGES.push(msg);
+  trimChatMessages();
+  if(input) input.value = '';
+  render();
+  scrollChatToBottom();
+  await saveChatMessagesWithRetry(CHAT_MESSAGES);
+}
+function doChatInsertEmoji(emoji){
+  const input = document.getElementById('chat-text-input');
+  if(input){ input.value += emoji; input.focus(); }
+}
+async function sendChatMediaMessage(type, dataUrl, duration){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p) return;
+  const mediaId = 'cmedia'+Date.now()+Math.random().toString(36).slice(2,6);
+  CHAT_MEDIA_CACHE[mediaId] = dataUrl;
+  const msg = { id:'cm'+Date.now()+Math.random().toString(36).slice(2,6), pid:p.id, name:p.name, type, mediaId, duration:duration||null, ts:Date.now() };
+  CHAT_MESSAGES.push(msg);
+  trimChatMessages();
+  render();
+  scrollChatToBottom();
+  const saved = (navigator.onLine===false) ? false : await saveChatMedia(mediaId, dataUrl);
+  if(saved){
+    await saveChatMessagesWithRetry(CHAT_MESSAGES);
+  } else {
+    PENDING_CHAT_MEDIA_UPLOADS.push({ mediaId, dataUrl, ts:Date.now() });
+    scheduleChatMediaUploadRetry();
+    showToast('📵 النت ضعيف — الرسالة هترفع تلقائي لما الاتصال يرجع', true);
+  }
+}
+async function doSendChatPhoto(file){
+  showToast('جاري تجهيز الصورة...');
+  const dataUrl = await readImageFileObjectToDataUrl(file, 1000);
+  if(!dataUrl){ showToast('تعذّر قراءة الصورة', true); return; }
+  await sendChatMediaMessage('image', dataUrl, null);
+}
+async function doSendChatVideo(file){
+  const MAX_BYTES = 8*1024*1024; // حد أقصى 8 ميجا — أكبر من كده بطيء جدًا وغير موثوق فيه على شبكة ضعيفة
+  if(file.size > MAX_BYTES){
+    showToast('⚠️ الفيديو كبير أوي (الحد الأقصى 8 ميجا) — جرّب فيديو أقصر أو بجودة أقل', true);
+    return;
+  }
+  showToast('جاري تجهيز الفيديو...');
+  const reader = new FileReader();
+  reader.onload = async ()=>{ await sendChatMediaMessage('video', reader.result, null); };
+  reader.onerror = ()=> showToast('تعذّر قراءة الفيديو', true);
+  reader.readAsDataURL(file);
+}
+let _chatRecorder = null, _chatRecordChunks = [], _chatRecordStart = 0, _chatRecordTimer = null;
+async function toggleChatVoiceRecording(){
+  if(state.chatRecording){ stopChatVoiceRecording(); return; }
+  if(typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showToast('المتصفح ده مش بيدعم تسجيل الصوت', true);
+    return;
+  }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    _chatRecordChunks = [];
+    _chatRecorder = new MediaRecorder(stream);
+    _chatRecorder.ondataavailable = (e)=>{ if(e.data && e.data.size>0) _chatRecordChunks.push(e.data); };
+    _chatRecorder.onstop = async ()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const durationSec = Math.max(1, Math.round((Date.now()-_chatRecordStart)/1000));
+      const blob = new Blob(_chatRecordChunks, { type:'audio/webm' });
+      const reader = new FileReader();
+      reader.onload = async ()=>{ await sendChatMediaMessage('voice', reader.result, durationSec); };
+      reader.readAsDataURL(blob);
+    };
+    _chatRecorder.start();
+    _chatRecordStart = Date.now();
+    state.chatRecording = true;
+    render();
+    _chatRecordTimer = setTimeout(()=>{ if(_chatRecorder && _chatRecorder.state==='recording') stopChatVoiceRecording(); }, 60000); // حد أقصى دقيقة للرسالة الصوتية
+  }catch(e){
+    console.error('getUserMedia failed:', e);
+    showToast('محتاجين إذن الميكروفون عشان تسجل رسالة صوتية', true);
+  }
+}
+function stopChatVoiceRecording(){
+  if(_chatRecordTimer){ clearTimeout(_chatRecordTimer); _chatRecordTimer = null; }
+  if(_chatRecorder && _chatRecorder.state==='recording') _chatRecorder.stop();
+  state.chatRecording = false;
+  render();
+}
+function openChatImageLightbox(mediaId){
+  const url = CHAT_MEDIA_CACHE[mediaId];
+  if(!url) return;
+  LIGHTBOX_STATE = { photoIds:[mediaId], i:0, cache: CHAT_MEDIA_CACHE };
+  const backdrop = document.createElement('div');
+  backdrop.className = 'lightbox-backdrop';
+  backdrop.id = 'gallery-lightbox';
+  backdrop.innerHTML = `
+    <button type="button" class="lightbox-close" data-lb-close>${ICO.back}</button>
+    <div class="lightbox-img-wrap"><img id="lb-img" src="${url}" alt="صورة مكبرة" /></div>
+  `;
+  document.body.appendChild(backdrop);
+  backdrop.querySelector('[data-lb-close]').addEventListener('click', ()=>{ backdrop.remove(); LIGHTBOX_STATE = null; });
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop){ backdrop.remove(); LIGHTBOX_STATE = null; } });
+}
+let _chatMediaRetryTimer = null;
+function scheduleChatMediaUploadRetry(){
+  if(_chatMediaRetryTimer) return;
+  if(!PENDING_CHAT_MEDIA_UPLOADS.length) return;
+  _chatMediaRetryTimer = setTimeout(async ()=>{
+    _chatMediaRetryTimer = null;
+    await processPendingChatMediaUploads();
+    if(PENDING_CHAT_MEDIA_UPLOADS.length) scheduleChatMediaUploadRetry();
+  }, 20000);
+}
+async function processPendingChatMediaUploads(){
+  if(!PENDING_CHAT_MEDIA_UPLOADS.length) return;
+  if(navigator.onLine === false) return;
+  const queue = PENDING_CHAT_MEDIA_UPLOADS.slice();
+  let doneAny = false;
+  for(const item of queue){
+    const saved = await saveChatMedia(item.mediaId, item.dataUrl, 1);
+    if(saved){
+      PENDING_CHAT_MEDIA_UPLOADS = PENDING_CHAT_MEDIA_UPLOADS.filter(x=>x.mediaId!==item.mediaId);
+      doneAny = true;
+    }
+  }
+  if(doneAny){
+    await saveChatMessagesWithRetry(CHAT_MESSAGES);
+    showToast('✅ اترفعت رسايل الشات اللي كانت مستنية');
+  }
+}
+function attachChatInputs(){
+  const photoInput = document.getElementById('chat-photo-input');
+  if(photoInput && !photoInput.dataset.bound){
+    photoInput.dataset.bound = '1';
+    photoInput.addEventListener('change', ()=>{
+      const file = photoInput.files && photoInput.files[0];
+      photoInput.value = '';
+      if(file) doSendChatPhoto(file);
+    });
+  }
+  const videoInput = document.getElementById('chat-video-input');
+  if(videoInput && !videoInput.dataset.bound){
+    videoInput.dataset.bound = '1';
+    videoInput.addEventListener('change', ()=>{
+      const file = videoInput.files && videoInput.files[0];
+      videoInput.value = '';
+      if(file) doSendChatVideo(file);
+    });
+  }
+  const textInput = document.getElementById('chat-text-input');
+  if(textInput && !textInput.dataset.bound){
+    textInput.dataset.bound = '1';
+    textInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); doSendChatText(); } });
+  }
+  scrollChatToBottom();
+}
+if(typeof window !== 'undefined'){
+  window.addEventListener('online', ()=>{ processPendingChatMediaUploads(); });
 }
 
 /* ============================= RENDER: OPINION (FEEDBACK) PAGE ============================= */
@@ -6785,6 +7068,7 @@ function render(){
   else if(state.view==='opinion') html = renderOpinionPage();
   else if(state.view==='capabilities') html = renderCapabilitiesPage();
   else if(state.view==='myphotos') html = renderMyPhotosPage();
+  else if(state.view==='chat') html = renderChatPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
@@ -6845,6 +7129,7 @@ function render(){
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
   if(state.view==='admin' && state.adminTab==='participants' && state.editingParticipantId){ attachParticipantPhotoInputs(); }
+  if(state.view==='chat'){ attachChatInputs(); }
   if(state.view==='admin' && state.editingSessionId){
     const info = SESSION_INFO[state.editingSessionId] || {};
     if(info.customQrText) drawCustomSessionQr(state.editingSessionId, info.customQrText);
@@ -7941,6 +8226,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='edit-participant'){ state.editingParticipantId = el.dataset.pid; render(); preloadParticipantPhotos(el.dataset.pid).then(render); }
   else if(action==='admin-delete-participant-photo'){ doAdminDeleteParticipantPhoto(el.dataset.pid, el.dataset.photo); }
   else if(action==='open-myphoto'){ openMyPhotosLightbox(parseInt(el.dataset.idx,10)||0); }
+  else if(action==='send-chat-text'){ doSendChatText(); }
+  else if(action==='chat-insert-emoji'){ doChatInsertEmoji(el.dataset.emoji); }
+  else if(action==='toggle-chat-voice'){ toggleChatVoiceRecording(); }
+  else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
   else if(action==='close-add-participant'){ state.addingParticipant = false; render(); }
   else if(action==='regen-new-code'){ state._suggestedNewCode = null; render(); }
@@ -10350,6 +10639,15 @@ async function doExportFullBackup(){
     }));
     const participantPhotos = {};
     allParticipantPhotoIds.forEach(id=>{ if(PARTICIPANT_PHOTO_CACHE[id]) participantPhotos[id] = PARTICIPANT_PHOTO_CACHE[id]; });
+    // وسائط الشات (صور/صوت/فيديو) — نجيبها من التخزين لو مش محمّلة في الكاش
+    const chatMediaIds = new Set(CHAT_MESSAGES.filter(m=>m.mediaId).map(m=>m.mediaId));
+    await Promise.all([...chatMediaIds].map(async id=>{
+      if(!CHAT_MEDIA_CACHE[id]){
+        try{ const r = await window.storage.get('glavera-chat-media-'+id, true); if(r && r.value) CHAT_MEDIA_CACHE[id] = r.value; }catch(e){}
+      }
+    }));
+    const chatMedia = {};
+    chatMediaIds.forEach(id=>{ if(CHAT_MEDIA_CACHE[id]) chatMedia[id] = CHAT_MEDIA_CACHE[id]; });
     const backup = {
       exportedAt: new Date().toISOString(),
       app: 'glavera3',
@@ -10360,7 +10658,7 @@ async function doExportFullBackup(){
         POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES,
         SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS,
         CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos,
-        PARTICIPANT_PHOTOS, participantPhotos
+        PARTICIPANT_PHOTOS, participantPhotos, CHAT_MESSAGES, chatMedia
       }
     };
     const json = JSON.stringify(backup, null, 2);
@@ -10627,14 +10925,14 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums(), loadParticipantPhotosIndex()
+    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
@@ -10785,6 +11083,12 @@ function startLivePolling(){
       if(state.view==='admin' && state.adminTab==='opinions'){
         OPINIONS = await loadOpinions();
         render();
+      }
+      if(state.view==='chat'){
+        const fresh = await loadChatMessages();
+        const lastFresh = fresh[fresh.length-1], lastMine = CHAT_MESSAGES[CHAT_MESSAGES.length-1];
+        const changed = fresh.length !== CHAT_MESSAGES.length || (lastFresh && lastMine && lastFresh.id !== lastMine.id);
+        if(changed){ CHAT_MESSAGES = fresh; render(); }
       }
     }catch(e){}
   }, 6000);
