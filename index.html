@@ -2088,6 +2088,99 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .xo-score-pill b{font-family:'Cairo',sans-serif; font-size:17px; color:var(--gold);}
   .xo-score-pill.draw b{color:var(--text-muted);}
   .xo-score-pill.o b{color:var(--good);}
+
+  /* ---------- player avatars inside games (participant photo instead of name) ---------- */
+  .pl-avatar{position:relative; width:40px; height:40px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center;
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#1a1633; flex:0 0 auto;
+    box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px var(--border);}
+  .pl-avatar.pl-ai{background:var(--surface-2); font-size:22px; color:var(--text);}
+  .pl-avatar.sm{width:28px; height:28px; font-size:10px; display:inline-flex; vertical-align:middle; margin:0 4px;}
+  .pl-avatar.xs{width:24px; height:24px; font-size:9px; margin:0; box-shadow:0 0 0 2px rgba(0,0,0,.35);}
+  .pl-badge{position:absolute; bottom:-5px; right:-5px; min-width:18px; height:18px; padding:0 3px; border-radius:9px; box-sizing:border-box;
+    background:var(--gold); color:#1a1633; font-style:normal; font-size:10px; font-weight:900; line-height:1;
+    display:flex; align-items:center; justify-content:center; border:2px solid var(--surface);}
+  .pl-badge.pl-dot{width:18px; padding:0; border-radius:50%; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
+  .pl-badge.pl-x{background:#E5484D; color:#fff;}
+  .xo-score-pill.has-av{padding-top:10px; gap:6px; align-items:center;}
+  .xo-score-pill.has-av span{line-height:1.2;}
+
+  /* ---------- connect four: color picker ---------- */
+  .c4-picker{margin:0 0 14px; text-align:center;}
+  .c4-picker-label{font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:9px;}
+  .c4-swatches{display:flex; flex-wrap:wrap; gap:11px; justify-content:center;}
+  .c4-swatch{position:relative; width:42px; height:42px; border-radius:50%; border:none; padding:0; background:transparent; color:#fff; font-weight:900; font-size:17px;
+    display:flex; align-items:center; justify-content:center;}
+  .c4-sw-fill{position:absolute; inset:0; border-radius:50%; box-shadow:inset 0 -3px 4px rgba(0,0,0,.28);}
+  .c4-swatch.sel .c4-sw-fill{box-shadow:0 0 0 3px var(--gold), inset 0 -3px 4px rgba(0,0,0,.28);}
+  .c4-swatch.taken{cursor:default;}
+  .c4-swatch.taken .c4-sw-fill{opacity:.35; filter:saturate(.5);}
+  .c4-swatch .c4-sw-mark{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .c4-swatch:not(:disabled):active{transform:scale(.9);}
+  .c4-vs-row{display:flex; align-items:center; justify-content:center; gap:22px; margin:6px 0 14px;}
+
+  /* ---------- VS intro (when both players are in the room) ---------- */
+  .vs-overlay{position:fixed; inset:0; z-index:10001; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px;
+    background:radial-gradient(circle at 50% 42%, #2f2170 0%, #150f3d 45%, #07051a 100%); overflow:hidden; direction:ltr;
+    animation:vsFadeIn .35s ease both; -webkit-tap-highlight-color:transparent;}
+  .vs-overlay.out{animation:vsFadeOut .45s ease forwards;}
+  .vs-overlay::before{content:''; position:absolute; inset:-30%; background:conic-gradient(from 0deg, transparent 0 20%, rgba(244,183,64,.10) 25%, transparent 32% 70%, rgba(63,220,201,.10) 75%, transparent 82%);
+    animation:vsSweep 6s linear infinite;}
+  .vs-overlay::after{content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 46%, rgba(255,255,255,.10) 50%, transparent 54%); transform:translateX(-120%); animation:vsStreak 1.1s ease-out 1s both;}
+  .vs-tag{position:relative; z-index:2; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; letter-spacing:3px; color:rgba(255,255,255,.55);
+    animation:vsRise .6s ease .1s both;}
+  .vs-stage{--s:min(29vw,124px); position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*.78);}
+  .vs-p{position:relative; width:var(--s); height:var(--s);}
+  .vs-p.left{animation:vsInL .8s cubic-bezier(.16,1.15,.3,1) .2s both;}
+  .vs-p.right{animation:vsInR .8s cubic-bezier(.16,1.15,.3,1) .2s both;}
+  .vs-ring{position:absolute; inset:-7px; border-radius:50%; background:conic-gradient(from 0deg, var(--c1), var(--c2), var(--c1)); animation:vsSpin 2.6s linear infinite;
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));}
+  .vs-glow{position:absolute; inset:-18px; border-radius:50%; background:radial-gradient(circle, var(--c1) 0%, transparent 68%); opacity:.35; animation:vsPulse 1.8s ease-in-out infinite;}
+  .vs-photo{position:absolute; inset:0; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:calc(var(--s)*.34); color:#1a1633; box-shadow:0 10px 30px rgba(0,0,0,.5), 0 0 0 4px rgba(255,255,255,.07);}
+  .vs-p.me{--c1:#F4B740; --c2:#FF7A59;}
+  .vs-p.opp{--c1:#3FDCC9; --c2:#9B8CFF;}
+  .vs-mid{position:absolute; left:50%; top:50%; width:0; height:0; z-index:3;}
+  .vs-badge{position:absolute; left:0; top:0; transform:translate(-50%,-50%); font-family:'Cairo',sans-serif; font-weight:900; font-style:italic; font-size:clamp(34px,11vw,50px); line-height:1;
+    background:linear-gradient(180deg,#fff 10%,#FFDE94 55%,#F4B740 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 4px 14px rgba(244,183,64,.65)); animation:vsSlam .55s cubic-bezier(.2,1.7,.4,1) 1s both;}
+  .vs-shock{position:absolute; left:0; top:0; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; border:3px solid rgba(255,222,148,.9); opacity:0; animation:vsShock .9s ease-out 1.05s both;}
+  .vs-shock.b{animation-delay:1.22s; border-color:rgba(63,220,201,.8);}
+  .vs-game{position:relative; z-index:2; display:flex; align-items:center; gap:10px; padding:10px 20px; border-radius:999px; background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; direction:rtl;
+    animation:vsRise .6s ease 1.7s both;}
+  .vs-game .vg-ico{font-size:22px;}
+  .vs-go{position:relative; z-index:2; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:rgba(255,255,255,.6); direction:rtl; animation:vsRise .6s ease 2.1s both, vsBlink 1.4s ease-in-out 2.7s infinite;}
+  @keyframes vsFadeIn{from{opacity:0;} to{opacity:1;}}
+  @keyframes vsFadeOut{to{opacity:0; transform:scale(1.04);}}
+  @keyframes vsSweep{to{transform:rotate(360deg);}}
+  @keyframes vsStreak{to{transform:translateX(120%);}}
+  @keyframes vsRise{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;}}
+  @keyframes vsInL{from{opacity:0; transform:translateX(-140%) scale(.6) rotate(-12deg);} to{opacity:1; transform:none;}}
+  @keyframes vsInR{from{opacity:0; transform:translateX(140%) scale(.6) rotate(12deg);} to{opacity:1; transform:none;}}
+  @keyframes vsSpin{to{transform:rotate(360deg);}}
+  @keyframes vsPulse{0%,100%{transform:scale(.94); opacity:.28;} 50%{transform:scale(1.06); opacity:.5;}}
+  @keyframes vsSlam{0%{opacity:0; transform:translate(-50%,-50%) scale(3.4) rotate(-8deg);} 60%{opacity:1;} 100%{opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0);}}
+  @keyframes vsShock{0%{opacity:.95; transform:scale(1);} 100%{opacity:0; transform:scale(15);}}
+  @keyframes vsBlink{0%,100%{opacity:.35;} 50%{opacity:.8;}}
+
+  /* ---------- emoji reactions ---------- */
+  .emoji-bar{position:sticky; bottom:12px; z-index:60; display:flex; align-items:center; justify-content:center; gap:4px; margin:22px auto 0; width:fit-content; max-width:100%;
+    padding:6px 8px; border-radius:999px; background:rgba(30,24,78,.72); border:1px solid var(--border);
+    backdrop-filter:blur(14px) saturate(1.3); -webkit-backdrop-filter:blur(14px) saturate(1.3); box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .emoji-btn{width:38px; height:38px; border-radius:50%; border:none; background:transparent; font-size:22px; line-height:1; padding:0; display:flex; align-items:center; justify-content:center;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .15s ease;}
+  .emoji-btn:active{transform:scale(1.35) translateY(-3px); background:rgba(255,255,255,.12);}
+  .emoji-btn.sent{animation:emojiSent .45s ease;}
+  @keyframes emojiSent{0%{transform:scale(1);} 40%{transform:scale(1.4) translateY(-4px);} 100%{transform:scale(1);}}
+  #react-layer{position:fixed; inset:0; pointer-events:none; z-index:10002; overflow:hidden;}
+  .react-float{position:absolute; bottom:96px; display:flex; flex-direction:column; align-items:center; gap:4px; animation:reactUp 2.6s cubic-bezier(.2,.7,.3,1) forwards;}
+  .react-float .rf-emoji{font-size:54px; line-height:1; filter:drop-shadow(0 8px 14px rgba(0,0,0,.45)); animation:reactPop .5s cubic-bezier(.34,1.8,.5,1) both;}
+  .react-float .pl-avatar{width:34px; height:34px; font-size:12px; box-shadow:0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,.4);}
+  @keyframes reactUp{0%{opacity:0; transform:translateY(20px);} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0; transform:translateY(-300px) translateX(var(--dx,0px));}}
+  @keyframes reactPop{from{transform:scale(.2) rotate(-25deg);} to{transform:scale(1) rotate(0);}}
+  .c4-vs-player{display:flex; flex-direction:column; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--text-muted);}
+  .c4-dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
   .xo-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; margin-bottom:12px;
     min-height:20px; color:var(--text);}
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
@@ -2114,6 +2207,27 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .c4-cell.c4-y .c4-disc{background:linear-gradient(145deg,#FFDE94,#F4B740); box-shadow:inset 0 -3px 4px rgba(0,0,0,.28);}
   .c4-cell.c4-win{animation:xoWinPulse 1s ease-in-out infinite;}
   .c4-cell.c4-win .c4-disc{box-shadow:0 0 0 3px var(--gold) inset, 0 0 14px rgba(244,183,64,.55);}
+
+  .domino-opp-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 10px; flex-wrap:wrap;}
+  .domino-opp-label{font-size:12.5px; color:var(--text-muted); font-weight:700;}
+  .domino-opp-tiles{display:flex; gap:3px; flex-wrap:wrap; max-width:60%; justify-content:flex-end;}
+  .domino-back{width:14px; height:22px; border-radius:3px; background:linear-gradient(145deg, var(--violet), #6C5CE7); border:1px solid rgba(255,255,255,.25); flex-shrink:0;}
+  .domino-chain{display:flex; gap:4px; overflow-x:auto; padding:14px 10px; background:linear-gradient(180deg, var(--surface-2), var(--surface)); border-radius:16px; border:1px solid var(--border); -webkit-overflow-scrolling:touch;}
+  .domino-empty-hint{margin:0 auto; color:var(--text-muted); font-size:13px; font-weight:700; padding:10px; white-space:nowrap;}
+  .domino-tile-h{display:flex; flex-direction:row; width:60px; height:32px; min-width:60px; background:linear-gradient(180deg,#FFFDF6,#EDE7D3); border-radius:6px; border:1px solid rgba(0,0,0,.25); box-shadow:0 2px 4px rgba(0,0,0,.2); overflow:hidden; flex-shrink:0;}
+  .domino-tile-h .domino-half:first-child{border-left:2px solid rgba(0,0,0,.35);}
+  .domino-hand-label{font-size:12.5px; color:var(--text-muted); font-weight:700; margin:14px 0 8px;}
+  .domino-hand{display:flex; gap:7px; overflow-x:auto; padding:6px 2px 10px; -webkit-overflow-scrolling:touch;}
+  .domino-tile{display:flex; flex-direction:column; width:46px; height:86px; min-width:46px; background:linear-gradient(180deg,#FFFDF6,#EDE7D3); border-radius:8px; border:1px solid rgba(0,0,0,.25); box-shadow:0 3px 6px rgba(0,0,0,.25); overflow:hidden; padding:0; cursor:pointer; flex-shrink:0;}
+  .domino-tile .domino-half:first-child{border-bottom:2px solid rgba(0,0,0,.35);}
+  .domino-tile.playable{box-shadow:0 3px 10px rgba(244,183,64,.4), 0 0 0 2px var(--gold);}
+  .domino-tile:disabled{opacity:.4; cursor:default;}
+  .domino-tile:not(:disabled):active{transform:scale(.92);}
+  .domino-half{display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2px; flex:1; padding:4px;}
+  .dpip{border-radius:50%; background:#2b2440;}
+  .dpip.empty{background:transparent;}
+  .domino-side-picker{display:flex; gap:8px; margin:10px 0;}
+  .domino-side-picker .btn{flex:1;}
 
   .memory-stats-row{display:flex; gap:8px; margin-bottom:14px;}
   .memory-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:360px; margin:0 auto;}
@@ -4403,6 +4517,7 @@ function myGameStats(pid){ return GAME_STATS[pid] || (GAME_STATS[pid] = {}); }
 const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
   {id:'connect4', icon:'🔴', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
+  {id:'domino', icon:'🁫', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'فكرنا في رقم من 1 لـ100، خمنه بأقل محاولات', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
@@ -4546,9 +4661,9 @@ function renderXoGame(){
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="xo-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
     <div class="xo-score-row">
-      <div class="xo-score-pill"><span>X (انت)</span><b>${g.scoreX}</b></div>
+      ${scorePill(gameAvatar(state.pid,'X'), g.scoreX)}
       <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
-      <div class="xo-score-pill o"><span>${g.mode==='ai'?'🤖 الجهاز':'O'}</span><b>${g.scoreO}</b></div>
+      ${g.mode==='ai' ? scorePill(gameAiAvatar('O'), g.scoreO, 'o') : `<div class="xo-score-pill o"><span>O</span><b>${g.scoreO}</b></div>`}
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
@@ -4949,8 +5064,10 @@ function c4BestMove(board){
 function initConnect4Game(){
   const prevMode = state.connect4 ? state.connect4.mode : 'ai';
   const prevScore = state.connect4 ? {r:state.connect4.scoreR, y:state.connect4.scoreY, d:state.connect4.scoreD} : {r:0,y:0,d:0};
+  const prevColors = state.connect4 ? {r:state.connect4.colorR, y:state.connect4.colorY} : {r:'red', y:'yellow'};
   state.connect4 = { board:newC4Board(), turn:'R', mode:prevMode, winner:null, winCells:null,
-    scoreR:prevScore.r, scoreY:prevScore.y, scoreD:prevScore.d, busy:false };
+    scoreR:prevScore.r, scoreY:prevScore.y, scoreD:prevScore.d, busy:false,
+    colorR:prevColors.r, colorY:prevColors.y };
 }
 function c4EndRound(res){
   const g = state.connect4;
@@ -5003,15 +5120,16 @@ function renderConnect4Game(){
       const cls = (v?('c4-'+v.toLowerCase()):'') + (isWin?' c4-win':'');
       const full = g.board[col].length>=6;
       const disabled = (g.winner || full || (g.mode==='ai' && g.turn==='Y')) ? 'disabled' : '';
-      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="c4-col" data-col="${col}" ${disabled}><span class="c4-disc"></span></button>`;
+      const discStyle = v ? `style="background:${c4Grad(v==='R'?g.colorR:g.colorY)}"` : '';
+      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="c4-col" data-col="${col}" ${disabled}><span class="c4-disc" ${discStyle}></span></button>`;
     }
   }
   let statusText;
   if(g.winner==='draw') statusText = '🤝 تعادل!';
   else if(g.winner==='R') statusText = '🎉 فزت!';
-  else if(g.winner==='Y') statusText = g.mode==='ai' ? '🤖 فاز الجهاز، حظ أوفر!' : '🎉 فاز اللاعب 🟡';
+  else if(g.winner==='Y') statusText = g.mode==='ai' ? '🤖 فاز الجهاز، حظ أوفر!' : `🎉 فاز اللاعب ${c4Dot(g.colorY)}`;
   else if(g.mode==='ai' && g.turn==='Y') statusText = '🤖 الجهاز بيفكر...';
-  else statusText = `دور اللاعب ${g.turn==='R'?'🔴':'🟡'}`;
+  else statusText = `دور اللاعب ${c4Dot(g.turn==='R'?g.colorR:g.colorY)}`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -5021,15 +5139,302 @@ function renderConnect4Game(){
       <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="c4-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="c4-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
+    ${c4PickerHtml(g.mode==='ai' ? 'اختار لون قطعتك' : 'لون اللاعب 1', g.colorR, g.colorY, null, 'c4-color', 'data-slot="R"')}
+    ${g.mode==='2p' ? c4PickerHtml('لون اللاعب 2', g.colorY, g.colorR, null, 'c4-color', 'data-slot="Y"') : ''}
     <div class="xo-score-row">
-      <div class="xo-score-pill"><span>🔴 انت</span><b>${g.scoreR}</b></div>
+      ${scorePill(gameAvatar(state.pid,'',null,g.colorR), g.scoreR)}
       <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
-      <div class="xo-score-pill o"><span>${g.mode==='ai'?'🤖 الجهاز':'🟡'}</span><b>${g.scoreY}</b></div>
+      ${g.mode==='ai' ? scorePill(gameAiAvatar('',null,g.colorY), g.scoreY, 'o') : `<div class="xo-score-pill o has-av"><div class="pl-avatar pl-ai">👥<i class="pl-badge pl-dot" style="background:${c4Grad(g.colorY)}"></i></div><b>${g.scoreY}</b></div>`}
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="c4-board">${cellsHtml}</div>
     <button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="c4-reset">🔄 جولة جديدة</button>
   `;
+}
+
+/* ============================= GAMES: DOMINO ============================= */
+const DOMINO_PIPS = {0:[],1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
+function dominoHalfHtml(n){
+  let dots='';
+  for(let i=1;i<=9;i++){ dots += (DOMINO_PIPS[n]||[]).indexOf(i)>-1 ? '<i class="dpip"></i>' : '<i class="dpip empty"></i>'; }
+  return `<span class="domino-half">${dots}</span>`;
+}
+function dominoFullSet(){
+  const s=[]; for(let a=0;a<=6;a++) for(let b=a;b<=6;b++) s.push({a,b});
+  return s;
+}
+function dominoHandCanPlay(hand, ends){
+  if(!ends) return hand.length>0;
+  return hand.some(t=> t.a===ends.left || t.b===ends.left || t.a===ends.right || t.b===ends.right);
+}
+function dominoPlayableSides(tile, ends){
+  if(!ends) return ['any'];
+  const sides=[];
+  if(tile.a===ends.left || tile.b===ends.left) sides.push('left');
+  if(tile.a===ends.right || tile.b===ends.right) sides.push('right');
+  return sides;
+}
+function dominoDraw(player, g){
+  g = g || state.domino;
+  if(!g || g.boneyard.length===0) return null;
+  const t = g.boneyard.pop();
+  g.hands[player].push(t);
+  return t;
+}
+function dominoPlaceTile(side, idx, player, g){
+  g = g || state.domino;
+  const hand = g.hands[player];
+  const tile = hand[idx];
+  if(!tile) return;
+  if(!g.ends){
+    g.chain.push({left:tile.a, right:tile.b});
+    g.ends = {left:tile.a, right:tile.b};
+  } else if(side==='left'){
+    const attach = g.ends.left;
+    const newVal = (tile.a===attach) ? tile.b : tile.a;
+    g.chain.unshift({left:newVal, right:attach});
+    g.ends.left = newVal;
+  } else {
+    const attach = g.ends.right;
+    const newVal = (tile.a===attach) ? tile.b : tile.a;
+    g.chain.push({left:attach, right:newVal});
+    g.ends.right = newVal;
+  }
+  hand.splice(idx,1);
+}
+function initDominoGame(){
+  const prevMode = state.domino ? state.domino.mode : 'ai';
+  const prevScore = state.domino ? {r:state.domino.scoreR, y:state.domino.scoreY, d:state.domino.scoreD} : {r:0,y:0,d:0};
+  const deck = shuffleArray(dominoFullSet());
+  const handR = deck.splice(0,7);
+  const handY = deck.splice(0,7);
+  const boneyard = deck;
+  let starter = 'R', bestDouble = -1;
+  handR.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='R'; } });
+  handY.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='Y'; } });
+  state.domino = {
+    mode: prevMode,
+    hands: {R:handR, Y:handY},
+    boneyard, chain:[], ends:null,
+    turn: starter, winner:null, blocked:false,
+    scoreR:prevScore.r, scoreY:prevScore.y, scoreD:prevScore.d,
+    busy:false, pendingIdx:null, passStreak:0
+  };
+}
+function dominoEndRound(res){
+  const g = state.domino;
+  g.winner = res.winner; g.blocked = !!res.blocked;
+  if(res.winner==='draw'){ g.scoreD++; SND.click(); }
+  else{
+    if(res.winner==='R') g.scoreR++; else g.scoreY++;
+    vibrate([20,20,30]);
+    SND.coinChime();
+    if(res.winner==='R' || g.mode==='2p'){ launchConfetti(); }
+  }
+}
+function dominoAfterMove(){
+  const g = state.domino;
+  if(!g) return;
+  if(g.hands.R.length===0){ dominoEndRound({winner:'R'}); render(); return; }
+  if(g.hands.Y.length===0){ dominoEndRound({winner:'Y'}); render(); return; }
+  g.turn = g.turn==='R' ? 'Y' : 'R';
+  dominoProcessTurn(false);
+}
+function dominoProcessTurn(silent){
+  const g = state.domino;
+  if(!g) return;
+  let guard = 0;
+  while(guard++<4){
+    const player = g.turn;
+    const hand = g.hands[player];
+    while(!dominoHandCanPlay(hand, g.ends) && g.boneyard.length>0){ dominoDraw(player); }
+    if(dominoHandCanPlay(hand, g.ends)){
+      g.passStreak = 0;
+      if(g.mode==='ai' && player==='Y'){
+        g.busy = true;
+        if(!silent) render();
+        setTimeout(()=>{ dominoAiMove(); }, 650);
+      } else {
+        g.busy = false;
+        if(!silent) render();
+      }
+      return;
+    }
+    g.passStreak = (g.passStreak||0)+1;
+    if(g.passStreak>=2){
+      const sumR = g.hands.R.reduce((s,t)=>s+t.a+t.b,0);
+      const sumY = g.hands.Y.reduce((s,t)=>s+t.a+t.b,0);
+      const winner = sumR<sumY ? 'R' : (sumY<sumR ? 'Y' : 'draw');
+      dominoEndRound({winner, blocked:true});
+      if(!silent) render();
+      return;
+    }
+    g.turn = player==='R' ? 'Y' : 'R';
+  }
+  if(!silent) render();
+}
+function dominoAiMove(){
+  const g = state.domino;
+  if(!g) return;
+  const hand = g.hands.Y;
+  let candidates = [];
+  hand.forEach((t,idx)=>{
+    const sides = dominoPlayableSides(t, g.ends);
+    if(sides.length===0) return;
+    if(sides[0]==='any') candidates.push({idx, side:'left', tile:t});
+    else sides.forEach(side=> candidates.push({idx, side, tile:t}));
+  });
+  if(candidates.length===0){ g.busy=false; dominoAfterMove(); return; }
+  candidates.sort((c1,c2)=>{
+    const d1 = c1.tile.a===c1.tile.b ? 1:0, d2 = c2.tile.a===c2.tile.b ? 1:0;
+    if(d2!==d1) return d2-d1;
+    return (c2.tile.a+c2.tile.b) - (c1.tile.a+c1.tile.b);
+  });
+  const choice = candidates[0];
+  dominoPlaceTile(choice.side, choice.idx, 'Y');
+  SND.click();
+  g.busy = false;
+  dominoAfterMove();
+}
+function doDominoTileTap(idx){
+  const g = state.domino;
+  if(!g || g.busy || g.winner) return;
+  if(g.mode==='ai' && g.turn==='Y') return;
+  if(g.pendingIdx!=null) return;
+  const player = g.turn;
+  const hand = g.hands[player];
+  const tile = hand[idx];
+  if(!tile) return;
+  const sides = dominoPlayableSides(tile, g.ends);
+  if(sides.length===0) return;
+  if(sides.length===1){
+    dominoPlaceTile(sides[0]==='any'?'left':sides[0], idx, player);
+    SND.click();
+    dominoAfterMove();
+    return;
+  }
+  g.pendingIdx = idx;
+  render();
+}
+function doDominoChooseSide(side){
+  const g = state.domino;
+  if(!g || g.pendingIdx==null) return;
+  dominoPlaceTile(side, g.pendingIdx, g.turn);
+  g.pendingIdx = null;
+  SND.click();
+  dominoAfterMove();
+}
+function renderDominoGame(){
+  if(!state.domino) initDominoGame();
+  const g = state.domino;
+  const activePlayer = g.turn;
+  const inactivePlayer = activePlayer==='R' ? 'Y' : 'R';
+  const isHumanInteractive = !(g.mode==='ai' && activePlayer==='Y') && !g.winner && !g.busy && g.pendingIdx==null;
+  const activeLabel = activePlayer==='R' ? '🔴 دورك، اختار قطعة 👇' : (g.mode==='ai' ? '🤖 دور الجهاز' : '🟡 دور اللاعب 2');
+  const inactiveLabel = inactivePlayer==='R' ? '🔴 انت' : (g.mode==='ai' ? '🤖 الجهاز' : '🟡 اللاعب 2');
+  const inactiveCount = g.hands[inactivePlayer].length;
+  const backTiles = Array.from({length:inactiveCount}).map(()=>`<span class="domino-back"></span>`).join('');
+  const chainHtml = g.chain.length
+    ? g.chain.map(t=>`<span class="domino-tile-h">${dominoHalfHtml(t.left)}${dominoHalfHtml(t.right)}</span>`).join('')
+    : `<div class="domino-empty-hint">حط أول قطعة 👇</div>`;
+  const activeHand = g.hands[activePlayer];
+  const handHtml = activeHand.map((t,i)=>{
+    const sides = isHumanInteractive ? dominoPlayableSides(t, g.ends) : [];
+    const playable = sides.length>0;
+    const dis = (isHumanInteractive && playable) ? '' : 'disabled';
+    return `<button type="button" class="domino-tile ${playable?'playable':''}" data-action="domino-tile" data-idx="${i}" ${dis}>${dominoHalfHtml(t.a)}${dominoHalfHtml(t.b)}</button>`;
+  }).join('');
+  let statusText;
+  if(g.winner==='draw') statusText = g.blocked ? '🤝 اتقفلت اللعبة وتعادلتوا في النقط!' : '🤝 تعادل!';
+  else if(g.winner==='R') statusText = g.blocked ? '🎉 اتقفلت اللعبة وفزت بأقل نقط!' : '🎉 فزت! خلصت قطعك الأول';
+  else if(g.winner==='Y') statusText = g.mode==='ai'
+      ? (g.blocked ? '🤖 اتقفلت اللعبة وفاز الجهاز بأقل نقط' : '🤖 فاز الجهاز، حظ أوفر!')
+      : (g.blocked ? '🟡 اتقفلت اللعبة وفاز اللاعب 2 بأقل نقط' : '🟡 فاز اللاعب 2! خلص قطعه الأول');
+  else if(g.busy) statusText = '🤖 الجهاز بيفكر...';
+  else if(g.pendingIdx!=null) statusText = 'القطعة دي بتتحط في الطرفين، اختار فين 👇';
+  else statusText = activeLabel;
+  const pendingButtons = (g.pendingIdx!=null) ? `
+    <div class="domino-side-picker">
+      <button type="button" class="btn btn-outline" data-action="domino-side" data-side="left">⬅️ الطرف الأول</button>
+      <button type="button" class="btn btn-outline" data-action="domino-side" data-side="right">➡️ الطرف التاني</button>
+    </div>` : '';
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">دومينو</div>
+    </div>
+    <div class="game-mode-switch">
+      <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="domino-mode" data-mode="ai">🤖 ضد الجهاز</button>
+      <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="domino-mode" data-mode="2p">👥 لاعبين اتنين</button>
+    </div>
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(state.pid), g.scoreR)}
+      <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
+      ${g.mode==='ai' ? scorePill(gameAiAvatar(), g.scoreY, 'o') : `<div class="xo-score-pill o"><span>🟡 لاعب 2</span><b>${g.scoreY}</b></div>`}
+    </div>
+    <div class="domino-opp-row">
+      <span class="domino-opp-label">${inactiveLabel} • ${inactiveCount} قطعة</span>
+      <div class="domino-opp-tiles">${backTiles}</div>
+    </div>
+    <div class="hint" style="text-align:center;">باقي في الكومة: ${g.boneyard.length} قطعة</div>
+    <div class="xo-status">${statusText}</div>
+    <div class="domino-chain">${chainHtml}</div>
+    ${pendingButtons}
+    <div class="domino-hand-label">${g.mode==='2p' ? (activePlayer==='R'?'قطع اللاعب 1 (انت):':'قطع اللاعب 2 (مرر الجهاز له):') : 'قطعك:'}</div>
+    <div class="domino-hand">${handHtml}</div>
+    <button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="domino-reset">🔄 جولة جديدة</button>
+  `;
+}
+
+/* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
+// يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
+function gameAvatar(pid, badgeText, size, dotColorId){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  let badge = '';
+  if(dotColorId) badge = `<i class="pl-badge pl-dot" style="background:${c4Grad(dotColorId)}"></i>`;
+  else if(badgeText) badge = `<i class="pl-badge ${badgeText==='✖'?'pl-x':''}">${badgeText}</i>`;
+  if(!p) return `<div class="pl-avatar pl-ai ${size||''}">👤${badge}</div>`;
+  const t = teamOf(p.teamId);
+  const bg = p.photo
+    ? `background-image:url('${p.photo}');background-size:cover;background-position:center;`
+    : `background:${t?t.color:'var(--gold)'};`;
+  return `<div class="pl-avatar ${size||''}" style="${bg}" title="${escapeHtml(p.name)}">${p.photo?'':escapeHtml(initials(p.name))}${badge}</div>`;
+}
+function gameAiAvatar(badgeText, size, dotColorId){
+  let badge = '';
+  if(dotColorId) badge = `<i class="pl-badge pl-dot" style="background:${c4Grad(dotColorId)}"></i>`;
+  else if(badgeText) badge = `<i class="pl-badge">${badgeText}</i>`;
+  return `<div class="pl-avatar pl-ai ${size||''}">🤖${badge}</div>`;
+}
+function scorePill(avatarHtml, score, cls){
+  return `<div class="xo-score-pill has-av ${cls||''}">${avatarHtml}<b>${score}</b></div>`;
+}
+
+/* ---- Connect Four colors (each player picks their own disc color) ---- */
+const C4_COLORS = [
+  {id:'red',    name:'أحمر',    a:'#FF7A59', b:'#D6473A'},
+  {id:'yellow', name:'أصفر',    a:'#FFDE94', b:'#F4B740'},
+  {id:'blue',   name:'أزرق',    a:'#7CC0FF', b:'#2F7BEA'},
+  {id:'green',  name:'أخضر',    a:'#8FF0BC', b:'#2FB672'},
+  {id:'purple', name:'بنفسجي',  a:'#C7A6FF', b:'#7F56D9'},
+  {id:'pink',   name:'وردي',    a:'#FFA6D0', b:'#E5478F'},
+  {id:'orange', name:'برتقالي', a:'#FFC08A', b:'#F2761E'},
+  {id:'teal',   name:'تركواز',  a:'#8CF0E4', b:'#16B3A4'},
+];
+function c4Color(id){ return C4_COLORS.find(c=>c.id===id) || C4_COLORS[0]; }
+function c4Grad(id){ const c=c4Color(id); return `linear-gradient(145deg,${c.a},${c.b})`; }
+function c4Dot(id){ return `<span class="c4-dot" style="background:${c4Grad(id)}"></span>`; }
+// takenColor = اللون اللي الخصم اختاره (بيظهر عليه علامة ✖ وصورة الخصم)، takenById = مين الخصم
+function c4PickerHtml(label, myColor, takenColor, takenById, action, extraAttrs){
+  const sw = C4_COLORS.map(c=>{
+    const sel = myColor===c.id;
+    const taken = !!takenColor && takenColor===c.id && !sel;
+    const mark = taken
+      ? `<span class="c4-sw-mark">${takenById ? gameAvatar(takenById,'✖','xs') : '✖'}</span>`
+      : (sel ? '<span class="c4-sw-mark">✓</span>' : '');
+    return `<button type="button" class="c4-swatch ${sel?'sel':''} ${taken?'taken':''}" title="${c.name}" data-action="${action}" data-color="${c.id}" ${extraAttrs||''} ${taken?'disabled':''}><span class="c4-sw-fill" style="background:${c4Grad(c.id)}"></span>${mark}</button>`;
+  }).join('');
+  return `<div class="c4-picker"><div class="c4-picker-label">${label}</div><div class="c4-swatches">${sw}</div></div>`;
 }
 
 /* ============================= GAMES: ROOMS (LIVE MULTIPLAYER) ============================= */
@@ -5057,6 +5462,30 @@ async function createGameRoom(gameType){
   };
   if(gameType==='xo'){
     Object.assign(room, {board:newXoBoard(), turn:'X', winner:null, line:null, scoreX:0, scoreO:0, scoreD:0});
+  } else if(gameType==='domino'){
+    const deck = shuffleArray(dominoFullSet());
+    const hostHand = deck.splice(0,7);
+    const guestHand = deck.splice(0,7);
+    const boneyard = deck;
+    let starter='host', bestDouble=-1;
+    hostHand.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='host'; } });
+    guestHand.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='guest'; } });
+    Object.assign(room, {hands:{host:hostHand, guest:guestHand}, boneyard, chain:[], ends:null,
+      turn:starter, winner:null, blocked:false, pendingIdx:null, passStreak:0,
+      scoreHost:0, scoreGuest:0, scoreDraw:0});
+  } else if(gameType==='connect4'){
+    Object.assign(room, {board:newC4Board(), turn:'host', round:0, hostColor:null, guestColor:null,
+      winner:null, winCells:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
+  } else if(gameType==='memory'){
+    const icons = ['🎓','🏆','🎁','🎯','📿','🎡','🪪','⭐'];
+    Object.assign(room, {cards:shuffleArray(icons.concat(icons)), flipped:[], matched:{}, turn:'host', round:0,
+      winner:null, scoreHost:0, scoreGuest:0});
+  } else if(gameType==='numguess'){
+    Object.assign(room, {target:1+Math.floor(Math.random()*100), guesses:[], turn:'host', round:0,
+      winner:null, scoreHost:0, scoreGuest:0});
+  } else if(gameType==='math'){
+    Object.assign(room, {problem:genMathProblem(), qIndex:0, total:10, locked:{host:false,guest:false},
+      finished:false, winner:null, scoreHost:0, scoreGuest:0});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -5158,6 +5587,94 @@ async function doRoomRpsNext(){
   await saveGameRooms(GAME_ROOMS);
   render();
 }
+function roomDominoEndRound(room, winner, blocked){
+  room.winner = winner;
+  room.blocked = !!blocked;
+  if(winner==='draw') room.scoreDraw++;
+  else if(winner==='host') room.scoreHost++; else room.scoreGuest++;
+}
+function roomDominoAdvance(room){
+  if(room.hands.host.length===0){ roomDominoEndRound(room, 'host'); return; }
+  if(room.hands.guest.length===0){ roomDominoEndRound(room, 'guest'); return; }
+  room.turn = room.turn==='host' ? 'guest' : 'host';
+  let guard = 0;
+  while(guard++<4){
+    const player = room.turn;
+    const hand = room.hands[player];
+    while(!dominoHandCanPlay(hand, room.ends) && room.boneyard.length>0){ dominoDraw(player, room); }
+    if(dominoHandCanPlay(hand, room.ends)){ room.passStreak = 0; return; }
+    room.passStreak = (room.passStreak||0)+1;
+    if(room.passStreak>=2){
+      const sumHost = room.hands.host.reduce((s,t)=>s+t.a+t.b,0);
+      const sumGuest = room.hands.guest.reduce((s,t)=>s+t.a+t.b,0);
+      const winner = sumHost<sumGuest ? 'host' : (sumGuest<sumHost ? 'guest' : 'draw');
+      roomDominoEndRound(room, winner, true);
+      return;
+    }
+    room.turn = player==='host' ? 'guest' : 'host';
+  }
+}
+async function doRoomDominoMove(idx){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.winner) return;
+  const myRole = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==myRole || room.pendingIdx!=null) return;
+  const hand = room.hands[myRole];
+  const tile = hand[idx];
+  if(!tile) return;
+  const sides = dominoPlayableSides(tile, room.ends);
+  if(sides.length===0) return;
+  SND.click();
+  if(sides.length===1){
+    dominoPlaceTile(sides[0]==='any'?'left':sides[0], idx, myRole, room);
+    roomDominoAdvance(room);
+  } else {
+    room.pendingIdx = idx;
+  }
+  room.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.winner){
+    vibrate([20,20,30]); SND.coinChime();
+    if(room.winner===myRole) launchConfetti();
+  }
+}
+async function doRoomDominoSide(side){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.pendingIdx==null) return;
+  const myRole = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==myRole) return;
+  dominoPlaceTile(side, room.pendingIdx, myRole, room);
+  room.pendingIdx = null;
+  SND.click();
+  roomDominoAdvance(room);
+  room.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.winner){
+    vibrate([20,20,30]); SND.coinChime();
+    if(room.winner===myRole) launchConfetti();
+  }
+}
+async function doRoomDominoNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  const deck = shuffleArray(dominoFullSet());
+  const hostHand = deck.splice(0,7);
+  const guestHand = deck.splice(0,7);
+  const boneyard = deck;
+  let starter='host', bestDouble=-1;
+  hostHand.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='host'; } });
+  guestHand.forEach(t=>{ if(t.a===t.b && t.a>bestDouble){ bestDouble=t.a; starter='guest'; } });
+  Object.assign(room, {hands:{host:hostHand, guest:guestHand}, boneyard, chain:[], ends:null,
+    turn:starter, winner:null, blocked:false, pendingIdx:null, passStreak:0});
+  room.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
 let roomPollInterval = null;
 function startRoomPolling(){
   stopRoomPolling();
@@ -5171,27 +5688,36 @@ function startRoomPolling(){
       if(before!==after) render();
     }catch(e){}
   }, 2000);
+  startReactPolling();
 }
-function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval=null; } }
+function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval=null; } stopReactPolling(); }
+const ROOM_GAMES = [
+  {id:'xo',       sub:'أنشئ غرفة والعب ضد صاحبك'},
+  {id:'connect4', sub:'كل واحد بيختار لون قطعته'},
+  {id:'domino',   sub:'أنشئ غرفة والعب ضد صاحبك'},
+  {id:'rps',      sub:'أنشئ غرفة والعب ضد صاحبك'},
+  {id:'memory',   sub:'بالدور — مين يلاقي أزواج أكتر؟'},
+  {id:'numguess', sub:'خمنوا الرقم بالدور — مين يوصله الأول؟'},
+  {id:'math',     sub:'سباق — أسرع واحد يجاوب صح ياخد النقطة'},
+];
 function renderRoomsLobby(){
+  const cards = ROOM_GAMES.map(rg=>{
+    const g = GAMES_CATALOG.find(x=>x.id===rg.id);
+    if(!g) return '';
+    return `
+      <button type="button" class="game-hub-card" data-action="create-room" data-game="${g.id}">
+        <span class="ghc-ico" style="background:${g.color}">${g.icon}</span>
+        <span class="ghc-text"><span class="ghc-title">${g.title}</span><span class="ghc-sub">${rg.sub}</span></span>
+        <span class="ghc-chev">${ICO.chev}</span>
+      </button>`;
+  }).join('');
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">العب مع صديق</div>
     </div>
     <div class="section-title">اختار اللعبة وافتح غرفة جديدة 🎮</div>
-    <div class="game-hub-list">
-      <button type="button" class="game-hub-card" data-action="create-room" data-game="xo">
-        <span class="ghc-ico" style="background:linear-gradient(145deg,#FF7A59,#F4B740)">⭕</span>
-        <span class="ghc-text"><span class="ghc-title">إكس أو</span><span class="ghc-sub">أنشئ غرفة والعب ضد صاحبك</span></span>
-        <span class="ghc-chev">${ICO.chev}</span>
-      </button>
-      <button type="button" class="game-hub-card" data-action="create-room" data-game="rps">
-        <span class="ghc-ico" style="background:linear-gradient(145deg,#5FE0A4,#FFDE94)">✊</span>
-        <span class="ghc-text"><span class="ghc-title">حجر ورقة مقص</span><span class="ghc-sub">أنشئ غرفة والعب ضد صاحبك</span></span>
-        <span class="ghc-chev">${ICO.chev}</span>
-      </button>
-    </div>
+    <div class="game-hub-list">${cards}</div>
     <div class="section-title" style="margin-top:20px;">عندك كود غرفة؟</div>
     <div class="room-join-row">
       <input type="text" inputmode="numeric" maxlength="4" class="room-code-input" id="room-join-code" placeholder="0000" value="${state.roomJoinInput||''}">
@@ -5219,6 +5745,7 @@ function renderRoomXo(){
   const mySymbol = room.hostId===state.pid ? 'X' : 'O';
   const myName = room.hostId===state.pid ? room.hostName : room.guestName;
   const oppName = room.hostId===state.pid ? room.guestName : room.hostName;
+  const myId = state.pid, oppId = room.hostId===state.pid ? room.guestId : room.hostId;
   const cellHtml = room.board.map((v,i)=>{
     const isWin = room.line && room.line.indexOf(i)>-1;
     const cls = (v?('xo-'+v.toLowerCase()):'') + (isWin?' xo-win':'');
@@ -5227,17 +5754,17 @@ function renderRoomXo(){
   }).join('');
   let statusText;
   if(room.winner==='draw') statusText = '🤝 تعادل!';
-  else if(room.winner) statusText = room.winner===mySymbol ? '🎉 فزت!' : `😅 فاز ${oppName}`;
-  else statusText = room.turn===mySymbol ? 'دورك! 🎯' : `دور ${oppName}...`;
+  else if(room.winner) statusText = room.winner===mySymbol ? '🎉 فزت!' : '😅 فاز صاحبك';
+  else statusText = room.turn===mySymbol ? 'دورك! 🎯' : 'دور صاحبك...';
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="leave-room">${ICO.back}</button>
-      <div class="back-title">إكس أو - ${myName} ضد ${oppName}</div>
+      <div class="back-title">إكس أو - غرفة ${room.code}</div>
     </div>
     <div class="xo-score-row">
-      <div class="xo-score-pill"><span>${myName} (${mySymbol})</span><b>${mySymbol==='X'?room.scoreX:room.scoreO}</b></div>
+      ${scorePill(gameAvatar(myId, mySymbol), mySymbol==='X'?room.scoreX:room.scoreO)}
       <div class="xo-score-pill draw"><span>تعادل</span><b>${room.scoreD}</b></div>
-      <div class="xo-score-pill o"><span>${oppName}</span><b>${mySymbol==='X'?room.scoreO:room.scoreX}</b></div>
+      ${scorePill(gameAvatar(oppId, mySymbol==='X'?'O':'X'), mySymbol==='X'?room.scoreO:room.scoreX, 'o')}
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
@@ -5257,30 +5784,31 @@ function renderRoomRps(){
   const oppPick = isHost ? room.guestPick : room.hostPick;
   const myName = isHost ? room.hostName : room.guestName;
   const oppName = isHost ? room.guestName : room.hostName;
+  const myId = state.pid, oppId = isHost ? room.guestId : room.hostId;
   const bothPicked = room.hostPick && room.guestPick;
   const battleHtml = myPick ? `
     <div class="rps-battle">
-      <div class="rps-side"><div class="rps-emoji">${RPS_ICONS[myPick]}</div><div class="rps-lab">${myName}</div></div>
+      <div class="rps-side"><div class="rps-emoji">${RPS_ICONS[myPick]}</div><div class="rps-lab">${gameAvatar(myId,'','sm')}</div></div>
       <div class="rps-vs">VS</div>
-      <div class="rps-side"><div class="rps-emoji">${bothPicked?RPS_ICONS[oppPick]:'❔'}</div><div class="rps-lab">${oppName}</div></div>
+      <div class="rps-side"><div class="rps-emoji">${bothPicked?RPS_ICONS[oppPick]:'❔'}</div><div class="rps-lab">${gameAvatar(oppId,'','sm')}</div></div>
     </div>` : `<div class="hint" style="text-align:center;margin-top:10px;">اختار حجر ولا ورقة ولا مقص!</div>`;
   let resultText = '';
   if(bothPicked){
     if(room.resultText==='draw') resultText='🤝 تعادل';
     else if((room.resultText==='host')===isHost) resultText='🎉 فزت في الجولة!';
-    else resultText=`😅 فاز ${oppName}`;
+    else resultText='😅 فاز صاحبك';
   } else if(myPick){
-    resultText = `⏳ في انتظار ${oppName}...`;
+    resultText = '⏳ في انتظار صاحبك...';
   }
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="leave-room">${ICO.back}</button>
-      <div class="back-title">حجر ورقة مقص - ${myName} ضد ${oppName}</div>
+      <div class="back-title">حجر ورقة مقص - غرفة ${room.code}</div>
     </div>
     <div class="xo-score-row">
-      <div class="xo-score-pill"><span>${myName}</span><b>${isHost?room.scoreHost:room.scoreGuest}</b></div>
+      ${scorePill(gameAvatar(myId), isHost?room.scoreHost:room.scoreGuest)}
       <div class="xo-score-pill draw"><span>تعادل</span><b>${room.scoreDraw}</b></div>
-      <div class="xo-score-pill o"><span>${oppName}</span><b>${isHost?room.scoreGuest:room.scoreHost}</b></div>
+      ${scorePill(gameAvatar(oppId), isHost?room.scoreGuest:room.scoreHost, 'o')}
     </div>
     ${battleHtml}
     ${resultText ? `<div class="xo-status">${resultText}</div>` : ''}
@@ -5290,6 +5818,511 @@ function renderRoomRps(){
     ${bothPicked ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-rps-next">🔄 جولة جديدة</button>` : ''}
   `;
 }
+function renderRoomDomino(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room){
+    return `<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">دومينو</div></div><div class="hint" style="text-align:center;margin-top:20px;">الغرفة مش موجودة أو خلصت</div>`;
+  }
+  if(room.status==='waiting'){
+    return `<div class="back-row"><button class="icon-btn" data-action="leave-room">${ICO.back}</button><div class="back-title">دومينو - غرفة</div></div>${renderRoomWaiting(room)}`;
+  }
+  const myRole = room.hostId===state.pid ? 'host' : 'guest';
+  const oppRole = myRole==='host' ? 'guest' : 'host';
+  const myName = myRole==='host' ? room.hostName : room.guestName;
+  const oppName = myRole==='host' ? room.guestName : room.hostName;
+  const myId = state.pid, oppId = myRole==='host' ? room.guestId : room.hostId;
+  const isMyTurn = room.turn===myRole && !room.winner;
+  const isPendingMine = room.pendingIdx!=null && isMyTurn;
+  const oppCount = room.hands[oppRole].length;
+  const backTiles = Array.from({length:oppCount}).map(()=>`<span class="domino-back"></span>`).join('');
+  const chainHtml = room.chain.length
+    ? room.chain.map(t=>`<span class="domino-tile-h">${dominoHalfHtml(t.left)}${dominoHalfHtml(t.right)}</span>`).join('')
+    : `<div class="domino-empty-hint">حط أول قطعة 👇</div>`;
+  const myHand = room.hands[myRole];
+  const handHtml = myHand.map((t,i)=>{
+    const sides = (isMyTurn && room.pendingIdx==null) ? dominoPlayableSides(t, room.ends) : [];
+    const playable = sides.length>0;
+    const dis = (isMyTurn && room.pendingIdx==null && playable) ? '' : 'disabled';
+    return `<button type="button" class="domino-tile ${playable?'playable':''}" data-action="room-domino-tile" data-idx="${i}" ${dis}>${dominoHalfHtml(t.a)}${dominoHalfHtml(t.b)}</button>`;
+  }).join('');
+  let statusText;
+  if(room.winner==='draw') statusText = room.blocked ? '🤝 اتقفلت اللعبة وتعادلتوا في النقط!' : '🤝 تعادل!';
+  else if(room.winner===myRole) statusText = room.blocked ? '🎉 اتقفلت اللعبة وفزت بأقل نقط!' : '🎉 فزت! خلصت قطعك الأول';
+  else if(room.winner) statusText = room.blocked ? `😅 اتقفلت اللعبة وفاز صاحبك بأقل نقط` : '😅 فاز صاحبك';
+  else if(isPendingMine) statusText = 'القطعة دي بتتحط في الطرفين، اختار فين 👇';
+  else if(isMyTurn) statusText = 'دورك! اختار قطعة 👇';
+  else statusText = '⏳ دور صاحبك...';
+  const pendingButtons = isPendingMine ? `
+    <div class="domino-side-picker">
+      <button type="button" class="btn btn-outline" data-action="room-domino-side" data-side="left">⬅️ الطرف الأول</button>
+      <button type="button" class="btn btn-outline" data-action="room-domino-side" data-side="right">➡️ الطرف التاني</button>
+    </div>` : '';
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="leave-room">${ICO.back}</button>
+      <div class="back-title">دومينو - غرفة ${room.code}</div>
+    </div>
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(myId), myRole==='host'?room.scoreHost:room.scoreGuest)}
+      <div class="xo-score-pill draw"><span>تعادل</span><b>${room.scoreDraw}</b></div>
+      ${scorePill(gameAvatar(oppId), myRole==='host'?room.scoreGuest:room.scoreHost, 'o')}
+    </div>
+    <div class="domino-opp-row">
+      <span class="domino-opp-label">${gameAvatar(oppId,'','sm')} • ${oppCount} قطعة</span>
+      <div class="domino-opp-tiles">${backTiles}</div>
+    </div>
+    <div class="hint" style="text-align:center;">باقي في الكومة: ${room.boneyard.length} قطعة</div>
+    <div class="xo-status">${statusText}</div>
+    <div class="domino-chain">${chainHtml}</div>
+    ${pendingButtons}
+    <div class="domino-hand-label">قطعك:</div>
+    <div class="domino-hand">${handHtml}</div>
+    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-domino-next">🔄 جولة جديدة</button>` : ''}
+  `;
+}
+
+
+/* ---------- rooms: shared helpers for the new games ---------- */
+function roomGate(title, room){
+  if(!room){
+    return `<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">${title}</div></div><div class="hint" style="text-align:center;margin-top:20px;">الغرفة مش موجودة أو خلصت</div>`;
+  }
+  if(room.status==='waiting'){
+    return `<div class="back-row"><button class="icon-btn" data-action="leave-room">${ICO.back}</button><div class="back-title">${title} - غرفة</div></div>${renderRoomWaiting(room)}`;
+  }
+  return null;
+}
+function roomHead(title, room){
+  return `<div class="back-row"><button class="icon-btn" data-action="leave-room">${ICO.back}</button><div class="back-title">${title} - غرفة ${room.code}</div></div>`;
+}
+function roomMe(room){
+  const isHost = room.hostId===state.pid;
+  return { isHost, role:isHost?'host':'guest', oppRole:isHost?'guest':'host', myId:state.pid, oppId:isHost?room.guestId:room.hostId,
+    myScore:isHost?room.scoreHost:room.scoreGuest, oppScore:isHost?room.scoreGuest:room.scoreHost };
+}
+function roomWinnerByScore(room){
+  return room.scoreHost>room.scoreGuest ? 'host' : (room.scoreGuest>room.scoreHost ? 'guest' : 'draw');
+}
+function roomTouch(room){ room.updatedAt = Date.now(); }
+
+/* ---------- rooms: CONNECT FOUR (each player picks a disc color) ---------- */
+function roomC4ColorsReady(room){
+  return !!room.hostColor && !!room.guestColor && room.hostColor!==room.guestColor;
+}
+async function doRoomC4Color(colorId){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing') return;
+  const isHost = room.hostId===state.pid;
+  const oppColor = isHost ? room.guestColor : room.hostColor;
+  if(oppColor===colorId){ showToast('صاحبك اختار اللون ده، اختار لون تاني', true); render(); return; }
+  if(isHost) room.hostColor = colorId; else room.guestColor = colorId;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  SND.click();
+  render();
+}
+async function doRoomC4Move(col){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.winner || !roomC4ColorsReady(room)) return;
+  const role = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==role) return;
+  if(!room.board[col] || room.board[col].length>=6) return;
+  const slot = role==='host' ? 'R' : 'Y';
+  room.board[col].push(slot);
+  SND.click();
+  const res = c4CheckWinner(room.board);
+  if(res){
+    room.winner = res.winner; room.winCells = res.cells;
+    if(res.winner==='draw') room.scoreDraw++;
+    else if(res.winner==='R') room.scoreHost++; else room.scoreGuest++;
+  } else {
+    room.turn = role==='host' ? 'guest' : 'host';
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(res && res.winner!=='draw'){
+    vibrate([20,20,30]); SND.coinChime();
+    if(res.winner===slot) launchConfetti();
+  }
+}
+async function doRoomC4Next(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.round = (room.round||0)+1;
+  room.board = newC4Board(); room.winner = null; room.winCells = null;
+  room.turn = room.round%2===0 ? 'host' : 'guest';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomC4(){
+  const room = GAME_ROOMS[state.roomCode];
+  const gate = roomGate('كونكت فور', room);
+  if(gate) return gate;
+  const me = roomMe(room);
+  const myColor = me.isHost ? room.hostColor : room.guestColor;
+  const oppColor = me.isHost ? room.guestColor : room.hostColor;
+  if(!roomC4ColorsReady(room)){
+    let msg;
+    if(myColor && oppColor && myColor===oppColor) msg = '⚠️ الاتنين اختاروا نفس اللون، غيّر لونك';
+    else if(myColor && !oppColor) msg = '✅ اخترت لونك — مستني صاحبك يختار لونه...';
+    else if(!myColor && oppColor) msg = 'صاحبك اختار لونه، دلوقتي دورك تختار لون تاني 👇';
+    else msg = 'اختار لون القطع اللي هتلعب بيها 👇';
+    return `
+      ${roomHead('كونكت فور', room)}
+      <div class="c4-vs-row">
+        <div class="c4-vs-player">${gameAvatar(me.myId,'',null,myColor)}<span>${myColor?'اخترت':'بتختار...'}</span></div>
+        <div class="rps-vs">VS</div>
+        <div class="c4-vs-player">${gameAvatar(me.oppId,'',null,oppColor)}<span>${oppColor?'اختار':'بيختار...'}</span></div>
+      </div>
+      <div class="xo-status">${msg}</div>
+      ${c4PickerHtml('لونك', myColor, oppColor, me.oppId, 'room-c4-color')}
+    `;
+  }
+  const mySlot = me.isHost ? 'R' : 'Y';
+  const colorOfSlot = sl => sl==='R' ? room.hostColor : room.guestColor;
+  let cellsHtml = '';
+  for(let row=5; row>=0; row--){
+    for(let col=0; col<7; col++){
+      const v = room.board[col][row] || null;
+      const isWin = room.winCells && room.winCells.some(cc=>cc[0]===col && cc[1]===row);
+      const cls = (v?('c4-'+v.toLowerCase()):'') + (isWin?' c4-win':'');
+      const full = room.board[col].length>=6;
+      const disabled = (room.winner || full || room.turn!==me.role) ? 'disabled' : '';
+      const discStyle = v ? `style="background:${c4Grad(colorOfSlot(v))}"` : '';
+      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="room-c4-col" data-col="${col}" ${disabled}><span class="c4-disc" ${discStyle}></span></button>`;
+    }
+  }
+  let statusText;
+  if(room.winner==='draw') statusText = '🤝 تعادل!';
+  else if(room.winner) statusText = room.winner===mySlot ? '🎉 فزت!' : '😅 فاز صاحبك';
+  else statusText = room.turn===me.role ? 'دورك! 🎯' : 'دور صاحبك...';
+  return `
+    ${roomHead('كونكت فور', room)}
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(me.myId,'',null,myColor), me.myScore)}
+      <div class="xo-score-pill draw"><span>تعادل</span><b>${room.scoreDraw}</b></div>
+      ${scorePill(gameAvatar(me.oppId,'',null,oppColor), me.oppScore, 'o')}
+    </div>
+    <div class="xo-status">${statusText}</div>
+    <div class="c4-board">${cellsHtml}</div>
+    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-c4-next">🔄 جولة جديدة</button>` : ''}
+  `;
+}
+
+/* ---------- rooms: MEMORY (turn based, matching a pair keeps your turn) ---------- */
+async function doRoomMemoryFlip(idx){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.winner) return;
+  const role = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==role) return;
+  room.flipped = room.flipped || []; room.matched = room.matched || {};
+  if(room.flipped.length>=2) room.flipped = [];      // نخبّي الكارتين الغلط اللي كانوا ظاهرين
+  if(room.matched[idx]!==undefined || room.flipped.indexOf(idx)>-1) return;
+  room.flipped.push(idx);
+  SND.click();
+  let iWon = false;
+  if(room.flipped.length===2){
+    const a = room.flipped[0], b = room.flipped[1];
+    if(room.cards[a]===room.cards[b]){
+      room.matched[a] = role; room.matched[b] = role; room.flipped = [];
+      if(role==='host') room.scoreHost++; else room.scoreGuest++;
+      SND.cheer();
+      if(Object.keys(room.matched).length>=room.cards.length){
+        room.winner = roomWinnerByScore(room);
+        iWon = room.winner===role;
+      }
+    } else {
+      room.turn = role==='host' ? 'guest' : 'host';
+    }
+  }
+  roomTouch(room);
+  const stamp = room.updatedAt;
+  const mismatch = room.flipped.length===2;
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.winner){ vibrate([20,20,30]); SND.coinChime(); if(iWon) launchConfetti(); }
+  if(mismatch){
+    setTimeout(async ()=>{
+      try{
+        const fresh = await loadGameRooms();
+        const r = fresh[state.roomCode];
+        if(r && r.updatedAt===stamp && r.flipped && r.flipped.length===2){
+          r.flipped = []; roomTouch(r);
+          GAME_ROOMS = fresh;
+          await saveGameRooms(fresh);
+          render();
+        }
+      }catch(e){}
+    }, 1300);
+  }
+}
+async function doRoomMemoryNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  const icons = ['🎓','🏆','🎁','🎯','📿','🎡','🪪','⭐'];
+  room.round = (room.round||0)+1;
+  room.cards = shuffleArray(icons.concat(icons)); room.flipped = []; room.matched = {};
+  room.winner = null; room.scoreHost = 0; room.scoreGuest = 0;
+  room.turn = room.round%2===0 ? 'host' : 'guest';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomMemory(){
+  const room = GAME_ROOMS[state.roomCode];
+  const gate = roomGate('لعبة الذاكرة', room);
+  if(gate) return gate;
+  const me = roomMe(room);
+  const flipped = room.flipped || [], matched = room.matched || {};
+  const myTurn = room.turn===me.role && !room.winner;
+  const cellsHtml = room.cards.map((icon,i)=>{
+    const isM = matched[i]!==undefined;
+    const shown = isM || flipped.indexOf(i)>-1;
+    return `<button type="button" class="memory-card ${shown?'flipped':''} ${isM?'matched':''}" data-action="room-memory-card" data-idx="${i}" ${(!myTurn || isM)?'disabled':''}>
+      <span class="mc-inner"><span class="mc-back">✨</span><span class="mc-front">${icon}</span></span>
+    </button>`;
+  }).join('');
+  const pairs = Object.keys(matched).length/2;
+  let statusText;
+  if(room.winner==='draw') statusText = '🤝 تعادل!';
+  else if(room.winner) statusText = room.winner===me.role ? '🎉 فزت!' : '😅 فاز صاحبك';
+  else statusText = myTurn ? 'دورك! اقلب كارتين 👇' : 'دور صاحبك...';
+  return `
+    ${roomHead('لعبة الذاكرة', room)}
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(me.myId), me.myScore)}
+      <div class="xo-score-pill draw"><span>أزواج</span><b>${pairs}/${room.cards.length/2}</b></div>
+      ${scorePill(gameAvatar(me.oppId), me.oppScore, 'o')}
+    </div>
+    <div class="xo-status">${statusText}</div>
+    <div class="memory-grid">${cellsHtml}</div>
+    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-memory-next">🔄 جولة جديدة</button>` : ''}
+  `;
+}
+
+/* ---------- rooms: NUMBER GUESS (take turns, shared hints) ---------- */
+async function doRoomNumGuess(){
+  const val = parseInt(state.roomGuessVal,10);
+  if(isNaN(val) || val<1 || val>100) return;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.winner) return;
+  const role = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==role) return;
+  let hint;
+  if(val===room.target){ hint='win'; room.winner = role; if(role==='host') room.scoreHost++; else room.scoreGuest++; }
+  else { hint = val<room.target ? 'up' : 'down'; room.turn = role==='host' ? 'guest' : 'host'; }
+  room.guesses.unshift({val, hint, by:role});
+  state.roomGuessVal = '';
+  SND.click();
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(hint==='win'){ launchConfetti(); SND.coinChime(); }
+}
+function roomNumKeyTap(k){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.winner || room.turn!==(room.hostId===state.pid?'host':'guest')) return;
+  if(k==='back') state.roomGuessVal = (state.roomGuessVal||'').slice(0,-1);
+  else if(k==='go'){ doRoomNumGuess(); return; }
+  else if((state.roomGuessVal||'').length<3) state.roomGuessVal = (state.roomGuessVal||'') + k;
+  render();
+}
+async function doRoomNumNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.round = (room.round||0)+1;
+  room.target = 1+Math.floor(Math.random()*100); room.guesses = []; room.winner = null;
+  room.turn = room.round%2===0 ? 'host' : 'guest';
+  state.roomGuessVal = '';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomNumGuess(){
+  const room = GAME_ROOMS[state.roomCode];
+  const gate = roomGate('تخمين الرقم', room);
+  if(gate) return gate;
+  const me = roomMe(room);
+  const myTurn = room.turn===me.role && !room.winner;
+  const historyHtml = (room.guesses||[]).slice(0,6).map(x=>{
+    const icon = x.hint==='win' ? '🎯 صح!' : x.hint==='up' ? '⬆️ أكبر' : '⬇️ أصغر';
+    return `<div class="xo-score-pill has-av">${gameAvatar(x.by===me.role?me.myId:me.oppId,'','sm')}<span>${x.val}</span><b>${icon}</b></div>`;
+  }).join('');
+  let statusText;
+  if(room.winner) statusText = room.winner===me.role ? `🎉 عرفت الرقم ${room.target}!` : `😅 صاحبك عرف الرقم ${room.target}`;
+  else statusText = myTurn ? 'دورك، خمن! 🎯' : 'دور صاحبك...';
+  const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','دخول'].map(k=>{
+    const action = k==='⌫' ? 'back' : k==='دخول' ? 'go' : k;
+    return `<button type="button" class="numguess-key" data-action="room-num-key" data-key="${action}" ${myTurn?'':'disabled'}>${k}</button>`;
+  }).join('');
+  return `
+    ${roomHead('تخمين الرقم', room)}
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(me.myId), me.myScore)}
+      <div class="xo-score-pill draw"><span>محاولات</span><b>${(room.guesses||[]).length}</b></div>
+      ${scorePill(gameAvatar(me.oppId), me.oppScore, 'o')}
+    </div>
+    <div class="hint" style="text-align:center;margin:4px 0 6px;">رقم من 1 لـ 100 — بتخمنوا بالدور</div>
+    <div class="numguess-display">${room.winner ? '🎉 '+room.target : (state.roomGuessVal || '؟')}</div>
+    <div class="xo-status">${statusText}</div>
+    <div class="numguess-keypad">${keys}</div>
+    ${historyHtml ? `<div class="memory-stats-row" style="margin-top:12px;flex-wrap:wrap;">${historyHtml}</div>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="room-num-next">🔄 جولة جديدة</button>` : ''}
+  `;
+}
+
+/* ---------- rooms: QUICK MATH (race — fastest correct answer scores) ---------- */
+function roomMathAdvance(room){
+  room.qIndex++;
+  if(room.qIndex>=room.total){ room.finished = true; room.winner = roomWinnerByScore(room); }
+  else { room.problem = genMathProblem(); room.locked = {host:false, guest:false}; }
+}
+async function doRoomMathPick(val){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.finished) return;
+  const role = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.locked[role]) return;
+  if(parseInt(val,10)===room.problem.answer){
+    if(role==='host') room.scoreHost++; else room.scoreGuest++;
+    SND.cheer();
+    roomMathAdvance(room);
+  } else {
+    room.locked[role] = true;
+    vibrate(30);
+    if(room.locked.host && room.locked.guest) roomMathAdvance(room);
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.finished){ SND.coinChime(); if(room.winner===role) launchConfetti(); }
+}
+async function doRoomMathNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  Object.assign(room, {problem:genMathProblem(), qIndex:0, locked:{host:false,guest:false}, finished:false, winner:null, scoreHost:0, scoreGuest:0});
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomMath(){
+  const room = GAME_ROOMS[state.roomCode];
+  const gate = roomGate('رياضيات سريعة', room);
+  if(gate) return gate;
+  const me = roomMe(room);
+  const iLocked = !!(room.locked && room.locked[me.role]);
+  let statusText;
+  if(room.finished) statusText = room.winner==='draw' ? '🤝 تعادل!' : (room.winner===me.role ? '🎉 فزت بالسباق!' : '😅 صاحبك كسب السباق');
+  else if(iLocked) statusText = '❌ غلطت — استنى السؤال الجاي';
+  else statusText = '⚡ أسرع واحد يجاوب صح ياخد النقطة';
+  return `
+    ${roomHead('رياضيات سريعة', room)}
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(me.myId), me.myScore)}
+      <div class="xo-score-pill draw"><span>سؤال</span><b>${Math.min(room.qIndex+1, room.total)}/${room.total}</b></div>
+      ${scorePill(gameAvatar(me.oppId), me.oppScore, 'o')}
+    </div>
+    <div class="xo-status">${statusText}</div>
+    ${room.finished ? '' : `
+    <div class="numguess-display">${room.problem.a} ${room.problem.op} ${room.problem.b} = ؟</div>
+    <div class="rps-choices">
+      ${room.problem.options.map(o=>`<button type="button" class="rps-btn" data-action="room-math-pick" data-val="${o}" ${iLocked?'disabled':''}>${o}</button>`).join('')}
+    </div>`}
+    ${room.finished ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-math-next">🔄 جولة جديدة</button>` : ''}
+  `;
+}
+
+
+/* ============================= ROOMS: VS INTRO + EMOJI REACTIONS ============================= */
+const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤'];
+function roomEmojiBar(){
+  return `<div class="emoji-bar">${ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('')}</div>`;
+}
+function vsPhotoHtml(pid){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  if(!p) return `<div class="vs-photo" style="background:var(--surface-2);font-size:40px;">👤</div>`;
+  const t = teamOf(p.teamId);
+  const bg = p.photo ? `background-image:url('${p.photo}');background-size:cover;background-position:center;` : `background:${t?t.color:'#F4B740'};`;
+  return `<div class="vs-photo" style="${bg}">${p.photo?'':escapeHtml(initials(p.name))}</div>`;
+}
+function roomMaybeIntro(){
+  if(String(state.view).indexOf('room-')!==0 || !state.roomCode) return;
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || !room.guestId) return;
+  state.roomIntroShown = state.roomIntroShown || {};
+  if(state.roomIntroShown[state.roomCode]) return;
+  state.roomIntroShown[state.roomCode] = true;
+  const oppId = room.hostId===state.pid ? room.guestId : room.hostId;
+  const g = GAMES_CATALOG.find(x=>x.id===room.game) || {icon:'🎮', title:''};
+  const ov = document.createElement('div');
+  ov.className = 'vs-overlay';
+  ov.innerHTML = `
+    <div class="vs-tag">MATCH READY</div>
+    <div class="vs-stage">
+      <div class="vs-p left opp"><span class="vs-glow"></span><span class="vs-ring"></span>${vsPhotoHtml(oppId)}</div>
+      <div class="vs-mid"><span class="vs-shock"></span><span class="vs-shock b"></span><span class="vs-badge">VS</span></div>
+      <div class="vs-p right me"><span class="vs-glow"></span><span class="vs-ring"></span>${vsPhotoHtml(state.pid)}</div>
+    </div>
+    <div class="vs-game"><span class="vg-ico">${g.icon}</span><span>${g.title}</span></div>
+    <div class="vs-go">اضغط للبدء</div>`;
+  let closed = false;
+  const close = ()=>{ if(closed) return; closed = true; ov.classList.add('out'); setTimeout(()=>{ if(ov.parentNode) ov.parentNode.removeChild(ov); }, 450); };
+  ov.addEventListener('click', close);
+  document.body.appendChild(ov);
+  try{ SND.coinChime(); }catch(e){}
+  vibrate([15,40,25]);
+  setTimeout(close, 3600);
+}
+function showReactionFloat(emoji, pid){
+  let layer = document.getElementById('react-layer');
+  if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
+  const el = document.createElement('div');
+  el.className = 'react-float';
+  el.style.left = (14 + Math.random()*62) + '%';
+  el.style.setProperty('--dx', (Math.random()*80-40).toFixed(0)+'px');
+  el.innerHTML = `<span class="rf-emoji">${emoji}</span>${gameAvatar(pid)}`;
+  layer.appendChild(el);
+  vibrate(12);
+  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2700);
+}
+let lastReactTs = 0;
+async function sendRoomReaction(emoji, btn){
+  if(!state.roomCode || ROOM_EMOJIS.indexOf(emoji)<0) return;
+  const now = Date.now();
+  if(now-lastReactTs<1100) return;
+  lastReactTs = now;
+  if(btn){ btn.classList.remove('sent'); void btn.offsetWidth; btn.classList.add('sent'); }
+  const payload = {n: now+'-'+Math.random().toString(36).slice(2,6), by: state.pid, emoji};
+  state.roomReactSeen = payload.n;
+  showReactionFloat(emoji, state.pid);
+  try{ await window.storage.set('glavera-react-'+state.roomCode, JSON.stringify(payload), true); }catch(e){}
+}
+let reactPollInterval = null;
+function startReactPolling(){
+  stopReactPolling();
+  state.roomReactInit = false; state.roomReactSeen = null;
+  reactPollInterval = setInterval(async ()=>{
+    if(!state.roomCode) return;
+    let p = null;
+    try{ const r = await window.storage.get('glavera-react-'+state.roomCode, true); if(r && r.value) p = JSON.parse(r.value); }catch(e){}
+    if(!state.roomReactInit){ state.roomReactInit = true; if(p) state.roomReactSeen = p.n; return; } // ما نعيدش تفاعلات قديمة
+    if(p && p.n!==state.roomReactSeen){
+      state.roomReactSeen = p.n;
+      if(p.by!==state.pid && ROOM_EMOJIS.indexOf(p.emoji)>-1) showReactionFloat(p.emoji, p.by);
+    }
+  }, 1200);
+}
+function stopReactPolling(){ if(reactPollInterval){ clearInterval(reactPollInterval); reactPollInterval=null; } }
 
 /* ============================= RENDER: SETTINGS PAGE ============================= */
 function renderSettingsPage(){
@@ -7294,13 +8327,19 @@ function render(){
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='game-xo') html = renderXoGame();
   else if(state.view==='game-connect4') html = renderConnect4Game();
+  else if(state.view==='game-domino') html = renderDominoGame();
   else if(state.view==='game-memory') html = renderMemoryGame();
   else if(state.view==='game-rps') html = renderRpsGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
   else if(state.view==='game-math') html = renderMathGame();
   else if(state.view==='game-rooms') html = renderRoomsLobby();
   else if(state.view==='room-xo') html = renderRoomXo();
+  else if(state.view==='room-domino') html = renderRoomDomino();
   else if(state.view==='room-rps') html = renderRoomRps();
+  else if(state.view==='room-connect4') html = renderRoomC4();
+  else if(state.view==='room-memory') html = renderRoomMemory();
+  else if(state.view==='room-numguess') html = renderRoomNumGuess();
+  else if(state.view==='room-math') html = renderRoomMath();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='pass') html = renderPassPage();
   else if(state.view==='stay') html = renderStayPage();
@@ -7313,6 +8352,10 @@ function render(){
   else if(state.view==='compare') html = renderCompare();
   else if(state.view==='timeline') html = renderTimeline();
   else if(state.view==='admin') html = renderAdmin();
+  if(String(state.view).indexOf('room-')===0 && state.roomCode){
+    const _rm = GAME_ROOMS[state.roomCode];
+    if(_rm && _rm.status==='playing') html += roomEmojiBar();
+  }
   app.innerHTML = html;
   updateTeamTint();
   playPageTransition(app, state.view==='welcome' ? 'fade' : state.navDir);
@@ -7322,7 +8365,7 @@ function render(){
   if(state.view==='splash'){ attachLampDrag(); }
   if(state.view==='gallery'){ attachGalleryEvents(); }
   if(state.view==='game-memory'){ startMemoryTicker(); } else { stopMemoryTicker(); }
-  if((state.view==='room-xo' || state.view==='room-rps') && state.roomCode){ if(!roomPollInterval) startRoomPolling(); } else { stopRoomPolling(); }
+  if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
   if(state.view==='gallery-album'){ attachGalleryAlbumEvents(); }
 
   if(state.view==='profile' && state.radialMenuOpen){
@@ -8545,6 +9588,7 @@ document.addEventListener('click', (e)=>{
     const gid = el.dataset.game;
     if(gid==='xo') initXoGame();
     else if(gid==='connect4') initConnect4Game();
+    else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
     else if(gid==='memory') initMemoryGame();
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
     else if(gid==='numguess') initNumberGame();
@@ -8557,8 +9601,21 @@ document.addEventListener('click', (e)=>{
   else if(action==='leave-room'){ leaveGameRoom(); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
+  else if(action==='room-domino-tile'){ doRoomDominoMove(parseInt(el.dataset.idx,10)); }
+  else if(action==='room-domino-side'){ doRoomDominoSide(el.dataset.side); }
+  else if(action==='room-domino-next'){ doRoomDominoNext(); }
   else if(action==='room-rps-pick'){ doRoomRpsPick(el.dataset.choice); }
   else if(action==='room-rps-next'){ doRoomRpsNext(); }
+  else if(action==='room-react'){ sendRoomReaction(el.dataset.emoji, el); }
+  else if(action==='room-c4-color'){ doRoomC4Color(el.dataset.color); }
+  else if(action==='room-c4-col'){ doRoomC4Move(parseInt(el.dataset.col,10)); }
+  else if(action==='room-c4-next'){ doRoomC4Next(); }
+  else if(action==='room-memory-card'){ doRoomMemoryFlip(parseInt(el.dataset.idx,10)); }
+  else if(action==='room-memory-next'){ doRoomMemoryNext(); }
+  else if(action==='room-num-key'){ roomNumKeyTap(el.dataset.key); }
+  else if(action==='room-num-next'){ doRoomNumNext(); }
+  else if(action==='room-math-pick'){ doRoomMathPick(el.dataset.val); }
+  else if(action==='room-math-next'){ doRoomMathNext(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
@@ -8593,8 +9650,39 @@ document.addEventListener('click', (e)=>{
     }
     render();
   }
+  else if(action==='c4-color'){
+    const g4 = state.connect4;
+    if(g4){
+      const slot = el.dataset.slot, cid = el.dataset.color;
+      const otherSlot = slot==='R' ? 'Y' : 'R';
+      if(g4['color'+otherSlot]!==cid){
+        g4['color'+slot] = cid;
+      }
+      // ضد الجهاز: لو اللاعب اختار نفس لون الجهاز، الجهاز ياخد أول لون تاني
+      if(g4.mode==='ai' && g4.colorR===g4.colorY){
+        g4.colorY = (C4_COLORS.find(c=>c.id!==g4.colorR)||C4_COLORS[0]).id;
+      }
+      SND.click();
+    }
+    render();
+  }
   else if(action==='c4-reset'){
     if(state.connect4){ state.connect4.board = newC4Board(); state.connect4.turn = 'R'; state.connect4.winner = null; state.connect4.winCells = null; }
+    render();
+  }
+  else if(action==='domino-tile'){ doDominoTileTap(parseInt(el.dataset.idx,10)); }
+  else if(action==='domino-side'){ doDominoChooseSide(el.dataset.side); }
+  else if(action==='domino-mode'){
+    const m = el.dataset.mode;
+    if(state.domino && state.domino.mode!==m){
+      state.domino.mode = m;
+      initDominoGame();
+      dominoProcessTurn(true);
+    }
+    render();
+  }
+  else if(action==='domino-reset'){
+    if(state.domino){ initDominoGame(); dominoProcessTurn(true); }
     render();
   }
   else if(action==='memory-card'){ doMemoryFlip(parseInt(el.dataset.idx,10)); }
