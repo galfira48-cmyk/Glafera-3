@@ -2367,7 +2367,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
   /* ===================== LUDO ===================== */
   .ludo-hero{text-align:center; padding:6px 0 10px;}
-  .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #EE4B4B; box-shadow:0 10px 22px rgba(0,0,0,.45); transform:rotate(-8deg);}
+  .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #EE4B4B; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
   .ludo-hero-dice svg{width:100%; height:100%; display:block;}
   .ludo-hero-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--text);}
   .ludo-hero-sub{font-size:12.5px; font-weight:700; color:var(--text-muted); margin-top:2px;}
@@ -2398,7 +2398,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ludo-online{width:100%; margin-top:10px;}
   /* لاعبين */
   .ludo-players{display:grid; gap:8px; margin:2px 0 12px;}
-  .lp-chip{position:relative; padding:12px 4px 8px; border-radius:16px; text-align:center; min-width:0; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); transition:border-color .25s, transform .25s;}
+  .lp-chip{position:relative; padding:12px 4px 8px; border-radius:16px; text-align:center; min-width:0; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); transition:border-color .25s, transform .25s; overflow:hidden;}
+  .lp-chip::after{content:''; position:absolute; top:0; left:-30%; width:40%; height:100%; background:linear-gradient(115deg,rgba(255,255,255,.16),transparent 60%); pointer-events:none;}
   .lp-chip::before{content:''; position:absolute; top:0; left:20%; right:20%; height:3px; border-radius:0 0 4px 4px; background:var(--pc);}
   .lp-chip .pl-avatar{width:40px; height:40px; font-size:13px; box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px rgba(var(--pr),.5);}
   .lp-chip.turn{border-color:var(--pc); transform:translateY(-2px); animation:lpGlow 1.7s ease-in-out infinite;}
@@ -2415,17 +2416,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .lp-dot.on{background:var(--pc); box-shadow:0 0 6px rgba(var(--pr),.8);}
   .lp-wins{font-size:10.5px; color:var(--text-muted); font-family:'Cairo',sans-serif;}
   /* اللوحة */
-  .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 16px;}
+  .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 16px; padding:9px; border-radius:26px;
+    background:linear-gradient(155deg,#FFE8A8,#C6871F 45%,#8a611f 100%); box-shadow:0 18px 40px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,255,255,.5), inset 0 -3px 6px rgba(0,0,0,.3);}
   .ludo-board{position:relative; width:100%; aspect-ratio:1/1; direction:ltr; border-radius:18px; overflow:hidden; background:#FBF6E9;
-    box-shadow:0 0 0 3px rgba(244,183,64,.6), 0 0 0 6px rgba(16,12,44,.9), 0 16px 36px rgba(0,0,0,.5);}
+    box-shadow:0 0 0 2px rgba(16,12,44,.9), inset 0 0 0 1px rgba(255,255,255,.5), 0 10px 22px rgba(0,0,0,.4);}
   .ludo-svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
   .lt-layer{position:absolute; inset:0;}
   .lt{position:absolute; width:5.7%; height:5.7%; border-radius:50%; transform:translate(-50%,-50%) scale(var(--s,1));
     transition:left .17s linear, top .17s linear, transform .25s cubic-bezier(.34,1.56,.64,1);}
   .lt i{position:absolute; inset:0; border-radius:50%; box-sizing:border-box; border:2px solid #fff;
-    background:radial-gradient(circle at 34% 28%, #fff 0 9%, var(--ca) 10%, var(--cb) 78%);
-    box-shadow:0 2px 4px rgba(0,0,0,.55), inset 0 -3px 4px rgba(0,0,0,.28);}
-  .lt.last i{box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 0 10px 2px var(--ca), 0 2px 4px rgba(0,0,0,.55);}
+    background:radial-gradient(circle at 32% 26%, #fff 0 8%, var(--ca) 9%, var(--cb) 82%);
+    box-shadow:0 3px 6px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.5) inset, inset 0 -4px 5px rgba(0,0,0,.3);}
+  .lt.last i{box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 0 10px 2px var(--ca), 0 3px 6px rgba(0,0,0,.5);}
   .lt.moving{transform:translate(-50%,-50%) scale(calc(var(--s,1) * 1.3)); z-index:80 !important;}
   .lt.flying{transition:left .65s cubic-bezier(.5,0,.2,1), top .65s cubic-bezier(.5,0,.2,1), transform .25s;}
   .lt.movable{cursor:pointer; animation:ltHop .75s ease-in-out infinite; z-index:70 !important;}
@@ -2436,7 +2438,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* الزهر */
   .ludo-dock{display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
   .ludo-dice{width:80px; height:80px; padding:0; border-radius:22px; display:block; background:linear-gradient(145deg,#FFFFFF,#E6DFCD); border:3.5px solid var(--dc);
-    box-shadow:0 10px 20px rgba(0,0,0,.5), inset 0 -6px 10px rgba(0,0,0,.12);}
+    box-shadow:0 10px 20px rgba(0,0,0,.5), inset 0 -6px 10px rgba(0,0,0,.12), inset 0 4px 6px rgba(255,255,255,.8);}
   .ludo-dice svg{width:100%; height:100%; display:block;}
   .ludo-dice:disabled{filter:saturate(.7) brightness(.92);}
   .ludo-dice.ready{cursor:pointer; animation:diceReady 1.1s ease-in-out infinite;}
@@ -7001,27 +7003,50 @@ function ludoStarPoints(cx, cy, r){
 }
 function ludoBoardSvg(active){
   const bases = [[0,0],[9,0],[9,9],[0,9]];
-  let s = '<svg viewBox="0 0 15 15" class="ludo-svg" aria-hidden="true"><rect width="15" height="15" fill="#FBF6E9"/>';
+  let s = '<svg viewBox="0 0 15 15" class="ludo-svg" aria-hidden="true">';
+  s += '<defs>';
+  s += '<radialGradient id="lb-bg" cx="50%" cy="42%" r="75%"><stop offset="0%" stop-color="#FFFDF6"/><stop offset="70%" stop-color="#F9F1DD"/><stop offset="100%" stop-color="#EFE2C0"/></radialGradient>';
+  s += '<linearGradient id="lb-card" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FBF3E1"/></linearGradient>';
+  s += '<linearGradient id="lb-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE8A8"/><stop offset="55%" stop-color="#F4B740"/><stop offset="100%" stop-color="#C6871F"/></linearGradient>';
+  LUDO_PAL.forEach((pal,c)=>{
+    s += `<linearGradient id="lb-c${c}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${pal.a}"/><stop offset="100%" stop-color="${pal.b}"/></linearGradient>`;
+  });
+  s += '</defs>';
+  s += '<rect width="15" height="15" fill="url(#lb-bg)"/>';
   bases.forEach((b,c)=>{
-    const pal = LUDO_PAL[c], on = active.has(c);
-    s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="${pal.solid}" opacity="${on?1:.3}"/>`;
-    s += `<rect x="${b[0]+.8}" y="${b[1]+.8}" width="4.4" height="4.4" rx=".7" fill="#FFFBF1"/>`;
+    const pal = LUDO_PAL[c], on = active.has(c), op = on?1:.32;
+    s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="url(#lb-c${c})" opacity="${op}"/>`;
+    s += `<rect x="${b[0]+.06}" y="${b[1]+.06}" width="5.88" height="5.88" fill="none" stroke="${pal.b}" stroke-width=".1" opacity="${on?.5:.22}"/>`;
+    s += `<rect x="${b[0]+.8}" y="${b[1]+.8}" width="4.4" height="4.4" rx=".85" fill="url(#lb-card)" stroke="${pal.soft}" stroke-width=".07" opacity="${on?1:.55}"/>`;
+    s += `<rect x="${b[0]+1}" y="${b[1]+1}" width="4" height="1.35" rx=".65" fill="#FFFFFF" opacity="${on?.4:.18}"/>`;
     LUDO_BASE_SLOTS[c].forEach(sl=>{
-      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".7" fill="${pal.soft}" stroke="${pal.solid}" stroke-width=".1" opacity="${on?1:.5}"/>`;
+      s += `<ellipse cx="${sl[0]}" cy="${sl[1]+.42}" rx=".62" ry=".16" fill="#000000" opacity="${on?.16:.07}"/>`;
+      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".74" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".13" opacity="${on?1:.5}"/>`;
+      s += `<circle cx="${(sl[0]-.2).toFixed(2)}" cy="${(sl[1]-.22).toFixed(2)}" r=".22" fill="#FFFFFF" opacity="${on?.55:.28}"/>`;
     });
   });
   LUDO_TRACK.forEach((c,i)=>{
     const sc = LUDO_START.indexOf(i);
-    s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="${sc>=0?LUDO_PAL[sc].solid:'#FFFFFF'}" stroke="#DCD3BC" stroke-width=".06"/>`;
+    if(sc>=0){
+      s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="url(#lb-c${sc})" stroke="${LUDO_PAL[sc].b}" stroke-width=".07"/>`;
+    } else {
+      s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="#FFFEF8" stroke="#E7DCC0" stroke-width=".045"/>`;
+    }
   });
   LUDO_HOME_COL.forEach((h,c)=>{
-    h.forEach(cell=>{ s += `<rect x="${cell[0]}" y="${cell[1]}" width="1" height="1" fill="${LUDO_PAL[c].solid}" opacity=".9" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".06"/>`; });
+    const pal = LUDO_PAL[c];
+    h.forEach((cell,ci)=>{
+      const op = .78 + ci*.055;
+      s += `<rect x="${cell[0]}" y="${cell[1]}" width="1" height="1" fill="url(#lb-c${c})" opacity="${op.toFixed(2)}" stroke="#FFFFFF" stroke-opacity=".55" stroke-width=".06"/>`;
+    });
   });
   const tri = ['6,6 6,9 7.5,7.5','6,6 9,6 7.5,7.5','9,6 9,9 7.5,7.5','6,9 9,9 7.5,7.5'];
-  tri.forEach((pts,c)=>{ s += `<polygon points="${pts}" fill="${LUDO_PAL[c].solid}" stroke="#FFFFFF" stroke-width=".06"/>`; });
-  s += '<circle cx="7.5" cy="7.5" r=".32" fill="#FFFFFF" opacity=".92"/>';
-  LUDO_START.forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.36)}" fill="#FFFFFF" opacity=".95"/>`; });
-  [8,21,34,47].forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.36)}" fill="#C9BFA3"/>`; });
+  tri.forEach((pts,c)=>{ s += `<polygon points="${pts}" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".07"/>`; });
+  s += '<circle cx="7.5" cy="7.5" r="1.02" fill="url(#lb-gold)" opacity=".95"/>';
+  s += '<circle cx="7.5" cy="7.5" r=".62" fill="url(#lb-card)" stroke="url(#lb-gold)" stroke-width=".08"/>';
+  s += `<polygon points="${ludoStarPoints(7.5,7.5,.36)}" fill="url(#lb-gold)"/>`;
+  LUDO_START.forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.38)}" fill="#FFFFFF" stroke="rgba(0,0,0,.18)" stroke-width=".03"/>`; });
+  [8,21,34,47].forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.37)}" fill="url(#lb-gold)" stroke="#C6871F" stroke-width=".035"/>`; });
   return s + '</svg>';
 }
 function ludoTokenPoints(L, disp){
@@ -7066,7 +7091,8 @@ const LUDO_DICE_PIPS = {
 };
 function ludoDiceFace(v, color){
   if(!v) return `<svg viewBox="0 0 100 100" aria-hidden="true"><text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="54" font-weight="900" font-family="Cairo,sans-serif" fill="${color}" opacity=".55">?</text></svg>`;
-  return `<svg viewBox="0 0 100 100" aria-hidden="true">${LUDO_DICE_PIPS[v].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="9.5" fill="${color}"/>`).join('')}</svg>`;
+  const pips = LUDO_DICE_PIPS[v].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="10" fill="${color}"/><circle cx="${p[0]-2.6}" cy="${p[1]-2.8}" r="2.6" fill="#fff" opacity=".5"/>`).join('');
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">${pips}</svg>`;
 }
 function ludoDockHtml(L, ctx){
   const pal = LUDO_PAL[L.seats[L.turn].color];
