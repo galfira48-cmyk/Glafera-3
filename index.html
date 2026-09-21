@@ -2372,18 +2372,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ludo-hero-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--text);}
   .ludo-hero-sub{font-size:12.5px; font-weight:700; color:var(--text-muted); margin-top:2px;}
   .ls-presets{display:flex; gap:8px; margin:6px 0 4px;}
-  .ls-preset{flex:1; padding:11px 6px; border-radius:14px; border:1.5px solid var(--border); background:linear-gradient(180deg,var(--surface-2),var(--surface)); color:var(--text); font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px;}
-  .ls-preset:active{transform:scale(.97);}
+  .ls-preset{flex:1; padding:13px 6px; border-radius:16px; border:1.5px solid var(--border); background:linear-gradient(165deg,var(--surface-2),var(--surface)); color:var(--text); font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px;
+    box-shadow:0 6px 14px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); transition:transform .15s ease, box-shadow .15s ease;}
+  .ls-preset:active{transform:scale(.97); box-shadow:0 3px 8px rgba(0,0,0,.2);}
   .ls-label{font-size:12.5px; font-weight:800; color:var(--text-muted); margin:14px 2px 8px;}
   .ls-chips{display:flex; gap:8px;}
-  .ls-chip{flex:1; padding:10px 4px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:800; font-size:13px;}
-  .ls-chip.on{border-color:var(--gold); color:var(--gold); background:linear-gradient(180deg,rgba(244,183,64,.16),var(--surface)); box-shadow:0 0 14px rgba(244,183,64,.2);}
+  .ls-chip{flex:1; padding:11px 4px; border-radius:13px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; transition:transform .15s ease;}
+  .ls-chip.on{border-color:var(--gold); color:var(--gold); background:linear-gradient(165deg,rgba(244,183,64,.2),var(--surface)); box-shadow:0 4px 14px rgba(244,183,64,.25), inset 0 1px 0 rgba(255,255,255,.08);}
+  .ls-chip:active{transform:scale(.96);}
   .ls-list{display:flex; flex-direction:column; gap:8px;}
-  .ls-row{position:relative; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); overflow:hidden;}
+  .ls-row{position:relative; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:16px;
+    background:linear-gradient(165deg, rgba(var(--pr,157,155,196),.14), var(--surface) 62%); border:1.5px solid rgba(var(--pr,157,155,196),.25); overflow:hidden;
+    box-shadow:0 5px 12px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.05);}
   .ls-row::before{content:''; position:absolute; top:0; bottom:0; inset-inline-start:0; width:4px; background:var(--pc, var(--border));}
   .ls-row.empty{border-style:dashed; opacity:.65; min-height:52px;}
   .ls-pawn{position:relative; flex:0 0 34px; width:34px; height:34px;}
-  .ls-pawn i{position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 34% 28%, #fff 0 9%, var(--pa) 10%, var(--pb) 78%); border:2.5px solid #fff; box-sizing:border-box; box-shadow:0 3px 6px rgba(0,0,0,.45), inset 0 -3px 5px rgba(0,0,0,.28);}
+  .ls-pawn i{position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 32% 26%, #fff 0 8%, var(--pa) 9%, var(--pb) 82%); border:2.5px solid #fff; box-sizing:border-box; box-shadow:0 3px 6px rgba(0,0,0,.45), inset 0 -3px 5px rgba(0,0,0,.28);}
   .ls-pawn.empty{border-radius:50%; border:2px dashed var(--border);}
   .ls-mid{flex:1; min-width:0;}
   .ls-color{font-size:11.5px; font-weight:800; color:var(--pc, var(--text-muted)); margin-bottom:3px;}
@@ -2398,11 +2402,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ludo-online{width:100%; margin-top:10px;}
   /* لاعبين */
   .ludo-players{display:grid; gap:8px; margin:2px 0 12px;}
-  .lp-chip{position:relative; padding:12px 4px 8px; border-radius:16px; text-align:center; min-width:0; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); transition:border-color .25s, transform .25s; overflow:hidden;}
-  .lp-chip::after{content:''; position:absolute; top:0; left:-30%; width:40%; height:100%; background:linear-gradient(115deg,rgba(255,255,255,.16),transparent 60%); pointer-events:none;}
-  .lp-chip::before{content:''; position:absolute; top:0; left:20%; right:20%; height:3px; border-radius:0 0 4px 4px; background:var(--pc);}
-  .lp-chip .pl-avatar{width:40px; height:40px; font-size:13px; box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px rgba(var(--pr),.5);}
-  .lp-chip.turn{border-color:var(--pc); transform:translateY(-2px); animation:lpGlow 1.7s ease-in-out infinite;}
+  .lp-chip{position:relative; padding:14px 4px 9px; border-radius:18px; text-align:center; min-width:0;
+    background:linear-gradient(165deg, rgba(var(--pr),.20), var(--surface) 62%); border:1.5px solid rgba(var(--pr),.3);
+    box-shadow:0 6px 14px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:border-color .25s, transform .25s, box-shadow .25s; overflow:hidden;}
+  .lp-chip::after{content:''; position:absolute; top:0; left:-30%; width:40%; height:100%; background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 60%); pointer-events:none;}
+  .lp-chip::before{content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, transparent, var(--pc), transparent);}
+  .lp-chip .pl-avatar{width:42px; height:42px; font-size:13px; box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px rgba(var(--pr),.55), 0 4px 10px rgba(0,0,0,.3);}
+  .lp-chip.turn{border-color:var(--pc); transform:translateY(-3px); box-shadow:0 10px 22px rgba(var(--pr),.28), inset 0 1px 0 rgba(255,255,255,.1); animation:lpGlow 1.7s ease-in-out infinite;}
   @keyframes lpGlow{0%,100%{box-shadow:0 0 0 1px rgba(var(--pr),.35), 0 0 12px rgba(var(--pr),.25);} 50%{box-shadow:0 0 0 1px rgba(var(--pr),.75), 0 0 24px rgba(var(--pr),.6);}}
   .lp-chip.turn .pl-avatar{box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px var(--pc), 0 0 16px 3px rgba(var(--pr),.65);}
   .lp-chip.turn .pl-avatar::before{content:''; position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
@@ -2415,6 +2422,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .lp-dot{width:7px; height:7px; border-radius:50%; background:var(--border);}
   .lp-dot.on{background:var(--pc); box-shadow:0 0 6px rgba(var(--pr),.8);}
   .lp-wins{font-size:10.5px; color:var(--text-muted); font-family:'Cairo',sans-serif;}
+  .ludo-status-card{position:relative; text-align:center; margin:0 0 14px; padding:11px 16px; border-radius:16px;
+    background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--border);
+    box-shadow:0 6px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06); overflow:hidden;}
+  .ludo-status-card::before{content:''; position:absolute; top:0; left:-40%; width:35%; height:100%;
+    background:linear-gradient(115deg,rgba(255,255,255,.12),transparent 60%); pointer-events:none;}
+  .ludo-status-card .xo-status{margin-bottom:0; position:relative;}
   /* اللوحة */
   .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 16px; padding:9px; border-radius:26px;
     background:linear-gradient(155deg,#FFE8A8,#C6871F 45%,#8a611f 100%); box-shadow:0 18px 40px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,255,255,.5), inset 0 -3px 6px rgba(0,0,0,.3);}
@@ -2447,12 +2460,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes diceRoll{0%{transform:rotate(0) scale(1);} 25%{transform:rotate(-26deg) scale(1.14) translateY(-12px);} 50%{transform:rotate(24deg) scale(1.18) translateY(-16px);} 75%{transform:rotate(-12deg) scale(1.08) translateY(-6px);} 100%{transform:rotate(0) scale(1);}}
   .ludo-msg{min-height:20px; font-weight:800; font-size:13px; color:var(--text-muted); text-align:center; padding:0 10px; line-height:1.5;}
   /* النتيجة */
-  .ludo-result{border-color:var(--pc); background:linear-gradient(160deg, rgba(var(--pr,244,183,64),.14), rgba(155,140,255,.14));}
-  .lr-list{display:flex; flex-direction:column; gap:6px; margin:10px 0 14px;}
-  .lr-row{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; background:var(--surface); border:1px solid var(--border); font-weight:800; font-size:13.5px; color:var(--text);}
-  .lr-row.first{border-color:var(--pc); box-shadow:0 0 14px rgba(244,183,64,.25);}
-  .lr-medal{font-size:17px;}
-  .lr-dot{width:10px; height:10px; border-radius:50%; background:var(--pc);}
+  .ludo-result{border-color:var(--pc); background:linear-gradient(160deg, rgba(var(--pr,244,183,64),.16), rgba(155,140,255,.12));
+    box-shadow:0 14px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08);}
+  .lr-list{display:flex; flex-direction:column; gap:7px; margin:10px 0 14px;}
+  .lr-row{display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:13px; background:linear-gradient(165deg,var(--surface-2),var(--surface)); border:1px solid var(--border); font-weight:800; font-size:13.5px; color:var(--text); box-shadow:0 4px 10px rgba(0,0,0,.16);}
+  .lr-row.first{border-color:var(--pc); box-shadow:0 0 16px rgba(244,183,64,.3), 0 4px 10px rgba(0,0,0,.2);}
+  .lr-medal{font-size:18px;}
+  .lr-dot{width:10px; height:10px; border-radius:50%; background:var(--pc); box-shadow:0 0 6px rgba(var(--pr,244,183,64),.7);}
   .lr-name{flex:1; text-align:start; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .lr-home{font-size:12px; color:var(--text-muted);}
 
@@ -7155,7 +7169,7 @@ function ludoResultHtml(L, ctx){
 function ludoPlayHtml(L, ctx){
   return `
     ${ludoPlayersHtml(L, ctx)}
-    <div class="xo-status" id="ludo-status">${ludoStatusText(L, ctx)}</div>
+    <div class="ludo-status-card"><div class="xo-status" id="ludo-status">${ludoStatusText(L, ctx)}</div></div>
     <div class="ludo-board-wrap">${ludoBoardHtml(L, ctx.disp || L.pos, ctx.movable)}</div>
     ${ludoDockHtml(L, ctx)}
     ${L.phase==='over' ? ludoResultHtml(L, ctx) : ''}`;
@@ -7224,7 +7238,7 @@ function renderLudoSetup(G){
   const rows = cols.map((col,i)=>{
     const pal = LUDO_PAL[col];
     const human = c.types[i]==='human';
-    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b}">
+    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b};--pr:${pal.rgb}">
       <span class="ls-pawn"><i></i></span>
       <div class="ls-mid">
         <div class="ls-color">${pal.name}</div>
@@ -7511,7 +7525,7 @@ function renderRoomLudoLobby(room){
     const p = ps[i];
     if(!p) return `<div class="ls-row empty"><span class="ls-pawn empty"></span><div class="ls-mid"><div class="ls-bot">⏳ في انتظار لاعب...</div></div></div>`;
     const pal = LUDO_PAL[cols[i]];
-    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b}">
+    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b};--pr:${pal.rgb}">
       <span class="ls-pawn"><i></i></span>
       <div class="ls-mid"><div class="ls-color">${pal.name}${p.id===room.hostId?' • صاحب الغرفة':''}</div><div class="ls-pname">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</div></div>
       <div class="ls-av">${gameAvatar(p.id)}</div>
