@@ -2318,6 +2318,94 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .domino-tile{position:relative;}
   .domino-tile.drawn{animation:dtDrawn .55s cubic-bezier(.34,1.56,.64,1);}
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
+  /* ===================== LUDO ===================== */
+  .ludo-hero{text-align:center; padding:6px 0 10px;}
+  .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #EE4B4B; box-shadow:0 10px 22px rgba(0,0,0,.45); transform:rotate(-8deg);}
+  .ludo-hero-dice svg{width:100%; height:100%; display:block;}
+  .ludo-hero-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--text);}
+  .ludo-hero-sub{font-size:12.5px; font-weight:700; color:var(--text-muted); margin-top:2px;}
+  .ls-presets{display:flex; gap:8px; margin:6px 0 4px;}
+  .ls-preset{flex:1; padding:11px 6px; border-radius:14px; border:1.5px solid var(--border); background:linear-gradient(180deg,var(--surface-2),var(--surface)); color:var(--text); font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px;}
+  .ls-preset:active{transform:scale(.97);}
+  .ls-label{font-size:12.5px; font-weight:800; color:var(--text-muted); margin:14px 2px 8px;}
+  .ls-chips{display:flex; gap:8px;}
+  .ls-chip{flex:1; padding:10px 4px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:800; font-size:13px;}
+  .ls-chip.on{border-color:var(--gold); color:var(--gold); background:linear-gradient(180deg,rgba(244,183,64,.16),var(--surface)); box-shadow:0 0 14px rgba(244,183,64,.2);}
+  .ls-list{display:flex; flex-direction:column; gap:8px;}
+  .ls-row{position:relative; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); overflow:hidden;}
+  .ls-row::before{content:''; position:absolute; top:0; bottom:0; inset-inline-start:0; width:4px; background:var(--pc, var(--border));}
+  .ls-row.empty{border-style:dashed; opacity:.65; min-height:52px;}
+  .ls-pawn{position:relative; flex:0 0 34px; width:34px; height:34px;}
+  .ls-pawn i{position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 34% 28%, #fff 0 9%, var(--pa) 10%, var(--pb) 78%); border:2.5px solid #fff; box-sizing:border-box; box-shadow:0 3px 6px rgba(0,0,0,.45), inset 0 -3px 5px rgba(0,0,0,.28);}
+  .ls-pawn.empty{border-radius:50%; border:2px dashed var(--border);}
+  .ls-mid{flex:1; min-width:0;}
+  .ls-color{font-size:11.5px; font-weight:800; color:var(--pc, var(--text-muted)); margin-bottom:3px;}
+  .ls-name{width:100%; box-sizing:border-box; padding:7px 10px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; outline:none;}
+  .ls-name:focus{border-color:var(--gold);}
+  .ls-pname{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:var(--text);}
+  .ls-bot{font-size:13px; font-weight:700; color:var(--text-muted);}
+  .ls-av .pl-avatar{width:36px; height:36px; font-size:12px; margin:0;}
+  .ls-toggle{display:flex; gap:4px; padding:3px; border-radius:12px; background:var(--surface); border:1px solid var(--border);}
+  .ls-toggle button{width:38px; height:34px; border-radius:9px; border:none; background:transparent; font-size:18px; opacity:.5; padding:0;}
+  .ls-toggle button.on{background:linear-gradient(145deg,var(--pa),var(--pb)); opacity:1; box-shadow:0 2px 8px rgba(0,0,0,.35);}
+  .ludo-online{width:100%; margin-top:10px;}
+  /* لاعبين */
+  .ludo-players{display:grid; gap:8px; margin:2px 0 12px;}
+  .lp-chip{position:relative; padding:12px 4px 8px; border-radius:16px; text-align:center; min-width:0; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1.5px solid var(--border); transition:border-color .25s, transform .25s;}
+  .lp-chip::before{content:''; position:absolute; top:0; left:20%; right:20%; height:3px; border-radius:0 0 4px 4px; background:var(--pc);}
+  .lp-chip .pl-avatar{width:40px; height:40px; font-size:13px; box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px rgba(var(--pr),.5);}
+  .lp-chip.turn{border-color:var(--pc); transform:translateY(-2px); animation:lpGlow 1.7s ease-in-out infinite;}
+  @keyframes lpGlow{0%,100%{box-shadow:0 0 0 1px rgba(var(--pr),.35), 0 0 12px rgba(var(--pr),.25);} 50%{box-shadow:0 0 0 1px rgba(var(--pr),.75), 0 0 24px rgba(var(--pr),.6);}}
+  .lp-chip.turn .pl-avatar{box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px var(--pc), 0 0 16px 3px rgba(var(--pr),.65);}
+  .lp-chip.turn .pl-avatar::before{content:''; position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
+    background:conic-gradient(from 0deg, rgba(var(--pr),0) 0%, var(--pc) 30%, #fff 45%, rgba(var(--pr),0) 60%, var(--pc) 85%, rgba(var(--pr),0) 100%);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    animation:turnSpin 2.2s linear infinite;}
+  .lp-name{font-size:11.5px; font-weight:800; margin-top:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 3px; color:var(--text);}
+  .lp-meta{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;}
+  .lp-dots{display:inline-flex; gap:3px;}
+  .lp-dot{width:7px; height:7px; border-radius:50%; background:var(--border);}
+  .lp-dot.on{background:var(--pc); box-shadow:0 0 6px rgba(var(--pr),.8);}
+  .lp-wins{font-size:10.5px; color:var(--text-muted); font-family:'Cairo',sans-serif;}
+  /* اللوحة */
+  .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 16px;}
+  .ludo-board{position:relative; width:100%; aspect-ratio:1/1; direction:ltr; border-radius:18px; overflow:hidden; background:#FBF6E9;
+    box-shadow:0 0 0 3px rgba(244,183,64,.6), 0 0 0 6px rgba(16,12,44,.9), 0 16px 36px rgba(0,0,0,.5);}
+  .ludo-svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .lt-layer{position:absolute; inset:0;}
+  .lt{position:absolute; width:5.7%; height:5.7%; border-radius:50%; transform:translate(-50%,-50%) scale(var(--s,1));
+    transition:left .17s linear, top .17s linear, transform .25s cubic-bezier(.34,1.56,.64,1);}
+  .lt i{position:absolute; inset:0; border-radius:50%; box-sizing:border-box; border:2px solid #fff;
+    background:radial-gradient(circle at 34% 28%, #fff 0 9%, var(--ca) 10%, var(--cb) 78%);
+    box-shadow:0 2px 4px rgba(0,0,0,.55), inset 0 -3px 4px rgba(0,0,0,.28);}
+  .lt.last i{box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 0 10px 2px var(--ca), 0 2px 4px rgba(0,0,0,.55);}
+  .lt.moving{transform:translate(-50%,-50%) scale(calc(var(--s,1) * 1.3)); z-index:80 !important;}
+  .lt.flying{transition:left .65s cubic-bezier(.5,0,.2,1), top .65s cubic-bezier(.5,0,.2,1), transform .25s;}
+  .lt.movable{cursor:pointer; animation:ltHop .75s ease-in-out infinite; z-index:70 !important;}
+  .lt.movable::before{content:''; position:absolute; inset:-42%; border-radius:50%; border:2.5px solid #fff; box-shadow:0 0 0 2px var(--cb), 0 0 14px 2px var(--ca); animation:ltRing 1s ease-out infinite; pointer-events:none;}
+  .lt.movable::after{content:''; position:absolute; inset:-55%; border-radius:50%;}
+  @keyframes ltHop{0%,100%{transform:translate(-50%,-50%) scale(var(--s,1));} 50%{transform:translate(-50%,-64%) scale(calc(var(--s,1) * 1.14));}}
+  @keyframes ltRing{0%{opacity:1; transform:scale(.85);} 100%{opacity:.15; transform:scale(1.25);}}
+  /* الزهر */
+  .ludo-dock{display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
+  .ludo-dice{width:80px; height:80px; padding:0; border-radius:22px; display:block; background:linear-gradient(145deg,#FFFFFF,#E6DFCD); border:3.5px solid var(--dc);
+    box-shadow:0 10px 20px rgba(0,0,0,.5), inset 0 -6px 10px rgba(0,0,0,.12);}
+  .ludo-dice svg{width:100%; height:100%; display:block;}
+  .ludo-dice:disabled{filter:saturate(.7) brightness(.92);}
+  .ludo-dice.ready{cursor:pointer; animation:diceReady 1.1s ease-in-out infinite;}
+  .ludo-dice.rolling{animation:diceRoll .65s ease-in-out;}
+  @keyframes diceReady{0%,100%{transform:scale(1); box-shadow:0 10px 20px rgba(0,0,0,.5), 0 0 0 0 rgba(var(--dr),.0), 0 0 14px rgba(var(--dr),.4);} 50%{transform:scale(1.08); box-shadow:0 12px 24px rgba(0,0,0,.5), 0 0 0 8px rgba(var(--dr),.16), 0 0 30px rgba(var(--dr),.85);}}
+  @keyframes diceRoll{0%{transform:rotate(0) scale(1);} 25%{transform:rotate(-26deg) scale(1.14) translateY(-12px);} 50%{transform:rotate(24deg) scale(1.18) translateY(-16px);} 75%{transform:rotate(-12deg) scale(1.08) translateY(-6px);} 100%{transform:rotate(0) scale(1);}}
+  .ludo-msg{min-height:20px; font-weight:800; font-size:13px; color:var(--text-muted); text-align:center; padding:0 10px; line-height:1.5;}
+  /* النتيجة */
+  .ludo-result{border-color:var(--pc); background:linear-gradient(160deg, rgba(var(--pr,244,183,64),.14), rgba(155,140,255,.14));}
+  .lr-list{display:flex; flex-direction:column; gap:6px; margin:10px 0 14px;}
+  .lr-row{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; background:var(--surface); border:1px solid var(--border); font-weight:800; font-size:13.5px; color:var(--text);}
+  .lr-row.first{border-color:var(--pc); box-shadow:0 0 14px rgba(244,183,64,.25);}
+  .lr-medal{font-size:17px;}
+  .lr-dot{width:10px; height:10px; border-radius:50%; background:var(--pc);}
+  .lr-name{flex:1; text-align:start; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .lr-home{font-size:12px; color:var(--text-muted);}
 
   .memory-stats-row{display:flex; gap:8px; margin-bottom:14px;}
   .memory-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:360px; margin:0 auto;}
@@ -5502,13 +5590,14 @@ const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
   {id:'connect4', icon:'🔴', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
   {id:'domino', icon:'🁫', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'},
+  {id:'ludo', icon:'🎲', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#FFB347,#EE4B4B)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'فكرنا في رقم من 1 لـ100، خمنه بأقل محاولات', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'جاوب صح قد ما تقدر قبل ما تخلص محاولاتك', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
 ];
 const GH_SOLO_SUB = {
-  xo:'ضد الجهاز أو صديقك', connect4:'وصّل 4 قطع قبل خصمك', domino:'ضد الجهاز أو صديقك',
+  xo:'ضد الجهاز أو صديقك', connect4:'وصّل 4 قطع قبل خصمك', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100', math:'جاوب صح قبل ما يخلص وقتك'
 };
 function ghGameTile(g, sub, action, i){
@@ -6670,6 +6759,812 @@ function renderDominoGame(){
   `;
 }
 
+/* ============================= GAMES: LUDO (ENGINE) ============================= */
+const LUDO_PAL = [
+  {id:'red',    name:'الأحمر',  a:'#FF9A8F', b:'#E5383F', solid:'#EE4B4B', soft:'#FFD9D5', rgb:'238,75,75', emoji:'🔴'},
+  {id:'green',  name:'الأخضر',  a:'#8EEDB0', b:'#1FA75A', solid:'#2FBF6C', soft:'#D2F6E0', rgb:'47,191,108', emoji:'🟢'},
+  {id:'yellow', name:'الأصفر',  a:'#FFE795', b:'#EFA70C', solid:'#F7B923', soft:'#FFF1C4', rgb:'247,185,35', emoji:'🟡'},
+  {id:'blue',   name:'الأزرق',  a:'#A3CFFF', b:'#2A67E0', solid:'#3F7BF0', soft:'#D6E7FF', rgb:'63,123,240', emoji:'🔵'}
+];
+const LUDO_START = [0,13,26,39];
+const LUDO_SAFE = new Set([0,13,26,39,8,21,34,47]);
+const LUDO_SEAT_COLORS = {2:[0,2], 3:[0,1,2], 4:[0,1,2,3]};
+const LUDO_TRACK = (function(){
+  const t = [];
+  for(let c=1;c<=5;c++) t.push([c,6]);
+  for(let r=5;r>=0;r--) t.push([6,r]);
+  t.push([7,0]); t.push([8,0]);
+  for(let r=1;r<=5;r++) t.push([8,r]);
+  for(let c=9;c<=14;c++) t.push([c,6]);
+  t.push([14,7]); t.push([14,8]);
+  for(let c=13;c>=9;c--) t.push([c,8]);
+  for(let r=9;r<=14;r++) t.push([8,r]);
+  t.push([7,14]); t.push([6,14]);
+  for(let r=13;r>=9;r--) t.push([6,r]);
+  for(let c=5;c>=0;c--) t.push([c,8]);
+  t.push([0,7]); t.push([0,6]);
+  return t;
+})();
+const LUDO_HOME_COL = [
+  [[1,7],[2,7],[3,7],[4,7],[5,7]],
+  [[7,1],[7,2],[7,3],[7,4],[7,5]],
+  [[13,7],[12,7],[11,7],[10,7],[9,7]],
+  [[7,13],[7,12],[7,11],[7,10],[7,9]]
+];
+const LUDO_BASE_SLOTS = [
+  [[2,2],[4,2],[2,4],[4,4]],
+  [[10,2],[12,2],[10,4],[12,4]],
+  [[10,10],[12,10],[10,12],[12,12]],
+  [[2,10],[4,10],[2,12],[4,12]]
+];
+const LUDO_FINAL = [{x:6.72,y:7.5,ax:'y'},{x:7.5,y:6.72,ax:'x'},{x:8.28,y:7.5,ax:'y'},{x:7.5,y:8.28,ax:'x'}];
+
+/* p = تقدّم البيدق: 0 في البيت، 1..51 على المسار (1 = خانة البداية)، 52..56 ممر النهاية، 57 = وصل */
+function ludoCell(color, p){ return (p>=1 && p<=51) ? (LUDO_START[color]+p-1)%52 : null; }
+function ludoCoord(color, p, tok){
+  if(p===0) return LUDO_BASE_SLOTS[color][tok];
+  if(p<=51){ const c = LUDO_TRACK[(LUDO_START[color]+p-1)%52]; return [c[0]+.5, c[1]+.5]; }
+  if(p<=56){ const c = LUDO_HOME_COL[color][p-52]; return [c[0]+.5, c[1]+.5]; }
+  const f = LUDO_FINAL[color], off = (tok-1.5)*.27;
+  return f.ax==='y' ? [f.x, f.y+off] : [f.x+off, f.y];
+}
+function ludoNew(seats, scores, starter, round){
+  return {
+    n: seats.length, seats,
+    pos: seats.map(()=>[0,0,0,0]),
+    turn: starter||0, phase:'roll', dice:null, sixes:0, movable:[],
+    winner:null, last:null, msg:null,
+    scores: scores || seats.map(()=>0),
+    seq:0, round: round||0
+  };
+}
+function ludoLegal(L, seat, d){
+  const out = [];
+  L.pos[seat].forEach((p,t)=>{
+    if(p===0){ if(d===6) out.push(t); }
+    else if(p+d<=57) out.push(t);
+  });
+  return out;
+}
+/* رمية الزهر: بترجّع 'forfeit' (٣ ستات ورا بعض) أو 'none' (مفيش حركة) أو 'moves' */
+function ludoRoll(L, v){
+  L.dice = v; L.seq++;
+  if(v===6) L.sixes++; else L.sixes = 0;
+  if(L.sixes>=3){ L.movable = []; return 'forfeit'; }
+  L.movable = ludoLegal(L, L.turn, v);
+  return L.movable.length ? 'moves' : 'none';
+}
+function ludoUniqueMoves(L, seat, list){
+  const seen = {}, out = [];
+  list.forEach(t=>{ const p = L.pos[seat][t]; if(!seen[p]){ seen[p] = 1; out.push(t); } });
+  return out;
+}
+/* بينفّذ الحركة، ويرجّع تفاصيلها للأنيميشن */
+function ludoApply(L, seat, t){
+  const d = L.dice, color = L.seats[seat].color;
+  const from = L.pos[seat][t];
+  const to = from===0 ? 1 : from + d;
+  L.pos[seat][t] = to;
+  const cap = [];
+  if(to>=1 && to<=51){
+    const idx = ludoCell(color, to);
+    if(!LUDO_SAFE.has(idx)){
+      L.seats.forEach((s,si)=>{
+        if(si===seat) return;
+        const here = [];
+        L.pos[si].forEach((p,ti)=>{ if(p>=1 && p<=51 && ludoCell(s.color,p)===idx) here.push(ti); });
+        if(here.length===1) cap.push({seat:si, tok:here[0], from:L.pos[si][here[0]]});   // بيدقين فوق بعض = محميين
+      });
+      cap.forEach(c=>{ L.pos[c.seat][c.tok] = 0; });
+    }
+  }
+  const home = to===57;
+  const won = L.pos[seat].every(p=>p===57);
+  L.last = {seat, tok:t, from, to, cap, d};
+  L.movable = [];
+  return {from, to, cap, home, won, d, extra: (d===6 || cap.length>0 || home)};
+}
+function ludoNextTurn(L){
+  L.turn = (L.turn+1) % L.n;
+  L.phase = 'roll'; L.dice = null; L.sixes = 0; L.movable = [];
+}
+function ludoProgress(L, seat){ return L.pos[seat].reduce((s,p)=>s+p,0); }
+function ludoHomeCount(L, seat){ return L.pos[seat].filter(p=>p===57).length; }
+function ludoStandings(L){
+  const arr = L.seats.map((s,i)=>({seat:i, home:ludoHomeCount(L,i), prog:ludoProgress(L,i)}));
+  arr.sort((a,b)=> (b.home-a.home) || (b.prog-a.prog));
+  if(L.winner!=null){ const w = arr.findIndex(x=>x.seat===L.winner); if(w>0){ const x = arr.splice(w,1)[0]; arr.unshift(x); } }
+  return arr;
+}
+/* ---------- ذكاء الجهاز ---------- */
+function ludoThreat(L, seat, idx){
+  let n = 0;
+  L.seats.forEach((s,si)=>{
+    if(si===seat) return;
+    L.pos[si].forEach(p=>{
+      if(p<1 || p>51) return;
+      const e = ludoCell(s.color, p);
+      const dist = (idx - e + 52) % 52;
+      if(dist>=1 && dist<=6 && p+dist<=51) n++;
+    });
+  });
+  return n;
+}
+function ludoBotPick(L, seat, list){
+  const color = L.seats[seat].color, d = L.dice;
+  let best = list[0], bestScore = -Infinity;
+  list.forEach(t=>{
+    const from = L.pos[seat][t];
+    const to = from===0 ? 1 : from + d;
+    let sc = to*1.0 + Math.random()*4;
+    if(to===57) sc += 1000;
+    if(from===0) sc += 220;
+    if(to>=52 && from<52) sc += 90;
+    if(to>=1 && to<=51){
+      const idx = ludoCell(color, to);
+      const safe = LUDO_SAFE.has(idx);
+      if(!safe){
+        L.seats.forEach((s,si)=>{
+          if(si===seat) return;
+          const here = [];
+          L.pos[si].forEach((p,ti)=>{ if(p>=1 && p<=51 && ludoCell(s.color,p)===idx) here.push(p); });
+          if(here.length===1) sc += 400 + here[0]*3;
+        });
+        sc -= ludoThreat(L, seat, idx) * 70;
+      } else if(from>=1 && from<=51 && !LUDO_SAFE.has(ludoCell(color, from))) sc += 60;
+    }
+    if(from>=1 && from<=51){
+      const fi = ludoCell(color, from);
+      if(!LUDO_SAFE.has(fi)){ const th = ludoThreat(L, seat, fi); if(th) sc += 45*th; }   // بيهرّب البيدق المهدّد
+    }
+    if(sc>bestScore){ bestScore = sc; best = t; }
+  });
+  return best;
+}
+
+/* بيقفل الحركة: رسايل، فوز، دور تاني ولا انتقال للاعب اللي بعده. بيرجّع 'won' | 'extra' | 'next' */
+function ludoFinishMove(L, seat, info){
+  const nm = L.seats[seat].name, parts = [];
+  if(info.cap.length) parts.push('💥 ' + nm + ' أكل بيدق ' + info.cap.map(c=>L.seats[c.seat].name).join(' و'));
+  if(info.home) parts.push('🏠 ' + nm + ' دخّل بيدق البيت');
+  if(info.won){
+    L.winner = seat; L.phase = 'over'; L.scores[seat]++; L.movable = [];
+    L.msg = '🏆 ' + nm + ' خلّص كل بياديقه!';
+    return 'won';
+  }
+  if(info.extra){
+    L.phase = 'roll'; L.movable = [];
+    parts.push(info.d===6 ? '🎲 جاب ٦، ارمي تاني' : '🎲 ارمي تاني');
+    L.msg = parts.join(' • ');
+    return 'extra';
+  }
+  L.msg = parts.join(' • ') || null;
+  ludoNextTurn(L);
+  return 'next';
+}
+
+/* ============================= GAMES: LUDO (UI) ============================= */
+function ludoStarPoints(cx, cy, r){
+  const pts = [];
+  for(let i=0;i<10;i++){
+    const a = -Math.PI/2 + i*Math.PI/5, rr = (i%2) ? r*.42 : r;
+    pts.push((cx+Math.cos(a)*rr).toFixed(3)+','+(cy+Math.sin(a)*rr).toFixed(3));
+  }
+  return pts.join(' ');
+}
+function ludoBoardSvg(active){
+  const bases = [[0,0],[9,0],[9,9],[0,9]];
+  let s = '<svg viewBox="0 0 15 15" class="ludo-svg" aria-hidden="true"><rect width="15" height="15" fill="#FBF6E9"/>';
+  bases.forEach((b,c)=>{
+    const pal = LUDO_PAL[c], on = active.has(c);
+    s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="${pal.solid}" opacity="${on?1:.3}"/>`;
+    s += `<rect x="${b[0]+.8}" y="${b[1]+.8}" width="4.4" height="4.4" rx=".7" fill="#FFFBF1"/>`;
+    LUDO_BASE_SLOTS[c].forEach(sl=>{
+      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".7" fill="${pal.soft}" stroke="${pal.solid}" stroke-width=".1" opacity="${on?1:.5}"/>`;
+    });
+  });
+  LUDO_TRACK.forEach((c,i)=>{
+    const sc = LUDO_START.indexOf(i);
+    s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="${sc>=0?LUDO_PAL[sc].solid:'#FFFFFF'}" stroke="#DCD3BC" stroke-width=".06"/>`;
+  });
+  LUDO_HOME_COL.forEach((h,c)=>{
+    h.forEach(cell=>{ s += `<rect x="${cell[0]}" y="${cell[1]}" width="1" height="1" fill="${LUDO_PAL[c].solid}" opacity=".9" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".06"/>`; });
+  });
+  const tri = ['6,6 6,9 7.5,7.5','6,6 9,6 7.5,7.5','9,6 9,9 7.5,7.5','6,9 9,9 7.5,7.5'];
+  tri.forEach((pts,c)=>{ s += `<polygon points="${pts}" fill="${LUDO_PAL[c].solid}" stroke="#FFFFFF" stroke-width=".06"/>`; });
+  s += '<circle cx="7.5" cy="7.5" r=".32" fill="#FFFFFF" opacity=".92"/>';
+  LUDO_START.forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.36)}" fill="#FFFFFF" opacity=".95"/>`; });
+  [8,21,34,47].forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.36)}" fill="#C9BFA3"/>`; });
+  return s + '</svg>';
+}
+function ludoTokenPoints(L, disp){
+  const groups = {}, pts = [];
+  L.seats.forEach((s,si)=>{
+    disp[si].forEach((p,t)=>{
+      const c = ludoCoord(s.color, p, t);
+      const e = {seat:si, tok:t, x:c[0], y:c[1], s:1, z:1, p};
+      if(p>=1 && p<=56){ const k = c[0]+','+c[1]; (groups[k] = groups[k] || []).push(e); }
+      else if(p===57){ e.s = .5; }
+      pts.push(e);
+    });
+  });
+  Object.keys(groups).forEach(k=>{
+    const g = groups[k], n = g.length;
+    if(n===1) return;
+    const offs = n===2 ? [[-.21,0],[.21,0]]
+      : n===3 ? [[-.21,.15],[.21,.15],[0,-.21]]
+      : n===4 ? [[-.21,-.21],[.21,-.21],[-.21,.21],[.21,.21]]
+      : [[-.27,-.27],[0,-.27],[.27,-.27],[-.27,0],[0,0],[.27,0],[-.27,.27],[0,.27],[.27,.27]];
+    const sc = n===2 ? .76 : (n===3 ? .68 : (n===4 ? .62 : .5));
+    g.forEach((e,i)=>{ const o = offs[i % offs.length]; e.x += o[0]; e.y += o[1]; e.s = sc; e.z = 2+i; });
+  });
+  return pts;
+}
+function ludoTokenStyle(e){
+  return `left:${(e.x/15*100).toFixed(3)}%;top:${(e.y/15*100).toFixed(3)}%;--s:${e.s};z-index:${10+e.z};`;
+}
+function ludoBoardHtml(L, disp, movable){
+  const active = new Set(L.seats.map(s=>s.color));
+  const tokens = ludoTokenPoints(L, disp).map(e=>{
+    const pal = LUDO_PAL[L.seats[e.seat].color];
+    const mv = movable && movable.has(e.seat+'-'+e.tok);
+    const last = L.last && L.last.seat===e.seat && L.last.tok===e.tok;
+    return `<div class="lt no-ripple${mv?' movable':''}${last?' last':''}" id="lt-${e.seat}-${e.tok}" data-seat="${e.seat}" data-tok="${e.tok}" ${mv?'data-action="ludo-token"':''} style="${ludoTokenStyle(e)}--ca:${pal.a};--cb:${pal.b};"><i></i></div>`;
+  }).join('');
+  return `<div class="ludo-board" id="ludo-board">${ludoBoardSvg(active)}<div class="lt-layer">${tokens}</div></div>`;
+}
+const LUDO_DICE_PIPS = {
+  1:[[50,50]], 2:[[28,28],[72,72]], 3:[[28,28],[50,50],[72,72]], 4:[[28,28],[72,28],[28,72],[72,72]],
+  5:[[28,28],[72,28],[50,50],[28,72],[72,72]], 6:[[30,26],[70,26],[30,50],[70,50],[30,74],[70,74]]
+};
+function ludoDiceFace(v, color){
+  if(!v) return `<svg viewBox="0 0 100 100" aria-hidden="true"><text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="54" font-weight="900" font-family="Cairo,sans-serif" fill="${color}" opacity=".55">?</text></svg>`;
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">${LUDO_DICE_PIPS[v].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="9.5" fill="${color}"/>`).join('')}</svg>`;
+}
+function ludoDockHtml(L, ctx){
+  const pal = LUDO_PAL[L.seats[L.turn].color];
+  const dis = ctx.ready ? '' : 'disabled';
+  return `
+    <div class="ludo-dock">
+      <button type="button" class="ludo-dice no-ripple${ctx.ready?' ready':''}" id="ludo-dice" data-action="ludo-roll" style="--dc:${pal.solid};--dr:${pal.rgb};" ${dis} aria-label="ارمي الزهر">${ludoDiceFace(L.dice, pal.b)}</button>
+      <div class="ludo-msg" id="ludo-msg">${escapeHtml(L.msg||'')}</div>
+    </div>`;
+}
+function ludoAvatarHtml(s){
+  const pal = LUDO_PAL[s.color];
+  if(s.pid) return gameAvatar(s.pid);
+  if(s.type==='bot') return gameAiAvatar();
+  return `<div class="pl-avatar" style="background:linear-gradient(145deg,${pal.a},${pal.b});color:#fff;">${escapeHtml((s.name||'؟').trim().charAt(0))}</div>`;
+}
+function ludoPlayersHtml(L, ctx){
+  const chips = L.seats.map((s,i)=>{
+    const pal = LUDO_PAL[s.color];
+    const turn = L.phase!=='over' && L.turn===i;
+    const homeN = ludoHomeCount(L,i);
+    const dots = [0,1,2,3].map(k=>`<span class="lp-dot${k<homeN?' on':''}"></span>`).join('');
+    const mine = ctx.mode==='room' && ctx.me===i;
+    return `<div class="lp-chip${turn?' turn':''}" id="lp-${i}" style="--pc:${pal.solid};--pr:${pal.rgb};">
+      ${ludoAvatarHtml(s)}
+      <div class="lp-name">${escapeHtml(s.name)}${mine?' (انت)':''}</div>
+      <div class="lp-meta"><span class="lp-dots">${dots}</span><b class="lp-wins" title="مرات الفوز">🏆${L.scores[i]}</b></div>
+    </div>`;
+  }).join('');
+  return `<div class="ludo-players" id="ludo-players" style="grid-template-columns:repeat(${L.n},1fr)">${chips}</div>`;
+}
+function ludoStatusText(L, ctx){
+  const s = L.seats[L.turn], pal = LUDO_PAL[s.color];
+  if(L.phase==='over') return '🏆 ' + escapeHtml(L.seats[L.winner].name) + ' كسب الجولة!';
+  const mine = ctx.mode==='room' ? (ctx.me===L.turn) : (s.type==='human');
+  const who = (ctx.mode==='room' ? mine : (mine && ctx.solo)) ? 'دورك' : 'دور ' + escapeHtml(s.name);
+  if(L.phase==='roll'){
+    return mine ? `${pal.emoji} ${who}، ارمي الزهر 🎲` : `${pal.emoji} ${escapeHtml(s.name)} بيرمي الزهر...`;
+  }
+  return mine ? `${pal.emoji} ${who} رمى ${L.dice}، اختار بيدق 👆` : `${pal.emoji} ${escapeHtml(s.name)} بيختار البيدق...`;
+}
+function ludoResultHtml(L, ctx){
+  const st = ludoStandings(L);
+  const medals = ['🥇','🥈','🥉','4️⃣'];
+  const rows = st.map((x,i)=>{
+    const s = L.seats[x.seat], pal = LUDO_PAL[s.color];
+    return `<div class="lr-row${i===0?' first':''}" style="--pc:${pal.solid}"><span class="lr-medal">${medals[i]}</span><span class="lr-dot"></span><span class="lr-name">${escapeHtml(s.name)}</span><span class="lr-home">🏠 ${x.home}/4</span></div>`;
+  }).join('');
+  const btn = ctx.canNew
+    ? `<button type="button" class="btn btn-outline" data-action="ludo-again">🔄 جولة جديدة</button>` + (ctx.mode==='local' ? `<button type="button" class="btn btn-outline" style="margin-top:8px;" data-action="ludo-setup">⚙️ تغيير اللاعبين</button>` : '')
+    : `<div class="dr-sub" style="margin:6px 0 0;">⏳ في انتظار صاحب الغرفة يبدأ جولة جديدة</div>`;
+  const w = L.seats[L.winner];
+  return `
+    <div class="domino-result ludo-result" style="--pc:${LUDO_PAL[w.color].solid};--pr:${LUDO_PAL[w.color].rgb}">
+      <div class="dr-title">🏆 ${escapeHtml(w.name)} كسب الجولة!</div>
+      <div class="lr-list">${rows}</div>
+      ${btn}
+    </div>`;
+}
+function ludoPlayHtml(L, ctx){
+  return `
+    ${ludoPlayersHtml(L, ctx)}
+    <div class="xo-status" id="ludo-status">${ludoStatusText(L, ctx)}</div>
+    <div class="ludo-board-wrap">${ludoBoardHtml(L, ctx.disp || L.pos, ctx.movable)}</div>
+    ${ludoDockHtml(L, ctx)}
+    ${L.phase==='over' ? ludoResultHtml(L, ctx) : ''}`;
+}
+
+/* ============================= LUDO: LOCAL (نفس الجهاز / ضد الجهاز) ============================= */
+function ludoMyName(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  return p ? String(p.name).trim().split(/\s+/)[0] : 'انت';
+}
+function ludoDefaultCfg(){
+  return {n:4, types:['human','bot','bot','bot'], names:[ludoMyName(),'لاعب 2','لاعب 3','لاعب 4']};
+}
+function ludoNewCtrl(prev){
+  return {stage:'setup', cfg: prev ? prev.cfg : ludoDefaultCfg(), L:null, disp:null, busy:false, dead:false};
+}
+function initLudoGame(){
+  if(state.ludo) state.ludo.dead = true;
+  state.ludo = ludoNewCtrl(null);
+}
+function ludoAlive(G){ return state.ludo===G && !G.dead && state.view==='game-ludo'; }
+const ludoSleep = ms => new Promise(r=>setTimeout(r, ms));
+function ludoSaveNames(G){
+  for(let i=0;i<4;i++){
+    const el = document.getElementById('ludo-name-'+i);
+    if(el) G.cfg.names[i] = el.value.slice(0,12);
+  }
+}
+function ludoSeatsFromCfg(cfg){
+  const cols = LUDO_SEAT_COLORS[cfg.n];
+  const bots = cfg.types.slice(0,cfg.n).filter(t=>t==='bot').length;
+  let b = 0;
+  return cols.map((col,i)=>{
+    const bot = cfg.types[i]==='bot';
+    if(bot) b++;
+    return {color:col, type:cfg.types[i], pid:(!bot && i===0) ? state.pid : null,
+      name: bot ? (bots>1 ? 'جهاز '+b : 'الجهاز') : ((cfg.names[i]||'').trim() || (i===0 ? ludoMyName() : 'لاعب '+(i+1)))};
+  });
+}
+function ludoLocalCtx(G){
+  const L = G.L;
+  const humans = L.seats.filter(s=>s.type==='human').length;
+  const cur = L.seats[L.turn];
+  const humanTurn = L.phase!=='over' && cur.type==='human';
+  const mv = new Set();
+  if(humanTurn && L.phase==='move' && !G.busy) L.movable.forEach(t=>mv.add(L.turn+'-'+t));
+  return {mode:'local', solo:humans===1, me:-1, disp:G.disp, movable:mv,
+    ready: humanTurn && L.phase==='roll' && !G.busy, canNew:true};
+}
+function renderLudoGame(){
+  if(!state.ludo) initLudoGame();
+  const G = state.ludo;
+  const head = `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">لودو</div>
+      ${G.stage==='play' ? `<button class="icon-btn" style="transform:none;margin-inline-start:auto;" data-action="ludo-setup" aria-label="اللاعبين">⚙️</button>` : ''}
+    </div>`;
+  if(G.stage==='setup') return head + renderLudoSetup(G);
+  return head + ludoPlayHtml(G.L, ludoLocalCtx(G));
+}
+function renderLudoSetup(G){
+  const c = G.cfg;
+  const cols = LUDO_SEAT_COLORS[c.n];
+  const countChips = [2,3,4].map(n=>`<button type="button" class="ls-chip${c.n===n?' on':''}" data-action="ludo-count" data-n="${n}">${n} لاعبين</button>`).join('');
+  const rows = cols.map((col,i)=>{
+    const pal = LUDO_PAL[col];
+    const human = c.types[i]==='human';
+    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b}">
+      <span class="ls-pawn"><i></i></span>
+      <div class="ls-mid">
+        <div class="ls-color">${pal.name}</div>
+        ${human ? `<input type="text" class="ls-name" id="ludo-name-${i}" maxlength="12" autocomplete="off" value="${escapeHtml(c.names[i]||'')}" placeholder="${i===0?ludoMyName():'اسم اللاعب '+(i+1)}">` : `<div class="ls-bot">🤖 الجهاز بيلعب مكانه</div>`}
+      </div>
+      <div class="ls-toggle">
+        <button type="button" class="${human?'on':''}" data-action="ludo-seat-type" data-i="${i}" data-type="human" aria-label="لاعب">👤</button>
+        <button type="button" class="${!human?'on':''}" data-action="ludo-seat-type" data-i="${i}" data-type="bot" aria-label="جهاز">🤖</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="ludo-hero">
+      <div class="ludo-hero-dice">${ludoDiceFace(6,'#E5383F')}</div>
+      <div class="ludo-hero-title">لودو</div>
+      <div class="ludo-hero-sub">من 2 لـ 4 لاعبين • ٦ يخرّج البيدق • كُل بياديق صحابك</div>
+    </div>
+    <div class="ls-presets">
+      <button type="button" class="ls-preset" data-action="ludo-preset" data-p="ai">🤖 ضد الجهاز</button>
+      <button type="button" class="ls-preset" data-action="ludo-preset" data-p="friends">👥 4 أصحاب على نفس الموبايل</button>
+    </div>
+    <div class="ls-label">عدد اللاعبين</div>
+    <div class="ls-chips">${countChips}</div>
+    <div class="ls-label">اللاعبين (👤 إنسان / 🤖 جهاز)</div>
+    <div class="ls-list">${rows}</div>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="ludo-start">🎲 ابدأ اللعب</button>
+    <button type="button" class="btn btn-outline ludo-online" data-action="ludo-online">🌐 كل واحد بموبايله؟ افتح غرفة أونلاين</button>`;
+}
+function doLudoCount(n){
+  const G = state.ludo; if(!G || G.stage!=='setup') return;
+  ludoSaveNames(G);
+  G.cfg.n = n;
+  if(!G.cfg.types.slice(0,n).some(t=>t==='human')) G.cfg.types[0] = 'human';
+  render();
+}
+function doLudoSeatType(i, type){
+  const G = state.ludo; if(!G || G.stage!=='setup') return;
+  ludoSaveNames(G);
+  const c = G.cfg;
+  if(type==='bot'){
+    const humans = c.types.slice(0,c.n).filter((t,k)=>t==='human' && k!==i).length;
+    if(humans===0){ showToast('لازم يبقى فيه لاعب واحد على الأقل', true); return; }
+  }
+  c.types[i] = type;
+  render();
+}
+function doLudoPreset(p){
+  const G = state.ludo; if(!G || G.stage!=='setup') return;
+  ludoSaveNames(G);
+  G.cfg.n = 4;
+  G.cfg.types = p==='ai' ? ['human','bot','bot','bot'] : ['human','human','human','human'];
+  render();
+}
+function doLudoStart(){
+  const G = state.ludo; if(!G || G.stage!=='setup') return;
+  ludoSaveNames(G);
+  const seats = ludoSeatsFromCfg(G.cfg);
+  G.L = ludoNew(seats, null, 0, 0);
+  G.disp = G.L.pos.map(a=>a.slice());
+  G.stage = 'play'; G.busy = false;
+  render();
+  ludoBeginTurn(G);
+}
+function doLudoAgain(){
+  const G = state.ludo; if(!G || !G.L) return;
+  const L0 = G.L;
+  const G2 = ludoNewCtrl(G);
+  G.dead = true;
+  G2.L = ludoNew(L0.seats, L0.scores.slice(), (L0.round+1) % L0.n, L0.round+1);
+  G2.disp = G2.L.pos.map(a=>a.slice());
+  G2.stage = 'play';
+  state.ludo = G2;
+  render();
+  ludoBeginTurn(G2);
+}
+function doLudoSetup(){
+  const G = state.ludo; if(!G) return;
+  const G2 = ludoNewCtrl(G);
+  G.dead = true;
+  state.ludo = G2;
+  render();
+}
+/* ---------- تحديث الشاشة من غير ما نعمل render كامل (عشان الحركة تبقى سلسة) ---------- */
+function ludoPatch(G){
+  if(!ludoAlive(G) || G.stage!=='play') return;
+  const L = G.L, ctx = ludoLocalCtx(G);
+  const st = document.getElementById('ludo-status'); if(st) st.innerHTML = ludoStatusText(L, ctx);
+  const ms = document.getElementById('ludo-msg'); if(ms) ms.textContent = L.msg || '';
+  const pl = document.getElementById('ludo-players');
+  if(pl){ const tmp = document.createElement('div'); tmp.innerHTML = ludoPlayersHtml(L, ctx); pl.innerHTML = tmp.firstChild.innerHTML; }
+  ludoPaintTokens(G, ctx);
+  const dice = document.getElementById('ludo-dice');
+  if(dice){
+    const pal = LUDO_PAL[L.seats[L.turn].color];
+    dice.style.setProperty('--dc', pal.solid); dice.style.setProperty('--dr', pal.rgb);
+    dice.classList.toggle('ready', !!ctx.ready);
+    dice.disabled = !ctx.ready;
+    if(!dice.classList.contains('rolling')) dice.innerHTML = ludoDiceFace(L.dice, pal.b);
+  }
+}
+function ludoPaintTokens(G, ctx){
+  ctx = ctx || ludoLocalCtx(G);
+  const L = G.L;
+  ludoTokenPoints(L, G.disp).forEach(e=>{
+    const el = document.getElementById(`lt-${e.seat}-${e.tok}`);
+    if(!el) return;
+    el.style.left = (e.x/15*100).toFixed(3)+'%';
+    el.style.top = (e.y/15*100).toFixed(3)+'%';
+    el.style.setProperty('--s', e.s);
+    el.style.zIndex = 10 + e.z;
+    const mv = ctx.movable.has(e.seat+'-'+e.tok);
+    el.classList.toggle('movable', mv);
+    if(mv) el.setAttribute('data-action','ludo-token'); else el.removeAttribute('data-action');
+    el.classList.toggle('last', !!(L.last && L.last.seat===e.seat && L.last.tok===e.tok));
+  });
+}
+function ludoTick(f, d, g){ try{ luxTone(f, d||.07, 'sine', g||.04, {cutoff:2200, wet:.12}); }catch(e){} }
+function ludoDiceAnim(L, v, aliveFn){
+  return new Promise(res=>{
+    const el = document.getElementById('ludo-dice');
+    if(!el){ res(); return; }
+    const col = LUDO_PAL[L.seats[L.turn].color].b;
+    el.classList.add('rolling');
+    let n = 0;
+    const iv = setInterval(()=>{
+      if(!aliveFn()){ clearInterval(iv); res(); return; }
+      n++;
+      el.innerHTML = ludoDiceFace(1+Math.floor(Math.random()*6), col);
+      if(n%2===0) ludoTick(380+Math.random()*260, .05, .035);
+      if(n>=9){
+        clearInterval(iv);
+        el.classList.remove('rolling');
+        el.innerHTML = ludoDiceFace(v, col);
+        ludoTick(720, .12, .05);
+        res();
+      }
+    }, 70);
+  });
+}
+async function ludoBeginTurn(G){
+  if(!ludoAlive(G)) return;
+  const L = G.L;
+  if(L.phase==='over') return;
+  G.busy = false;
+  ludoPatch(G);
+  if(L.seats[L.turn].type==='bot'){
+    G.busy = true; ludoPatch(G);
+    await ludoSleep(650);
+    if(!ludoAlive(G)) return;
+    await ludoRollFlow(G);
+  }
+}
+function doLudoRoll(){
+  if(state.view==='room-ludo'){ doRoomLudoRoll(); return; }
+  const G = state.ludo;
+  if(!G || G.stage!=='play' || G.busy) return;
+  const L = G.L;
+  if(L.phase!=='roll' || L.seats[L.turn].type!=='human') return;
+  ludoRollFlow(G);
+}
+async function ludoRollFlow(G){
+  const L = G.L;
+  G.busy = true; L.msg = null;
+  ludoPatch(G);
+  const v = 1 + Math.floor(Math.random()*6);
+  await ludoDiceAnim(L, v, ()=>ludoAlive(G));
+  if(!ludoAlive(G)) return;
+  const seat = L.turn, s = L.seats[seat];
+  const r = ludoRoll(L, v);
+  if(r==='forfeit'){
+    L.msg = '🚫 ' + s.name + ' جاب ٦ تلات مرات ورا بعض، الدور راح';
+    ludoPatch(G);
+    await ludoSleep(1500); if(!ludoAlive(G)) return;
+    ludoNextTurn(L);
+    return ludoBeginTurn(G);
+  }
+  if(r==='none'){
+    L.msg = '🙁 ' + s.name + ' رمى ' + v + ' ومفيش حركة ممكنة';
+    ludoPatch(G);
+    await ludoSleep(950); if(!ludoAlive(G)) return;
+    if(v===6){ L.phase = 'roll'; L.msg = '🎲 جاب ٦، ارمي تاني'; } else ludoNextTurn(L);
+    return ludoBeginTurn(G);
+  }
+  L.phase = 'move'; L.msg = null;
+  const uniq = ludoUniqueMoves(L, seat, L.movable);
+  if(s.type==='bot'){
+    ludoPatch(G);
+    await ludoSleep(800); if(!ludoAlive(G)) return;
+    return ludoMoveFlow(G, uniq.length===1 ? uniq[0] : ludoBotPick(L, seat, uniq));
+  }
+  if(uniq.length===1){
+    ludoPatch(G);
+    await ludoSleep(650); if(!ludoAlive(G)) return;
+    return ludoMoveFlow(G, uniq[0]);
+  }
+  G.busy = false;
+  ludoPatch(G);
+  vibrate(15);
+}
+function doLudoToken(seat, tok){
+  if(state.view==='room-ludo'){ doRoomLudoMove(tok); return; }
+  const G = state.ludo;
+  if(!G || G.stage!=='play' || G.busy) return;
+  const L = G.L;
+  if(L.phase!=='move' || L.turn!==seat || L.seats[seat].type!=='human' || L.movable.indexOf(tok)<0) return;
+  ludoMoveFlow(G, tok);
+}
+async function ludoMoveFlow(G, tok){
+  const L = G.L, seat = L.turn, disp = G.disp;
+  G.busy = true;
+  const info = ludoApply(L, seat, tok);          // المنطق بيتحدّث فورًا، والأنيميشن بيلحقه
+  ludoPatch(G);
+  const el = document.getElementById(`lt-${seat}-${tok}`);
+  if(el) el.classList.add('moving');
+  const steps = [];
+  if(info.from===0) steps.push(1); else for(let p=info.from+1;p<=info.to;p++) steps.push(p);
+  for(let i=0;i<steps.length;i++){
+    disp[seat][tok] = steps[i];
+    ludoPaintTokens(G);
+    ludoTick(520 + i*22, .06, .035);
+    await ludoSleep(steps.length>1 ? 175 : 300);
+    if(!ludoAlive(G)) return;
+  }
+  if(el) el.classList.remove('moving');
+  if(info.cap.length){
+    try{ SND.error(); }catch(e){}
+    vibrate([25,30,25]);
+    await ludoSleep(220); if(!ludoAlive(G)) return;
+    info.cap.forEach(c=>{
+      disp[c.seat][c.tok] = 0;
+      const ce = document.getElementById(`lt-${c.seat}-${c.tok}`);
+      if(ce){ ce.classList.add('flying'); setTimeout(()=>ce.classList.remove('flying'), 700); }
+    });
+    ludoPaintTokens(G);
+    await ludoSleep(700); if(!ludoAlive(G)) return;
+  }
+  if(info.home){ try{ SND.success(); }catch(e){} await ludoSleep(350); if(!ludoAlive(G)) return; }
+  const res = ludoFinishMove(L, seat, info);
+  if(res==='won'){
+    G.busy = false;
+    const anyHuman = L.seats[seat].type==='human';
+    try{ SND.rank1Chime(); }catch(e){}
+    vibrate([20,20,30]);
+    if(anyHuman) launchConfetti();
+    render();
+    return;
+  }
+  return ludoBeginTurn(G);
+}
+
+/* ============================= LUDO: ROOM (أونلاين لحد 4 لاعبين) ============================= */
+/* رمية الزهر في الغرفة: كل حاجة بتتحسم فورًا وبتتحفظ، وباقي اللاعبين بيشوفوها في التحديث الجاي */
+function ludoRoomRoll(L, v){
+  const seat = L.turn, s = L.seats[seat];
+  const r = ludoRoll(L, v);
+  if(r==='forfeit'){ L.msg = '🚫 ' + s.name + ' جاب ٦ تلات مرات ورا بعض، الدور راح'; ludoNextTurn(L); return; }
+  if(r==='none'){
+    L.msg = '🙁 ' + s.name + ' رمى ' + v + ' ومفيش حركة ممكنة';
+    if(v===6){ L.phase = 'roll'; L.msg += ' • 🎲 ارمي تاني'; } else ludoNextTurn(L);
+    return;
+  }
+  L.phase = 'move'; L.msg = s.name + ' رمى ' + v;
+  const uniq = ludoUniqueMoves(L, seat, L.movable);
+  if(uniq.length===1){
+    const info = ludoApply(L, seat, uniq[0]);
+    const res = ludoFinishMove(L, seat, info);
+    if(res!=='won') L.msg = s.name + ' رمى ' + v + (L.msg ? ' • ' + L.msg : '');
+  }
+}
+function ludoRoomCtx(room){
+  const L = room.ludo;
+  const me = L.seats.findIndex(s=>s.pid===state.pid);
+  const myTurn = me>=0 && L.turn===me && L.phase!=='over';
+  const mv = new Set();
+  if(myTurn && L.phase==='move') L.movable.forEach(t=>mv.add(me+'-'+t));
+  return {mode:'room', solo:false, me, disp:L.pos, movable:mv,
+    ready: myTurn && L.phase==='roll' && !state.ludoRoomBusy, canNew: me>=0};
+}
+function renderRoomLudoLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const cols = LUDO_SEAT_COLORS[Math.max(2, Math.min(4, ps.length))];
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="ls-row empty"><span class="ls-pawn empty"></span><div class="ls-mid"><div class="ls-bot">⏳ في انتظار لاعب...</div></div></div>`;
+    const pal = LUDO_PAL[cols[i]];
+    return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b}">
+      <span class="ls-pawn"><i></i></span>
+      <div class="ls-mid"><div class="ls-color">${pal.name}${p.id===room.hostId?' • صاحب الغرفة':''}</div><div class="ls-pname">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</div></div>
+      <div class="ls-av">${gameAvatar(p.id)}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      <div class="room-code-display">كود الغرفة<br><b>${room.code}</b></div>
+      <div class="hint" style="text-align:center;margin:10px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🎲</div>
+      <div class="ls-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-ludo-start" ${ps.length<2?'disabled':''}>🎲 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
+    </div>`;
+}
+function renderRoomLudo(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('لودو', room);
+  if(room.status==='waiting' || !room.ludo) return roomHead('لودو', room) + renderRoomLudoLobby(room);
+  const ctx = ludoRoomCtx(room);
+  const L = room.ludo;
+  const spectator = ctx.me<0 ? '<div class="hint" style="text-align:center;margin-top:8px;">👀 بتتفرج على اللعبة</div>' : '';
+  /* لو صاحب الدور غاب أكتر من دقيقة، أي لاعب يقدر يتخطّى دوره عشان اللعبة ماتقفش */
+  let skip = '';
+  clearTimeout(state.ludoSkipT);
+  if(ctx.me>=0 && L.phase!=='over' && L.turn!==ctx.me){
+    const idle = Date.now() - (room.updatedAt||0);
+    if(idle>LUDO_IDLE_MS){
+      skip = `<button type="button" class="btn btn-outline" style="margin-top:6px;" data-action="room-ludo-skip">⏭️ ${escapeHtml(L.seats[L.turn].name)} غايب؟ تخطّى دوره</button>`;
+    } else {
+      state.ludoSkipT = setTimeout(()=>{ if(state.view==='room-ludo') render(); }, LUDO_IDLE_MS - idle + 300);
+    }
+  }
+  return roomHead('لودو', room) + ludoPlayHtml(L, ctx) + skip + spectator;
+}
+const LUDO_IDLE_MS = 60000;
+async function doRoomLudoSkip(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  const L = room && room.ludo;
+  if(!L || L.phase==='over') return;
+  const me = L.seats.findIndex(s=>s.pid===state.pid);
+  if(me<0 || L.turn===me) return;
+  if(Date.now() - (room.updatedAt||0) < LUDO_IDLE_MS) return;
+  const nm = L.seats[L.turn].name;
+  ludoNextTurn(L);
+  L.msg = '⏭️ اتخطّى دور ' + nm + ' لأنه غايب';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomLudoStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='ludo' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  const cols = LUDO_SEAT_COLORS[ps.length];
+  const seats = ps.map((p,i)=>({color:cols[i], type:'human', name:p.name, pid:p.id}));
+  room.ludo = ludoNew(seats, null, 0, 0);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomLudoRoll(){
+  if(state.ludoRoomBusy) return;
+  const room0 = GAME_ROOMS[state.roomCode];
+  if(!room0 || !room0.ludo) return;
+  const L0 = room0.ludo;
+  const me = L0.seats.findIndex(s=>s.pid===state.pid);
+  if(me<0 || L0.turn!==me || L0.phase!=='roll') return;
+  state.ludoRoomBusy = true;
+  try{
+    const v = 1 + Math.floor(Math.random()*6);
+    const dice = document.getElementById('ludo-dice'); if(dice) dice.disabled = true;
+    await ludoDiceAnim(L0, v, ()=>state.view==='room-ludo');
+    GAME_ROOMS = await loadGameRooms();
+    const room = GAME_ROOMS[state.roomCode];
+    const L = room && room.ludo;
+    if(!L || L.phase!=='roll' || L.turn!==me || L.seats[me].pid!==state.pid) return;
+    ludoRoomRoll(L, v);
+    roomTouch(room);
+    await saveGameRooms(GAME_ROOMS);
+    if(L.phase==='over'){ try{ SND.rank1Chime(); }catch(e){} if(L.winner===me) launchConfetti(); }
+  } finally {
+    state.ludoRoomBusy = false;
+    render();
+  }
+}
+async function doRoomLudoMove(tok){
+  if(state.ludoRoomBusy) return;
+  state.ludoRoomBusy = true;
+  try{
+    GAME_ROOMS = await loadGameRooms();
+    const room = GAME_ROOMS[state.roomCode];
+    const L = room && room.ludo;
+    if(!L) return;
+    const me = L.seats.findIndex(s=>s.pid===state.pid);
+    if(me<0 || L.phase!=='move' || L.turn!==me || L.movable.indexOf(tok)<0) return;
+    const info = ludoApply(L, me, tok);
+    ludoFinishMove(L, me, info);
+    roomTouch(room);
+    await saveGameRooms(GAME_ROOMS);
+    if(info.cap.length){ try{ SND.error(); }catch(e){} vibrate([25,30,25]); }
+    else if(info.home){ try{ SND.success(); }catch(e){} }
+    else ludoTick(560, .08, .04);
+    if(L.phase==='over'){ try{ SND.rank1Chime(); }catch(e){} if(L.winner===me) launchConfetti(); }
+  } finally {
+    state.ludoRoomBusy = false;
+    render();
+  }
+}
+async function doRoomLudoNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  const L = room && room.ludo;
+  if(!L || L.phase!=='over') return;
+  if(L.seats.findIndex(s=>s.pid===state.pid)<0) return;
+  room.ludo = ludoNew(L.seats, L.scores.slice(), (L.round+1) % L.n, L.round+1);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+
 /* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
 // يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
 function gameAvatar(pid, badgeText, size, dotColorId){
@@ -6754,6 +7649,8 @@ async function createGameRoom(gameType){
     Object.assign(room, {hands:{host:hostHand, guest:guestHand}, boneyard, chain:[], ends:null,
       turn:'host', round:0, winner:null, blocked:false, pendingIdx:null, passStreak:0,
       scoreHost:0, scoreGuest:0, scoreDraw:0});
+  } else if(gameType==='ludo'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], ludo:null});
   } else if(gameType==='connect4'){
     Object.assign(room, {board:newC4Board(), turn:'host', round:0, hostColor:null, guestColor:null,
       winner:null, winCells:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
@@ -6783,6 +7680,21 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(room.game==='ludo'){
+    room.players = room.players || [{id:room.hostId, name:room.hostName}];
+    if(!room.players.some(x=>x.id===state.pid)){
+      if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
+      if(room.players.length>=4){ showToast('الغرفة دي مكتملة (4 لاعبين)', true); return; }
+      room.players.push({id:state.pid, name:p ? p.name : 'لاعب'});
+    }
+    room.updatedAt = Date.now();
+    await saveGameRooms(GAME_ROOMS);
+    state.roomCode = code;
+    state.roomJoinInput = '';
+    startRoomPolling();
+    go('room-ludo');
+    return;
+  }
   if(room.hostId===state.pid){ /* rejoining as host */ }
   else if(!room.guestId || room.guestId===state.pid){
     room.guestId = state.pid;
@@ -6977,6 +7889,7 @@ const ROOM_GAMES = [
   {id:'xo',       sub:'حدّي صاحبك'},
   {id:'connect4', sub:'كل واحد بيختار لون قطعته'},
   {id:'domino',   sub:'خلّص قطعك الأول'},
+  {id:'ludo',     sub:'لحد 4 أصحاب، كل واحد بموبايله'},
   {id:'rps',      sub:'جولة سريعة بينكم'},
   {id:'memory',   sub:'مين يلاقي أزواج أكتر؟'},
   {id:'numguess', sub:'خمّنوا الرقم بالدور'},
@@ -9608,6 +10521,7 @@ function render(){
   else if(state.view==='game-xo') html = renderXoGame();
   else if(state.view==='game-connect4') html = renderConnect4Game();
   else if(state.view==='game-domino') html = renderDominoGame();
+  else if(state.view==='game-ludo') html = renderLudoGame();
   else if(state.view==='game-memory') html = renderMemoryGame();
   else if(state.view==='game-rps') html = renderRpsGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
@@ -9615,6 +10529,7 @@ function render(){
   else if(state.view==='game-rooms') html = renderRoomsLobby();
   else if(state.view==='room-xo') html = renderRoomXo();
   else if(state.view==='room-domino') html = renderRoomDomino();
+  else if(state.view==='room-ludo') html = renderRoomLudo();
   else if(state.view==='room-rps') html = renderRoomRps();
   else if(state.view==='room-connect4') html = renderRoomC4();
   else if(state.view==='room-memory') html = renderRoomMemory();
@@ -9795,7 +10710,7 @@ document.addEventListener('pointerdown', (e)=>{
   const saver = state.pid ? (myExtra(state.pid)||{}).dataSaver : false;
   if(saver) return;
   const target = e.target.closest('[data-action]');
-  if(!target) return;
+  if(!target || target.classList.contains('no-ripple')) return;
   const cs = getComputedStyle(target);
   if(cs.position==='static') target.style.position = 'relative';
   if(cs.overflow!=='hidden') target.dataset._rippleOverflow = cs.overflow;
@@ -10876,6 +11791,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='xo') initXoGame();
     else if(gid==='connect4') initConnect4Game();
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
+    else if(gid==='ludo') initLudoGame();
     else if(gid==='memory') initMemoryGame();
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
     else if(gid==='numguess') initNumberGame();
@@ -10987,6 +11903,17 @@ document.addEventListener('click', (e)=>{
   else if(action==='domino-draw'){ doDominoDraw(); }
   else if(action==='domino-yard-open'){ doDominoYardOpen(); }
   else if(action==='domino-yard-close'){ doDominoYardClose(); }
+  else if(action==='ludo-count'){ doLudoCount(parseInt(el.dataset.n,10)); }
+  else if(action==='ludo-seat-type'){ doLudoSeatType(parseInt(el.dataset.i,10), el.dataset.type); }
+  else if(action==='ludo-preset'){ doLudoPreset(el.dataset.p); }
+  else if(action==='ludo-start'){ doLudoStart(); }
+  else if(action==='ludo-roll'){ doLudoRoll(); }
+  else if(action==='ludo-token'){ doLudoToken(parseInt(el.dataset.seat,10), parseInt(el.dataset.tok,10)); }
+  else if(action==='ludo-again'){ if(state.view==='room-ludo') doRoomLudoNext(); else doLudoAgain(); }
+  else if(action==='ludo-setup'){ doLudoSetup(); }
+  else if(action==='ludo-online'){ createGameRoom('ludo'); }
+  else if(action==='room-ludo-start'){ doRoomLudoStart(); }
+  else if(action==='room-ludo-skip'){ doRoomLudoSkip(); }
   else if(action==='domino-pass'){ doDominoPass(); }
   else if(action==='domino-mode'){
     const m = el.dataset.mode;
