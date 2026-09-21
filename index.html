@@ -3525,6 +3525,9 @@ let ADMIN_ALERTS = [];
 let TEAM_OVERRIDES = {};
 let PARTICIPANT_OVERRIDES = {};
 let TEAM_BONUS = {};
+let POINTS_BACKUP = null;          /* نسخة النقاط اللي اتصفرت (للاسترجاع) */
+let _pointsBackupLoaded = false;
+let _pointsOpBusy = false;
 let GALLERY_ALBUMS = [];
 let PENDING_GALLERY_UPLOADS = []; // صور فشل رفعها بسبب ضعف/انقطاع النت، بتتحفظ هنا وبترفع تلقائي أول ما الاتصال يرجع
 let PENDING_PARTICIPANT_PHOTO_UPLOADS = []; // نفس الفكرة بس لصور المشاركين الخاصة
@@ -10329,6 +10332,7 @@ function renderAdminParticipantsTab(){
   return `
     ${justAddedCard}
     <button type="button" class="btn btn-primary" style="margin-bottom:14px;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
+    ${renderAdminPointsResetCard()}
     <input type="text" class="field admin-search-input" data-filter-target=".admin-participant-tile" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />
     <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته — عددهم: ${PARTICIPANTS.length}</div>
     <div class="admin-participant-grid">${tiles}</div>
@@ -11831,6 +11835,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-add-participant'){ doAdminAddParticipant(); }
   else if(action==='dismiss-just-added'){ state.justAddedParticipantId = null; render(); }
   else if(action==='download-all-qr'){ doDownloadAllQR(); }
+  else if(action==='admin-reset-all-points'){ confirmResetAllPoints(); }
+  else if(action==='admin-restore-points'){ confirmRestorePoints(); }
   else if(action==='cancel-edit-participant'){ state.editingParticipantId = null; render(); }
   else if(action==='save-participant'){ doSaveParticipant(el.dataset.pid); }
   else if(action==='admin-cancel-checkin'){ confirmCancelCheckin(el.dataset.pid, el.dataset.session); }
@@ -13074,6 +13080,195 @@ async function doApplyParticipantBonus(pid, sign){
   showToast(val>0 ? `تمت إضافة ${val} نقطة` : `تم خصم ${Math.abs(val)} نقطة`);
   if(input) input.value = '';
   render();
+}
+/* ============================= ADMIN: تصفير / استرجاع نقاط الجميع ============================= */
+/* التصفير بياخد نسخة كاملة من (نقاط الفقرات + البونص + بونص الفرق) ويحفظها في مفتاح منفصل على Firebase
+   وبعدين يصفّر النقاط الحية. الاسترجاع بيرجّع النسخة دي "بالإضافة" لأي نقاط اتجمعت بعد التصفير، وبعدها بيمسح النسخة
+   (عشان محدش يرجّعها مرتين). لو ضغطت تصفير أكتر من مرة قبل الاسترجاع، النسخ بتتجمع مع بعض ومفيش حاجة بتضيع. */
+const POINTS_BACKUP_KEY = 'glavera-points-backup';
+const POINTS_LIVE_KEYS = { checkins:'glavera-checkins', bonus:'glavera-bonus', teamBonus:'glavera-team-bonus' };
+
+async function loadPointsBackup(){
+  try{
+    const r = await window.storage.get(POINTS_BACKUP_KEY, true);
+    if(!r || !r.value) return null;
+    const v = JSON.parse(r.value);
+    return (v && typeof v==='object' && (v.checkins || v.bonus || v.teamBonus)) ? v : null;
+  }catch(e){ return null; }
+}
+/* بيرجّع كائن البيانات، أو undefined لو القراءة فشلت/مشكوك فيها (السيرفر رجّع فاضي بينما عندنا بيانات في الذاكرة) */
+async function readLivePointsStore(key, mem){
+  let r = null;
+  try{ r = await window.storage.get(key, true); }catch(e){}
+  if(r && r.value){
+    try{ const v = JSON.parse(r.value); if(v && typeof v==='object') return v; }catch(e){}
+  }
+  if(mem && Object.keys(mem).length) return undefined;
+  return {};
+}
+async function readLivePoints(){
+  const [checkins, bonus, teamBonus] = await Promise.all([
+    readLivePointsStore(POINTS_LIVE_KEYS.checkins, CHECKINS),
+    readLivePointsStore(POINTS_LIVE_KEYS.bonus, BONUS),
+    readLivePointsStore(POINTS_LIVE_KEYS.teamBonus, TEAM_BONUS)
+  ]);
+  if(checkins===undefined || bonus===undefined || teamBonus===undefined) return null;
+  return { checkins, bonus, teamBonus };
+}
+function pointsDataIsEmpty(d){
+  if(!d) return true;
+  const nz = o => Object.values(o||{}).some(v => v && (typeof v==='object' ? (v.points||0)!==0 : v!==0));
+  return !nz(d.checkins) && !nz(d.bonus) && !nz(d.teamBonus);
+}
+/* جمع مجموعتين نقاط (النتيجة = a + b) */
+function mergePointsData(a, b){
+  const out = { checkins:{}, bonus:{}, teamBonus:{} };
+  [a, b].forEach(src=>{
+    if(!src) return;
+    Object.entries(src.checkins||{}).forEach(([k, v])=>{
+      if(!v || typeof v!=='object') return;
+      const cur = out.checkins[k];
+      if(cur){
+        out.checkins[k] = Object.assign({}, cur, v, { points:(cur.points||0)+(v.points||0), ts:Math.min(cur.ts||v.ts||Date.now(), v.ts||cur.ts||Date.now()) });
+      } else {
+        out.checkins[k] = Object.assign({}, v, { points:v.points||0 });
+      }
+    });
+    ['bonus','teamBonus'].forEach(f=>{
+      Object.entries(src[f]||{}).forEach(([k, v])=>{ if(v) out[f][k] = (out[f][k]||0) + v; });
+    });
+  });
+  ['bonus','teamBonus'].forEach(f=>{ Object.keys(out[f]).forEach(k=>{ if(!out[f][k]) delete out[f][k]; }); });
+  Object.keys(out.checkins).forEach(k=>{ if(!out.checkins[k].points) delete out.checkins[k]; });
+  return out;
+}
+/* ملخص للعرض: عدد المشاركين اللي كان عندهم نقاط + مجموع نقاطهم */
+function summarizePointsData(d){
+  const per = {};
+  Object.entries(d.checkins||{}).forEach(([k, v])=>{ const pid = k.split('__')[0]; per[pid] = (per[pid]||0) + ((v && v.points)||0); });
+  Object.entries(d.bonus||{}).forEach(([pid, v])=>{ per[pid] = (per[pid]||0) + (v||0); });
+  let participants = 0, total = 0;
+  Object.values(per).forEach(v=>{ if(v>0){ participants++; total += v; } });
+  return { participants, total };
+}
+async function writePointsStores(data){
+  const res = await Promise.all([
+    window.storage.set(POINTS_LIVE_KEYS.checkins, JSON.stringify(data.checkins), true),
+    window.storage.set(POINTS_LIVE_KEYS.bonus, JSON.stringify(data.bonus), true),
+    window.storage.set(POINTS_LIVE_KEYS.teamBonus, JSON.stringify(data.teamBonus), true)
+  ]);
+  return res.map(r=>!!r);   /* [checkinsOk, bonusOk, teamBonusOk] */
+}
+async function rollbackPointsStores(original, okFlags){
+  /* لو الحفظ فشل في جزء، بنرجّع الأجزاء اللي اتغيّرت لأصلها */
+  const keys = ['checkins','bonus','teamBonus'];
+  for(let i=0;i<keys.length;i++){
+    if(okFlags[i]){ try{ await window.storage.set(POINTS_LIVE_KEYS[keys[i]], JSON.stringify(original[keys[i]]), true); }catch(e){} }
+  }
+}
+function confirmResetAllPoints(){
+  if(_pointsOpBusy) return;
+  showConfirmDialog('تصفير نقاط جميع المشاركين؟', ()=>doResetAllPoints(), {
+    icon:'⚠️', confirmLabel:'تصفير الكل',
+    sub:'كل المشاركين والفرق هيرجعوا بصفر نقطة. النقاط بتتحفظ في نسخة، وتقدر ترجّعها بزر "استرجاع النقاط اللي اتصفرت".'
+  });
+}
+function confirmRestorePoints(){
+  if(_pointsOpBusy) return;
+  showConfirmDialog('استرجاع النقاط اللي اتصفرت؟', ()=>doRestorePoints(), {
+    icon:'↩️', confirmLabel:'استرجاع',
+    sub:'النقاط المحفوظة هتترجع وتتضاف على أي نقاط اتجمعت بعد التصفير (مفيش حاجة هتتمسح).'
+  });
+}
+async function doResetAllPoints(){
+  if(_pointsOpBusy) return;
+  _pointsOpBusy = true;
+  try{
+    showToast('⏳ جاري تصفير النقاط...');
+    const live = await readLivePoints();
+    if(!live){ showToast('تعذر قراءة أحدث النقاط من السيرفر — تحقق من الاتصال وحاول تاني', true); return; }
+    if(pointsDataIsEmpty(live)){ showToast('كل النقاط متصفرة بالفعل', true); return; }
+
+    /* نجمع مع أي نسخة قديمة لسه ماترجعتش، عشان مفيش حاجة تضيع لو التصفير اتعمل مرتين */
+    const oldBackup = await loadPointsBackup();
+    if(!oldBackup && POINTS_BACKUP){ showToast('تعذر قراءة نسخة النقاط المحفوظة — حاول تاني', true); return; }
+    const merged = mergePointsData(oldBackup, live);
+    const sum = summarizePointsData(merged);
+    const doc = { ts: Date.now(), checkins: merged.checkins, bonus: merged.bonus, teamBonus: merged.teamBonus, participants: sum.participants, total: sum.total };
+
+    /* 1) نحفظ النسخة الأول — لو فشلت منصفّرش */
+    const backupSaved = await window.storage.set(POINTS_BACKUP_KEY, JSON.stringify(doc), true);
+    if(!backupSaved){ showToast('تعذر حفظ نسخة النقاط — مفيش حاجة اتصفّرت. تحقق من الاتصال وحاول تاني', true); return; }
+
+    /* 2) نصفّر النقاط الحية */
+    const flags = await writePointsStores({ checkins:{}, bonus:{}, teamBonus:{} });
+    if(flags.some(f=>!f)){
+      await rollbackPointsStores(live, flags);
+      if(oldBackup){ await window.storage.set(POINTS_BACKUP_KEY, JSON.stringify(oldBackup), true); }
+      else { try{ await window.storage.delete(POINTS_BACKUP_KEY, true); }catch(e){} }
+      showToast('تعذر إتمام التصفير على السيرفر — رجّعنا كل حاجة زي ما كانت. حاول تاني', true);
+      return;
+    }
+    CHECKINS = {}; BONUS = {}; TEAM_BONUS = {};
+    POINTS_BACKUP = doc; _pointsBackupLoaded = true;
+    showToast('✅ تم تصفير نقاط جميع المشاركين');
+    render();
+  } finally { _pointsOpBusy = false; }
+}
+async function doRestorePoints(){
+  if(_pointsOpBusy) return;
+  _pointsOpBusy = true;
+  try{
+    showToast('⏳ جاري استرجاع النقاط...');
+    const backup = await loadPointsBackup();
+    if(!backup){
+      POINTS_BACKUP = null; _pointsBackupLoaded = true;
+      showToast('مفيش نقاط متصفرة محفوظة عشان تتسترجع', true);
+      render();
+      return;
+    }
+    const live = await readLivePoints();
+    if(!live){ showToast('تعذر قراءة أحدث النقاط من السيرفر — تحقق من الاتصال وحاول تاني', true); return; }
+    const merged = mergePointsData(live, backup);
+
+    const flags = await writePointsStores(merged);
+    if(flags.some(f=>!f)){
+      await rollbackPointsStores(live, flags);
+      showToast('تعذر إتمام الاسترجاع على السيرفر — رجّعنا كل حاجة زي ما كانت. حاول تاني', true);
+      return;
+    }
+    CHECKINS = merged.checkins; BONUS = merged.bonus; TEAM_BONUS = merged.teamBonus;
+
+    /* بعد نجاح الاسترجاع نمسح النسخة عشان مترجعش مرتين */
+    let cleared = false;
+    try{ const d = await window.storage.delete(POINTS_BACKUP_KEY, true); cleared = !!d; }catch(e){}
+    if(!cleared){ const r = await window.storage.set(POINTS_BACKUP_KEY, 'null', true); cleared = !!r; }
+    POINTS_BACKUP = cleared ? null : backup; _pointsBackupLoaded = true;
+    if(cleared) showToast('✅ تم استرجاع النقاط');
+    else showToast('النقاط اترجعت، بس مقدرناش نمسح النسخة المحفوظة — متضغطش "استرجاع" تاني', true, 6000);
+    render();
+  } finally { _pointsOpBusy = false; }
+}
+function renderAdminPointsResetCard(){
+  if(!_pointsBackupLoaded){
+    _pointsBackupLoaded = true;
+    loadPointsBackup().then(b=>{ POINTS_BACKUP = b; if(state.view==='admin' && state.adminTab==='participants' && !state.editingParticipantId && !state.addingParticipant) render(); });
+  }
+  const b = POINTS_BACKUP;
+  let when = '';
+  if(b && b.ts){ try{ when = new Date(b.ts).toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'}); }catch(e){ when = new Date(b.ts).toLocaleString(); } }
+  const status = b
+    ? `<div class="hint" style="margin:8px 0 0;">💾 نسخة محفوظة (${when}) — ${b.participants||0} مشارك، مجموع ${b.total||0} نقطة</div>`
+    : `<div class="hint" style="margin:8px 0 0;">مفيش نقاط متصفرة محفوظة دلوقتي</div>`;
+  return `
+    <div class="card" style="margin-bottom:14px;border-color:rgba(214,71,58,.35);">
+      <div class="admin-session-name" style="margin-bottom:10px;">🧹 تصفير نقاط الجميع</div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-outline" style="flex:1;padding:10px 6px;font-size:12px;color:var(--danger);" data-action="admin-reset-all-points">🔄 تصفير كل النقاط</button>
+        <button type="button" class="btn btn-outline" style="flex:1;padding:10px 6px;font-size:12px;${b?'':'opacity:.4;'}" data-action="admin-restore-points" ${b?'':'disabled'}>↩️ استرجاع النقاط</button>
+      </div>
+      ${status}
+    </div>`;
 }
 async function doMoveParticipantTeam(pid, newTeamId){
   PARTICIPANT_OVERRIDES[pid] = Object.assign({}, PARTICIPANT_OVERRIDES[pid], {teamId:newTeamId});
@@ -14781,6 +14976,14 @@ function startLivePolling(){
           render();
         }
       }
+    }catch(e){}
+    try{
+      /* البونص وبونص الفرق: نحدّثهم كل دورة (وبس لو القراءة نجحت) عشان تصفير/استرجاع النقاط يظهر عند الكل ومحدش يكتب فوقه ببيانات قديمة */
+      const readObj = async (key)=>{ const r = await window.storage.get(key, true); if(!r || !r.value) return null; const v = JSON.parse(r.value); return (v && typeof v==='object') ? v : null; };
+      const fb = await readObj('glavera-bonus');
+      if(fb && JSON.stringify(fb) !== JSON.stringify(BONUS)) BONUS = fb;
+      const ftb = await readObj('glavera-team-bonus');
+      if(ftb && JSON.stringify(ftb) !== JSON.stringify(TEAM_BONUS)) TEAM_BONUS = ftb;
     }catch(e){}
     try{
       if(state.view==='wall'){
