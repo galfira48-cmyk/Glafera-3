@@ -1,4 +1,4 @@
-const CACHE_NAME = 'glavera3-v6';
+const CACHE_NAME = 'glavera3-v7';
 const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
 
 self.addEventListener('install', (event) => {

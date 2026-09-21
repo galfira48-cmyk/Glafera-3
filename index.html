@@ -2367,7 +2367,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
   /* ===================== LUDO ===================== */
   .ludo-hero{text-align:center; padding:6px 0 10px;}
-  .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #EE4B4B; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
+  .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #F00315; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
   .ludo-hero-dice svg{width:100%; height:100%; display:block;}
   .ludo-hero-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--text);}
   .ludo-hero-sub{font-size:12.5px; font-weight:700; color:var(--text-muted); margin-top:2px;}
@@ -2386,9 +2386,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     box-shadow:0 5px 12px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.05);}
   .ls-row::before{content:''; position:absolute; top:0; bottom:0; inset-inline-start:0; width:4px; background:var(--pc, var(--border));}
   .ls-row.empty{border-style:dashed; opacity:.65; min-height:52px;}
-  .ls-pawn{position:relative; flex:0 0 34px; width:34px; height:34px;}
-  .ls-pawn i{position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 32% 26%, #fff 0 8%, var(--pa) 9%, var(--pb) 82%); border:2.5px solid #fff; box-sizing:border-box; box-shadow:0 3px 6px rgba(0,0,0,.45), inset 0 -3px 5px rgba(0,0,0,.28);}
+  .ls-pawn{position:relative; flex:0 0 36px; width:36px; height:36px; display:block;}
   .ls-pawn.empty{border-radius:50%; border:2px dashed var(--border);}
+  .ls-pawn .lt-pawn{display:block; width:100%; height:100%;}
   .ls-mid{flex:1; min-width:0;}
   .ls-color{font-size:11.5px; font-weight:800; color:var(--pc, var(--text-muted)); margin-bottom:3px;}
   .ls-name{width:100%; box-sizing:border-box; padding:7px 10px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; outline:none;}
@@ -2429,24 +2429,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:linear-gradient(115deg,rgba(255,255,255,.12),transparent 60%); pointer-events:none;}
   .ludo-status-card .xo-status{margin-bottom:0; position:relative;}
   /* اللوحة */
-  .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 16px; padding:9px; border-radius:26px;
-    background:linear-gradient(155deg,#FFE8A8,#C6871F 45%,#8a611f 100%); box-shadow:0 18px 40px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,255,255,.5), inset 0 -3px 6px rgba(0,0,0,.3);}
-  .ludo-board{position:relative; width:100%; aspect-ratio:1/1; direction:ltr; border-radius:18px; overflow:hidden; background:#FBF6E9;
-    box-shadow:0 0 0 2px rgba(16,12,44,.9), inset 0 0 0 1px rgba(255,255,255,.5), 0 10px 22px rgba(0,0,0,.4);}
-  .ludo-svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .ludo-board-wrap{width:100%; max-width:520px; margin:0 auto 18px; padding:0; position:relative;}
+  .ludo-board{position:relative; width:100%; aspect-ratio:1/1; direction:ltr;}
+  .ludo-svg{position:absolute; inset:0; width:100%; height:100%; display:block; border-radius:7.3%; box-shadow:0 14px 30px rgba(0,0,0,.5);}
   .lt-layer{position:absolute; inset:0;}
-  .lt{position:absolute; width:5.7%; height:5.7%; border-radius:50%; transform:translate(-50%,-50%) scale(var(--s,1));
+  .lt{position:absolute; width:7.2%; height:7.2%; --ty:-50%; transform-origin:50% 50%;
+    transform:translate(-50%,var(--ty)) scale(var(--s,1));
     transition:left .17s linear, top .17s linear, transform .25s cubic-bezier(.34,1.56,.64,1);}
-  .lt i{position:absolute; inset:0; border-radius:50%; box-sizing:border-box; border:2px solid #fff;
-    background:radial-gradient(circle at 32% 26%, #fff 0 8%, var(--ca) 9%, var(--cb) 82%);
-    box-shadow:0 3px 6px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.5) inset, inset 0 -4px 5px rgba(0,0,0,.3);}
-  .lt.last i{box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 0 10px 2px var(--ca), 0 3px 6px rgba(0,0,0,.5);}
-  .lt.moving{transform:translate(-50%,-50%) scale(calc(var(--s,1) * 1.3)); z-index:80 !important;}
+  .lt-pawn{display:block; width:100%; height:100%; overflow:visible; pointer-events:none;}
+  .lt.last .lt-pawn{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px var(--ca));}
+  .lt.moving{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1) * 1.25)); z-index:80 !important;}
   .lt.flying{transition:left .65s cubic-bezier(.5,0,.2,1), top .65s cubic-bezier(.5,0,.2,1), transform .25s;}
   .lt.movable{cursor:pointer; animation:ltHop .75s ease-in-out infinite; z-index:70 !important;}
-  .lt.movable::before{content:''; position:absolute; inset:-42%; border-radius:50%; border:2.5px solid #fff; box-shadow:0 0 0 2px var(--cb), 0 0 14px 2px var(--ca); animation:ltRing 1s ease-out infinite; pointer-events:none;}
-  .lt.movable::after{content:''; position:absolute; inset:-55%; border-radius:50%;}
-  @keyframes ltHop{0%,100%{transform:translate(-50%,-50%) scale(var(--s,1));} 50%{transform:translate(-50%,-64%) scale(calc(var(--s,1) * 1.14));}}
+  .lt.movable::before{content:''; position:absolute; left:-30%; width:160%; top:-30%; aspect-ratio:1/1; border-radius:50%; border:2.5px solid #fff; box-shadow:0 0 0 2px var(--cb), 0 0 12px 2px var(--ca); animation:ltRing 1s ease-out infinite; pointer-events:none;}
+  .lt.movable::after{content:''; position:absolute; left:-40%; width:180%; top:-40%; aspect-ratio:1/1; border-radius:50%;}
+  @keyframes ltHop{0%,100%{transform:translate(-50%,var(--ty)) scale(var(--s,1));} 50%{transform:translate(-50%,calc(var(--ty) - 9%)) scale(calc(var(--s,1) * 1.08));}}
   @keyframes ltRing{0%{opacity:1; transform:scale(.85);} 100%{opacity:.15; transform:scale(1.25);}}
   /* الزهر */
   .ludo-dock{display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
@@ -6824,10 +6821,10 @@ function renderDominoGame(){
 
 /* ============================= GAMES: LUDO (ENGINE) ============================= */
 const LUDO_PAL = [
-  {id:'red',    name:'الأحمر',  a:'#FF9A8F', b:'#E5383F', solid:'#EE4B4B', soft:'#FFD9D5', rgb:'238,75,75', emoji:'🔴'},
-  {id:'green',  name:'الأخضر',  a:'#8EEDB0', b:'#1FA75A', solid:'#2FBF6C', soft:'#D2F6E0', rgb:'47,191,108', emoji:'🟢'},
-  {id:'yellow', name:'الأصفر',  a:'#FFE795', b:'#EFA70C', solid:'#F7B923', soft:'#FFF1C4', rgb:'247,185,35', emoji:'🟡'},
-  {id:'blue',   name:'الأزرق',  a:'#A3CFFF', b:'#2A67E0', solid:'#3F7BF0', soft:'#D6E7FF', rgb:'63,123,240', emoji:'🔵'}
+  {id:'blue',   name:'الأزرق',  a:'#8CC8FF', b:'#0068CF', solid:'#0084FF', soft:'#D6EBFF', rgb:'0,132,255',  emoji:'🔵', d:'#00386E'},
+  {id:'green',  name:'الأخضر',  a:'#A8E85C', b:'#2C7A00', solid:'#42A200', soft:'#DDF2C9', rgb:'66,162,0',   emoji:'🟢', d:'#1A4A00', tri:'#5DBC00'},
+  {id:'yellow', name:'الأصفر',  a:'#FFE68A', b:'#D99500', solid:'#FFBA02', soft:'#FFF0BF', rgb:'255,186,2',  emoji:'🟡', d:'#6B4500'},
+  {id:'red',    name:'الأحمر',  a:'#FF8790', b:'#BF000F', solid:'#F00315', soft:'#FFD5D8', rgb:'240,3,21',   emoji:'🔴', d:'#650008'}
 ];
 const LUDO_START = [0,13,26,39];
 const LUDO_SAFE = new Set([0,13,26,39,8,21,34,47]);
@@ -6855,10 +6852,10 @@ const LUDO_HOME_COL = [
   [[7,13],[7,12],[7,11],[7,10],[7,9]]
 ];
 const LUDO_BASE_SLOTS = [
-  [[2,2],[4,2],[2,4],[4,4]],
-  [[10,2],[12,2],[10,4],[12,4]],
-  [[10,10],[12,10],[10,12],[12,12]],
-  [[2,10],[4,10],[2,12],[4,12]]
+  [[2.1,2.1],[3.9,2.1],[2.1,3.9],[3.9,3.9]],
+  [[11.1,2.1],[12.9,2.1],[11.1,3.9],[12.9,3.9]],
+  [[11.1,11.1],[12.9,11.1],[11.1,12.9],[12.9,12.9]],
+  [[2.1,11.1],[3.9,11.1],[2.1,12.9],[3.9,12.9]]
 ];
 const LUDO_FINAL = [{x:6.72,y:7.5,ax:'y'},{x:7.5,y:6.72,ax:'x'},{x:8.28,y:7.5,ax:'y'},{x:7.5,y:8.28,ax:'x'}];
 
@@ -7010,68 +7007,78 @@ function ludoFinishMove(L, seat, info){
 function ludoStarPoints(cx, cy, r){
   const pts = [];
   for(let i=0;i<10;i++){
-    const a = -Math.PI/2 + i*Math.PI/5, rr = (i%2) ? r*.42 : r;
+    const a = -Math.PI/2 + i*Math.PI/5, rr = (i%2) ? r*.46 : r;
     pts.push((cx+Math.cos(a)*rr).toFixed(3)+','+(cy+Math.sin(a)*rr).toFixed(3));
   }
   return pts.join(' ');
 }
+/* اللوحة على ستايل Zen Ludo: ألوان سادة، خانات بيضا بخطوط رفيعة، نجوم رمادي، وأسهم دخول */
 function ludoBoardSvg(active){
   const bases = [[0,0],[9,0],[9,9],[0,9]];
+  const LINE = '#7a7a7a', LW = .035, SAFE = '#B3B3B3';
   let s = '<svg viewBox="0 0 15 15" class="ludo-svg" aria-hidden="true">';
-  s += '<defs>';
-  s += '<radialGradient id="lb-bg" cx="50%" cy="42%" r="75%"><stop offset="0%" stop-color="#FFFDF6"/><stop offset="70%" stop-color="#F9F1DD"/><stop offset="100%" stop-color="#EFE2C0"/></radialGradient>';
-  s += '<linearGradient id="lb-card" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FBF3E1"/></linearGradient>';
-  s += '<linearGradient id="lb-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE8A8"/><stop offset="55%" stop-color="#F4B740"/><stop offset="100%" stop-color="#C6871F"/></linearGradient>';
-  s += '<radialGradient id="lb-socket" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#00000022"/><stop offset="75%" stop-color="#00000010"/><stop offset="100%" stop-color="#00000000"/></radialGradient>';
-  LUDO_PAL.forEach((pal,c)=>{
-    s += `<linearGradient id="lb-c${c}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${pal.a}"/><stop offset="100%" stop-color="${pal.b}"/></linearGradient>`;
-  });
-  s += '</defs>';
-  s += '<rect width="15" height="15" fill="url(#lb-bg)"/>';
+  s += '<defs><clipPath id="lb-clip"><rect width="15" height="15" rx="1.1"/></clipPath></defs>';
+  s += '<g clip-path="url(#lb-clip)">';
+  s += '<rect width="15" height="15" fill="#FFFFFF"/>';
+  /* البيوت: مربع ملوّن + مربع أبيض بحواف دايرية */
   bases.forEach((b,c)=>{
-    const pal = LUDO_PAL[c], on = active.has(c), op = on?1:.32;
-    s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="url(#lb-c${c})" opacity="${op}"/>`;
-    s += `<rect x="${b[0]+.06}" y="${b[1]+.06}" width="5.88" height="5.88" fill="none" stroke="${pal.b}" stroke-width=".1" opacity="${on?.5:.22}"/>`;
-    s += `<rect x="${b[0]+.7}" y="${b[1]+.7}" width="4.6" height="4.6" rx="1" fill="url(#lb-card)" stroke="${pal.soft}" stroke-width=".07" opacity="${on?1:.55}"/>`;
-    s += `<rect x="${b[0]+.92}" y="${b[1]+.92}" width="4.16" height="1.3" rx=".6" fill="#FFFFFF" opacity="${on?.35:.15}"/>`;
-    LUDO_BASE_SLOTS[c].forEach(sl=>{
-      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".98" fill="url(#lb-socket)"/>`;
-      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".98" fill="none" stroke="${pal.b}" stroke-width=".05" opacity="${on?.28:.14}"/>`;
-      s += `<ellipse cx="${sl[0]}" cy="${sl[1]+.4}" rx=".58" ry=".15" fill="#000000" opacity="${on?.18:.08}"/>`;
-      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".7" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".13" opacity="${on?1:.5}"/>`;
-      s += `<circle cx="${(sl[0]-.19).toFixed(2)}" cy="${(sl[1]-.21).toFixed(2)}" r=".21" fill="#FFFFFF" opacity="${on?.55:.28}"/>`;
-    });
+    const pal = LUDO_PAL[c], on = active.has(c);
+    s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="${pal.solid}"/>`;
+    if(!on) s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="#FFFFFF" opacity=".55"/>`;
+    s += `<rect x="${b[0]+.85}" y="${b[1]+.85}" width="4.3" height="4.3" rx="1" fill="#FFFFFF" opacity="${on?1:.7}"/>`;
   });
+  /* المسار */
   LUDO_TRACK.forEach((c,i)=>{
     const sc = LUDO_START.indexOf(i);
-    if(sc>=0){
-      s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="url(#lb-c${sc})" stroke="${LUDO_PAL[sc].b}" stroke-width=".07"/>`;
-    } else {
-      s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="#FFFEF8" stroke="#E7DCC0" stroke-width=".045"/>`;
-    }
+    const fill = sc>=0 ? LUDO_PAL[sc].solid : (LUDO_SAFE.has(i) ? SAFE : '#FFFFFF');
+    s += `<rect x="${c[0]}" y="${c[1]}" width="1" height="1" fill="${fill}" stroke="${LINE}" stroke-width="${LW}"/>`;
   });
+  /* ممر النهاية */
   LUDO_HOME_COL.forEach((h,c)=>{
-    const pal = LUDO_PAL[c];
-    h.forEach((cell,ci)=>{
-      const op = .78 + ci*.055;
-      s += `<rect x="${cell[0]}" y="${cell[1]}" width="1" height="1" fill="url(#lb-c${c})" opacity="${op.toFixed(2)}" stroke="#FFFFFF" stroke-opacity=".55" stroke-width=".06"/>`;
+    h.forEach(cell=>{
+      s += `<rect x="${cell[0]}" y="${cell[1]}" width="1" height="1" fill="${LUDO_PAL[c].solid}" stroke="#2b2b2b" stroke-opacity=".55" stroke-width="${LW}"/>`;
     });
   });
+  /* المثلثات في النص */
   const tri = ['6,6 6,9 7.5,7.5','6,6 9,6 7.5,7.5','9,6 9,9 7.5,7.5','6,9 9,9 7.5,7.5'];
-  tri.forEach((pts,c)=>{ s += `<polygon points="${pts}" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".07"/>`; });
-  s += '<circle cx="7.5" cy="7.5" r="1.02" fill="url(#lb-gold)" opacity=".95"/>';
-  s += '<circle cx="7.5" cy="7.5" r=".62" fill="url(#lb-card)" stroke="url(#lb-gold)" stroke-width=".08"/>';
-  s += `<polygon points="${ludoStarPoints(7.5,7.5,.36)}" fill="url(#lb-gold)"/>`;
-  LUDO_START.forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.38)}" fill="#FFFFFF" stroke="rgba(0,0,0,.18)" stroke-width=".03"/>`; });
-  [8,21,34,47].forEach(i=>{ const c = LUDO_TRACK[i]; s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.37)}" fill="url(#lb-gold)" stroke="#C6871F" stroke-width=".035"/>`; });
+  tri.forEach((pts,c)=>{ s += `<polygon points="${pts}" fill="${LUDO_PAL[c].tri || LUDO_PAL[c].solid}" stroke="#2b2b2b" stroke-opacity=".8" stroke-width=".04" stroke-linejoin="round"/>`; });
+  /* نجوم: بيضا على خانة البداية، وبيضا على الرمادي للخانات الآمنة */
+  LUDO_TRACK.forEach((c,i)=>{
+    if(!LUDO_SAFE.has(i)) return;
+    s += `<polygon points="${ludoStarPoints(c[0]+.5,c[1]+.5,.36)}" fill="#FFFFFF" stroke="rgba(0,0,0,.14)" stroke-width=".02" stroke-linejoin="round"/>`;
+  });
+  /* أسهم الدخول عند بداية كل ممر */
+  const ar = (pal, pts)=> `<polyline points="${pts}" fill="none" stroke="${pal.solid}" stroke-width=".13" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += ar(LUDO_PAL[0], '.38,7.22 .66,7.5 .38,7.78');
+  s += ar(LUDO_PAL[1], '7.22,.38 7.5,.66 7.78,.38');
+  s += ar(LUDO_PAL[2], '14.62,7.22 14.34,7.5 14.62,7.78');
+  s += ar(LUDO_PAL[3], '7.22,14.62 7.5,14.34 7.78,14.62');
+  s += '</g>';
+  s += '<rect x=".045" y=".045" width="14.91" height="14.91" rx="1.06" fill="none" stroke="#8a8a8a" stroke-width=".09"/>';
   return s + '</svg>';
+}
+/* بيدق على شكل عملة لامعة بتاج (زي الصورة): حافة سميكة + دايرة غاطسة + تاج */
+function ludoPawnSvg(c, uid){
+  const p = LUDO_PAL[c], g = 'lg-'+uid;
+  return `<svg class="lt-pawn" viewBox="0 0 64 64" aria-hidden="true" focusable="false">`
+    + `<defs><radialGradient id="${g}" cx="34%" cy="26%" r="90%"><stop offset="0" stop-color="${p.a}"/><stop offset=".45" stop-color="${p.solid}"/><stop offset="1" stop-color="${p.b}"/></radialGradient>`
+    + `<linearGradient id="${g}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.b}"/><stop offset="1" stop-color="${p.solid}"/></linearGradient></defs>`
+    + `<ellipse cx="34" cy="55" rx="27" ry="7" fill="#000" opacity=".28"/>`
+    + `<circle cx="32" cy="36" r="26" fill="${p.b}" stroke="${p.d}" stroke-width="2"/>`
+    + `<circle cx="32" cy="31" r="26" fill="url(#${g})" stroke="${p.d}" stroke-width="1.6"/>`
+    + `<ellipse cx="25" cy="13" rx="13" ry="5" transform="rotate(-24 25 13)" fill="#fff" opacity=".35"/>`
+    + `<circle cx="32" cy="31" r="17" fill="url(#${g}i)" stroke="${p.d}" stroke-opacity=".55" stroke-width="1.2"/>`
+    + `<path d="M32 46.5a15.5 15.5 0 0 0 13-7" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.4" stroke-linecap="round"/>`
+    + `<path d="M21 34l-2.5-11 8 5.5L32 19l5.5 9.5 8-5.5L43 34z" fill="${p.soft}"/>`
+    + `<rect x="21" y="36" width="22" height="4" rx="1.4" fill="${p.soft}"/>`
+    + `</svg>`;
 }
 function ludoTokenPoints(L, disp){
   const groups = {}, pts = [];
   L.seats.forEach((s,si)=>{
     disp[si].forEach((p,t)=>{
       const c = ludoCoord(s.color, p, t);
-      const e = {seat:si, tok:t, x:c[0], y:c[1], s:1, z:1, p};
+      const e = {seat:si, tok:t, x:c[0], y:c[1], s:(p===0 ? 1.4 : 1), z:1, p};
       if(p>=1 && p<=56){ const k = c[0]+','+c[1]; (groups[k] = groups[k] || []).push(e); }
       else if(p===57){ e.s = .5; }
       pts.push(e);
@@ -7080,11 +7087,11 @@ function ludoTokenPoints(L, disp){
   Object.keys(groups).forEach(k=>{
     const g = groups[k], n = g.length;
     if(n===1) return;
-    const offs = n===2 ? [[-.21,0],[.21,0]]
-      : n===3 ? [[-.21,.15],[.21,.15],[0,-.21]]
-      : n===4 ? [[-.21,-.21],[.21,-.21],[-.21,.21],[.21,.21]]
+    const offs = n===2 ? [[-.24,0],[.24,0]]
+      : n===3 ? [[-.25,.15],[.25,.15],[0,-.24]]
+      : n===4 ? [[-.25,-.25],[.25,-.25],[-.25,.25],[.25,.25]]
       : [[-.27,-.27],[0,-.27],[.27,-.27],[-.27,0],[0,0],[.27,0],[-.27,.27],[0,.27],[.27,.27]];
-    const sc = n===2 ? .76 : (n===3 ? .68 : (n===4 ? .62 : .5));
+    const sc = n===2 ? .7 : (n===3 ? .6 : (n===4 ? .55 : .45));
     g.forEach((e,i)=>{ const o = offs[i % offs.length]; e.x += o[0]; e.y += o[1]; e.s = sc; e.z = 2+i; });
   });
   return pts;
@@ -7095,10 +7102,10 @@ function ludoTokenStyle(e){
 function ludoBoardHtml(L, disp, movable){
   const active = new Set(L.seats.map(s=>s.color));
   const tokens = ludoTokenPoints(L, disp).map(e=>{
-    const pal = LUDO_PAL[L.seats[e.seat].color];
+    const col = L.seats[e.seat].color, pal = LUDO_PAL[col];
     const mv = movable && movable.has(e.seat+'-'+e.tok);
     const last = L.last && L.last.seat===e.seat && L.last.tok===e.tok;
-    return `<div class="lt no-ripple${mv?' movable':''}${last?' last':''}" id="lt-${e.seat}-${e.tok}" data-seat="${e.seat}" data-tok="${e.tok}" ${mv?'data-action="ludo-token"':''} style="${ludoTokenStyle(e)}--ca:${pal.a};--cb:${pal.b};"><i></i></div>`;
+    return `<div class="lt no-ripple${mv?' movable':''}${last?' last':''}" id="lt-${e.seat}-${e.tok}" data-seat="${e.seat}" data-tok="${e.tok}" ${mv?'data-action="ludo-token"':''} style="${ludoTokenStyle(e)}--ca:${pal.a};--cb:${pal.b};">${ludoPawnSvg(col, e.seat+'-'+e.tok)}</div>`;
   }).join('');
   return `<div class="ludo-board" id="ludo-board">${ludoBoardSvg(active)}<div class="lt-layer">${tokens}</div></div>`;
 }
@@ -7242,7 +7249,7 @@ function renderLudoSetup(G){
     const pal = LUDO_PAL[col];
     const human = c.types[i]==='human';
     return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b};--pr:${pal.rgb}">
-      <span class="ls-pawn"><i></i></span>
+      <span class="ls-pawn">${ludoPawnSvg(col,'ls'+i)}</span>
       <div class="ls-mid">
         <div class="ls-color">${pal.name}</div>
         ${human ? `<input type="text" class="ls-name" id="ludo-name-${i}" maxlength="12" autocomplete="off" value="${escapeHtml(c.names[i]||'')}" placeholder="${i===0?ludoMyName():'اسم اللاعب '+(i+1)}">` : `<div class="ls-bot">🤖 الجهاز بيلعب مكانه</div>`}
@@ -7255,7 +7262,7 @@ function renderLudoSetup(G){
   }).join('');
   return `
     <div class="ludo-hero">
-      <div class="ludo-hero-dice">${ludoDiceFace(6,'#E5383F')}</div>
+      <div class="ludo-hero-dice">${ludoDiceFace(6,'#F00315')}</div>
       <div class="ludo-hero-title">لودو</div>
       <div class="ludo-hero-sub">من 2 لـ 4 لاعبين • ٦ يخرّج البيدق • كُل بياديق صحابك</div>
     </div>
@@ -7529,7 +7536,7 @@ function renderRoomLudoLobby(room){
     if(!p) return `<div class="ls-row empty"><span class="ls-pawn empty"></span><div class="ls-mid"><div class="ls-bot">⏳ في انتظار لاعب...</div></div></div>`;
     const pal = LUDO_PAL[cols[i]];
     return `<div class="ls-row" style="--pc:${pal.solid};--pa:${pal.a};--pb:${pal.b};--pr:${pal.rgb}">
-      <span class="ls-pawn"><i></i></span>
+      <span class="ls-pawn">${ludoPawnSvg(cols[i],'lr'+i)}</span>
       <div class="ls-mid"><div class="ls-color">${pal.name}${p.id===room.hostId?' • صاحب الغرفة':''}</div><div class="ls-pname">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</div></div>
       <div class="ls-av">${gameAvatar(p.id)}</div>
     </div>`;
