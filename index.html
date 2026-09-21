@@ -2444,18 +2444,48 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ludo-board{position:relative; width:100%; aspect-ratio:1/1; direction:ltr;}
   .ludo-svg{position:absolute; inset:0; width:100%; height:100%; display:block; border-radius:7.3%; box-shadow:0 14px 30px rgba(0,0,0,.5);}
   .lt-layer{position:absolute; inset:0;}
-  .lt{position:absolute; width:7.2%; height:7.2%; --ty:-50%; transform-origin:50% 50%;
+  .lt{position:absolute; width:7.2%; height:7.2%; --ty:-50%; transform-origin:50% 78%;
     transform:translate(-50%,var(--ty)) scale(var(--s,1));
-    transition:left .17s linear, top .17s linear, transform .25s cubic-bezier(.34,1.56,.64,1);}
-  .lt-pawn{display:block; width:100%; height:100%; overflow:visible; pointer-events:none;}
+    transition:left .15s cubic-bezier(.36,.01,.21,1), top .15s cubic-bezier(.36,.01,.21,1), transform .22s cubic-bezier(.34,1.56,.64,1);}
+  .lt-shadow{position:absolute; left:50%; top:82%; width:62%; height:20%; border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,.45), rgba(0,0,0,0) 72%);
+    transform:translate(-50%,-50%) scale(1); opacity:.5; pointer-events:none; z-index:0;
+    transition:transform .18s ease-out, opacity .18s ease-out;}
+  .lt-pawn{position:relative; display:block; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:1;}
   .lt.last .lt-pawn{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px var(--ca));}
-  .lt.moving{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1) * 1.25)); z-index:80 !important;}
-  .lt.flying{transition:left .65s cubic-bezier(.5,0,.2,1), top .65s cubic-bezier(.5,0,.2,1), transform .25s;}
-  .lt.movable{cursor:pointer; animation:ltHop .75s ease-in-out infinite; z-index:70 !important;}
+  .lt.moving{z-index:80 !important;}
+  .lt.hop{animation:ltStepHop .26s cubic-bezier(.33,0,.2,1) both;}
+  .lt.hop .lt-shadow{animation:ltShadowPulse .26s cubic-bezier(.33,0,.2,1) both;}
+  .lt.land{animation:ltLand .22s cubic-bezier(.34,1.56,.64,1) both;}
+  .lt.flying{transition:left .55s cubic-bezier(.5,0,.2,1), top .55s cubic-bezier(.5,0,.2,1); animation:ltCaptureSpin .55s ease-in-out both; z-index:82 !important;}
+  .lt.movable{cursor:pointer; animation:ltHop2 .75s ease-in-out infinite; z-index:70 !important;}
   .lt.movable::before{content:''; position:absolute; left:-30%; width:160%; top:-30%; aspect-ratio:1/1; border-radius:50%; border:2.5px solid #fff; box-shadow:0 0 0 2px var(--cb), 0 0 12px 2px var(--ca); animation:ltRing 1s ease-out infinite; pointer-events:none;}
   .lt.movable::after{content:''; position:absolute; left:-40%; width:180%; top:-40%; aspect-ratio:1/1; border-radius:50%;}
-  @keyframes ltHop{0%,100%{transform:translate(-50%,var(--ty)) scale(var(--s,1));} 50%{transform:translate(-50%,calc(var(--ty) - 9%)) scale(calc(var(--s,1) * 1.08));}}
+  @keyframes ltHop2{0%,100%{transform:translate(-50%,var(--ty)) scale(var(--s,1));} 50%{transform:translate(-50%,calc(var(--ty) - 9%)) scale(calc(var(--s,1) * 1.08));}}
   @keyframes ltRing{0%{opacity:1; transform:scale(.85);} 100%{opacity:.15; transform:scale(1.25);}}
+  @keyframes ltStepHop{
+    0%{transform:translate(-50%,var(--ty)) scale(var(--s,1),var(--s,1)) rotate(0deg);}
+    28%{transform:translate(-50%,calc(var(--ty) - 32%)) scale(calc(var(--s,1)*1.16),calc(var(--s,1)*.88)) rotate(-5deg);}
+    58%{transform:translate(-50%,calc(var(--ty) - 26%)) scale(calc(var(--s,1)*.94),calc(var(--s,1)*1.08)) rotate(4deg);}
+    82%{transform:translate(-50%,calc(var(--ty) - 4%)) scale(calc(var(--s,1)*1.12),calc(var(--s,1)*.9)) rotate(-2deg);}
+    100%{transform:translate(-50%,var(--ty)) scale(var(--s,1),var(--s,1)) rotate(0deg);}
+  }
+  @keyframes ltShadowPulse{
+    0%{transform:translate(-50%,-50%) scale(1); opacity:.5;}
+    28%{transform:translate(-50%,-50%) scale(.5); opacity:.2;}
+    58%{transform:translate(-50%,-50%) scale(.46); opacity:.18;}
+    100%{transform:translate(-50%,-50%) scale(1); opacity:.5;}
+  }
+  @keyframes ltLand{
+    0%{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1)*1.22),calc(var(--s,1)*.78));}
+    55%{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1)*.92),calc(var(--s,1)*1.1));}
+    100%{transform:translate(-50%,var(--ty)) scale(var(--s,1),var(--s,1));}
+  }
+  @keyframes ltCaptureSpin{
+    0%{transform:translate(-50%,var(--ty)) scale(var(--s,1)) rotate(0deg);}
+    45%{transform:translate(-50%,calc(var(--ty) - 46%)) scale(calc(var(--s,1)*.72)) rotate(230deg);}
+    100%{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1)*.95)) rotate(360deg);}
+  }
   /* الزهر */
   .ludo-dock{display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
   .ludo-dice{width:80px; height:80px; padding:0; border-radius:22px; display:block; background:linear-gradient(145deg,#FFFFFF,#E6DFCD); border:3.5px solid var(--dc);
@@ -2549,6 +2579,32 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     font-size:30px; background:var(--g); box-shadow:0 10px 22px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.45);}
   .gh-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; line-height:1.3;}
   .gh-sub{font-size:11.5px; line-height:1.45; color:var(--text-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .gh-live-badge{position:absolute; top:10px; inset-inline-end:10px; display:flex; align-items:center; gap:5px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px;
+    color:#fff; background:rgba(220,40,70,.85); padding:4px 9px 4px 7px; border-radius:999px; box-shadow:0 6px 14px rgba(220,40,70,.4);
+    animation:ghLivePulse 1.6s ease-in-out infinite;}
+  @keyframes ghLivePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+
+  /* شاشة مشاهدة المعركة */
+  .watch-list{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+  .watch-card{position:relative; display:flex; align-items:center; gap:12px; width:100%; text-align:right; cursor:pointer;
+    padding:12px 14px; border-radius:20px; font-family:inherit; color:var(--text);
+    background:linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.04));
+    -webkit-backdrop-filter:blur(16px) saturate(150%); backdrop-filter:blur(16px) saturate(150%);
+    border:1px solid rgba(255,255,255,.16); box-shadow:0 10px 24px rgba(0,0,0,.26); transition:transform .15s ease;}
+  .watch-card:active{transform:scale(.97);}
+  .watch-live-dot{position:absolute; top:12px; inset-inline-start:12px; width:9px; height:9px; border-radius:50%; background:#ff3b5c;
+    box-shadow:0 0 0 0 rgba(255,59,92,.55); animation:watchDotPulse 1.5s ease-out infinite;}
+  @keyframes watchDotPulse{0%{box-shadow:0 0 0 0 rgba(255,59,92,.55);}70%{box-shadow:0 0 0 9px rgba(255,59,92,0);}100%{box-shadow:0 0 0 0 rgba(255,59,92,0);}}
+  .watch-ico{width:46px; height:46px; min-width:46px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px;
+    box-shadow:0 8px 16px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.4);}
+  .watch-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+  .watch-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px;}
+  .watch-names{font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .watch-eye{font-size:18px; opacity:.75;}
+  .spectate-banner{position:sticky; top:0; z-index:40; display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:0 0 10px; padding:9px 14px; border-radius:999px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#fff;
+    background:linear-gradient(95deg,#5B47FB,#FF5E7E); box-shadow:0 10px 22px rgba(91,71,251,.35);}
+  .spectate-dot{width:8px; height:8px; border-radius:50%; background:#fff; animation:watchDotPulse 1.5s ease-out infinite;}
 
   /* friend tile: front face -> reveals join / create inside the same square */
   .gh-face{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:12px;
@@ -3978,7 +4034,7 @@ function avgRatingOverall(){
 }
 
 /* ============================= STATE ============================= */
-const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'' });
+const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
 let state = FRESH_STATE();
 
 function go(view, extra={}){
@@ -5711,6 +5767,14 @@ function renderGamesHub(){
       <span class="gh-title">العب ضد الجهاز</span>
       <span class="gh-sub">${GAMES_CATALOG.length} ألعاب بدون انتظار</span>
     </button>`;
+  const liveCount = liveRoomsList().length;
+  const watchTile = `
+    <button type="button" class="gh-tile gh-tile-watch" style="--g:linear-gradient(145deg,#FF5E7E,#5B47FB); --i:2" data-action="open-watch">
+      ${liveCount ? `<span class="gh-live-badge">${liveCount} 🔴 لايف</span>` : ''}
+      <span class="gh-ico">👀</span>
+      <span class="gh-title">مشاهدة المعركة</span>
+      <span class="gh-sub">اتفرج على أصحابك وهما بيلعبوا لايڤ</span>
+    </button>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -5721,8 +5785,66 @@ function renderGamesHub(){
       <div class="opinion-hero-title">استراحة تفاعلية</div>
       <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
     </div>
-    <div class="gh-grid">${friendTile}${soloTile}</div>
+    <div class="gh-grid">${friendTile}${soloTile}${watchTile}</div>
   `;
+}
+/* ============================= GAMES: WATCH THE BATTLE (مشاهدة المعركة) ============================= */
+function liveRoomsList(){
+  return Object.values(GAME_ROOMS||{})
+    .filter(r=> r && r.status==='playing')
+    .sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
+}
+function watchRoomNames(room){
+  if(room.game==='ludo'){
+    return (room.players||[]).map(p=>p.name).filter(Boolean).join(' • ') || 'لاعبين';
+  }
+  return [room.hostName, room.guestName].filter(Boolean).join('  🆚  ');
+}
+function renderWatchRooms(){
+  const rooms = liveRoomsList();
+  const cards = rooms.map(room=>{
+    const g = GAMES_CATALOG.find(x=>x.id===room.game) || {icon:'🎮', title:room.game, color:'linear-gradient(145deg,#845EC2,#3FDCC9)'};
+    return `
+      <button type="button" class="watch-card" data-action="watch-room" data-code="${room.code}" data-game="${room.game}">
+        <span class="watch-live-dot" aria-hidden="true"></span>
+        <span class="watch-ico" style="background:${g.color}">${g.icon}</span>
+        <span class="watch-info">
+          <span class="watch-title">${g.title}</span>
+          <span class="watch-names">${escapeHtml(watchRoomNames(room))}</span>
+        </span>
+        <span class="watch-eye">👀</span>
+      </button>`;
+  }).join('');
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">مشاهدة المعركة</div>
+    </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">👀</div>
+      <div class="opinion-hero-title">مين بيلعب دلوقتي؟</div>
+      <div class="opinion-hero-sub">اختار معركة وشوفها لايڤ من غير ما تلعب</div>
+    </div>
+    ${rooms.length ? `<div class="watch-list">${cards}</div>` : `<div class="empty-note">مفيش معارك شغالة دلوقتي 🍿<br>تعالى تاني كمان شوية</div>`}
+  `;
+}
+async function enterSpectateRoom(code, game){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[code];
+  if(!room || room.status!=='playing'){ showToast('المعركة دي خلصت خلاص', true); render(); return; }
+  state.roomCode = code;
+  state.roomSpectate = true;
+  state.roomIntroShown = state.roomIntroShown || {};
+  state.roomIntroShown[code] = true;
+  startRoomPolling();
+  go('room-'+game);
+}
+function spectateBannerHtml(room){
+  const names = room ? watchRoomNames(room) : '';
+  return `<div class="spectate-banner">
+    <span class="spectate-dot"></span>
+    <span class="spectate-txt">👀 بتتفرج على ${escapeHtml(names)}</span>
+  </div>`;
 }
 function renderSoloGames(){
   const tiles = GAMES_CATALOG.map((g,i)=> ghGameTile(g, GH_SOLO_SUB[g.id]||g.sub, 'open-game', i)).join('');
@@ -7123,7 +7245,7 @@ function ludoBoardHtml(L, disp, movable){
     const col = L.seats[e.seat].color, pal = LUDO_PAL[col];
     const mv = movable && movable.has(e.seat+'-'+e.tok);
     const last = L.last && L.last.seat===e.seat && L.last.tok===e.tok;
-    return `<div class="lt no-ripple${mv?' movable':''}${last?' last':''}" id="lt-${e.seat}-${e.tok}" data-seat="${e.seat}" data-tok="${e.tok}" ${mv?'data-action="ludo-token"':''} style="${ludoTokenStyle(e)}--ca:${pal.a};--cb:${pal.b};">${ludoPawnSvg(col, e.seat+'-'+e.tok)}</div>`;
+    return `<div class="lt no-ripple${mv?' movable':''}${last?' last':''}" id="lt-${e.seat}-${e.tok}" data-seat="${e.seat}" data-tok="${e.tok}" ${mv?'data-action="ludo-token"':''} style="${ludoTokenStyle(e)}--ca:${pal.a};--cb:${pal.b};"><span class="lt-shadow"></span>${ludoPawnSvg(col, e.seat+'-'+e.tok)}</div>`;
   }).join('');
   return `<div class="ludo-board" id="ludo-board">${ludoBoardSvg(active)}<div class="lt-layer">${tokens}</div></div>`;
 }
@@ -7497,11 +7619,17 @@ async function ludoMoveFlow(G, tok){
   for(let i=0;i<steps.length;i++){
     disp[seat][tok] = steps[i];
     ludoPaintTokens(G);
+    if(el){ el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); }
     ludoTick(520 + i*22, .06, .035);
-    await ludoSleep(steps.length>1 ? 175 : 300);
+    await ludoSleep(steps.length>1 ? 160 : 260);
     if(!ludoAlive(G)) return;
   }
-  if(el) el.classList.remove('moving');
+  if(el){
+    el.classList.remove('hop');
+    el.classList.remove('moving');
+    el.classList.remove('land'); void el.offsetWidth; el.classList.add('land');
+    setTimeout(()=>{ if(el) el.classList.remove('land'); }, 240);
+  }
   if(info.cap.length){
     try{ SND.error(); }catch(e){}
     vibrate([25,30,25]);
@@ -7845,6 +7973,7 @@ async function joinGameRoom(code){
 const LEAVE_ROOM_PENALTY = 50;
 let leaveRoomTimer = null;
 function confirmLeaveGameRoom(){
+  if(state.roomSpectate){ leaveGameRoom(); return; }
   const room = GAME_ROOMS[state.roomCode];
   if(!room || room.status!=='playing'){ leaveGameRoom(); return; }
   showLeaveRoomWarning();
@@ -7900,10 +8029,12 @@ async function applyLeaveRoomPenalty(){
 }
 async function leaveGameRoom(){
   const code = state.roomCode;
+  const wasSpectating = state.roomSpectate;
   stopRoomPolling();
   state.roomCode = null;
+  state.roomSpectate = false;
   goBack();
-  if(!code) return;
+  if(!code || wasSpectating) return;
   try{
     GAME_ROOMS = await loadGameRooms();
     const room = GAME_ROOMS[code];
@@ -8114,6 +8245,16 @@ function startRoomPolling(){
   startReactPolling();
 }
 function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval=null; } stopReactPolling(); }
+let watchListPollInterval = null;
+function startWatchListPolling(){
+  if(watchListPollInterval) return;
+  watchListPollInterval = setInterval(async ()=>{
+    if(state.view!=='watch-rooms'){ stopWatchListPolling(); return; }
+    GAME_ROOMS = await loadGameRooms();
+    render();
+  }, 4000);
+}
+function stopWatchListPolling(){ if(watchListPollInterval){ clearInterval(watchListPollInterval); watchListPollInterval=null; } }
 const ROOM_GAMES = [
   {id:'xo',       sub:'حدّي صاحبك'},
   {id:'connect4', sub:'كل واحد بيختار لون قطعته'},
@@ -8670,7 +8811,7 @@ function vsPhotoHtml(pid){
   return `<div class="vs-photo" style="${bg}">${p.photo?'':escapeHtml(initials(p.name))}</div>`;
 }
 function roomMaybeIntro(){
-  if(String(state.view).indexOf('room-')!==0 || !state.roomCode) return;
+  if(String(state.view).indexOf('room-')!==0 || !state.roomCode || state.roomSpectate) return;
   const room = GAME_ROOMS[state.roomCode];
   if(!room || room.status!=='playing' || !room.guestId) return;
   state.roomIntroShown = state.roomIntroShown || {};
@@ -10776,6 +10917,7 @@ function render(){
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='games-solo') html = renderSoloGames();
+  else if(state.view==='watch-rooms') html = renderWatchRooms();
   else if(state.view==='chefs') html = renderChefsPage();
   else if(state.view==='chef-meals') html = renderChefMealsPage();
   else if(state.view==='chef-dishes') html = renderChefDishesPage();
@@ -10811,6 +10953,7 @@ function render(){
   if(String(state.view).indexOf('room-')===0 && state.roomCode){
     const _rm = GAME_ROOMS[state.roomCode];
     if(_rm && _rm.status==='playing') html += roomEmojiBar();
+    if(state.roomSpectate) html = spectateBannerHtml(_rm) + html;
   }
   app.innerHTML = html;
   if(state.view!=='game-domino') dominoSyncYardLayer('');
@@ -10823,6 +10966,7 @@ function render(){
   if(state.view==='gallery'){ attachGalleryEvents(); }
   if(state.view==='game-memory'){ startMemoryTicker(); } else { stopMemoryTicker(); }
   if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
+  if(state.view==='watch-rooms'){ if(!watchListPollInterval) startWatchListPolling(); } else { stopWatchListPolling(); }
   if(state.view==='gallery-album'){ attachGalleryAlbumEvents(); }
 
   if(state.view==='profile' && state.radialMenuOpen){
@@ -11902,6 +12046,13 @@ function closeScanModal(){
 }
 
 /* ============================= EVENTS ============================= */
+const SPECTATE_BLOCKED_ACTIONS = new Set([
+  'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
+  'room-rps-pick','room-rps-next','room-c4-color','room-c4-col','room-c4-next',
+  'room-memory-card','room-memory-next','room-num-key','room-num-next','room-math-pick','room-math-next',
+  'room-ludo-start','room-ludo-skip','ludo-token','ludo-roll',
+  'create-room','join-room','friend-tile-open','friend-join-show'
+]);
 document.addEventListener('keydown', (e)=>{
   if(e.key==='Enter' && e.target && e.target.id==='room-join-code'){
     e.preventDefault();
@@ -11912,6 +12063,11 @@ document.addEventListener('click', (e)=>{
   const el = e.target.closest('[data-action]');
   if(!el) return;
   const action = el.dataset.action;
+
+  if(state.roomSpectate && SPECTATE_BLOCKED_ACTIONS.has(action)){
+    showToast('👀 إنت بس بتتفرج — مينفعش تلعب في المعركة دي', true);
+    return;
+  }
 
   if(state.radialMenuOpen && action!=='toggle-radial-menu' && action!=='radial-tap'){ state.radialMenuOpen = false; }
 
@@ -12084,6 +12240,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
+  else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>{ GAME_ROOMS = r; render(); }); }
+  else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-tile-open'){ setFriendTile('menu'); }
   else if(action==='friend-join-show'){ setFriendTile('join'); }
   else if(action==='friend-tile-close'){ setFriendTile(state.friendTile==='join' ? 'menu' : null); }
@@ -12195,7 +12353,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='memory-reset'){ initMemoryGame(); render(); }
   else if(action==='rps-pick'){ doRpsPick(el.dataset.choice); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
-  else if(action==='tile-nav'){ go(el.dataset.page); }
+  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
   else if(action==='radial-tap'){
     if(suppressNextRadialClick){ suppressNextRadialClick = false; }
