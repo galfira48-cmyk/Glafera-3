@@ -2236,7 +2236,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background-image:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.4px); background-size:14px 14px;}
   .db-in{position:absolute; inset:3.2%;}
   .domino-board-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.78); font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; direction:rtl;}
-  .dt{position:absolute; padding:1px; box-sizing:border-box;}
+  .dt{position:absolute; box-sizing:border-box;}
   .dt-in{width:100%; height:100%; border-radius:7px; background:linear-gradient(180deg,#FFFDF6,#EAE3CC); border:1px solid rgba(0,0,0,.3);
     box-shadow:0 2px 3px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8); overflow:hidden; box-sizing:border-box; display:flex;}
   .dt-in svg{width:100%; height:100%; display:block;}
@@ -2245,7 +2245,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .dt-spin{fill:#C6871F;}
   .dt.new .dt-in{animation:dtPop .42s cubic-bezier(.34,1.56,.64,1);}
   @keyframes dtPop{0%{transform:scale(.4); opacity:0;} 100%{transform:scale(1); opacity:1;}}
-  .dt-ghost{position:absolute; box-sizing:border-box; border-radius:8px; border:2px dashed; pointer-events:none; opacity:.85; animation:dtGhost 1.3s ease-in-out infinite;}
+  .dtg-wrap{position:absolute; box-sizing:border-box; pointer-events:none;}
+  .dt-ghost{position:relative; width:100%; height:100%; box-sizing:border-box; border-radius:8px; border:2px dashed; pointer-events:none; opacity:.85; animation:dtGhost 1.3s ease-in-out infinite;}
   .dt-ghost svg{width:100%; height:100%; display:block;}
   .dt-ghost.gl{border-color:#3FDCC9; background:rgba(63,220,201,.14);}
   .dt-ghost.gr{border-color:#F4B740; background:rgba(244,183,64,.14);}
@@ -2256,24 +2257,58 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes dtGhost{0%,100%{opacity:.55;} 50%{opacity:1;}}
   .dsp-l{border-color:#3FDCC9; color:#3FDCC9;}
   .dsp-r{border-color:#F4B740; color:#F4B740;}
-  /* ===== كومة السحب ===== */
-  .domino-yard{margin:0 0 6px; padding:10px 12px 10px; border-radius:16px; background:linear-gradient(180deg, var(--surface-2), var(--surface)); border:1px solid var(--border); transition:border-color .2s, box-shadow .2s;}
-  .domino-yard.must{border-color:var(--gold); box-shadow:0 0 0 2px rgba(244,183,64,.22), 0 8px 20px rgba(244,183,64,.14);}
-  .dy-head{display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:800; color:var(--text);}
-  .dy-count{background:var(--violet); color:#fff; border-radius:999px; padding:1px 10px; font-size:12.5px; font-family:'Cairo',sans-serif;}
-  .dy-cards{display:flex; align-items:center; min-height:64px; padding:12px 4px 4px;}
-  .dy-card{position:relative; width:30px; height:46px; margin-inline-start:-15px; flex-shrink:0; padding:0; border-radius:6px; border:1px solid rgba(255,255,255,.4);
-    background:linear-gradient(150deg,#B3A7FF,#6C5CE7); box-shadow:3px 0 6px rgba(0,0,0,.35);}
-  .dy-card:first-child{margin-inline-start:0;}
-  .dy-card::before{content:''; position:absolute; left:15%; right:15%; top:50%; height:2px; margin-top:-1px; background:rgba(255,255,255,.55); border-radius:2px;}
-  .dy-card::after{content:''; position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px 0 0 -3.5px; transform:rotate(45deg); background:#F4B740; border-radius:1px;}
-  .domino-yard:not(.must) .dy-card{filter:saturate(.75) brightness(.9);}
-  .domino-yard.must .dy-card{animation:dyPulse .9s ease-in-out infinite alternate; animation-delay:calc(var(--i) * 45ms);}
-  @keyframes dyPulse{from{transform:translateY(0);} to{transform:translateY(-7px); box-shadow:0 0 12px rgba(244,183,64,.8);}}
-  .dy-card:active{transform:scale(.92);}
-  .dy-empty{color:var(--text-muted); font-weight:800; margin:0 auto;}
-  .dy-sub{font-size:12px; color:var(--text-muted); text-align:center; margin-top:2px; font-weight:700;}
-  .domino-yard.must .dy-sub{color:var(--gold);}
+  /* ===== زرار الكومة الدائري + ورقة السحب ===== */
+  .domino-board-wrap{position:relative; width:100%; max-width:520px; margin:32px auto 0;}
+  .domino-board-wrap .domino-board{margin:0 auto 12px;}
+  .dy-fab-wrap{position:absolute; top:-30px; left:14px; width:60px; height:60px; z-index:4;}
+  .dy-fab{width:100%; height:100%; padding:0; border-radius:50%; border:2.5px solid var(--gold); display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 35% 28%, #B9AEFF 0%, #6C5CE7 72%);
+    box-shadow:0 8px 18px rgba(0,0,0,.5), 0 0 0 4px rgba(16,12,44,.7); transition:transform .15s ease;}
+  .dy-fab svg{width:32px; height:32px; display:block; filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));}
+  .dy-fab:not(:disabled):active{transform:scale(.92);}
+  .dy-fab:disabled{filter:grayscale(.75) brightness(.75); border-color:var(--border);}
+  .dy-fab.empty{filter:grayscale(.85) brightness(.8);}
+  .dy-fab.must{animation:fabPulse 1.1s ease-in-out infinite;}
+  @keyframes fabPulse{
+    0%,100%{box-shadow:0 8px 18px rgba(0,0,0,.5), 0 0 0 4px rgba(244,183,64,.28), 0 0 0 0 rgba(244,183,64,.0);}
+    50%{box-shadow:0 8px 18px rgba(0,0,0,.5), 0 0 0 4px rgba(244,183,64,.5), 0 0 0 12px rgba(244,183,64,.12), 0 0 24px rgba(244,183,64,.75);}}
+  .dy-fab-count{position:absolute; top:-5px; right:-7px; min-width:24px; height:24px; padding:0 5px; box-sizing:border-box; border-radius:12px; background:var(--gold); color:#221900;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; border:2.5px solid #14102f; pointer-events:none;}
+  #domino-yard-layer .dyl-backdrop{position:fixed; inset:0; z-index:57; background:rgba(6,5,20,.62); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); animation:dylFade .25s ease;}
+  #domino-yard-layer .dyl-sheet{position:fixed; left:0; right:0; bottom:0; z-index:58; max-width:480px; margin:0 auto; box-sizing:border-box;
+    background:linear-gradient(170deg, var(--surface), var(--surface-2)); border-radius:26px 26px 0 0; padding:8px 16px calc(22px + env(safe-area-inset-bottom, 0px));
+    border-top:1.5px solid rgba(244,183,64,.55); box-shadow:0 -14px 40px rgba(0,0,0,.5);}
+  #domino-yard-layer .dyl-sheet.anim{animation:dylUp .36s cubic-bezier(.22,1.1,.3,1);}
+  @keyframes dylUp{from{transform:translateY(100%);} to{transform:translateY(0);}}
+  @keyframes dylFade{from{opacity:0;} to{opacity:1;}}
+  .dyl-grab{width:42px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 10px;}
+  .dyl-head{display:flex; align-items:center; justify-content:space-between; font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:var(--text);}
+  .dyl-n{display:inline-block; margin-inline-start:6px; background:var(--violet); color:#fff; border-radius:999px; padding:0 10px; font-size:13px;}
+  .dyl-x{width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:14px; padding:0;}
+  .dyl-msg{text-align:center; font-weight:800; font-size:13.5px; color:var(--text-muted); margin:12px 0 4px; min-height:20px;}
+  .dyl-msg.must{color:var(--gold);}
+  .dyl-reveal{display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 2px; font-weight:800; font-size:13px; color:var(--text-muted);}
+  .dyl-mini{display:inline-block; width:78px; height:39px; padding:2px; box-sizing:border-box; animation:dtPop .4s cubic-bezier(.34,1.56,.64,1);}
+  .dyl-mini-in{display:flex; width:100%; height:100%; border-radius:7px; background:linear-gradient(180deg,#FFFDF6,#EAE3CC); border:1px solid rgba(0,0,0,.3); box-shadow:0 2px 6px rgba(0,0,0,.4); overflow:hidden; box-sizing:border-box;}
+  .dyl-mini-in svg{width:100%; height:100%; display:block;}
+  .dyl-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin:12px 0 4px;}
+  .dyl-card{position:relative; aspect-ratio:2/3; width:100%; padding:0; border-radius:8px; border:1.5px solid rgba(255,255,255,.45);
+    background:linear-gradient(150deg,#B9AEFF,#6C5CE7); box-shadow:0 4px 8px rgba(0,0,0,.35);}
+  .dyl-card::before{content:''; position:absolute; left:14%; right:14%; top:50%; height:2px; margin-top:-1px; background:rgba(255,255,255,.6); border-radius:2px;}
+  .dyl-card::after{content:''; position:absolute; left:50%; top:50%; width:10px; height:10px; margin:-5px 0 0 -5px; transform:rotate(45deg); background:#F4B740; border-radius:2px;}
+  .dyl-card:disabled{opacity:.5; filter:saturate(.5);}
+  .dyl-card.go{animation:dylBob 1s ease-in-out infinite alternate; animation-delay:calc(var(--i) * 55ms); border-color:rgba(244,183,64,.85);}
+  .dyl-card.go:active{transform:scale(.9);}
+  @keyframes dylBob{from{transform:translateY(0);} to{transform:translateY(-5px); box-shadow:0 8px 14px rgba(244,183,64,.45);}}
+  /* ===== إطار اللاعب صاحب الدور ===== */
+  .xo-score-pill.turn{border-color:var(--gold); background:linear-gradient(180deg, rgba(244,183,64,.14), var(--surface)); animation:turnPill 1.8s ease-in-out infinite;}
+  @keyframes turnPill{0%,100%{box-shadow:0 0 0 1px rgba(244,183,64,.35), 0 0 12px rgba(244,183,64,.2);} 50%{box-shadow:0 0 0 1px rgba(244,183,64,.7), 0 0 22px rgba(244,183,64,.5);}}
+  .xo-score-pill.turn .pl-avatar{box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px var(--gold), 0 0 16px 3px rgba(244,183,64,.6);}
+  .xo-score-pill.turn .pl-avatar::before{content:''; position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
+    background:conic-gradient(from 0deg, rgba(244,183,64,0) 0%, #F4B740 30%, #FFF1C2 45%, rgba(244,183,64,0) 60%, #F4B740 85%, rgba(244,183,64,0) 100%);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    animation:turnSpin 2.2s linear infinite;}
+  @keyframes turnSpin{to{transform:rotate(360deg);}}
   /* ===== نتيجة الجولة ===== */
   .domino-result{margin:2px 0 6px; padding:16px 14px 14px; border-radius:18px; text-align:center; border:1.5px solid var(--teal);
     background:linear-gradient(160deg, rgba(63,220,201,.14), rgba(155,140,255,.14)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1);}
@@ -6228,13 +6263,14 @@ function initDominoGame(){
     scoreR:prevScore.r, scoreY:prevScore.y, scoreD:prevScore.d,
     busy:false, pendingIdx:null, passStreak:0,
     mustDraw:false, mustPass:false, note:null, carryNote:null, lastDrawn:null, drawnAnim:false,
+    yardOpen:false, yardAnim:false, yardReveal:false,
     ptsR:0, ptsY:0
   };
 }
 function dominoEndRound(res){
   const g = state.domino;
   g.winner = res.winner; g.blocked = !!res.blocked;
-  g.busy = false; g.mustDraw = false; g.mustPass = false; g.pendingIdx = null;
+  g.busy = false; g.mustDraw = false; g.mustPass = false; g.pendingIdx = null; g.yardOpen = false; g.yardReveal = false;
   g.ptsR = g.hands.R.reduce((s,t)=>s+t.a+t.b,0);
   g.ptsY = g.hands.Y.reduce((s,t)=>s+t.a+t.b,0);
   if(res.winner==='draw'){ g.scoreD++; SND.click(); }
@@ -6266,6 +6302,7 @@ function dominoProcessTurn(silent){
   const ai = dominoIsAiTurn(g);
   g.note = g.carryNote || null; g.carryNote = null;
   g.mustDraw = false; g.mustPass = false;
+  const yardWasOpen = g.yardOpen; g.yardOpen = false; g.yardReveal = false;
   if(dominoHandCanPlay(hand, g.ends)){
     if(ai){
       g.busy = true;
@@ -6290,6 +6327,7 @@ function dominoProcessTurn(silent){
       });
     } else {
       g.busy = false; g.mustDraw = true;
+      g.yardOpen = true; g.yardAnim = !yardWasOpen;   /* الكومة بتفتح لوحدها لما مفيش قطعة تنفع */
       if(!silent) render();
     }
     return;
@@ -6327,7 +6365,7 @@ function dominoPass(){
 function doDominoDraw(){
   const g = state.domino;
   if(!g || g.winner || g.busy || g.pendingIdx!=null || dominoIsAiTurn(g)) return;
-  if(g.boneyard.length===0) return;
+  if(g.boneyard.length===0 || g.yardReveal) return;
   if(dominoHandCanPlay(g.hands[g.turn], g.ends)){
     showToast('عندك قطعة تنفع تلعبها، السحب بس لما مفيش 👌', true);
     return;
@@ -6335,7 +6373,28 @@ function doDominoDraw(){
   const t = dominoDraw(g.turn);
   g.lastDrawn = t; g.drawnAnim = true;
   SND.click();
-  dominoProcessTurn(false);
+  dominoProcessTurn(true);
+  g.yardAnim = false;
+  if(!g.mustDraw){
+    /* اتسحبت قطعة تنفع (أو الكومة خلصت): نعرضها لحظة وبعدين الكومة تتقفل لوحدها */
+    g.yardOpen = true; g.yardReveal = true;
+    render();
+    dominoLater(g, 1100, ()=>{ g.yardOpen = false; g.yardReveal = false; render(); });
+  } else {
+    render();
+  }
+}
+function doDominoYardOpen(){
+  const g = state.domino;
+  if(!g || g.winner || g.busy || dominoIsAiTurn(g)) return;
+  g.yardOpen = true; g.yardAnim = true;
+  render();
+}
+function doDominoYardClose(){
+  const g = state.domino;
+  if(!g) return;
+  g.yardOpen = false; g.yardReveal = false;
+  render();
 }
 function doDominoPass(){
   const g = state.domino;
@@ -6475,29 +6534,57 @@ function dominoBoardHtml(chain, origin, o){
   const G = lay.G;
   const p = v => (v/G*100).toFixed(3)+'%';
   const pos = s => `left:${p(s.x)};top:${p(s.y)};width:${p(s.w)};height:${p(s.h)};`;
+  const pad = (20/G).toFixed(3)+'%';   /* مسافة بين القطع = خُمس سمك القطعة */
   let html = lay.tiles.map(t=>{
     const isNew = o.newId && t.id===o.newId;
-    return `<div class="dt ${t.slot.vert?'v':'h'}${isNew?' new':''}" style="${pos(t.slot)}"><div class="dt-in">${dominoTileSvg(t.a,t.b,t.slot.vert)}</div></div>`;
+    return `<div class="dt ${t.slot.vert?'v':'h'}${isNew?' new':''}" style="${pos(t.slot)}padding:${pad};"><div class="dt-in">${dominoTileSvg(t.a,t.b,t.slot.vert)}</div></div>`;
   }).join('');
   if(o.ghosts && o.ends){
-    const ghost = (slot, side, val)=> slot ? `<div class="dt-ghost ${side==='left'?'gl':'gr'}${o.pick?' pick':''}" style="${pos(slot)}" ${o.pick?`data-action="${o.sideAction}" data-side="${side}"`:''}>${dominoGhostSvg(slot,val)}</div>` : '';
+    const ghost = (slot, side, val)=> slot ? `<div class="dtg-wrap" style="${pos(slot)}padding:${pad};"><div class="dt-ghost ${side==='left'?'gl':'gr'}${o.pick?' pick':''}" ${o.pick?`data-action="${o.sideAction}" data-side="${side}"`:''}>${dominoGhostSvg(slot,val)}</div></div>` : '';
     html += ghost(lay.ghostL, 'left', o.ends.left) + ghost(lay.ghostR, 'right', o.ends.right);
   }
   return `<div class="domino-board"><div class="db-in">${html}</div></div>`;
 }
-function dominoYardHtml(g){
+const DOMINO_FAB_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="8" width="15" height="21" rx="3" transform="rotate(-14 11 18)" fill="#8B7BFF" stroke="#fff" stroke-width="1.6"/><rect x="13" y="4" width="15" height="21" rx="3" transform="rotate(10 20 14)" fill="#B7ABFF" stroke="#fff" stroke-width="1.6"/><path d="M20.5 9.5l3 4.5-3 4.5-3-4.5z" transform="rotate(10 20 14)" fill="#F4B740"/></svg>';
+function dominoFabHtml(g, humanTurn){
   const n = g.boneyard.length;
-  const cards = Array.from({length:n}).map((_,i)=>`<button type="button" class="dy-card" data-action="domino-draw" aria-label="اسحب قطعة" style="--i:${i}"></button>`).join('');
-  let sub;
-  if(g.mustDraw) sub = '👆 اضغط على أي كارت عشان تسحب';
-  else if(n===0) sub = 'الكومة فاضية';
-  else sub = 'اسحب بس لما مفيش قطعة تنفع';
+  const dis = (!humanTurn || g.busy || g.winner) ? 'disabled' : '';
   return `
-    <div class="domino-yard ${g.mustDraw?'must':''}">
-      <div class="dy-head"><span>🎴 كومة السحب</span><span class="dy-count">${n}</span></div>
-      <div class="dy-cards">${n ? cards : '<div class="dy-empty">—</div>'}</div>
-      <div class="dy-sub">${sub}</div>
+    <div class="dy-fab-wrap">
+      <button type="button" class="dy-fab ${g.mustDraw?'must':''} ${n===0?'empty':''}" data-action="domino-yard-open" aria-label="كومة السحب" ${dis}>${DOMINO_FAB_SVG}</button>
+      <span class="dy-fab-count">${n}</span>
     </div>`;
+}
+/* الكومة بتتعرض في طبقة على مستوى الصفحة (خارج #app) عشان الـ fixed ما يتأثرش بحركة انتقال الصفحة */
+function dominoYardLayerHtml(g){
+  if(!g.yardOpen || g.winner) return '';
+  const n = g.boneyard.length;
+  const canPlay = dominoHandCanPlay(g.hands[g.turn], g.ends);
+  const active = g.mustDraw && !g.yardReveal;
+  const drawn = g.lastDrawn;
+  let msg;
+  if(g.yardReveal) msg = g.mustPass ? '❌ مفيش قطعة تنفع والكومة خلصت' : '✅ القطعة دي تنفع، اتضافت لإيدك';
+  else if(g.mustDraw) msg = drawn ? 'لسه مفيش قطعة تنفع، اسحب تاني 👇' : 'مفيش قطعة تنفع معاك، اسحب كارت 👇';
+  else if(canPlay) msg = 'عندك قطعة تنفع تلعبها، مفيش داعي تسحب 👌';
+  else msg = 'الكومة فاضية';
+  const reveal = (drawn && (g.yardReveal || g.mustDraw)) ? `
+      <div class="dyl-reveal"><span>سحبت:</span><span class="dyl-mini"><span class="dyl-mini-in">${dominoTileSvg(drawn.a, drawn.b, false)}</span></span></div>` : '';
+  const cards = Array.from({length:n}).map((_,i)=>`<button type="button" class="dyl-card ${active?'go':''}" data-action="domino-draw" aria-label="اسحب قطعة" style="--i:${i}" ${active?'':'disabled'}></button>`).join('');
+  return `
+    <div class="dyl-backdrop" data-action="domino-yard-close"></div>
+    <div class="dyl-sheet ${g.yardAnim?'anim':''}">
+      <div class="dyl-grab"></div>
+      <div class="dyl-head"><span>🎴 كومة السحب <b class="dyl-n">${n}</b></span><button type="button" class="dyl-x" data-action="domino-yard-close" aria-label="إغلاق">✕</button></div>
+      <div class="dyl-msg ${g.mustDraw?'must':''}">${msg}</div>
+      ${reveal}
+      ${n ? `<div class="dyl-grid">${cards}</div>` : ''}
+    </div>`;
+}
+function dominoSyncYardLayer(html){
+  let el = document.getElementById('domino-yard-layer');
+  if(!html){ if(el) el.remove(); return; }
+  if(!el){ el = document.createElement('div'); el.id = 'domino-yard-layer'; document.body.appendChild(el); }
+  el.innerHTML = html;
 }
 function renderDominoGame(){
   if(!state.domino) initDominoGame();
@@ -6518,6 +6605,8 @@ function renderDominoGame(){
   const activeHand = g.hands[activePlayer];
   const drawnT = g.drawnAnim ? g.lastDrawn : null;
   g.drawnAnim = false;
+  dominoSyncYardLayer(dominoYardLayerHtml(g));
+  g.yardAnim = false;
   const handHtml = activeHand.map((t,i)=>{
     const sides = isHumanInteractive ? dominoPlayableSides(t, g.ends) : [];
     const playable = sides.length>0;
@@ -6533,7 +6622,7 @@ function renderDominoGame(){
       ? (g.blocked ? '🤖 اتقفلت اللعبة وفاز الجهاز بأقل نقط' : '🤖 فاز الجهاز، حظ أوفر!')
       : (g.blocked ? '🟡 اتقفلت اللعبة وفاز اللاعب 2 بأقل نقط' : '🟡 فاز اللاعب 2! خلص قطعه الأول');
   else if(g.pendingIdx!=null) statusText = 'القطعة دي بتتحط في الطرفين، اختار فين 👇';
-  else if(g.mustDraw) statusText = '🎴 مفيش قطعة تنفع، اسحب من الكومة 👇';
+  else if(g.mustDraw) statusText = '🎴 مفيش قطعة تنفع، اسحب من الكومة';
   else if(g.mustPass) statusText = '⛔ مفيش قطعة تنفع والكومة فاضية';
   else if(g.busy) statusText = g.note || '🤖 الجهاز بيفكر...';
   else statusText = (g.note ? g.note+'<br>' : '') + activeLabel;
@@ -6560,18 +6649,21 @@ function renderDominoGame(){
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="domino-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
     <div class="xo-score-row">
-      ${scorePill(gameAvatar(state.pid), g.scoreR)}
+      ${scorePill(gameAvatar(state.pid), g.scoreR, '', !g.winner && g.turn==='R')}
       <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
-      ${g.mode==='ai' ? scorePill(gameAiAvatar(), g.scoreY, 'o') : `<div class="xo-score-pill o"><span>🟡 لاعب 2</span><b>${g.scoreY}</b></div>`}
+      ${g.mode==='ai' ? scorePill(gameAiAvatar(), g.scoreY, 'o', !g.winner && g.turn==='Y') : `<div class="xo-score-pill o${(!g.winner && g.turn==='Y')?' turn':''}"><span>🟡 لاعب 2</span><b>${g.scoreY}</b></div>`}
     </div>
     <div class="domino-opp-row">
       <span class="domino-opp-label">${inactiveLabel} • ${inactiveCount} قطعة</span>
       <div class="domino-opp-tiles">${backTiles}</div>
     </div>
     ${g.winner ? '' : `<div class="xo-status">${statusText}</div>`}
-    ${boardHtml}
+    <div class="domino-board-wrap">
+      ${g.winner ? '' : dominoFabHtml(g, humanTurn)}
+      ${boardHtml}
+    </div>
     ${pendingButtons}
-    ${g.winner ? resultHtml : dominoYardHtml(g)}
+    ${g.winner ? resultHtml : ''}
     ${passHtml}
     <div class="domino-hand-label">${g.mode==='2p' ? (activePlayer==='R'?'قطع اللاعب 1 (انت):':'قطع اللاعب 2 (مرر الجهاز له):') : 'قطعك:'}</div>
     <div class="domino-hand">${handHtml}</div>
@@ -6598,8 +6690,8 @@ function gameAiAvatar(badgeText, size, dotColorId){
   else if(badgeText) badge = `<i class="pl-badge">${badgeText}</i>`;
   return `<div class="pl-avatar pl-ai ${size||''}">🤖${badge}</div>`;
 }
-function scorePill(avatarHtml, score, cls){
-  return `<div class="xo-score-pill has-av ${cls||''}">${avatarHtml}<b>${score}</b></div>`;
+function scorePill(avatarHtml, score, cls, active){
+  return `<div class="xo-score-pill has-av ${cls||''}${active?' turn':''}">${avatarHtml}<b>${score}</b></div>`;
 }
 
 /* ---- Connect Four colors (each player picks their own disc color) ---- */
@@ -9545,6 +9637,7 @@ function render(){
     if(_rm && _rm.status==='playing') html += roomEmojiBar();
   }
   app.innerHTML = html;
+  if(state.view!=='game-domino') dominoSyncYardLayer('');
   updateTeamTint();
   playPageTransition(app, state.view==='welcome' ? 'fade' : state.navDir);
   state.navDir = null;
@@ -10892,6 +10985,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='domino-tile'){ doDominoTileTap(parseInt(el.dataset.idx,10)); }
   else if(action==='domino-side'){ doDominoChooseSide(el.dataset.side); }
   else if(action==='domino-draw'){ doDominoDraw(); }
+  else if(action==='domino-yard-open'){ doDominoYardOpen(); }
+  else if(action==='domino-yard-close'){ doDominoYardClose(); }
   else if(action==='domino-pass'){ doDominoPass(); }
   else if(action==='domino-mode'){
     const m = el.dataset.mode;
