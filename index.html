@@ -7022,6 +7022,7 @@ function ludoBoardSvg(active){
   s += '<radialGradient id="lb-bg" cx="50%" cy="42%" r="75%"><stop offset="0%" stop-color="#FFFDF6"/><stop offset="70%" stop-color="#F9F1DD"/><stop offset="100%" stop-color="#EFE2C0"/></radialGradient>';
   s += '<linearGradient id="lb-card" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FBF3E1"/></linearGradient>';
   s += '<linearGradient id="lb-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE8A8"/><stop offset="55%" stop-color="#F4B740"/><stop offset="100%" stop-color="#C6871F"/></linearGradient>';
+  s += '<radialGradient id="lb-socket" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#00000022"/><stop offset="75%" stop-color="#00000010"/><stop offset="100%" stop-color="#00000000"/></radialGradient>';
   LUDO_PAL.forEach((pal,c)=>{
     s += `<linearGradient id="lb-c${c}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${pal.a}"/><stop offset="100%" stop-color="${pal.b}"/></linearGradient>`;
   });
@@ -7031,12 +7032,14 @@ function ludoBoardSvg(active){
     const pal = LUDO_PAL[c], on = active.has(c), op = on?1:.32;
     s += `<rect x="${b[0]}" y="${b[1]}" width="6" height="6" fill="url(#lb-c${c})" opacity="${op}"/>`;
     s += `<rect x="${b[0]+.06}" y="${b[1]+.06}" width="5.88" height="5.88" fill="none" stroke="${pal.b}" stroke-width=".1" opacity="${on?.5:.22}"/>`;
-    s += `<rect x="${b[0]+.8}" y="${b[1]+.8}" width="4.4" height="4.4" rx=".85" fill="url(#lb-card)" stroke="${pal.soft}" stroke-width=".07" opacity="${on?1:.55}"/>`;
-    s += `<rect x="${b[0]+1}" y="${b[1]+1}" width="4" height="1.35" rx=".65" fill="#FFFFFF" opacity="${on?.4:.18}"/>`;
+    s += `<rect x="${b[0]+.7}" y="${b[1]+.7}" width="4.6" height="4.6" rx="1" fill="url(#lb-card)" stroke="${pal.soft}" stroke-width=".07" opacity="${on?1:.55}"/>`;
+    s += `<rect x="${b[0]+.92}" y="${b[1]+.92}" width="4.16" height="1.3" rx=".6" fill="#FFFFFF" opacity="${on?.35:.15}"/>`;
     LUDO_BASE_SLOTS[c].forEach(sl=>{
-      s += `<ellipse cx="${sl[0]}" cy="${sl[1]+.42}" rx=".62" ry=".16" fill="#000000" opacity="${on?.16:.07}"/>`;
-      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".74" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".13" opacity="${on?1:.5}"/>`;
-      s += `<circle cx="${(sl[0]-.2).toFixed(2)}" cy="${(sl[1]-.22).toFixed(2)}" r=".22" fill="#FFFFFF" opacity="${on?.55:.28}"/>`;
+      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".98" fill="url(#lb-socket)"/>`;
+      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".98" fill="none" stroke="${pal.b}" stroke-width=".05" opacity="${on?.28:.14}"/>`;
+      s += `<ellipse cx="${sl[0]}" cy="${sl[1]+.4}" rx=".58" ry=".15" fill="#000000" opacity="${on?.18:.08}"/>`;
+      s += `<circle cx="${sl[0]}" cy="${sl[1]}" r=".7" fill="url(#lb-c${c})" stroke="#FFFFFF" stroke-width=".13" opacity="${on?1:.5}"/>`;
+      s += `<circle cx="${(sl[0]-.19).toFixed(2)}" cy="${(sl[1]-.21).toFixed(2)}" r=".21" fill="#FFFFFF" opacity="${on?.55:.28}"/>`;
     });
   });
   LUDO_TRACK.forEach((c,i)=>{
