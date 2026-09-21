@@ -5791,7 +5791,14 @@ function renderGamesHub(){
 /* ============================= GAMES: WATCH THE BATTLE (مشاهدة المعركة) ============================= */
 function liveRoomsList(){
   return Object.values(GAME_ROOMS||{})
-    .filter(r=> r && r.status==='playing')
+    .filter(r=>{
+      if(!r || r.status!=='playing') return false;
+      // استبعاد الغرف اللي المعركة خلصت فيها فعليًا (فيه فايز/انتهت) حتى لو لسه موجودة قبل ما اللاعبين يخرجوا
+      if(r.game==='ludo') return !(r.ludo && r.ludo.phase==='over');
+      if(r.finished) return false;
+      if(r.winner) return false;
+      return true;
+    })
     .sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
 }
 function watchRoomNames(room){
