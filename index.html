@@ -2419,6 +2419,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .lp-chip.left{opacity:.4; filter:grayscale(.85);}
   .lp-chip.left .lp-name{text-decoration:line-through;}
   .lp-left-badge{font-size:9.5px; font-weight:800; color:var(--text-muted);}
+  /* عداد دائري حوالين صورة اللاعب اللي عليه الدور */
+  .lp-avatar-wrap{position:relative; width:42px; height:42px; margin:0 auto;}
+  .lp-turnring{position:absolute; inset:-5px; width:52px; height:52px; transform:rotate(-90deg); pointer-events:none; overflow:visible;}
+  .lp-turnring-bg{fill:none; stroke:rgba(255,255,255,.14); stroke-width:3;}
+  .lp-turnring-fg{fill:none; stroke:var(--pc); stroke-width:3; stroke-linecap:round; stroke-dasharray:131.95;
+    filter:drop-shadow(0 0 4px rgba(var(--pr),.65));
+    animation-name:lpRingDeplete; animation-timing-function:linear; animation-fill-mode:forwards;}
+  @keyframes lpRingDeplete{ from{stroke-dashoffset:0;} to{stroke-dashoffset:131.95;} }
   .lp-name{font-size:11.5px; font-weight:800; margin-top:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 3px; color:var(--text);}
   .lp-meta{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;}
   .lp-dots{display:inline-flex; gap:3px;}
@@ -7143,6 +7151,15 @@ function ludoAvatarHtml(s){
   if(s.type==='bot') return gameAiAvatar();
   return `<div class="pl-avatar" style="background:linear-gradient(145deg,${pal.a},${pal.b});color:#fff;">${escapeHtml((s.name||'؟').trim().charAt(0))}</div>`;
 }
+/* عداد دائري احترافي حوالين صورة اللاعب اللي عليه الدور، بيفضى تدريجيًا لحد ما الوقت يخلص */
+function ludoTurnRingHtml(remainMs, totalMs){
+  const dur = Math.max(.05, totalMs/1000);
+  const elapsed = Math.min(totalMs, Math.max(0, totalMs-remainMs));
+  return `<svg class="lp-turnring" viewBox="0 0 48 48" aria-hidden="true">
+    <circle class="lp-turnring-bg" cx="24" cy="24" r="21"></circle>
+    <circle class="lp-turnring-fg" cx="24" cy="24" r="21" style="animation-duration:${dur.toFixed(2)}s; animation-delay:${(-elapsed/1000).toFixed(2)}s;"></circle>
+  </svg>`;
+}
 function ludoPlayersHtml(L, ctx){
   const chips = L.seats.map((s,i)=>{
     const pal = LUDO_PAL[s.color];
@@ -7150,8 +7167,10 @@ function ludoPlayersHtml(L, ctx){
     const homeN = ludoHomeCount(L,i);
     const dots = [0,1,2,3].map(k=>`<span class="lp-dot${k<homeN?' on':''}"></span>`).join('');
     const mine = ctx.mode==='room' && ctx.me===i;
+    const ring = (turn && ctx.mode==='room' && ctx.turnDeadline)
+      ? ludoTurnRingHtml(Math.max(0, ctx.turnDeadline-Date.now()), LUDO_IDLE_MS) : '';
     return `<div class="lp-chip${turn?' turn':''}${s.left?' left':''}" id="lp-${i}" style="--pc:${pal.solid};--pr:${pal.rgb};">
-      ${ludoAvatarHtml(s)}
+      <div class="lp-avatar-wrap">${ring}${ludoAvatarHtml(s)}</div>
       <div class="lp-name">${escapeHtml(s.name)}${mine?' (انت)':''}</div>
       <div class="lp-meta">${s.left?'<span class="lp-left-badge">🚪 خرج</span>':`<span class="lp-dots">${dots}</span><b class="lp-wins" title="مرات الفوز">🏆${L.scores[i]}</b>`}</div>
     </div>`;
@@ -7568,20 +7587,23 @@ function renderRoomLudo(){
   const ctx = ludoRoomCtx(room);
   const L = room.ludo;
   const spectator = ctx.me<0 ? '<div class="hint" style="text-align:center;margin-top:8px;">👀 بتتفرج على اللعبة</div>' : '';
-  /* لو صاحب الدور غاب أكتر من دقيقة، أي لاعب يقدر يتخطّى دوره عشان اللعبة ماتقفش */
-  let skip = '';
+  /* لو صاحب الدور غاب، دوره يتخطّى تلقائيًا بعد المهلة (يظهر عداد دائري حوالين صورته) */
   clearTimeout(state.ludoSkipT);
-  if(ctx.me>=0 && L.phase!=='over' && L.turn!==ctx.me){
+  if(L.phase!=='over'){
     const idle = Date.now() - (room.updatedAt||0);
-    if(idle>LUDO_IDLE_MS){
-      skip = `<button type="button" class="btn btn-outline" style="margin-top:6px;" data-action="room-ludo-skip">⏭️ ${escapeHtml(L.seats[L.turn].name)} غايب؟ تخطّى دوره</button>`;
-    } else {
-      state.ludoSkipT = setTimeout(()=>{ if(state.view==='room-ludo') render(); }, LUDO_IDLE_MS - idle + 300);
+    const remain = LUDO_IDLE_MS - idle;
+    ctx.turnDeadline = (room.updatedAt||Date.now()) + LUDO_IDLE_MS;
+    if(ctx.me>=0 && L.turn!==ctx.me){
+      if(remain<=0){
+        state.ludoSkipT = setTimeout(()=>{ if(state.view==='room-ludo') doRoomLudoSkip(); }, 0);
+      } else {
+        state.ludoSkipT = setTimeout(()=>{ if(state.view==='room-ludo') render(); }, remain + 300);
+      }
     }
   }
-  return roomHead('لودو', room) + ludoPlayHtml(L, ctx) + skip + spectator;
+  return roomHead('لودو', room) + ludoPlayHtml(L, ctx) + spectator;
 }
-const LUDO_IDLE_MS = 60000;
+const LUDO_IDLE_MS = 30000;
 async function doRoomLudoSkip(){
   GAME_ROOMS = await loadGameRooms();
   const room = GAME_ROOMS[state.roomCode];
