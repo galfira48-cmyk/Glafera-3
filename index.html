@@ -2416,6 +2416,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:conic-gradient(from 0deg, rgba(var(--pr),0) 0%, var(--pc) 30%, #fff 45%, rgba(var(--pr),0) 60%, var(--pc) 85%, rgba(var(--pr),0) 100%);
     -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
     animation:turnSpin 2.2s linear infinite;}
+  .lp-chip.left{opacity:.4; filter:grayscale(.85);}
+  .lp-chip.left .lp-name{text-decoration:line-through;}
+  .lp-left-badge{font-size:9.5px; font-weight:800; color:var(--text-muted);}
   .lp-name{font-size:11.5px; font-weight:800; margin-top:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 3px; color:var(--text);}
   .lp-meta{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;}
   .lp-dots{display:inline-flex; gap:3px;}
@@ -6928,7 +6931,11 @@ function ludoApply(L, seat, t){
   return {from, to, cap, home, won, d, extra: (d===6 || cap.length>0 || home)};
 }
 function ludoNextTurn(L){
-  L.turn = (L.turn+1) % L.n;
+  let guard = 0;
+  do{
+    L.turn = (L.turn+1) % L.n;
+    guard++;
+  }while(L.seats[L.turn] && L.seats[L.turn].left && guard<=L.n);
   L.phase = 'roll'; L.dice = null; L.sixes = 0; L.movable = [];
 }
 function ludoProgress(L, seat){ return L.pos[seat].reduce((s,p)=>s+p,0); }
@@ -7139,14 +7146,14 @@ function ludoAvatarHtml(s){
 function ludoPlayersHtml(L, ctx){
   const chips = L.seats.map((s,i)=>{
     const pal = LUDO_PAL[s.color];
-    const turn = L.phase!=='over' && L.turn===i;
+    const turn = L.phase!=='over' && L.turn===i && !s.left;
     const homeN = ludoHomeCount(L,i);
     const dots = [0,1,2,3].map(k=>`<span class="lp-dot${k<homeN?' on':''}"></span>`).join('');
     const mine = ctx.mode==='room' && ctx.me===i;
-    return `<div class="lp-chip${turn?' turn':''}" id="lp-${i}" style="--pc:${pal.solid};--pr:${pal.rgb};">
+    return `<div class="lp-chip${turn?' turn':''}${s.left?' left':''}" id="lp-${i}" style="--pc:${pal.solid};--pr:${pal.rgb};">
       ${ludoAvatarHtml(s)}
       <div class="lp-name">${escapeHtml(s.name)}${mine?' (انت)':''}</div>
-      <div class="lp-meta"><span class="lp-dots">${dots}</span><b class="lp-wins" title="مرات الفوز">🏆${L.scores[i]}</b></div>
+      <div class="lp-meta">${s.left?'<span class="lp-left-badge">🚪 خرج</span>':`<span class="lp-dots">${dots}</span><b class="lp-wins" title="مرات الفوز">🏆${L.scores[i]}</b>`}</div>
     </div>`;
   }).join('');
   return `<div class="ludo-players" id="ludo-players" style="grid-template-columns:repeat(${L.n},1fr)">${chips}</div>`;
@@ -7659,7 +7666,9 @@ async function doRoomLudoNext(){
   const L = room && room.ludo;
   if(!L || L.phase!=='over') return;
   if(L.seats.findIndex(s=>s.pid===state.pid)<0) return;
-  room.ludo = ludoNew(L.seats, L.scores.slice(), (L.round+1) % L.n, L.round+1);
+  let starter = (L.round+1) % L.n, sg = 0;
+  while(L.seats[starter] && L.seats[starter].left && sg<L.n){ starter = (starter+1) % L.n; sg++; }
+  room.ludo = ludoNew(L.seats, L.scores.slice(), starter, L.round+1);
   roomTouch(room);
   await saveGameRooms(GAME_ROOMS);
   render();
@@ -7811,10 +7820,108 @@ async function joinGameRoom(code){
   startRoomPolling();
   go('room-'+room.game);
 }
-function leaveGameRoom(){
+const LEAVE_ROOM_PENALTY = 50;
+let leaveRoomTimer = null;
+function confirmLeaveGameRoom(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing'){ leaveGameRoom(); return; }
+  showLeaveRoomWarning();
+}
+function showLeaveRoomWarning(){
+  const old = document.getElementById('leave-room-overlay');
+  if(old) old.remove();
+  if(leaveRoomTimer){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; }
+  let secs = 30;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay confirm-overlay';
+  overlay.id = 'leave-room-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-card">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-msg">هتخرج من الغرفة؟ هتخسر ${LEAVE_ROOM_PENALTY} نقطة ودورك هيتلغي في الحال</div>
+      <div class="confirm-sub" id="leave-room-countdown">هيتلغي دورك تلقائيًا بعد <b>${secs}</b> ثانية لو محدش رد</div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" id="leave-room-stay-btn">أكمل اللعب</button>
+        <button type="button" class="btn btn-primary" id="leave-room-yes-btn" style="background:linear-gradient(95deg,var(--danger),#e0644f); color:#fff;">نعم، اخرج</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const cleanup = ()=>{
+    if(leaveRoomTimer){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; }
+    const el = document.getElementById('leave-room-overlay');
+    if(el) el.remove();
+  };
+  const doLeave = ()=>{
+    cleanup();
+    applyLeaveRoomPenalty();
+    leaveGameRoom();
+  };
+  document.getElementById('leave-room-stay-btn').addEventListener('click', cleanup);
+  document.getElementById('leave-room-yes-btn').addEventListener('click', doLeave);
+  leaveRoomTimer = setInterval(()=>{
+    secs--;
+    const lbl = document.getElementById('leave-room-countdown');
+    if(!lbl){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; return; }
+    if(secs<=0){ doLeave(); return; }
+    lbl.innerHTML = `هيتلغي دورك تلقائيًا بعد <b>${secs}</b> ثانية لو محدش رد`;
+  }, 1000);
+}
+async function applyLeaveRoomPenalty(){
+  if(!state.pid) return;
+  BONUS[state.pid] = (BONUS[state.pid]||0) - LEAVE_ROOM_PENALTY;
+  try{
+    await saveBonus(BONUS);
+    pushNotification(state.pid, `🚪 خسرت ${LEAVE_ROOM_PENALTY} نقطة بسبب الخروج من غرفة اللعب أثناء الدور`, '⚠️');
+  }catch(e){}
+  showToast(`تم خصم ${LEAVE_ROOM_PENALTY} نقطة`, true);
+}
+async function leaveGameRoom(){
+  const code = state.roomCode;
   stopRoomPolling();
   state.roomCode = null;
   goBack();
+  if(!code) return;
+  try{
+    GAME_ROOMS = await loadGameRooms();
+    const room = GAME_ROOMS[code];
+    if(!room) return;
+    if(room.game==='ludo'){
+      const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
+        || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
+      room.players = (room.players||[]).filter(p=>p.id!==state.pid);
+      if(room.ludo){
+        const L = room.ludo;
+        const myIdx = L.seats.findIndex(s=>s.pid===state.pid);
+        if(myIdx>=0 && !L.seats[myIdx].left){
+          L.seats[myIdx].left = true;
+          const activeLeft = L.seats.filter(s=>!s.left).length;
+          if(activeLeft<2){
+            delete GAME_ROOMS[code];
+          } else {
+            if(L.phase!=='over' && L.turn===myIdx) ludoNextTurn(L);
+            L.msg = '🚪 ' + myName + ' خرج من اللعبة';
+            roomTouch(room);
+          }
+        }
+      } else {
+        // still in the lobby, game hasn't started yet
+        if(room.players.length===0){
+          delete GAME_ROOMS[code];
+        } else {
+          if(room.hostId===state.pid){
+            room.hostId = room.players[0].id;
+            room.hostName = room.players[0].name;
+          }
+          roomTouch(room);
+        }
+      }
+    } else {
+      // 2-player rooms: with only two seats, one leaving means no one is left to continue
+      delete GAME_ROOMS[code];
+    }
+    await saveGameRooms(GAME_ROOMS);
+  }catch(e){}
 }
 async function doRoomXoMove(idx){
   GAME_ROOMS = await loadGameRooms();
@@ -11960,7 +12067,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='friend-tile-close'){ setFriendTile(state.friendTile==='join' ? 'menu' : null); }
   else if(action==='create-room'){ createGameRoom(el.dataset.game); }
   else if(action==='join-room'){ const inp = document.getElementById('room-join-code'); joinGameRoom(ghNormalizeDigits(inp?inp.value:'')); }
-  else if(action==='leave-room'){ leaveGameRoom(); }
+  else if(action==='leave-room'){ confirmLeaveGameRoom(); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
   else if(action==='room-domino-tile'){ doRoomDominoMove(parseInt(el.dataset.idx,10)); }
