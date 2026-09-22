@@ -2227,6 +2227,38 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @media (max-width:520px){ .emoji-bar{flex-wrap:wrap; max-width:calc(6*40px + 5*6px + 24px);} }
   @keyframes emojiSent{0%{transform:scale(1);} 40%{transform:scale(1.35) translateY(-4px);} 100%{transform:scale(1);}}
   @keyframes emojiRing{from{transform:scale(.9); opacity:.9;} to{transform:scale(1.75); opacity:0;}}
+
+  /* ---------- room chat widget: floating tab + slide panel ---------- */
+  .room-chat-widget{position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:75; direction:ltr;}
+  .room-chat-tab{position:absolute; right:0; top:50%; transform:translateY(-50%); width:34px; height:66px; border:1px solid rgba(255,255,255,.25);
+    border-radius:16px 0 0 16px; background:linear-gradient(180deg, var(--gold), var(--gold-2)); color:#221a4d; font-size:19px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; box-shadow:-6px 6px 18px rgba(0,0,0,.35);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:filter .15s ease;}
+  .room-chat-tab:active{filter:brightness(.92);}
+  .room-chat-panel{position:absolute; right:34px; top:50%; transform:translateY(-50%) translateX(100%); opacity:0; pointer-events:none;
+    width:236px; max-width:66vw; max-height:min(420px,72vh); overflow-y:auto; direction:rtl; padding:12px;
+    background:linear-gradient(180deg, rgba(50,42,124,.94), rgba(24,19,66,.96)); border:1px solid rgba(255,255,255,.14);
+    border-radius:18px 0 0 18px; backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4);
+    box-shadow:0 16px 38px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.14);
+    transition:transform .3s cubic-bezier(.32,1.1,.4,1), opacity .22s ease;}
+  .room-chat-panel.open{transform:translateY(-50%) translateX(0); opacity:1; pointer-events:auto;}
+  .room-chat-emoji-row{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid var(--border);}
+  .room-chat-emoji-row .emoji-btn{width:34px; height:34px; font-size:18px;}
+  .room-chat-msgs-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;}
+  .room-chat-msg-btn{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:10px; padding:7px 6px; font-size:11.5px;
+    font-weight:800; color:var(--text); cursor:pointer; line-height:1.25; -webkit-tap-highlight-color:transparent;}
+  .room-chat-msg-btn:active{transform:scale(.94); background:rgba(244,183,64,.18); border-color:rgba(244,183,64,.5);}
+  .room-chat-input-row{display:flex; gap:6px; align-items:center;}
+  .room-chat-input-row .field{flex:1; margin:0; padding:8px 10px; font-size:12.5px;}
+  .room-chat-send{flex:none; width:34px; height:34px; border-radius:50%; border:1px solid rgba(244,183,64,.5); background:var(--gold); color:#221a4d;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transform:rotate(180deg); padding:0;}
+  .room-chat-send:active{filter:brightness(.92);}
+  @media (max-width:380px){ .room-chat-panel{width:200px;} }
+
+  .react-float.is-text .rf-emoji{width:auto; height:auto; min-width:44px; max-width:170px; border-radius:14px; padding:7px 12px; font-size:13px;
+    font-weight:800; font-family:inherit; color:var(--text); background:linear-gradient(180deg, rgba(50,42,124,.94), rgba(24,19,66,.96));
+    border:1px solid rgba(244,183,64,.55); box-shadow:0 8px 20px rgba(0,0,0,.4); white-space:normal; text-align:center; line-height:1.3;}
+  .react-toast .rt-text{font-weight:800; font-size:13px; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   #react-layer{position:fixed; inset:0; pointer-events:none; z-index:10002; overflow:hidden;}
   .react-float{position:absolute; bottom:96px; display:flex; flex-direction:column; align-items:center; gap:6px; animation:reactUp 2.6s cubic-bezier(.2,.7,.3,1) forwards;}
   .react-float .rf-emoji{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif; width:84px; height:84px; border-radius:50%; font-size:52px; line-height:1;
@@ -2285,37 +2317,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes rtIn{from{opacity:0; transform:translateY(-12px) scale(.92);} to{opacity:1; transform:translateY(0) scale(1);}}
   @keyframes rtOut{to{opacity:0; transform:translateY(-8px) scale(.94);}}
 
-  /* ---------- تفرقيع البيضة على شاشة الخصم ---------- */
-  .egg-splat-wrap{position:absolute; inset:0; pointer-events:none; overflow:hidden;}
-  .egg-falling{position:absolute; left:50%; top:-14%; font-size:38px; transform:translateX(-50%);
-    animation:eggFall .46s cubic-bezier(.5,0,.85,.4) forwards; filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));}
-  @keyframes eggFall{0%{top:-14%; transform:translateX(-50%) rotate(0deg);} 100%{top:42%; transform:translateX(-50%) rotate(260deg);}}
-  .egg-yolk{position:absolute; left:50%; top:42%; width:12px; height:12px; border-radius:48% 52% 55% 45%/55% 48% 52% 45%;
-    transform:translate(-50%,-50%) scale(0);
-    background:radial-gradient(circle at 35% 30%, #fff8dc, #ffd23f 55%, #e8a821 100%);
-    box-shadow:0 0 0 9px rgba(255,246,208,.14), 0 0 22px rgba(244,183,64,.35);
-    animation:yolkPop .4s cubic-bezier(.3,1.6,.5,1) .46s forwards;}
-  @keyframes yolkPop{0%{transform:translate(-50%,-50%) scale(0);} 65%{transform:translate(-50%,-50%) scale(8.5) rotate(6deg);} 100%{transform:translate(-50%,-50%) scale(6.5) rotate(0); opacity:.88;}}
-  .egg-bit{position:absolute; left:50%; top:42%; font-size:15px; opacity:0; animation:eggBit .75s ease .46s forwards;}
-  @keyframes eggBit{0%{opacity:0; transform:translate(-50%,-50%) scale(.3) rotate(0);} 14%{opacity:1;}
-    100%{opacity:0; transform:translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) rotate(var(--br)) scale(1);}}
-  .egg-drip{position:absolute; top:0; width:var(--dw); border-radius:0 0 60% 60%; opacity:0;
-    background:linear-gradient(180deg,#ffe27a,#f4b740); box-shadow:inset 0 -4px 6px rgba(0,0,0,.12);
-    animation:eggDrip 1.5s ease .5s forwards;}
-  @keyframes eggDrip{0%{height:0; opacity:0;} 18%{opacity:.95;} 100%{height:var(--dh); opacity:.85;}}
-  .egg-caption{position:absolute; left:50%; top:calc(42% + 44px); transform:translateX(-50%); direction:rtl; white-space:nowrap;
-    font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#fff;
-    background:rgba(20,17,40,.82); padding:6px 13px; border-radius:999px; border:1px solid rgba(244,183,64,.45);
-    opacity:0; animation:eggCapIn .3s ease .5s forwards, eggCapOut .3s ease 1.85s forwards;}
-  @keyframes eggCapIn{to{opacity:1;}}
-  @keyframes eggCapOut{to{opacity:0; transform:translateX(-50%) translateY(-4px);}}
-  @keyframes eggShake{0%,100%{transform:translate(0,0);} 20%{transform:translate(-6px,3px);} 40%{transform:translate(5px,-4px);}
-    60%{transform:translate(-4px,2px);} 80%{transform:translate(3px,-2px);}}
-  #app.egg-shake{animation:eggShake .38s ease;}
   @media (prefers-reduced-motion:reduce){
     .react-toast{animation-duration:.01s;}
-    .egg-falling, .egg-yolk, .egg-bit, .egg-drip, .egg-caption{animation-duration:.01s; animation-delay:0s;}
-    #app.egg-shake{animation:none;}
   }
   .c4-vs-player{display:flex; flex-direction:column; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--text-muted);}
   .c4-dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
@@ -10698,9 +10701,24 @@ function renderRoomMath(){
 
 
 /* ============================= ROOMS: VS INTRO + EMOJI REACTIONS ============================= */
-const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','😂','😨','🤨','🥚','🌹','👍'];
-function roomEmojiBar(){
-  return `<div class="emoji-bar">${ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('')}</div>`;
+const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','😂','😨','🤨','🌹','👍'];
+const ROOM_QUICK_MSGS = ['أهلاً! 👋','مبروك! 🎉','يلا بسرعة!','دورك!','حظ سعيد! 🍀','برافو عليك!','ايه ده! 😅','لعبة تانية؟'];
+function roomChatWidget(){
+  const open = !!state.roomChatOpen;
+  const emojiBtns = ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('');
+  const msgBtns = ROOM_QUICK_MSGS.map(m=>`<button type="button" class="room-chat-msg-btn" data-action="room-quick-msg" data-msg="${escapeHtml(m)}">${escapeHtml(m)}</button>`).join('');
+  return `
+  <div class="room-chat-widget">
+    <button type="button" class="room-chat-tab" data-action="toggle-room-chat" aria-label="شات">${open ? ICO.chev : '💬'}</button>
+    <div class="room-chat-panel ${open?'open':''}">
+      <div class="room-chat-emoji-row">${emojiBtns}</div>
+      <div class="room-chat-msgs-grid">${msgBtns}</div>
+      <div class="room-chat-input-row">
+        <input type="text" id="room-chat-free-input" class="field" placeholder="اكتب أي حاجة تتبعت..." maxlength="60" />
+        <button type="button" class="room-chat-send" data-action="room-chat-send-free" aria-label="إرسال">${ICO.chev}</button>
+      </div>
+    </div>
+  </div>`;
 }
 function vsPhotoHtml(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
@@ -10737,94 +10755,66 @@ function roomMaybeIntro(){
   vibrate([15,40,25]);
   setTimeout(close, 3600);
 }
-/* تفاعل الخصم: لو بيضة، تتفرقع بشكل مضحك على شاشته. غير كدا، تظهر بشكل هادي واحترافي (توست صغير فوق) */
-function showOpponentReaction(emoji, pid){
-  if(emoji==='🥚'){ showEggSplat(pid); return; }
-  showReactionToast(emoji, pid);
+/* تفاعل الخصم: يظهر بشكل هادي واحترافي (توست صغير فوق) */
+function showOpponentReaction(content, pid, kind){
+  showReactionToast(content, pid, kind);
 }
-function showReactionToast(emoji, pid){
+function showReactionToast(content, pid, kind){
   let layer = document.getElementById('react-toast-layer');
   if(!layer){ layer = document.createElement('div'); layer.id = 'react-toast-layer'; document.body.appendChild(layer); }
   const p = PARTICIPANTS.find(x=>x.id===pid);
   const name = p ? p.name.split(' ')[0] : 'حد في الغرفة';
   const el = document.createElement('div');
   el.className = 'react-toast';
-  el.innerHTML = `${gameAvatar(pid)}<span class="rt-name">${escapeHtml(name)}</span><span class="rt-emoji">${emoji}</span>`;
+  const contentHtml = kind==='text' ? `<span class="rt-text">${escapeHtml(content)}</span>` : `<span class="rt-emoji">${content}</span>`;
+  el.innerHTML = `${gameAvatar(pid)}<span class="rt-name">${escapeHtml(name)}</span>${contentHtml}`;
   layer.appendChild(el);
   tone(720, 0.08, 'sine', 0.05);
   setTimeout(()=>{ el.classList.add('out'); }, 1900);
   setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2250);
 }
-/* تفرقيع البيضة: بيضة بتقع من فوق وتتفرقع فجأة مع رشقات صفار وقطر وهزة خفيفة للشاشة */
-function showEggSplat(pid){
-  let layer = document.getElementById('react-layer');
-  if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
-  const p = PARTICIPANTS.find(x=>x.id===pid);
-  const name = p ? p.name.split(' ')[0] : 'حد في الغرفة';
-  const wrap = document.createElement('div');
-  wrap.className = 'egg-splat-wrap';
-  let bits = '';
-  for(let i=0;i<9;i++){
-    const ang = Math.random()*360;
-    const dist = 46 + Math.random()*95;
-    const bx = Math.round(Math.cos(ang*Math.PI/180)*dist);
-    const by = Math.round(Math.sin(ang*Math.PI/180)*dist);
-    bits += `<span class="egg-bit" style="--bx:${bx}px;--by:${by}px;--br:${Math.round(Math.random()*180-90)}deg">${Math.random()>0.55?'💦':'🟡'}</span>`;
-  }
-  let drips = '';
-  for(let i=0;i<6;i++){
-    const x = 10 + Math.random()*80;
-    const h = 46 + Math.random()*84;
-    const w = 9 + Math.random()*9;
-    const delay = (Math.random()*0.12).toFixed(2);
-    drips += `<span class="egg-drip" style="left:${x}%; --dh:${h}px; --dw:${w}px; animation-delay:${delay}s"></span>`;
-  }
-  wrap.innerHTML = `
-    <div class="egg-falling">🥚</div>
-    <span class="egg-yolk"></span>
-    ${bits}
-    ${drips}
-    <div class="egg-caption">😂 ${escapeHtml(name)} رماكلك بيضة!</div>
-  `;
-  layer.appendChild(wrap);
-  vibrate([10,50,10,70,40]);
-  setTimeout(()=>{
-    tone(140, 0.05, 'square', 0.05);
-    setTimeout(()=>tone(80, 0.16, 'sawtooth', 0.07), 40);
-    const app = document.getElementById('app');
-    if(app){ app.classList.remove('egg-shake'); void app.offsetWidth; app.classList.add('egg-shake'); setTimeout(()=>app.classList.remove('egg-shake'), 420); }
-  }, 460);
-  setTimeout(()=>{ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 2300);
-}
-function showReactionFloat(emoji, pid){
-  if(pid && pid!==state.pid){ showOpponentReaction(emoji, pid); return; }
+function showReactionFloat(content, pid, kind){
+  if(pid && pid!==state.pid){ showOpponentReaction(content, pid, kind); return; }
   let layer = document.getElementById('react-layer');
   if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
   const el = document.createElement('div');
-  el.className = 'react-float';
+  el.className = 'react-float' + (kind==='text' ? ' is-text' : '');
   el.style.left = (14 + Math.random()*62) + '%';
   el.style.setProperty('--dx', (Math.random()*80-40).toFixed(0)+'px');
-  el.innerHTML = `<span class="rf-emoji">${emoji}</span>${gameAvatar(pid)}`;
+  const contentHtml = kind==='text' ? escapeHtml(content) : content;
+  el.innerHTML = `<span class="rf-emoji">${contentHtml}</span>${gameAvatar(pid)}`;
   layer.appendChild(el);
   vibrate(12);
   setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2700);
 }
 let lastReactTs = 0;
-async function sendRoomReaction(emoji, btn){
-  if(!state.roomCode || ROOM_EMOJIS.indexOf(emoji)<0) return;
+async function sendRoomReaction(content, btn, kind){
+  kind = kind==='text' ? 'text' : 'emoji';
+  if(kind==='emoji' && ROOM_EMOJIS.indexOf(content)<0) return;
+  if(kind==='text'){ content = String(content||'').trim().slice(0,60); if(!content) return; }
+  if(!state.roomCode) return;
   const now = Date.now();
   if(now-lastReactTs<1100) return;
   lastReactTs = now;
   if(btn){ btn.classList.remove('sent'); void btn.offsetWidth; btn.classList.add('sent'); }
-  const payload = {n: now+'-'+Math.random().toString(36).slice(2,6), by: state.pid, emoji};
+  const payload = {n: now+'-'+Math.random().toString(36).slice(2,6), by: state.pid, kind, content, emoji: kind==='emoji'?content:undefined};
   state.roomReactSeen = payload.n;
-  showReactionFloat(emoji, state.pid);
+  showReactionFloat(content, state.pid, kind);
+  state.roomChatOpen = false;
+  render();
   try{ await window.storage.set('glavera-react-'+state.roomCode, JSON.stringify(payload), true); }catch(e){}
+}
+function doSendRoomFreeText(){
+  const input = document.getElementById('room-chat-free-input');
+  const text = input ? input.value.trim() : '';
+  if(!text) return;
+  if(input) input.value = '';
+  sendRoomReaction(text, null, 'text');
 }
 let reactPollInterval = null;
 function startReactPolling(){
   stopReactPolling();
-  state.roomReactInit = false; state.roomReactSeen = null;
+  state.roomReactInit = false; state.roomReactSeen = null; state.roomChatOpen = false;
   reactPollInterval = setInterval(async ()=>{
     if(!state.roomCode) return;
     let p = null;
@@ -10832,7 +10822,9 @@ function startReactPolling(){
     if(!state.roomReactInit){ state.roomReactInit = true; if(p) state.roomReactSeen = p.n; return; } // ما نعيدش تفاعلات قديمة
     if(p && p.n!==state.roomReactSeen){
       state.roomReactSeen = p.n;
-      if(p.by!==state.pid && ROOM_EMOJIS.indexOf(p.emoji)>-1) showReactionFloat(p.emoji, p.by);
+      const kind = p.kind==='text' ? 'text' : 'emoji';
+      const content = kind==='text' ? p.content : (p.emoji || p.content);
+      if(p.by!==state.pid && (kind==='text' ? !!content : ROOM_EMOJIS.indexOf(content)>-1)) showReactionFloat(content, p.by, kind);
     }
   }, 1200);
 }
@@ -12884,7 +12876,7 @@ function render(){
   else if(state.view==='admin') html = renderAdmin();
   if(String(state.view).indexOf('room-')===0 && state.roomCode){
     const _rm = GAME_ROOMS[state.roomCode];
-    if(_rm && _rm.status==='playing') html += roomEmojiBar();
+    if(_rm && _rm.status==='playing') html += roomChatWidget();
     if(state.roomSpectate) html = spectateBannerHtml(_rm) + html;
   }
   app.innerHTML = html;
@@ -14052,6 +14044,10 @@ document.addEventListener('keydown', (e)=>{
     e.preventDefault();
     attemptJoinRoom(e.target.value);
   }
+  if(e.key==='Enter' && e.target && e.target.id==='room-chat-free-input'){
+    e.preventDefault();
+    doSendRoomFreeText();
+  }
 });
 document.addEventListener('click', (e)=>{
   const el = e.target.closest('[data-action]');
@@ -14252,7 +14248,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-domino-next'){ doRoomDominoNext(); }
   else if(action==='room-rps-pick'){ doRoomRpsPick(el.dataset.choice); }
   else if(action==='room-rps-next'){ doRoomRpsNext(); }
-  else if(action==='room-react'){ sendRoomReaction(el.dataset.emoji, el); }
+  else if(action==='room-react'){ sendRoomReaction(el.dataset.emoji, el, 'emoji'); }
+  else if(action==='room-quick-msg'){ sendRoomReaction(el.dataset.msg, el, 'text'); }
+  else if(action==='room-chat-send-free'){ doSendRoomFreeText(); }
+  else if(action==='toggle-room-chat'){ state.roomChatOpen = !state.roomChatOpen; render(); }
   else if(action==='room-c4-color'){ doRoomC4Color(el.dataset.color); }
   else if(action==='room-c4-col'){ doRoomC4Move(parseInt(el.dataset.col,10)); }
   else if(action==='room-c4-next'){ doRoomC4Next(); }
