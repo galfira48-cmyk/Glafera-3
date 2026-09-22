@@ -2499,29 +2499,51 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .uno-card.uno-back{background:linear-gradient(155deg,#F3392E,#C4141B 60%,#8E0E13); box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 0 3px #fff, inset 0 0 0 4.5px rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center;}
   .uno-back-logo{font-family:'Cairo',sans-serif; font-weight:900; font-style:italic; font-size:15px; letter-spacing:-.5px; color:#fff; -webkit-text-stroke:1px rgba(0,0,0,.35); transform:rotate(-16deg);}
   .uno-card.mini .uno-back-logo{font-size:9px;}
-  .uno-card.playable{cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 14px rgba(244,183,64,.55);}
-  .uno-card.playable:active{transform:translateY(-8px);}
+  .uno-card.playable{cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 14px rgba(244,183,64,.55); animation:unoCardGlow 1.3s ease-in-out infinite;}
+  @keyframes unoCardGlow{0%,100%{box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 10px rgba(244,183,64,.4);} 50%{box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 4px var(--gold), 0 0 22px rgba(244,183,64,.85);}}
+  .uno-card.playable:active{transform:translateY(-8px) scale(1.04); animation:none;}
   .uno-card.dim{opacity:.42;}
+  .uno-card.uno-just-landed{animation:unoCardLand .32s cubic-bezier(.2,.9,.32,1.4);}
+  @keyframes unoCardLand{0%{transform:scale(.3) rotate(-40deg) translateY(-30px); opacity:0;} 70%{transform:scale(1.08) rotate(6deg);} 100%{transform:none; opacity:1;}}
+  .uno-card.uno-just-drawn{animation:unoCardDrawIn .3s cubic-bezier(.2,.9,.32,1.4);}
+  @keyframes unoCardDrawIn{0%{transform:translateY(34px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
   .uno-bottom-row{position:absolute; left:0; right:0; bottom:8px; display:flex; align-items:flex-end; gap:8px; padding:0 10px; z-index:4;}
   .uno-call-btn{flex-shrink:0; width:70px; height:70px; border-radius:50%; border:3px solid #fff; background:radial-gradient(circle at 35% 30%, #ff8a7a, #d6301e 70%); color:#fff;
     font-family:'Cairo',sans-serif; font-weight:900; font-size:11px; line-height:1.15; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
     box-shadow:0 6px 16px rgba(0,0,0,.45); text-shadow:0 1px 3px rgba(0,0,0,.4);}
   .uno-call-btn.is-active{animation:unoPulse .8s infinite; box-shadow:0 0 0 4px rgba(255,217,61,.5), 0 6px 16px rgba(0,0,0,.45);}
   .uno-call-btn:disabled{opacity:.42; cursor:default; animation:none;}
-  .uno-hand-scroller{flex:1; display:flex; gap:5px; overflow-x:auto; padding:6px 2px 4px; -webkit-overflow-scrolling:touch; align-items:flex-end;}
-  .uno-hand-scroller .uno-card{transition:transform .15s;}
+  .uno-hand-scroller{flex:1; display:flex; justify-content:center; overflow-x:auto; padding:14px 2px 4px; -webkit-overflow-scrolling:touch; align-items:flex-end;}
+  .uno-hand-card-wrap{flex-shrink:0; margin:0 -13px; transform:translateY(var(--fan-y,0px)) rotate(var(--fan-rot,0deg)); transition:transform .15s; position:relative;}
+  .uno-hand-card-wrap:hover{ z-index:20 !important; transform:translateY(calc(var(--fan-y,0px) - 10px)) rotate(var(--fan-rot,0deg)); }
+  .uno-hand-scroller .uno-card{transition:transform .15s, box-shadow .15s;}
   .uno-hand-count{flex-shrink:0; font-size:10.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); align-self:center; white-space:nowrap;}
   .uno-actions-row{position:absolute; bottom:98px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:5;}
   .uno-color-overlay{position:absolute; inset:0; z-index:60; background:rgba(6,5,20,.68); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; animation:dylFade .2s ease;}
   .uno-color-card{background:var(--surface); border-radius:20px; padding:20px; width:240px; max-width:70%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
   .uno-color-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:var(--text); margin-bottom:14px;}
-  .uno-color-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .uno-color-btn{border:none; border-radius:14px; height:50px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);}
-  .uno-color-btn[data-color="red"]{background:linear-gradient(150deg,#FF6B6B,#C81E3A);}
-  .uno-color-btn[data-color="yellow"]{background:linear-gradient(150deg,#FFE066,#E0A400);}
-  .uno-color-btn[data-color="green"]{background:linear-gradient(150deg,#79D989,#1E8E3E);}
-  .uno-color-btn[data-color="blue"]{background:linear-gradient(150deg,#63A4FF,#1450B8);}
-  .uno-color-btn:active{transform:scale(.94);}
+  .uno-color-wheel{position:relative; width:170px; height:170px; margin:4px auto 0; border-radius:50%;
+    background:conic-gradient(from -45deg, #F3392E 0 25%, #FFDA1E 0 50%, #3FBE4C 0 75%, #2E8CE0 0 100%);
+    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 0 0 5px rgba(255,255,255,.9), inset 0 0 0 8px rgba(0,0,0,.15);
+    animation:unoWheelIn .35s cubic-bezier(.2,.9,.32,1.4);}
+  @keyframes unoWheelIn{0%{transform:scale(.4) rotate(-120deg); opacity:0;} 100%{transform:none; opacity:1;}}
+  .uno-color-wheel::after{content:''; position:absolute; inset:38%; background:var(--surface); border-radius:50%; box-shadow:inset 0 0 0 3px rgba(0,0,0,.1); pointer-events:none;}
+  .uno-color-btn{position:absolute; width:50%; height:50%; border:none; background:transparent; cursor:pointer;}
+  .uno-color-btn:active{filter:brightness(1.3);}
+  .uno-color-btn[data-color="red"]{top:0; right:50%; clip-path:polygon(100% 100%, 0 0, 100% 0);}
+  .uno-color-btn[data-color="yellow"]{top:0; left:50%; clip-path:polygon(0 100%, 0 0, 100% 0);}
+  .uno-color-btn[data-color="blue"]{bottom:0; right:50%; clip-path:polygon(100% 0, 0 100%, 100% 100%);}
+  .uno-color-btn[data-color="green"]{bottom:0; left:50%; clip-path:polygon(0 0, 0 100%, 100% 100%);}
+  .uno-fx-banner{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:12; pointer-events:none;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; color:#fff; text-shadow:0 3px 10px rgba(0,0,0,.6), 0 0 20px rgba(0,0,0,.4);
+    padding:10px 26px; border-radius:16px; white-space:nowrap; animation:unoFxPop .9s cubic-bezier(.2,.9,.32,1.4) forwards;}
+  @keyframes unoFxPop{0%{transform:translate(-50%,-50%) scale(.3) rotate(-8deg); opacity:0;} 22%{transform:translate(-50%,-50%) scale(1.15) rotate(2deg); opacity:1;} 75%{transform:translate(-50%,-50%) scale(1) rotate(0); opacity:1;} 100%{transform:translate(-50%,-50%) scale(1.1) rotate(0); opacity:0;}}
+  .uno-fx-banner.fx-red{background:radial-gradient(circle,#FF6B6B,#C81E3A);}
+  .uno-fx-banner.fx-yellow{background:radial-gradient(circle,#FFE066,#E0A400); color:#3A2400;}
+  .uno-fx-banner.fx-green{background:radial-gradient(circle,#79D989,#1E8E3E);}
+  .uno-fx-banner.fx-blue{background:radial-gradient(circle,#63A4FF,#1450B8);}
+  .uno-fx-banner.fx-skip{background:radial-gradient(circle,#666,#111);}
+  .uno-fx-banner.fx-plus{background:radial-gradient(circle,#FF8A3D,#C8471E); font-size:38px;}
   .uno-win-overlay{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; padding:20px;}
   .uno-win-card{width:min(320px,84%); padding:20px 16px 16px; border-radius:18px; text-align:center; border:1.5px solid var(--gold);
     background:linear-gradient(160deg, rgba(244,183,64,.94), rgba(255,107,107,.88)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1); box-shadow:0 20px 50px rgba(0,0,0,.5);}
@@ -8311,7 +8333,7 @@ function unoCardHtml(card, opts){
   }
   const color = card.color==='wild' ? (card.chosen || 'wild') : card.color;
   const v = unoCardVisual(card);
-  const cls = ['uno-card', opts.mini?'mini':'', opts.selectable?'playable':'', opts.dim?'dim':''].filter(Boolean).join(' ');
+  const cls = ['uno-card', opts.mini?'mini':'', opts.selectable?'playable':'', opts.dim?'dim':'', opts.extraCls||''].filter(Boolean).join(' ');
   if(opts.selectable){
     return `<button type="button" class="${cls}" data-color="${color}" data-action="${opts.action}" data-cid="${card.id}">
       <span class="uno-oval"></span><span class="uno-corner tl">${v}</span><span class="uno-center-pip">${v}</span><span class="uno-corner br">${v}</span>
@@ -8430,6 +8452,8 @@ function unoPlayCard(g, key, cardId, chosenColor){
     g.winner = key;
     g.wins = g.wins || {};
     g.wins[key] = (g.wins[key]||0)+1;
+    g._fxSeq = (g._fxSeq||0)+1;
+    g.lastFx = {seq:g._fxSeq, type:card.type, color:card.chosen||card.color||g.color};
     return true;
   }
   const curIdx = g.turnIdx;
@@ -8446,6 +8470,8 @@ function unoPlayCard(g, key, cardId, chosenColor){
     unoDrawN(g, g.players[nxt].key, 4);
     unoAdvance(g,true);
   } else { unoAdvance(g,false); }
+  g._fxSeq = (g._fxSeq||0)+1;
+  g.lastFx = {seq:g._fxSeq, type:card.type, color:card.chosen||card.color||g.color};
   return true;
 }
 function unoBotTakeTurn(g, key){
@@ -8476,6 +8502,33 @@ function unoBotTakeTurn(g, key){
   }
   if(g.hands[key] && g.hands[key].length===1) g.unoCalledFlag = true;
 }
+const UNO_FX_SEEN = {};
+function unoFxInfo(fx){
+  switch(fx.type){
+    case 'skip': return {text:'⛔ سكيب', cls:'fx-skip', snd:'unoSkip'};
+    case 'reverse': return {text:'🔄 عكس', cls:'fx-skip', snd:'unoReverse'};
+    case 'draw2': return {text:'+2', cls:'fx-plus', snd:'unoDrawPenalty'};
+    case 'wild4': return {text:'+4', cls:'fx-plus', snd:'unoDrawPenalty'};
+    case 'wild': return {text:UNO_COLOR_NAMES[fx.color]||'', cls:'fx-'+(fx.color||'wild'), snd:'unoWild'};
+    default: return null;
+  }
+}
+function unoMaybeShowFx(g){
+  if(!g || !g.lastFx) return;
+  const key = (state.roomCode||'local');
+  if((UNO_FX_SEEN[key]||0) >= g.lastFx.seq) return;
+  UNO_FX_SEEN[key] = g.lastFx.seq;
+  const info = unoFxInfo(g.lastFx);
+  if(!info) return;
+  try{ SND[info.snd] && SND[info.snd](); }catch(e){}
+  const mount = document.querySelector('.uno-stage .uno-center');
+  if(!mount) return;
+  const el = document.createElement('div');
+  el.className = 'uno-fx-banner '+info.cls;
+  el.textContent = info.text;
+  mount.appendChild(el);
+  setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 950);
+}
 function unoAlive(g){ return state.uno===g && state.view==='game-uno'; }
 function unoLater(g, ms, fn){ setTimeout(()=>{ if(!unoAlive(g) || g.winner) return; fn(); }, ms); }
 function unoRunBots(g, silent){
@@ -8486,6 +8539,7 @@ function unoRunBots(g, silent){
   unoLater(g, 850, ()=>{
     unoBotTakeTurn(g, cur.key);
     render();
+    unoMaybeShowFx(g);
     if(g.winner){ vibrate([20,20,30]); SND.coinChime(); }
     else unoRunBots(g);
   });
@@ -8521,9 +8575,11 @@ function doUnoPlay(cardId){
     render();
     return;
   }
-  SND.click();
+  g._justDrew = false;
+  SND.unoPlay(card);
   unoPlayCard(g, 'me', cardId);
   render();
+  unoMaybeShowFx(g);
   if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
   else unoRunBots(g);
 }
@@ -8532,9 +8588,11 @@ function doUnoColorChoice(color){
   const pick = state.unoColorPick;
   if(!g || !pick) return;
   state.unoColorPick = null;
-  SND.click();
+  g._justDrew = false;
+  SND.unoPlay({type:'wild'});
   unoPlayCard(g, 'me', pick.cardId, color);
   render();
+  unoMaybeShowFx(g);
   if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
   else unoRunBots(g);
 }
@@ -8546,7 +8604,8 @@ function doUnoDraw(){
   const card = unoDrawOne(g);
   if(card) g.hands.me.push(card);
   g.drewThisTurn = true;
-  SND.click();
+  g._justDrew = true;
+  SND.unoDraw();
   render();
 }
 function doUnoEndTurn(){
@@ -8584,7 +8643,7 @@ function unoColorOverlayHtml(prefix){
   return `<div class="uno-color-overlay">
     <div class="uno-color-card">
       <div class="uno-color-title">🎨 اختار لون</div>
-      <div class="uno-color-grid">
+      <div class="uno-color-wheel">
         ${UNO_COLORS.map(c=>`<button type="button" class="uno-color-btn" data-color="${c}" data-action="${prefix}uno-color"></button>`).join('')}
       </div>
     </div>
@@ -8613,9 +8672,14 @@ function unoTableHtml(g, myKey, prefix){
   const canAct = !g.winner && g.players[g.turnIdx].key===myKey;
   const meP = g.players.find(p=>p.key===myKey) || {};
   const isMyTurn = !g.winner && g.players[g.turnIdx].key===myKey;
-  const handHtml = myHand.map(c=>{
+  const handN = myHand.length;
+  const handHtml = myHand.map((c,i)=>{
     const sel = canAct && unoCardPlayable(g,c);
-    return unoCardHtml(c, {selectable:sel, action:prefix+'uno-play'});
+    const justDrawn = i===handN-1 && g._justDrew && (!g._justDrewBy || g._justDrewBy===myKey) ? 'uno-just-drawn' : '';
+    const off = i - (handN-1)/2;
+    const rot = Math.max(-24, Math.min(24, off*7));
+    const ty = Math.abs(off)*3;
+    return `<div class="uno-hand-card-wrap" style="--fan-rot:${rot}deg; --fan-y:${ty}px; z-index:${i};">${unoCardHtml(c, {selectable:sel, action:prefix+'uno-play', extraCls:justDrawn})}</div>`;
   }).join('');
   const drawDisabled = !canAct || g.drewThisTurn;
   const showEndTurn = canAct && g.drewThisTurn;
@@ -8630,7 +8694,7 @@ function unoTableHtml(g, myKey, prefix){
     <div class="uno-center">
       ${unoDirArrowsHtml(g.dir)}
       <div class="uno-discard-stack">
-        ${unoCardHtml(top,{})}
+        ${unoCardHtml(top,{extraCls:'uno-just-landed'})}
         <div class="uno-color-dot" style="background:${UNO_GRAD(g.color)}"></div>
       </div>
       <button type="button" class="uno-draw-pile" data-action="${prefix}uno-draw" ${drawDisabled?'disabled':''}>
@@ -9293,8 +9357,8 @@ function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval
    عشان يبقوا أوضح وأعلى من غير ما "يفرقع" أو يتشوه. */
 const VOICE = { enabled:false, roomCode:null, myId:null, rawStream:null, sendStream:null, audioCtx:null, muted:false, peers:{}, peersRef:null, peersCb:null };
 const VOICE_ICE_SERVERS = [{ urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302'] }];
-const VOICE_INPUT_GAIN = 2.4;   // تكبير صوت ميكروفوني قبل ما يتبعت لأصحابي
-const VOICE_OUTPUT_GAIN = 1.6;  // تكبير إضافي لصوت اللي بييجي من كل واحد فيهم
+const VOICE_INPUT_GAIN = 1.6;   // تكبير صوت ميكروفوني قبل ما يتبعت لأصحابي (متوسط عشان ميبوظش/يتقطعش)
+const VOICE_OUTPUT_GAIN = 1.5;  // تكبير صوت اللي بييجي من كل واحد فيهم (تكبير واحد بس، مش مضاعف)
 
 function voiceRoot(roomCode){ return _fbDb ? _fbDb.ref(_FB_ROOT+'/voice_signal/'+_fbEncodeKey(roomCode)) : null; }
 function _voiceIsInitiator(myId, otherId){ return String(myId) < String(otherId); }
@@ -9460,22 +9524,28 @@ function voiceEnsurePeer(otherId, isInitiator){
 
   pc.ontrack = (ev)=>{
     const remoteStream = ev.streams[0];
-    // الصوت الأساسي بيشتغل عادي من هنا على طول (مضمون، مش متوقف على AudioContext)...
     audioEl.srcObject = remoteStream;
     audioEl.volume = 1;
+    // مهم: بنخرّج صوت الشخص التاني من مصدر واحد بس (مش الـ audio element + مسار Web Audio منفصل مع بعض)
+    // كان في السابق الصوت بيتشغل مرتين في نفس الوقت (مرة من الـ <audio> ومرة من AudioContext.destination)،
+    // وده اللي كان بيسبب صدى/تكرار عالي في الصوت وبيوصل تاني للميكروفون كـ"إكو". دلوقتي بنستخدم
+    // createMediaElementSource اللي بياخد مخرج الـ audio element نفسه ويوجهه لمسار واحد بس (Gain -> Limiter -> السماعة).
+    if(!peer._graphNodes){
+      try{
+        let ctx = VOICE.audioCtx;
+        if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); VOICE.audioCtx = ctx; }
+        ctx.resume().catch(()=>{});
+        const srcNode = ctx.createMediaElementSource(audioEl); // ده بياخد تحكم كامل في مخرج العنصر، فمفيش تكرار صوت خالص
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = VOICE_OUTPUT_GAIN;
+        const limiter = _voiceLimiter(ctx);
+        srcNode.connect(gainNode).connect(limiter).connect(ctx.destination);
+        peer._graphNodes = {srcNode, gainNode, limiter};
+      }catch(e){
+        // لو المتصفح مايدعمش createMediaElementSource، الصوت هيفضل شغال عادي من الـ audio element بس (مسار واحد برضه، من غير تكبير زيادة)
+      }
+    }
     audioEl.play().catch(()=>{});
-    // ...وفوقه بنضيف تكبير إضافي (Gain+Limiter) لو المتصفح سمح، عشان الصوت يبقى أعلى من كده
-    try{
-      let ctx = VOICE.audioCtx;
-      if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); VOICE.audioCtx = ctx; }
-      ctx.resume().catch(()=>{});
-      const srcNode = ctx.createMediaStreamSource(remoteStream);
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = Math.max(0, VOICE_OUTPUT_GAIN - 1); // إضافي فوق الصوت العادي اللي أصلاً شغال من الـ audio element
-      const limiter = _voiceLimiter(ctx);
-      srcNode.connect(gainNode).connect(limiter).connect(ctx.destination);
-      peer._graphNodes = {srcNode, gainNode, limiter}; // نمسك مرجع عشان الـ nodes ما تتمسحش
-    }catch(e){}
     if(peer.stopMeter) peer.stopMeter();
     peer.stopMeter = voiceAttachSpeakingMeter(remoteStream, (speaking)=>{ peer.speaking = speaking; });
   };
@@ -9680,11 +9750,13 @@ async function doRoomUnoPlay(cardId){
     render();
     return;
   }
-  SND.click();
+  G._justDrew = false;
+  SND.unoPlay(card);
   unoPlayCard(G, state.pid, cardId);
   roomTouch(room);
   await saveGameRooms(GAME_ROOMS);
   render();
+  unoMaybeShowFx(G);
   if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
 }
 async function doRoomUnoColorChoice(color){
@@ -9697,11 +9769,13 @@ async function doRoomUnoColorChoice(color){
   const G = room.uno;
   const cur = G.players[G.turnIdx];
   if(!cur || cur.key!==state.pid) return;
-  SND.click();
+  G._justDrew = false;
+  SND.unoPlay({type:'wild'});
   unoPlayCard(G, state.pid, pick.cardId, color);
   roomTouch(room);
   await saveGameRooms(GAME_ROOMS);
   render();
+  unoMaybeShowFx(G);
   if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
 }
 async function doRoomUnoDraw(){
@@ -9715,7 +9789,8 @@ async function doRoomUnoDraw(){
   const card = unoDrawOne(G);
   if(card) (G.hands[state.pid]=G.hands[state.pid]||[]).push(card);
   G.drewThisTurn = true;
-  SND.click();
+  G._justDrew = true; G._justDrewBy = state.pid;
+  SND.unoDraw();
   roomTouch(room);
   await saveGameRooms(GAME_ROOMS);
   render();
@@ -13218,6 +13293,30 @@ const SND = {
     [392.00,523.25,659.25,783.99,987.77].forEach((f,i)=>{
       setTimeout(()=>luxTone(f, .5, 'sine', .09, {chorus:true, wet:.3, cutoff:7000}), i*90);
     });
+  },
+  unoPlay(card){
+    whooshSweep(false, .12);
+    const t = card && card.type;
+    if(t==='number' || !t) setTimeout(()=>luxTone(640, .1, 'sine', .05, {cutoff:2200, wet:.18}), 60);
+  },
+  unoDraw(){
+    whooshSweep(true, .09);
+    setTimeout(()=>luxTone(300, .08, 'sine', .04, {cutoff:1500, wet:.15}), 40);
+  },
+  unoSkip(){
+    luxTone(180, .16, 'sawtooth', .08, {wet:.14});
+    setTimeout(()=>luxTone(130, .16, 'sawtooth', .07, {wet:.14}), 70);
+  },
+  unoReverse(){
+    luxTone(500, .09, 'triangle', .06, {wet:.16});
+    setTimeout(()=>luxTone(380, .09, 'triangle', .06, {wet:.16}), 60);
+    setTimeout(()=>luxTone(500, .09, 'triangle', .06, {wet:.16}), 120);
+  },
+  unoWild(){
+    [523.25,659.25,783.99].forEach((f,i)=> setTimeout(()=>luxTone(f, .18, 'triangle', .06, {chorus:true, wet:.22}), i*55));
+  },
+  unoDrawPenalty(){
+    [1,2,3].forEach(i=> setTimeout(()=>luxTone(220-i*20, .12, 'sawtooth', .07, {wet:.15}), i*70));
   },
   fanfare(){
     tick(.6);
