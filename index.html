@@ -1123,35 +1123,46 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .trash-empty-btn{margin-bottom:12px;}
 
   /* ============================= FEE / PAYMENT MODAL (room create/join) ============================= */
-  .fee-overlay{background:rgba(4,3,14,.86); padding:18px; z-index:210;}
-  .fee-card{position:relative; width:100%; max-width:330px; border-radius:26px; overflow:hidden;
-    background:radial-gradient(circle at 50% 0%, #2A2160, #0E0D2B 68%);
-    border:1px solid rgba(255,222,148,.25); box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,222,148,.06) inset;
+  .fee-overlay{background:rgba(4,3,14,.88); padding:18px; z-index:210;}
+  .fee-card{position:relative; width:100%; max-width:340px; border-radius:28px; overflow:hidden;
+    background:#0E0D2B; border:1px solid rgba(255,222,148,.22); box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,222,148,.05) inset;
     animation:confirmPop .25s ease;}
   .fee-close{position:absolute; top:10px; left:10px; width:30px; height:30px; border-radius:50%; border:none;
-    background:rgba(255,255,255,.1); color:var(--text); font-size:15px; display:flex; align-items:center; justify-content:center; z-index:5; cursor:pointer;}
-  .fee-stage{position:relative; height:172px; display:flex; align-items:center; justify-content:center; overflow:hidden;
-    background:radial-gradient(circle at 50% 45%, #FFE9A8 0%, #FFC94D 30%, #F4A227 55%, #C97A17 78%, #8B4F0E 100%);}
-  .fee-rays{position:absolute; inset:-40%; background:repeating-conic-gradient(from 0deg, rgba(255,255,255,.22) 0deg 9deg, transparent 9deg 18deg);
-    animation:feeSpin 14s linear infinite; opacity:.55;}
+    background:rgba(0,0,0,.35); color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; z-index:6; cursor:pointer;}
+  .fee-stage{position:relative; height:236px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    background:radial-gradient(circle at 50% 42%, #FFF3C4 0%, #FFDD66 22%, #FFC12E 42%, #F49B1C 62%, #D9760F 82%, #A85408 100%);}
+  .fee-rays{position:absolute; inset:-55%; background:repeating-conic-gradient(from 0deg, rgba(255,255,255,.30) 0deg 8deg, transparent 8deg 18deg);
+    animation:feeSpin 16s linear infinite; opacity:.65;}
+  .fee-rays.r2{background:repeating-conic-gradient(from 9deg, rgba(255,150,20,.18) 0deg 6deg, transparent 6deg 20deg); animation-duration:24s; animation-direction:reverse;}
   @keyframes feeSpin{ to{ transform:rotate(360deg); } }
-  .fee-badge{position:relative; z-index:2; width:112px; height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-    background:linear-gradient(160deg,#4FC3F7,#1E63E0 55%,#123E9C); color:#fff;
-    clip-path:polygon(0% 8%,10% 0%,20% 8%,30% 0%,40% 8%,50% 0%,60% 8%,70% 0%,80% 8%,90% 0%,100% 8%,100% 92%,90% 100%,80% 92%,70% 100%,60% 92%,50% 100%,40% 92%,30% 100%,20% 92%,10% 100%,0% 92%);
-    box-shadow:0 10px 26px rgba(10,30,80,.45); animation:feePop .35s ease .05s both;}
-  @keyframes feePop{from{opacity:0; transform:scale(.7) translateY(8px);} to{opacity:1; transform:scale(1) translateY(0);}}
-  .fee-badge::before{content:''; position:absolute; inset:9px; border:2px dashed rgba(255,255,255,.55); border-radius:6px; pointer-events:none;}
-  .fee-badge-coin{font-size:26px; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));}
-  .fee-badge-amount{font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; letter-spacing:.5px; text-shadow:0 2px 4px rgba(0,0,0,.3);}
-  .fee-badge-unit{font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; opacity:.9;}
-  .fee-body{padding:18px 20px 20px; text-align:center;}
-  .fee-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:var(--text);}
+  .fee-ticket-wrap{position:relative; z-index:2; width:168px; height:206px; animation:feePop .38s cubic-bezier(.2,1.4,.4,1) .05s both;}
+  @keyframes feePop{from{opacity:0; transform:scale(.65) rotate(-6deg);} to{opacity:1; transform:scale(1) rotate(-3deg);}}
+  .fee-ticket-notch{clip-path:polygon(0% 6%,9% 0%,18% 6%,27% 0%,36% 6%,45% 0%,50% 4%,55% 0%,64% 6%,73% 0%,82% 6%,91% 0%,100% 6%,100% 94%,91% 100%,82% 94%,73% 100%,64% 94%,55% 100%,50% 96%,45% 100%,36% 94%,27% 100%,18% 94%,9% 100%,0% 94%);}
+  .fee-ticket-outline{position:absolute; inset:0; background:#0B1633;}
+  .fee-ticket{position:absolute; inset:5px; background:linear-gradient(160deg,#7FE3FF 0%,#3FA8F5 38%,#1E63E0 68%,#123E9C 100%);
+    display:flex; align-items:center; justify-content:center;}
+  .fee-ticket::before{content:''; position:absolute; inset:14px; border:2.5px dashed rgba(255,255,255,.55); border-radius:4px; pointer-events:none;}
+  .fee-ticket-shine{position:absolute; inset:5px; background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.4) 44%, transparent 58%); pointer-events:none;}
+  .fee-ticket-amount{position:relative; z-index:2; font-family:'Cairo',sans-serif; font-weight:900; font-size:64px; line-height:1; color:#fff; letter-spacing:-2px;
+    text-shadow:-3px -3px 0 #0F2E80, 3px -3px 0 #0F2E80, -3px 3px 0 #0F2E80, 3px 3px 0 #0F2E80, 0 3px 0 #0F2E80, 0 -3px 0 #0F2E80, -3px 0 0 #0F2E80, 3px 0 0 #0F2E80, 0 8px 12px rgba(0,0,0,.4);}
+  .fee-unit-chip{position:relative; z-index:3; margin-top:-14px; align-self:center; display:inline-flex; align-items:center; gap:5px;
+    background:#1B1444; border:1.5px solid rgba(255,222,148,.4); border-radius:999px; padding:5px 14px;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:12.5px; color:var(--gold-2); box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .fee-stage-foot{position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; z-index:3;}
+  .fee-body{padding:16px 22px 22px; text-align:center;}
+  .fee-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; color:var(--text);}
   .fee-msg{font-family:'Cairo',sans-serif; font-weight:700; font-size:13px; color:var(--text-muted); margin-top:6px; line-height:1.7;}
   .fee-balance{display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:6px 14px; border-radius:999px;
     background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.3); font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:var(--gold-2);}
-  .fee-actions{display:flex; gap:10px; margin-top:18px;}
-  .fee-actions .btn{padding:13px; margin:0; font-size:14.5px;}
-  .fee-pay-btn{background:linear-gradient(95deg,#FFC94D,#F4A227); color:#241300; box-shadow:0 10px 22px rgba(244,162,39,.35);}
+  .fee-actions{display:flex; gap:10px; margin-top:20px;}
+  .fee-actions .btn{padding:14px; margin:0; font-size:15px; font-weight:900; border-radius:16px; border:none; position:relative;
+    transition:transform .08s ease, box-shadow .08s ease;}
+  .fee-actions .btn:active{transform:translateY(3px);}
+  .fee-back-btn{background:linear-gradient(180deg,#3A3570,#242052); color:var(--text); box-shadow:0 5px 0 #16123B, 0 10px 18px rgba(0,0,0,.35);}
+  .fee-back-btn:active{box-shadow:0 2px 0 #16123B, 0 4px 10px rgba(0,0,0,.3);}
+  .fee-pay-btn{background:linear-gradient(180deg,#FFE9A8 0%,#FFC94D 45%,#F4A227 100%); color:#241300;
+    box-shadow:0 5px 0 #B9740E, 0 12px 24px rgba(244,162,39,.4);}
+  .fee-pay-btn:active{box-shadow:0 2px 0 #B9740E, 0 6px 14px rgba(244,162,39,.35);}
 
   .empty-note{text-align:center; color:var(--text-muted); font-size:13px; padding:20px 6px;}
 
@@ -3113,7 +3124,7 @@ async function saveConfSettings(obj){
 }
 /* نقاط الألعاب: كام نقطة تتحسب للمركز الأول/التاني/التالت (لودو) وكام نقطة تتخصم من اللاعب اللي يخرج/ينسحب */
 async function loadGamePointsSettings(){
-  const fallback = {first:100, second:60, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3};
+  const fallback = {first:100, second:60, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25};
   try{
     const r = await window.storage.get('glavera-game-points-settings', true);
     return r ? Object.assign({}, fallback, JSON.parse(r.value)) : fallback;
@@ -8022,18 +8033,22 @@ async function showRoomFeeModal(kind, onPaid){
       <button type="button" class="fee-close" id="fee-close-btn" aria-label="إغلاق">✕</button>
       <div class="fee-stage">
         <div class="fee-rays"></div>
-        <div class="fee-badge">
-          <span class="fee-badge-coin">🪙</span>
-          <span class="fee-badge-amount">${fee}</span>
-          <span class="fee-badge-unit">نقطة</span>
+        <div class="fee-rays r2"></div>
+        <div class="fee-ticket-wrap">
+          <div class="fee-ticket-outline fee-ticket-notch"></div>
+          <div class="fee-ticket fee-ticket-notch">
+            <span class="fee-ticket-amount">${fee}</span>
+          </div>
+          <div class="fee-ticket-shine fee-ticket-notch"></div>
         </div>
+        <div class="fee-stage-foot"><span class="fee-unit-chip">🪙 نقطة</span></div>
       </div>
       <div class="fee-body">
         <div class="fee-title">${title}</div>
         <div class="fee-msg">${msg}</div>
         <div class="fee-balance">💰 رصيدك الحالي: ${bal} نقطة</div>
         <div class="fee-actions">
-          <button type="button" class="btn btn-ghost" id="fee-back-btn">رجوع</button>
+          <button type="button" class="btn fee-back-btn" id="fee-back-btn">رجوع</button>
           <button type="button" class="btn fee-pay-btn" id="fee-pay-btn">ادفع ${fee} 🪙</button>
         </div>
       </div>
@@ -10633,48 +10648,6 @@ function renderAdminPointCodesTab(){
   `;
 }
 
-function renderAdminGamePointsTab(){
-  const gp = GAME_POINTS_SETTINGS || {};
-  return `
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🏆 نقاط الترتيب (لودو)</div>
-      <div class="hint" style="margin:2px 0 12px;">لما جولة لودو تخلص، اللاعبين اللي ياخدوا المركز الأول والتاني والتالت ياخدوا النقط دي تلقائيًا</div>
-      <label>المركز الأول 🥇</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-first" value="${gp.first!=null?gp.first:100}" />
-      <label style="margin-top:10px;">المركز التاني 🥈</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-second" value="${gp.second!=null?gp.second:60}" />
-      <label style="margin-top:10px;">المركز التالت 🥉</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-third" value="${gp.third!=null?gp.third:30}" />
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🚪 خصم الانسحاب</div>
-      <div class="hint" style="margin:2px 0 12px;">لو لاعب خرج أو انسحب من غرفة لعب شغالة، النقط دي بتتخصم منه وبتتوزّع بالتساوي على باقي اللاعبين اللي فاضلين في الغرفة</div>
-      <label>نقط الخصم</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-leave" value="${gp.leavePenalty!=null?gp.leavePenalty:50}" />
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">⭕ معركة إكس أو (اشتراك + جائزة)</div>
-      <div class="hint" style="margin:2px 0 12px;">أول ما لاعب تاني ينضم لغرفة إكس أو، بيتخصم من الاتنين رسوم الاشتراك فورًا. المعركة بتستمر لحد ما حد يوصل لعدد الأجيمات المطلوب، وبعدها ياخد الفائز الجايزة كاملة والمعركة تقفل خالص</div>
-      <label>رسوم الاشتراك لكل لاعب</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-xo-fee" value="${gp.xoEntryFee!=null?gp.xoEntryFee:25}" />
-      <label style="margin-top:10px;">جائزة الفوز بالمعركة كاملة</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-xo-reward" value="${gp.xoWinReward!=null?gp.xoWinReward:50}" />
-      <label style="margin-top:10px;">عدد الأجيمات المطلوبة للفوز بالمعركة</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-xo-wins" value="${gp.xoWinsNeeded!=null?gp.xoWinsNeeded:3}" />
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🎟️ رسوم فتح غرف اللعب</div>
-      <div class="hint" style="margin:2px 0 12px;">قبل ما اللاعب يفتح غرفة جديدة أو ينضم لغرفة بالكود، هتظهرله رسالة احترافية بالرسوم دي وهو يختار يدفع أو يرجع</div>
-      <label>رسوم إنشاء غرفة</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-room-create" value="${gp.roomCreateFee!=null?gp.roomCreateFee:25}" />
-      <label style="margin-top:10px;">رسوم الانضمام لغرفة</label>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" id="gp-room-join" value="${gp.roomJoinFee!=null?gp.roomJoinFee:25}" />
-    </div>
-    <div class="admin-edit-actions">
-      <button type="button" class="btn btn-primary" data-action="save-game-points" style="flex:1;">حفظ نقاط الألعاب</button>
-    </div>
-  `;
-}
 
 const ADMIN_HUB_ITEMS = [
   {tab:'settings',   icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
@@ -10685,7 +10658,6 @@ const ADMIN_HUB_ITEMS = [
   {tab:'teams',      icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {tab:'alerts',     icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
   {tab:'pointcodes', icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
-  {tab:'gamepoints', icon:'🎮', label:'نقاط الألعاب',        color:'linear-gradient(145deg,#845EC2,#3FDCC9)'},
   {tab:'rankings',   icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
   {tab:'audit',      icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
   {tab:'analytics',  icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
@@ -10723,7 +10695,6 @@ function renderAdmin(){
   else if(tab==='gallery') body = renderAdminGalleryTab();
   else if(tab==='chefs') body = renderAdminChefsTab();
   else if(tab==='pointcodes') body = renderAdminPointCodesTab();
-  else if(tab==='gamepoints') body = renderAdminGamePointsTab();
   else if(tab==='rankings') body = renderAdminRankingsTab();
   else if(tab==='audit') body = renderAdminAuditTab();
   else if(tab==='pulse') body = renderAdminPulseTab();
@@ -12528,7 +12499,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='save-logistics'){ doSaveLogistics(el.dataset.pid); }
   else if(action==='toggle-conf-ended'){ doToggleConfEnded(); }
   else if(action==='save-conf-dates'){ doSaveConfDates(); }
-  else if(action==='save-game-points'){ doSaveGamePoints(); }
   else if(action==='save-name-font'){ doSaveNameFont(); }
   else if(action==='share-conf-countdown'){ shareConfCountdown(); }
   else if(action==='export-participants-xlsx'){ exportParticipantsXlsx(); }
@@ -15026,23 +14996,6 @@ async function doSaveConfDates(){
   showToast('تم حفظ توقيت المؤتمر');
   render();
   tickConfCountdown();
-}
-async function doSaveGamePoints(){
-  const val = (id, fb)=>{ const el = document.getElementById(id); const n = el ? parseInt(el.value,10) : NaN; return isNaN(n) || n<0 ? fb : n; };
-  GAME_POINTS_SETTINGS = {
-    first: val('gp-first', 100),
-    second: val('gp-second', 60),
-    third: val('gp-third', 30),
-    leavePenalty: val('gp-leave', 50),
-    xoEntryFee: val('gp-xo-fee', 25),
-    xoWinReward: val('gp-xo-reward', 50),
-    xoWinsNeeded: Math.max(1, val('gp-xo-wins', 3)),
-    roomCreateFee: val('gp-room-create', 25),
-    roomJoinFee: val('gp-room-join', 25)
-  };
-  await saveGamePointsSettings(GAME_POINTS_SETTINGS);
-  showToast('تم حفظ نقاط الألعاب');
-  render();
 }
 async function doSaveNameFont(){
   const sizeEl = document.getElementById('name-font-size');
