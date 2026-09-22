@@ -2236,7 +2236,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .react-float .pl-avatar{width:34px; height:34px; font-size:12px; box-shadow:0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,.4);}
   @keyframes reactUp{0%{opacity:0; transform:translateY(20px);} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0; transform:translateY(-300px) translateX(var(--dx,0px));}}
   @keyframes reactPop{from{transform:scale(.2) rotate(-25deg);} to{transform:scale(1) rotate(0);}}
-  /* ---- كارت تفاعل الخصم ---- */
+  /* ---- كارت تفاعل الخصم (القديم — بقى مستخدم بس كـ fallback لو احتجناه) ---- */
   .react-card{position:absolute; left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 84px + var(--slot,0)*86px); display:flex; justify-content:center; padding:0 12px; pointer-events:none;}
   .rc-pill{position:relative; display:flex; align-items:center; gap:14px; direction:rtl; max-width:100%; padding:8px 12px 8px 10px; border-radius:999px;
     background:linear-gradient(180deg, rgba(52,44,128,.94), rgba(22,18,62,.96));
@@ -2267,6 +2267,55 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .rc-pill, .rc-emoji, .rc-burst{animation-duration:.01s; animation-delay:0s;}
     .rc-pill{animation:rcIn .01s both, rcOut .3s ease 2.1s forwards;}
     .rc-burst{display:none;}
+  }
+
+  /* ---------- تفاعل احترافي هادي (لكل الإيموجيات ماعدا البيضة) ---------- */
+  #react-toast-layer{position:fixed; top:calc(10px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%);
+    z-index:9999; display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;}
+  .react-toast{display:flex; align-items:center; gap:8px; direction:rtl; padding:6px 13px 6px 10px; border-radius:999px;
+    background:linear-gradient(180deg, rgba(46,39,110,.92), rgba(20,17,44,.94));
+    border:1px solid rgba(255,255,255,.14); box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(14px) saturate(1.3); -webkit-backdrop-filter:blur(14px) saturate(1.3);
+    font-family:'Cairo',sans-serif; font-size:12.5px; color:#fff; white-space:nowrap;
+    animation:rtIn .3s cubic-bezier(.3,1.4,.5,1) both;}
+  .react-toast .pl-avatar{width:24px; height:24px; font-size:9.5px; flex:none; box-shadow:0 0 0 1.5px rgba(244,183,64,.6);}
+  .react-toast .rt-emoji{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif; font-size:16px; line-height:1;}
+  .react-toast .rt-name{font-weight:800; color:#F4B740;}
+  .react-toast.out{animation:rtOut .28s ease forwards;}
+  @keyframes rtIn{from{opacity:0; transform:translateY(-12px) scale(.92);} to{opacity:1; transform:translateY(0) scale(1);}}
+  @keyframes rtOut{to{opacity:0; transform:translateY(-8px) scale(.94);}}
+
+  /* ---------- تفرقيع البيضة على شاشة الخصم ---------- */
+  .egg-splat-wrap{position:absolute; inset:0; pointer-events:none; overflow:hidden;}
+  .egg-falling{position:absolute; left:50%; top:-14%; font-size:38px; transform:translateX(-50%);
+    animation:eggFall .46s cubic-bezier(.5,0,.85,.4) forwards; filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));}
+  @keyframes eggFall{0%{top:-14%; transform:translateX(-50%) rotate(0deg);} 100%{top:42%; transform:translateX(-50%) rotate(260deg);}}
+  .egg-yolk{position:absolute; left:50%; top:42%; width:12px; height:12px; border-radius:48% 52% 55% 45%/55% 48% 52% 45%;
+    transform:translate(-50%,-50%) scale(0);
+    background:radial-gradient(circle at 35% 30%, #fff8dc, #ffd23f 55%, #e8a821 100%);
+    box-shadow:0 0 0 9px rgba(255,246,208,.14), 0 0 22px rgba(244,183,64,.35);
+    animation:yolkPop .4s cubic-bezier(.3,1.6,.5,1) .46s forwards;}
+  @keyframes yolkPop{0%{transform:translate(-50%,-50%) scale(0);} 65%{transform:translate(-50%,-50%) scale(8.5) rotate(6deg);} 100%{transform:translate(-50%,-50%) scale(6.5) rotate(0); opacity:.88;}}
+  .egg-bit{position:absolute; left:50%; top:42%; font-size:15px; opacity:0; animation:eggBit .75s ease .46s forwards;}
+  @keyframes eggBit{0%{opacity:0; transform:translate(-50%,-50%) scale(.3) rotate(0);} 14%{opacity:1;}
+    100%{opacity:0; transform:translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) rotate(var(--br)) scale(1);}}
+  .egg-drip{position:absolute; top:0; width:var(--dw); border-radius:0 0 60% 60%; opacity:0;
+    background:linear-gradient(180deg,#ffe27a,#f4b740); box-shadow:inset 0 -4px 6px rgba(0,0,0,.12);
+    animation:eggDrip 1.5s ease .5s forwards;}
+  @keyframes eggDrip{0%{height:0; opacity:0;} 18%{opacity:.95;} 100%{height:var(--dh); opacity:.85;}}
+  .egg-caption{position:absolute; left:50%; top:calc(42% + 44px); transform:translateX(-50%); direction:rtl; white-space:nowrap;
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#fff;
+    background:rgba(20,17,40,.82); padding:6px 13px; border-radius:999px; border:1px solid rgba(244,183,64,.45);
+    opacity:0; animation:eggCapIn .3s ease .5s forwards, eggCapOut .3s ease 1.85s forwards;}
+  @keyframes eggCapIn{to{opacity:1;}}
+  @keyframes eggCapOut{to{opacity:0; transform:translateX(-50%) translateY(-4px);}}
+  @keyframes eggShake{0%,100%{transform:translate(0,0);} 20%{transform:translate(-6px,3px);} 40%{transform:translate(5px,-4px);}
+    60%{transform:translate(-4px,2px);} 80%{transform:translate(3px,-2px);}}
+  #app.egg-shake{animation:eggShake .38s ease;}
+  @media (prefers-reduced-motion:reduce){
+    .react-toast{animation-duration:.01s;}
+    .egg-falling, .egg-yolk, .egg-bit, .egg-drip, .egg-caption{animation-duration:.01s; animation-delay:0s;}
+    #app.egg-shake{animation:none;}
   }
   .c4-vs-player{display:flex; flex-direction:column; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--text-muted);}
   .c4-dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
@@ -10649,7 +10698,7 @@ function renderRoomMath(){
 
 
 /* ============================= ROOMS: VS INTRO + EMOJI REACTIONS ============================= */
-const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','😂','😨','🤨'];
+const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','😂','😨','🤨','🥚','🌹','👍'];
 function roomEmojiBar(){
   return `<div class="emoji-bar">${ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('')}</div>`;
 }
@@ -10688,35 +10737,64 @@ function roomMaybeIntro(){
   vibrate([15,40,25]);
   setTimeout(close, 3600);
 }
-/* تفاعل الخصم: كارت احترافي فيه صورة واسم اللاعب + الإيموجي + انفجار إيموجي صغير */
+/* تفاعل الخصم: لو بيضة، تتفرقع بشكل مضحك على شاشته. غير كدا، تظهر بشكل هادي واحترافي (توست صغير فوق) */
 function showOpponentReaction(emoji, pid){
+  if(emoji==='🥚'){ showEggSplat(pid); return; }
+  showReactionToast(emoji, pid);
+}
+function showReactionToast(emoji, pid){
+  let layer = document.getElementById('react-toast-layer');
+  if(!layer){ layer = document.createElement('div'); layer.id = 'react-toast-layer'; document.body.appendChild(layer); }
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  const name = p ? p.name.split(' ')[0] : 'حد في الغرفة';
+  const el = document.createElement('div');
+  el.className = 'react-toast';
+  el.innerHTML = `${gameAvatar(pid)}<span class="rt-name">${escapeHtml(name)}</span><span class="rt-emoji">${emoji}</span>`;
+  layer.appendChild(el);
+  tone(720, 0.08, 'sine', 0.05);
+  setTimeout(()=>{ el.classList.add('out'); }, 1900);
+  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2250);
+}
+/* تفرقيع البيضة: بيضة بتقع من فوق وتتفرقع فجأة مع رشقات صفار وقطر وهزة خفيفة للشاشة */
+function showEggSplat(pid){
   let layer = document.getElementById('react-layer');
   if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
-  // كارت واحد لكل لاعب: التفاعل الجديد بيحل محل القديم بتاعه
-  layer.querySelectorAll('.react-card[data-pid="'+pid+'"]').forEach(n=>n.remove());
   const p = PARTICIPANTS.find(x=>x.id===pid);
-  const name = p ? p.name : 'الخصم';
-  const slot = layer.querySelectorAll('.react-card').length; // لو أكتر من لاعب بعتوا مع بعض ينزلوا تحت بعض
-  const el = document.createElement('div');
-  el.className = 'react-card';
-  el.dataset.pid = pid;
-  el.style.setProperty('--slot', slot);
-  let burst = '';
-  for(let i=0;i<8;i++){
-    const ang = (-160 + i*(140/7)) * Math.PI/180;          // نصف دايرة لفوق
-    const dist = 70 + Math.random()*40;
-    const bx = Math.round(Math.cos(ang)*dist), by = Math.round(Math.sin(ang)*dist);
-    const sz = 14 + Math.round(Math.random()*8);
-    burst += `<span class="rc-burst" style="--bx:${bx}px;--by:${by}px;--br:${Math.round(Math.random()*60-30)}deg;--d:${(0.12+i*0.05).toFixed(2)}s;font-size:${sz}px">${emoji}</span>`;
+  const name = p ? p.name.split(' ')[0] : 'حد في الغرفة';
+  const wrap = document.createElement('div');
+  wrap.className = 'egg-splat-wrap';
+  let bits = '';
+  for(let i=0;i<9;i++){
+    const ang = Math.random()*360;
+    const dist = 46 + Math.random()*95;
+    const bx = Math.round(Math.cos(ang*Math.PI/180)*dist);
+    const by = Math.round(Math.sin(ang*Math.PI/180)*dist);
+    bits += `<span class="egg-bit" style="--bx:${bx}px;--by:${by}px;--br:${Math.round(Math.random()*180-90)}deg">${Math.random()>0.55?'💦':'🟡'}</span>`;
   }
-  el.innerHTML = `<div class="rc-pill">
-      <div class="rc-who">${gameAvatar(pid)}<div class="rc-txt"><b class="rc-name">${escapeHtml(name)}</b><small>بعت تفاعل</small></div></div>
-      <div class="rc-emoji-wrap"><span class="rc-emoji">${emoji}</span>${burst}</div>
-    </div>`;
-  layer.appendChild(el);
-  tone(660, 0.12, 'sine', 0.06);
-  setTimeout(()=>tone(990, 0.16, 'sine', 0.05), 90);
-  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2700);
+  let drips = '';
+  for(let i=0;i<6;i++){
+    const x = 10 + Math.random()*80;
+    const h = 46 + Math.random()*84;
+    const w = 9 + Math.random()*9;
+    const delay = (Math.random()*0.12).toFixed(2);
+    drips += `<span class="egg-drip" style="left:${x}%; --dh:${h}px; --dw:${w}px; animation-delay:${delay}s"></span>`;
+  }
+  wrap.innerHTML = `
+    <div class="egg-falling">🥚</div>
+    <span class="egg-yolk"></span>
+    ${bits}
+    ${drips}
+    <div class="egg-caption">😂 ${escapeHtml(name)} رماكلك بيضة!</div>
+  `;
+  layer.appendChild(wrap);
+  vibrate([10,50,10,70,40]);
+  setTimeout(()=>{
+    tone(140, 0.05, 'square', 0.05);
+    setTimeout(()=>tone(80, 0.16, 'sawtooth', 0.07), 40);
+    const app = document.getElementById('app');
+    if(app){ app.classList.remove('egg-shake'); void app.offsetWidth; app.classList.add('egg-shake'); setTimeout(()=>app.classList.remove('egg-shake'), 420); }
+  }, 460);
+  setTimeout(()=>{ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 2300);
 }
 function showReactionFloat(emoji, pid){
   if(pid && pid!==state.pid){ showOpponentReaction(emoji, pid); return; }
