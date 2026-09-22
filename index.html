@@ -2012,6 +2012,20 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .chat-input-bar{ position:sticky; bottom:0; background:var(--bg); padding:8px 0 4px; border-top:1px solid var(--border); z-index:5; }
   .chat-quick-emoji{ display:flex; gap:6px; margin-bottom:6px; overflow-x:auto; }
   .chat-emoji-btn{ flex:none; background:var(--surface); border:1px solid var(--border); border-radius:10px; font-size:16px; padding:4px 8px; cursor:pointer; }
+  .chat-bubble.sticker{ background:none!important; border:none!important; padding:0!important; max-width:120px; }
+  .chat-bubble.sticker .chat-bubble-text{ display:none; }
+  .chat-bubble-sticker-img{ font-size:56px; line-height:1; display:block; text-align:center; filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+  .chat-bubble-sticker-custom{ width:100px; max-width:100%; display:block; filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+  .chat-sticker-panel{ display:none; grid-template-columns:repeat(6,1fr); gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:10px; margin-bottom:8px; max-height:180px; overflow-y:auto; }
+  .chat-sticker-panel.open{ display:grid; }
+  .chat-sticker-divider{ grid-column:1/-1; height:1px; background:var(--border); margin:2px 0; }
+  .chat-sticker-btn{ font-size:26px; background:none; border:none; cursor:pointer; padding:4px; border-radius:8px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .chat-sticker-btn:active{ background:rgba(244,183,64,.2); transform:scale(.9); }
+  .admin-sticker-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .admin-sticker-item{ position:relative; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; }
+  .admin-sticker-thumb{ width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+  .admin-sticker-thumb img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .admin-sticker-del{ position:absolute; top:4px; left:4px; width:22px; height:22px; border-radius:50%; border:none; background:rgba(255,60,60,.9); color:#fff; font-size:12px; cursor:pointer; }
   .chat-input-row{ display:flex; align-items:center; gap:6px; }
   .chat-input-row .field{ flex:1; margin:0; }
   .chat-attach-btn{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
@@ -3681,6 +3695,51 @@ async function preloadChatMedia(messages){
     }catch(e){}
   }));
 }
+
+/* ---- مكتبة الاستيكرات (يرفعها الأدمن، وتظهر لكل المشاركين في الشات — أساس متجر الاستيكرات لاحقًا) ---- */
+let CUSTOM_STICKERS = []; // [{id, name}]
+const STICKER_IMG_CACHE = {};
+async function loadCustomStickers(){
+  try{ const r = await window.storage.get('glavera-stickers-list', true); return r && r.value ? JSON.parse(r.value) : []; }
+  catch(e){ console.error('loadCustomStickers failed:', e); return []; }
+}
+async function saveCustomStickers(arr){
+  try{ await window.storage.set('glavera-stickers-list', JSON.stringify(arr), true); return true; }
+  catch(e){ console.error('saveCustomStickers failed:', e); return false; }
+}
+async function saveCustomStickersWithRetry(arr, attempt){
+  attempt = attempt || 1;
+  const ok = await saveCustomStickers(arr);
+  if(ok) return true;
+  if(attempt < 3){ await sleep(800*attempt); return saveCustomStickersWithRetry(arr, attempt+1); }
+  return false;
+}
+async function saveStickerImage(stickerId, dataUrl, attempt){
+  attempt = attempt || 1;
+  try{
+    const r = await window.storage.set('glavera-sticker-img-'+stickerId, dataUrl, true, 45000);
+    if(!r) throw new Error(_fbLastError||'save failed');
+    return true;
+  }catch(e){
+    console.error('saveStickerImage failed (attempt '+attempt+'):', e);
+    if(attempt < 3){ await sleep(900*attempt); return saveStickerImage(stickerId, dataUrl, attempt+1); }
+    return false;
+  }
+}
+async function deleteStickerImage(stickerId){
+  try{ await window.storage.delete('glavera-sticker-img-'+stickerId, true); }catch(e){}
+}
+async function preloadStickerImages(list){
+  const ids = (list||[]).filter(s=>!STICKER_IMG_CACHE[s.id]).map(s=>s.id);
+  if(!ids.length) return;
+  await Promise.all(ids.map(async id=>{
+    try{
+      const r = await window.storage.get('glavera-sticker-img-'+id, true);
+      if(r && r.value) STICKER_IMG_CACHE[id] = r.value;
+    }catch(e){}
+  }));
+}
+
 async function loadTrash(){
   try{
     const r = await window.storage.get('glavera-trash', true);
@@ -10607,16 +10666,25 @@ function chatBubbleBody(m){
   if(m.type==='video'){
     return url ? `<video controls class="chat-bubble-video" src="${url}"></video>` : `<div class="chat-media-loading">⏳ فيديو...</div>`;
   }
+  if(m.type==='sticker'){
+    return `<div class="chat-bubble-sticker-img">${escapeHtml(m.text||'')}</div>`;
+  }
+  if(m.type==='stickerImg'){
+    const surl = STICKER_IMG_CACHE[m.stickerId];
+    return surl ? `<img class="chat-bubble-sticker-custom" src="${surl}" alt="استيكر" />` : `<div class="chat-media-loading">⏳ استيكر...</div>`;
+  }
   return '';
 }
 function renderChatBubble(m){
   const mine = m.pid === state.pid;
-  return `<div class="chat-bubble ${mine?'mine':'theirs'}">
+  const isSticker = m.type==='sticker' || m.type==='stickerImg';
+  return `<div class="chat-bubble ${mine?'mine':'theirs'} ${isSticker?'sticker':''}">
     ${!mine ? `<div class="chat-bubble-name">${escapeHtml(m.name||'')}</div>` : ''}
     ${chatBubbleBody(m)}
     <div class="chat-bubble-time">${formatChatTime(m.ts)}</div>
   </div>`;
 }
+const CHAT_STICKERS = ['😂','😍','🔥','🎉','👑','💖','😱','🥳','😴','🤩','💯','🙌','👏','😎','🤔','😭','🙈','🥰','😡','👋','✅','❌','⭐','🎊','🍕','☕','🎮','⚽','🎵','💤'];
 function renderChatPage(){
   const msgs = CHAT_MESSAGES.slice(-100);
   if(!CHAT_MEDIA_LOADING){
@@ -10628,6 +10696,11 @@ function renderChatPage(){
   }
   const bubbles = msgs.map(renderChatBubble).join('');
   const quickEmoji = ['👍','❤️','😂','🎉','🔥','👏','🙏','😍'].map(e=>`<button type="button" class="chat-emoji-btn" data-action="chat-insert-emoji" data-emoji="${e}">${e}</button>`).join('');
+  const customStickerBtns = CUSTOM_STICKERS.map(s=>{
+    const url = STICKER_IMG_CACHE[s.id];
+    return `<button type="button" class="chat-sticker-btn" data-action="send-chat-custom-sticker" data-id="${s.id}">${url ? `<img src="${url}" style="width:30px;height:30px;object-fit:contain;" />` : '⏳'}</button>`;
+  }).join('');
+  const emojiStickerBtns = CHAT_STICKERS.map(s=>`<button type="button" class="chat-sticker-btn" data-action="send-chat-sticker" data-sticker="${s}">${s}</button>`).join('');
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -10636,8 +10709,10 @@ function renderChatPage(){
     <div class="hint" style="margin:0 0 8px;">شات مشترك بين كل المشاركين — أي حد بيبعت رسالة، الكل بيشوفها</div>
     <div class="chat-messages" id="chat-messages-list">${bubbles || '<div class="empty-note">لسه محدش كتب حاجة، ابدأ إنت!</div>'}</div>
     <div class="chat-input-bar">
+      <div class="chat-sticker-panel ${state.chatStickerPanelOpen?'open':''}" id="chat-sticker-panel">${customStickerBtns}${customStickerBtns?'<div class="chat-sticker-divider"></div>':''}${emojiStickerBtns}</div>
       <div class="chat-quick-emoji">${quickEmoji}</div>
       <div class="chat-input-row">
+        <button type="button" class="chat-attach-btn" title="استيكر" data-action="toggle-chat-sticker-panel">😊</button>
         <label class="chat-attach-btn" title="صورة">📷<input type="file" accept="image/*" id="chat-photo-input" style="display:none;" /></label>
         <label class="chat-attach-btn" title="فيديو">🎥<input type="file" accept="video/*" id="chat-video-input" style="display:none;" /></label>
         <input type="text" id="chat-text-input" class="field" placeholder="اكتب رسالة..." />
@@ -10667,6 +10742,32 @@ async function doSendChatText(){
 function doChatInsertEmoji(emoji){
   const input = document.getElementById('chat-text-input');
   if(input){ input.value += emoji; input.focus(); }
+}
+function doToggleChatStickerPanel(){
+  state.chatStickerPanelOpen = !state.chatStickerPanelOpen;
+  render();
+}
+async function doSendChatSticker(sticker){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p || !sticker) return;
+  const msg = { id:'cm'+Date.now()+Math.random().toString(36).slice(2,6), pid:p.id, name:p.name, type:'sticker', text:sticker, ts:Date.now() };
+  CHAT_MESSAGES.push(msg);
+  trimChatMessages();
+  state.chatStickerPanelOpen = false;
+  render();
+  scrollChatToBottom();
+  await saveChatMessagesWithRetry(CHAT_MESSAGES);
+}
+async function doSendChatCustomSticker(stickerId){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid);
+  if(!p || !stickerId) return;
+  const msg = { id:'cm'+Date.now()+Math.random().toString(36).slice(2,6), pid:p.id, name:p.name, type:'stickerImg', stickerId, ts:Date.now() };
+  CHAT_MESSAGES.push(msg);
+  trimChatMessages();
+  state.chatStickerPanelOpen = false;
+  render();
+  scrollChatToBottom();
+  await saveChatMessagesWithRetry(CHAT_MESSAGES);
 }
 async function sendChatMediaMessage(type, dataUrl, duration){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -11914,6 +12015,7 @@ const ADMIN_HUB_ITEMS = [
   {tab:'opinions',   icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {tab:'reports',    icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {tab:'trash',      icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
+  {tab:'stickers',   icon:'🎨', label:'متجر الاستيكرات',      color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
@@ -11956,6 +12058,7 @@ function renderAdmin(){
   else if(tab==='opinions') body = renderAdminOpinionsTab();
   else if(tab==='reports') body = renderAdminReportsTab();
   else if(tab==='trash') body = renderAdminTrashTab();
+  else if(tab==='stickers') body = renderAdminStickersTab();
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
   let pageTitle = hubItem ? hubItem.label : 'لوحة المنظمين';
   if(tab==='sessions'){
@@ -12552,6 +12655,7 @@ function render(){
   if(state.view==='admin' && !state.adminUnlocked){ attachAdminOtpBoxes(); }
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
+  if(state.view==='admin' && state.adminTab==='stickers'){ attachStickerAdminInputs(); }
   if(state.view==='admin' && state.adminTab==='participants' && state.editingParticipantId){ attachParticipantPhotoInputs(); }
   if(state.view==='chat'){ attachChatInputs(); }
   if(state.view==='admin' && state.editingSessionId){
@@ -13731,6 +13835,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-myphoto'){ openMyPhotosLightbox(parseInt(el.dataset.idx,10)||0); }
   else if(action==='send-chat-text'){ doSendChatText(); }
   else if(action==='chat-insert-emoji'){ doChatInsertEmoji(el.dataset.emoji); }
+  else if(action==='toggle-chat-sticker-panel'){ doToggleChatStickerPanel(); }
+  else if(action==='send-chat-sticker'){ doSendChatSticker(el.dataset.sticker); }
+  else if(action==='send-chat-custom-sticker'){ doSendChatCustomSticker(el.dataset.id); }
+  else if(action==='admin-delete-sticker'){ doAdminDeleteSticker(el.dataset.id); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
@@ -14637,7 +14745,95 @@ function readImageFileObjectToDataUrl(file, maxSize){
   });
 }
 
-/* ============================= ADMIN: GALLERY ============================= */
+/* ============================= ADMIN: STICKERS (مكتبة استيكرات مركزية — أساس متجر الاستيكرات) ============================= */
+function readStickerFileToDataUrl(file, maxSize){
+  return new Promise((resolve)=>{
+    if(!file){ resolve(null); return; }
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const size = maxSize || 512;
+        let w = img.width, h = img.height;
+        const longest = Math.max(w, h);
+        if(longest > size){
+          if(w>h){ h = Math.round(h*size/w); w = size; } else { w = Math.round(w*size/h); h = size; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+        // PNG عشان نحافظ على الخلفية الشفافة بتاعة الاستيكرات
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = ()=>resolve(null);
+      img.src = reader.result;
+    };
+    reader.onerror = ()=>resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+function renderAdminStickersTab(){
+  const items = CUSTOM_STICKERS.map(s=>{
+    const url = STICKER_IMG_CACHE[s.id];
+    return `<div class="admin-sticker-item">
+      <div class="admin-sticker-thumb">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'')}" />` : '⏳'}</div>
+      <button type="button" class="admin-sticker-del" title="حذف" data-action="admin-delete-sticker" data-id="${s.id}">✕</button>
+    </div>`;
+  }).join('');
+  return `
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎨 رفع استيكرات جديدة</div>
+      <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف، وهتظهر فورًا لكل المشاركين في خانة الاستيكر بالشات — دي نفس المكتبة اللي هيتبنى عليها متجر الاستيكرات بعدين</div>
+      <label class="btn btn-primary" style="display:inline-block;text-align:center;cursor:pointer;">
+        📤 اختيار صور استيكر
+        <input type="file" accept="image/*" multiple id="sticker-admin-upload" style="display:none;" />
+      </label>
+    </div>
+    <div class="admin-day-title">الاستيكرات الحالية (${CUSTOM_STICKERS.length})</div>
+    ${items ? `<div class="admin-sticker-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات مرفوعة</div>`}
+  `;
+}
+function attachStickerAdminInputs(){
+  const inputEl = document.getElementById('sticker-admin-upload');
+  if(!inputEl || inputEl.dataset.bound) return;
+  inputEl.dataset.bound = '1';
+  inputEl.addEventListener('change', ()=>{
+    const files = Array.from(inputEl.files || []);
+    if(files.length) doAdminUploadStickers(files, inputEl);
+  });
+}
+async function doAdminUploadStickers(files, inputEl){
+  showToast('جاري رفع الاستيكرات...');
+  let okCount = 0;
+  for(let i=0;i<files.length;i++){
+    const dataUrl = await readStickerFileToDataUrl(files[i], 512);
+    if(!dataUrl) continue;
+    const id = 'stk'+Date.now()+Math.random().toString(36).slice(2,6);
+    STICKER_IMG_CACHE[id] = dataUrl;
+    const saved = await saveStickerImage(id, dataUrl);
+    if(saved){ CUSTOM_STICKERS.push({id, name:''}); okCount++; render(); }
+  }
+  if(inputEl) inputEl.value = '';
+  if(okCount){
+    await saveCustomStickersWithRetry(CUSTOM_STICKERS);
+    showToast(`✅ اتضاف ${okCount} استيكر بنجاح`);
+  } else {
+    showToast('⚠️ حصلت مشكلة في رفع الاستيكرات، جرب تاني', true);
+  }
+  render();
+}
+async function doAdminDeleteSticker(id){
+  CUSTOM_STICKERS = CUSTOM_STICKERS.filter(s=>s.id!==id);
+  delete STICKER_IMG_CACHE[id];
+  render();
+  await deleteStickerImage(id);
+  await saveCustomStickersWithRetry(CUSTOM_STICKERS);
+}
+
+
 function attachGalleryAdminInputs(){
   document.querySelectorAll('input[type="file"][id^="gallery-admin-upload-"]').forEach(inputEl=>{
     if(inputEl.dataset.bound) return;
@@ -16874,17 +17070,18 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, GAME_POINTS_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs()
+    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
+  await preloadStickerImages(CUSTOM_STICKERS);
   CUSTOM_TEAMS.forEach(ct=>{
     if(!TEAMS.some(t=>t.id===ct.id)) TEAMS.push({id:ct.id, name:ct.name, color:ct.color});
   });
@@ -17057,14 +17254,34 @@ function startLivePolling(){
         const freshChefs = await loadChefs();
         if(JSON.stringify(freshChefs) !== JSON.stringify(CHEFS)){ CHEFS = freshChefs; render(); }
       }
+    }catch(e){}
+  }, 6000);
+  /* حلقة أسرع مخصوصة للشات والاستيكرات بس، عشان الرسايل والاستيكرات توصل بسرعة أكبر من غير ما نبطّئ باقي الصفحات */
+  setInterval(async ()=>{
+    if(document.hidden) return;
+    try{
       if(state.view==='chat'){
         const fresh = await loadChatMessages();
         const lastFresh = fresh[fresh.length-1], lastMine = CHAT_MESSAGES[CHAT_MESSAGES.length-1];
         const changed = fresh.length !== CHAT_MESSAGES.length || (lastFresh && lastMine && lastFresh.id !== lastMine.id);
         if(changed){ CHAT_MESSAGES = fresh; render(); }
+        const freshStickers = await loadCustomStickers();
+        if(JSON.stringify(freshStickers) !== JSON.stringify(CUSTOM_STICKERS)){
+          CUSTOM_STICKERS = freshStickers;
+          await preloadStickerImages(CUSTOM_STICKERS);
+          render();
+        }
+      }
+      if(state.view==='admin' && state.adminTab==='stickers'){
+        const freshStickers = await loadCustomStickers();
+        if(JSON.stringify(freshStickers) !== JSON.stringify(CUSTOM_STICKERS)){
+          CUSTOM_STICKERS = freshStickers;
+          await preloadStickerImages(CUSTOM_STICKERS);
+          render();
+        }
       }
     }catch(e){}
-  }, 6000);
+  }, 1500);
 }
 
 /* ============================= HARDWARE / BROWSER BACK BUTTON ============================= */
