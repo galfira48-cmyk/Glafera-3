@@ -6889,11 +6889,11 @@ function snlAfterLanding(p, val){
   if(SNL_LADDERS[finalPos]){
     const to = SNL_LADDERS[finalPos];
     SND.coinChime();
-    render();
+    snlRenderPartial();
     setTimeout(()=>{
       p.pos = to;
       g.lastEvent = {type:'ladder', from:finalPos, to:to};
-      render();
+      snlRenderPartial();
       snlFinishTurn(p, val);
     }, 420);
     return;
@@ -6902,11 +6902,11 @@ function snlAfterLanding(p, val){
     const to = SNL_SNAKES[finalPos];
     SND.error();
     vibrate([30,20,30]);
-    render();
+    snlRenderPartial();
     setTimeout(()=>{
       p.pos = to;
       g.lastEvent = {type:'snake', from:finalPos, to:to};
-      render();
+      snlRenderPartial();
       snlFinishTurn(p, val);
     }, 420);
     return;
@@ -6922,7 +6922,7 @@ function snlAnimateMove(p, from, to, cb){
     cur++;
     p.pos = cur;
     SND.click();
-    render();
+    snlRenderPartial();
     setTimeout(step, 140);
   };
   step();
@@ -6936,11 +6936,11 @@ function snlResolveRoll(){
   const dest = p.pos + val;
   if(dest>100){
     g.lastEvent = {type:'blocked'};
-    render();
+    snlRenderPartial();
     setTimeout(()=>{
       snlAdvanceTurn(true);
       g.busy = false;
-      render();
+      snlRenderPartial();
       snlMaybeAiTurn();
     }, 700);
     return;
@@ -6959,7 +6959,7 @@ function snlDoRoll(){
   const spin = setInterval(()=>{
     if(!state.snl){ clearInterval(spin); return; }
     state.snl.dice = 1+Math.floor(Math.random()*6);
-    render();
+    snlRenderPartial();
     ticks++;
     if(ticks>=7){
       clearInterval(spin);
@@ -6979,7 +6979,57 @@ function snlDieFaceHtml(v){
   let dots = '';
   for(let i=1;i<=9;i++){ dots += pips.indexOf(i)>-1 ? '<i class="snl-pip"></i>' : '<i class="snl-pip empty"></i>'; }
   const g = state.snl;
-  return `<div class="snl-die ${g && g.rolling ? 'rolling':''}">${dots}</div>`;
+  return `<div class="snl-die ${g && g.rolling ? 'rolling':''}" id="snl-die">${dots}</div>`;
+}
+/* ---------- lightweight partial update while the board is animating ----------
+   Re-rendering the WHOLE app (app.innerHTML = ...) on every dice tick / move step
+   was destroying and recreating the die element several times a second, which
+   restarted its CSS spin animation each time and looked like the screen was
+   trembling. These helpers patch just the pieces that actually changed instead. */
+function snlStatusText(g){
+  const curP = g.players[g.turnIndex];
+  if(g.winnerIdx!=null){
+    const wp = g.players[g.winnerIdx];
+    return wp.isAI ? '🤖 فاز الجهاز، حظ أوفر!' : `🎉 فاز ${wp.name}!`;
+  } else if(g.rolling){
+    return '🎲 الزهر بيلف...';
+  } else if(curP.isAI){
+    return '🤖 الجهاز بيلعب...';
+  } else {
+    return `دور ${curP.name} 🎯`;
+  }
+}
+function snlEventBannerHtml(g){
+  if(!g.lastEvent) return '';
+  if(g.lastEvent.type==='ladder') return `<div class="snl-event snl-event-ladder">🪜 سلم! طلعت من ${g.lastEvent.from} لـ ${g.lastEvent.to}</div>`;
+  if(g.lastEvent.type==='snake') return `<div class="snl-event snl-event-snake">🐍 تعبان! نزلت من ${g.lastEvent.from} لـ ${g.lastEvent.to}</div>`;
+  if(g.lastEvent.type==='extra') return `<div class="snl-event snl-event-extra">🎉 رقم 6! دور تاني</div>`;
+  if(g.lastEvent.type==='blocked') return `<div class="snl-event">🚫 لازم رقم بالظبط عشان توصل 100</div>`;
+  return '';
+}
+function snlRenderPartial(){
+  if(!state.snl || state.view!=='game-snl'){ render(); return; }
+  const g = state.snl;
+  const boardWrap = document.getElementById('snl-board-wrap');
+  if(!boardWrap){ render(); return; } // view not mounted yet, fall back to a full render
+  boardWrap.innerHTML = snlBoardSvg(g);
+  const dieEl = document.getElementById('snl-die');
+  if(dieEl){
+    dieEl.classList.toggle('rolling', !!g.rolling);
+    const pips = SNL_DIE_PIPS[g.dice] || [];
+    dieEl.querySelectorAll('.snl-pip').forEach((el,i)=>{ el.classList.toggle('empty', pips.indexOf(i+1)===-1); });
+  }
+  const rollBtn = document.getElementById('snl-roll-btn');
+  if(rollBtn){
+    const curP = g.players[g.turnIndex];
+    rollBtn.disabled = !(g.winnerIdx==null && !g.busy && !curP.isAI);
+  }
+  const statusEl = document.getElementById('snl-status');
+  if(statusEl) statusEl.textContent = snlStatusText(g);
+  const eventWrap = document.getElementById('snl-event-wrap');
+  if(eventWrap) eventWrap.innerHTML = snlEventBannerHtml(g);
+  const playersRow = document.getElementById('snl-players-row');
+  if(playersRow) playersRow.innerHTML = g.players.map(p=>snlPlayerChip(p,g)).join('');
 }
 function snlPlayerChip(p, g){
   const active = g.winnerIdx==null && g.turnIndex===p.idx && !g.matchOver;
@@ -7118,26 +7168,10 @@ function renderSnlGame(){
       ${[2,3,4].map(n=>`<button type="button" class="gms-btn snl-count-btn ${g.playerCount===n?'active':''}" data-action="snl-players" data-n="${n}">${n} لاعبين</button>`).join('')}
     </div>` : '';
   const banner = g.mode==='ai' ? `<div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز تاخد <b>${reward}</b> نقطة</div>` : '';
-  const playersRow = `<div class="snl-players-row">${g.players.map(p=>snlPlayerChip(p,g)).join('')}</div>`;
-  let eventBanner = '';
-  if(g.lastEvent){
-    if(g.lastEvent.type==='ladder') eventBanner = `<div class="snl-event snl-event-ladder">🪜 سلم! طلعت من ${g.lastEvent.from} لـ ${g.lastEvent.to}</div>`;
-    else if(g.lastEvent.type==='snake') eventBanner = `<div class="snl-event snl-event-snake">🐍 تعبان! نزلت من ${g.lastEvent.from} لـ ${g.lastEvent.to}</div>`;
-    else if(g.lastEvent.type==='extra') eventBanner = `<div class="snl-event snl-event-extra">🎉 رقم 6! دور تاني</div>`;
-    else if(g.lastEvent.type==='blocked') eventBanner = `<div class="snl-event">🚫 لازم رقم بالظبط عشان توصل 100</div>`;
-  }
+  const playersRow = `<div class="snl-players-row" id="snl-players-row">${g.players.map(p=>snlPlayerChip(p,g)).join('')}</div>`;
+  const eventBanner = snlEventBannerHtml(g);
   const curP = g.players[g.turnIndex];
-  let statusText;
-  if(g.winnerIdx!=null){
-    const wp = g.players[g.winnerIdx];
-    statusText = wp.isAI ? '🤖 فاز الجهاز، حظ أوفر!' : `🎉 فاز ${wp.name}!`;
-  } else if(g.rolling){
-    statusText = '🎲 الزهر بيلف...';
-  } else if(curP.isAI){
-    statusText = '🤖 الجهاز بيلعب...';
-  } else {
-    statusText = `دور ${curP.name} 🎯`;
-  }
+  const statusText = snlStatusText(g);
   const canRoll = g.winnerIdx==null && !g.busy && !curP.isAI;
   return `
     <div class="back-row">
@@ -7148,12 +7182,12 @@ function renderSnlGame(){
     ${countRow}
     ${banner}
     ${playersRow}
-    <div class="xo-status">${statusText}</div>
-    ${eventBanner}
-    <div class="snl-board-wrap">${snlBoardSvg(g)}</div>
-    <div class="snl-dice-row">
+    <div class="xo-status" id="snl-status">${statusText}</div>
+    <div id="snl-event-wrap">${eventBanner}</div>
+    <div class="snl-board-wrap" id="snl-board-wrap">${snlBoardSvg(g)}</div>
+    <div class="snl-dice-row" id="snl-dice-row">
       ${snlDieFaceHtml(g.dice)}
-      <button type="button" class="btn btn-primary snl-roll-btn" data-action="snl-roll" ${canRoll?'':'disabled'}>🎲 ارمي الزهر</button>
+      <button type="button" class="btn btn-primary snl-roll-btn" id="snl-roll-btn" data-action="snl-roll" ${canRoll?'':'disabled'}>🎲 ارمي الزهر</button>
     </div>
     <button type="button" class="btn btn-outline" style="width:100%;margin-top:14px;" data-action="snl-reset">🔄 جولة جديدة</button>
   `;
