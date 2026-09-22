@@ -9322,17 +9322,26 @@ async function voiceStart(roomCode, myId){
   }
   VOICE.enabled = true;
 
-  // بنكبّر صوت الميكروفون رقميًا (Gain) قبل ما نبعته، وبنمرره على Limiter عشان يفضل واضح ومايتقطعش
+  // بنكبّر صوت الميكروفون رقميًا (Gain) قبل ما نبعته، وبنمرره على Limiter عشان يفضل واضح ومايتقطعش.
+  // لو المتصفح رفض يشغّل الـ AudioContext (سياسة autoplay)، بنرجع نبعت الصوت الخام عادي عشان الصوت
+  // مايتقطعش خالص، وبعدين بنحاول نرفّعه لحظة ما نحس بأي تفاعل من المستخدم (voiceTryUpgradeToBoostedInput).
   try{
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    VOICE.audioCtx = ctx;
-    const src = ctx.createMediaStreamSource(VOICE.rawStream);
-    const gainNode = ctx.createGain();
-    gainNode.gain.value = VOICE_INPUT_GAIN;
-    const limiter = _voiceLimiter(ctx);
-    const dest = ctx.createMediaStreamDestination();
-    src.connect(gainNode).connect(limiter).connect(dest);
-    VOICE.sendStream = dest.stream;
+    await ctx.resume().catch(()=>{});
+    if(ctx.state==='running'){
+      const src = ctx.createMediaStreamSource(VOICE.rawStream);
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = VOICE_INPUT_GAIN;
+      const limiter = _voiceLimiter(ctx);
+      const dest = ctx.createMediaStreamDestination();
+      src.connect(gainNode).connect(limiter).connect(dest);
+      VOICE.audioCtx = ctx;
+      VOICE.sendStream = dest.stream;
+      VOICE._localGraphNodes = {src, gainNode, limiter, dest};
+    } else {
+      try{ ctx.close(); }catch(e2){}
+      VOICE.sendStream = VOICE.rawStream;
+    }
   }catch(e){
     VOICE.sendStream = VOICE.rawStream; // fallback: ابعت الصوت الخام من غير تكبير لو المتصفح مايدعمش الـ Web Audio graph
   }
@@ -9366,7 +9375,7 @@ function voiceEnsurePeer(otherId, isInitiator){
   if(VOICE.peers[otherId]) return VOICE.peers[otherId];
   const pc = new RTCPeerConnection({ iceServers: VOICE_ICE_SERVERS });
   const audioEl = document.createElement('audio');
-  audioEl.autoplay = true; audioEl.playsInline = true; audioEl.style.display='none'; audioEl.muted = true; // الصوت الفعلي هيخرج من خلال الـ Web Audio graph بعد التكبير
+  audioEl.autoplay = true; audioEl.playsInline = true; audioEl.style.display='none'; audioEl.volume = 1;
   audioEl.dataset.voicePeer = otherId;
   document.body.appendChild(audioEl);
   const peer = { pc, audioEl, otherId, madeOffer:false, speaking:false, stopMeter:null };
@@ -9377,16 +9386,21 @@ function voiceEnsurePeer(otherId, isInitiator){
 
   pc.ontrack = (ev)=>{
     const remoteStream = ev.streams[0];
+    // الصوت الأساسي بيشتغل عادي من هنا على طول (مضمون، مش متوقف على AudioContext)...
     audioEl.srcObject = remoteStream;
+    audioEl.volume = 1;
     audioEl.play().catch(()=>{});
-    // تكبير صوت الطرف التاني (Gain) + Limiter عشان يبقى أعلى وواضح
+    // ...وفوقه بنضيف تكبير إضافي (Gain+Limiter) لو المتصفح سمح، عشان الصوت يبقى أعلى من كده
     try{
-      const ctx = VOICE.audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-      const srcNode = ctx.createMediaElementSource(audioEl);
+      let ctx = VOICE.audioCtx;
+      if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); VOICE.audioCtx = ctx; }
+      ctx.resume().catch(()=>{});
+      const srcNode = ctx.createMediaStreamSource(remoteStream);
       const gainNode = ctx.createGain();
-      gainNode.gain.value = VOICE_OUTPUT_GAIN;
+      gainNode.gain.value = Math.max(0, VOICE_OUTPUT_GAIN - 1); // إضافي فوق الصوت العادي اللي أصلاً شغال من الـ audio element
       const limiter = _voiceLimiter(ctx);
       srcNode.connect(gainNode).connect(limiter).connect(ctx.destination);
+      peer._graphNodes = {srcNode, gainNode, limiter}; // نمسك مرجع عشان الـ nodes ما تتمسحش
     }catch(e){}
     if(peer.stopMeter) peer.stopMeter();
     peer.stopMeter = voiceAttachSpeakingMeter(remoteStream, (speaking)=>{ peer.speaking = speaking; });
@@ -9446,6 +9460,42 @@ function voiceTeardownPeer(otherId){
   delete VOICE.peers[otherId];
 }
 
+/* لو الميكروفون اشتغل من غير تكبير (لأن المتصفح رفض يشغّل الـ AudioContext وقت الدخول)، بنحاول
+   نرفّعه أول ما نحس بأي ضغطة/لمسة من المستخدم — وبنستبدل التراك اللي بيتبعت للاعبين التانيين
+   من غير ما نعمل اتصال جديد (replaceTrack) عشان الصوت ميتقطعش. */
+async function voiceTryUpgradeToBoostedInput(){
+  if(!VOICE.enabled || !VOICE.rawStream || VOICE.sendStream !== VOICE.rawStream) return;
+  try{
+    let ctx = VOICE.audioCtx;
+    if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); }
+    await ctx.resume().catch(()=>{});
+    if(ctx.state!=='running') return;
+    const src = ctx.createMediaStreamSource(VOICE.rawStream);
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = VOICE_INPUT_GAIN;
+    const limiter = _voiceLimiter(ctx);
+    const dest = ctx.createMediaStreamDestination();
+    src.connect(gainNode).connect(limiter).connect(dest);
+    VOICE.audioCtx = ctx;
+    VOICE.sendStream = dest.stream;
+    VOICE._localGraphNodes = {src, gainNode, limiter, dest};
+    const newTrack = dest.stream.getAudioTracks()[0];
+    if(newTrack){
+      Object.values(VOICE.peers).forEach(peer=>{
+        const sender = (peer.pc.getSenders()||[]).find(s=> s.track && s.track.kind==='audio');
+        if(sender) sender.replaceTrack(newTrack).catch(()=>{});
+      });
+    }
+  }catch(e){}
+}
+function _voiceResumeAndUpgrade(){
+  if(!VOICE.enabled) return;
+  if(VOICE.audioCtx && VOICE.audioCtx.state==='suspended') VOICE.audioCtx.resume().catch(()=>{});
+  voiceTryUpgradeToBoostedInput();
+}
+document.addEventListener('click', _voiceResumeAndUpgrade, { passive:true });
+document.addEventListener('touchend', _voiceResumeAndUpgrade, { passive:true });
+
 async function voiceStop(){
   if(VOICE.peersRef && VOICE.peersCb){ try{ VOICE.peersRef.off('value', VOICE.peersCb); }catch(e){} }
   Object.keys(VOICE.peers).forEach(voiceTeardownPeer);
@@ -9455,7 +9505,7 @@ async function voiceStop(){
   if(_fbDb && VOICE.roomCode && VOICE.myId){
     try{ await voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).remove(); }catch(e){}
   }
-  VOICE.enabled=false; VOICE.roomCode=null; VOICE.myId=null; VOICE.rawStream=null; VOICE.sendStream=null; VOICE.audioCtx=null; VOICE.muted=false; VOICE.speaking=false;
+  VOICE.enabled=false; VOICE.roomCode=null; VOICE.myId=null; VOICE.rawStream=null; VOICE.sendStream=null; VOICE.audioCtx=null; VOICE.muted=false; VOICE.speaking=false; VOICE._localGraphNodes=null;
   VOICE.peersRef=null; VOICE.peersCb=null; VOICE.peers={};
   removeVoiceWidget();
 }
