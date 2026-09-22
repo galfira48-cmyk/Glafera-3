@@ -12780,7 +12780,11 @@ function render(){
   app.innerHTML = html;
   if(state.view!=='game-domino') dominoSyncYardLayer('');
   updateTeamTint();
-  playPageTransition(app, state.view==='welcome' ? 'fade' : state.navDir);
+  /* الأنيميشن ده (فيد + حركة خفيفة) لازم يشتغل بس لما فعلاً بنتنقل بين شاشات (go/goBack) —
+     مش في كل مرة الشاشة نفسها بترندر تاني (زي تحديثات polling الغرفة كل ثانيتين أو بعد كل حركة في اللعبة)،
+     عشان كده كانت الشاشة بتـ"اهتز" في إكس أو والكونكت فور كل ما اللوح يتحدث. */
+  if(state.view==='welcome'){ playPageTransition(app, 'fade'); }
+  else if(state.navDir){ playPageTransition(app, state.navDir); }
   state.navDir = null;
   staggerRevealChildren(app);
 
