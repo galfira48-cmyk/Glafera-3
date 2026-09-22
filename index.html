@@ -16994,6 +16994,8 @@ function attachOtpBoxes(){
       }
       syncOtpHidden();
       if(box.value && idx < boxes.length-1){ boxes[idx+1].focus(); }
+      const allFilled = Array.from(boxes).every(b=>b.value);
+      if(allFilled){ setTimeout(autoSubmitOtpLogin, 220); }
     });
     box.addEventListener('keydown', (e)=>{
       if(e.key==='Backspace' && !box.value && idx>0){ boxes[idx-1].focus(); }
@@ -17001,6 +17003,28 @@ function attachOtpBoxes(){
     });
   });
   updateOtpProgress();
+}
+/* بمجرد ما يكمل كل خانات كود الدخول، يدخل على طول من غير ما يدوس زرار "دخول" */
+function autoSubmitOtpLogin(){
+  const input = document.getElementById('login-code-input');
+  if(!input) return;
+  const code = input.value.trim().toUpperCase();
+  if(!code) return;
+  const p = PARTICIPANTS.find(x=>x.id===code);
+  if(!p){
+    showToast('كود الدخول غير صحيح', true);
+    const boxes = document.querySelectorAll('.otp-box');
+    boxes.forEach(b=>{
+      b.value = '';
+      b.classList.remove('filled');
+      const v = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
+      if(v){ v.textContent=''; v.classList.remove('show'); }
+    });
+    syncOtpHidden();
+    if(boxes[0]) boxes[0].focus();
+    return;
+  }
+  doLoginWithCode(code);
 }
 function fillOtpBoxes(code){
   const boxes = document.querySelectorAll('.otp-box');
