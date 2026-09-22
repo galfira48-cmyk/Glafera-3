@@ -2018,10 +2018,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; }
   .chat-send-btn{ flex:none; width:38px; height:38px; border-radius:50%; border:none; background:linear-gradient(145deg,#3FDCC9,#845EC2);
     color:#fff; display:flex; align-items:center; justify-content:center; transform:scaleX(-1); }
-  .chat-voice-btn{ flex:none; width:38px; height:38px; border-radius:50%; border:none; background:var(--surface); border:1px solid var(--border);
-    font-size:16px; display:flex; align-items:center; justify-content:center; }
-  .chat-voice-btn.recording{ background:#FF6B6B; color:#fff; animation:chatPulse 1s ease-in-out infinite; }
-  @keyframes chatPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(255,107,107,.5);} 50%{ box-shadow:0 0 0 8px rgba(255,107,107,0);} }
 
   /* ---------- participant-facing: my photos (Photo) page ---------- */
   .myphotos-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
@@ -2228,32 +2224,55 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes emojiSent{0%{transform:scale(1);} 40%{transform:scale(1.35) translateY(-4px);} 100%{transform:scale(1);}}
   @keyframes emojiRing{from{transform:scale(.9); opacity:.9;} to{transform:scale(1.75); opacity:0;}}
 
-  /* ---------- room chat widget: floating tab + slide panel ---------- */
-  .room-chat-widget{position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:75; direction:ltr;}
-  .room-chat-tab{position:absolute; right:0; top:50%; transform:translateY(-50%); width:34px; height:66px; border:1px solid rgba(255,255,255,.25);
-    border-radius:16px 0 0 16px; background:linear-gradient(180deg, var(--gold), var(--gold-2)); color:#221a4d; font-size:19px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; box-shadow:-6px 6px 18px rgba(0,0,0,.35);
-    -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:filter .15s ease;}
-  .room-chat-tab:active{filter:brightness(.92);}
-  .room-chat-panel{position:absolute; right:34px; top:50%; transform:translateY(-50%) translateX(100%); opacity:0; pointer-events:none;
-    width:236px; max-width:66vw; max-height:min(420px,72vh); overflow-y:auto; direction:rtl; padding:12px;
-    background:linear-gradient(180deg, rgba(50,42,124,.94), rgba(24,19,66,.96)); border:1px solid rgba(255,255,255,.14);
-    border-radius:18px 0 0 18px; backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4);
-    box-shadow:0 16px 38px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.14);
-    transition:transform .3s cubic-bezier(.32,1.1,.4,1), opacity .22s ease;}
-  .room-chat-panel.open{transform:translateY(-50%) translateX(0); opacity:1; pointer-events:auto;}
-  .room-chat-emoji-row{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid var(--border);}
-  .room-chat-emoji-row .emoji-btn{width:34px; height:34px; font-size:18px;}
-  .room-chat-msgs-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;}
-  .room-chat-msg-btn{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:10px; padding:7px 6px; font-size:11.5px;
-    font-weight:800; color:var(--text); cursor:pointer; line-height:1.25; -webkit-tap-highlight-color:transparent;}
-  .room-chat-msg-btn:active{transform:scale(.94); background:rgba(244,183,64,.18); border-color:rgba(244,183,64,.5);}
-  .room-chat-input-row{display:flex; gap:6px; align-items:center;}
-  .room-chat-input-row .field{flex:1; margin:0; padding:8px 10px; font-size:12.5px;}
-  .room-chat-send{flex:none; width:34px; height:34px; border-radius:50%; border:1px solid rgba(244,183,64,.5); background:var(--gold); color:#221a4d;
-    display:flex; align-items:center; justify-content:center; cursor:pointer; transform:rotate(180deg); padding:0;}
-  .room-chat-send:active{filter:brightness(.92);}
-  @media (max-width:380px){ .room-chat-panel{width:200px;} }
+  /* ---------- room chat widget: elegant floating launcher + bottom panel ---------- */
+  .room-chat-widget{position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:75;
+    display:flex; flex-direction:column; align-items:flex-end; gap:14px;}
+
+  .room-chat-launcher{position:relative; flex:none; width:58px; height:58px; border-radius:50%; border:none; padding:0; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(155deg, var(--gold-2) 0%, var(--gold) 58%, #a9790d 100%);
+    box-shadow:0 12px 28px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.4), inset 0 -8px 16px rgba(0,0,0,.14);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .25s ease, box-shadow .25s ease;}
+  .room-chat-launcher::before{content:''; position:absolute; inset:-7px; border-radius:50%; border:1.5px solid rgba(244,183,64,.5); animation:roomChatRing 2.6s ease-out infinite;}
+  .room-chat-launcher:active{transform:scale(.9);}
+  .room-chat-launcher svg{position:relative; z-index:1; width:24px; height:24px; color:#241a4d; transition:transform .3s ease;}
+  .room-chat-launcher.open{background:linear-gradient(155deg, #332a72, #16123c);
+    box-shadow:0 12px 28px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);}
+  .room-chat-launcher.open svg{color:var(--gold-2);}
+  .room-chat-launcher.open::before{display:none;}
+  @keyframes roomChatRing{0%{transform:scale(1); opacity:.8;} 100%{transform:scale(1.4); opacity:0;}}
+  @media (prefers-reduced-motion:reduce){ .room-chat-launcher::before{animation:none;} }
+
+  .room-chat-panel{width:278px; max-width:82vw; max-height:min(430px,62vh); overflow-y:auto;
+    padding:16px 14px 14px; border-radius:24px; transform-origin:bottom right;
+    background:linear-gradient(165deg, rgba(58,49,142,.97), rgba(19,15,56,.98));
+    border:1px solid rgba(244,183,64,.22);
+    box-shadow:0 26px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.05), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(20px) saturate(1.5); -webkit-backdrop-filter:blur(20px) saturate(1.5);
+    transform:scale(.82) translateY(16px); opacity:0; pointer-events:none;
+    transition:transform .32s cubic-bezier(.22,1.2,.36,1), opacity .22s ease;}
+  .room-chat-panel.open{transform:scale(1) translateY(0); opacity:1; pointer-events:auto;}
+  .room-chat-head{display:flex; align-items:center; gap:7px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(244,183,64,.18);}
+  .room-chat-head-dot{width:7px; height:7px; border-radius:50%; background:var(--good); box-shadow:0 0 0 3px rgba(95,224,164,.2); flex:none;}
+  .room-chat-head-title{font-size:13.5px; font-weight:900; color:var(--gold-2); letter-spacing:.2px;}
+  .room-chat-emoji-row{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding-bottom:12px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,.08);}
+  .room-chat-emoji-row .emoji-btn{width:36px; height:36px; font-size:19px; background:rgba(255,255,255,.05);}
+  .room-chat-msgs-grid{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:12px;}
+  .room-chat-msg-btn{background:linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.1); border-radius:13px; padding:8px 7px; font-size:11.5px;
+    font-weight:800; color:var(--text); cursor:pointer; line-height:1.3; -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease;}
+  .room-chat-msg-btn:active{transform:scale(.94); background:linear-gradient(160deg, rgba(244,183,64,.3), rgba(244,183,64,.1)); border-color:rgba(244,183,64,.55);}
+  .room-chat-input-row{display:flex; gap:8px; align-items:center;}
+  .room-chat-input-row .field{flex:1; margin:0; padding:10px 15px; font-size:12.5px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);}
+  .room-chat-send{flex:none; width:38px; height:38px; border-radius:50%; border:none; cursor:pointer; padding:0;
+    background:linear-gradient(155deg, var(--gold-2), var(--gold)); color:#241a4d;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(0,0,0,.35);
+    transition:transform .15s ease, filter .15s ease;}
+  .room-chat-send svg{width:16px; height:16px;}
+  .room-chat-send:active{transform:scale(.9); filter:brightness(.95);}
+  @media (max-width:380px){ .room-chat-panel{width:232px;} .room-chat-launcher{width:52px; height:52px;} }
 
   .react-float.is-text .rf-emoji{width:auto; height:auto; min-width:44px; max-width:170px; border-radius:14px; padding:7px 12px; font-size:13px;
     font-weight:800; font-family:inherit; color:var(--text); background:linear-gradient(180deg, rgba(50,42,124,.94), rgba(24,19,66,.96));
@@ -9569,362 +9588,6 @@ function startRoomPolling(){
 }
 function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval=null; } stopReactPolling(); }
 
-/* ============================= VOICE CHAT (WebRTC mesh, signaled over Firebase) =============================
-   لما اللاعب يدخل غرفة لعب حقيقية (مش مشاهدة)، بنفتحله مايك ونعمل اتصال صوتي مباشر (WebRTC)
-   مع كل اللاعبين التانيين في نفس الغرفة. الإشارات (offer/answer/ICE) بتتبعت عن طريق نفس
-   قاعدة بيانات Firebase اللي اللعبة أصلاً بتستخدمها، فمفيش سيرفر إضافي مطلوب.
-   صوت الميكروفون والصوت الجاي من الطرف التاني بيتكبروا رقميًا (Web Audio Gain + Limiter)
-   عشان يبقوا أوضح وأعلى من غير ما "يفرقع" أو يتشوه. */
-const VOICE = { enabled:false, roomCode:null, myId:null, rawStream:null, sendStream:null, audioCtx:null, muted:false, peers:{}, peersRef:null, peersCb:null, idleRoom:null, idlePid:null };
-const VOICE_ICE_SERVERS = [{ urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302'] }];
-const VOICE_INPUT_GAIN = 1.6;   // تكبير صوت ميكروفوني قبل ما يتبعت لأصحابي (متوسط عشان ميبوظش/يتقطعش)
-const VOICE_OUTPUT_GAIN = 1.5;  // تكبير صوت اللي بييجي من كل واحد فيهم (تكبير واحد بس، مش مضاعف)
-
-function voiceRoot(roomCode){ return _fbDb ? _fbDb.ref(_FB_ROOT+'/voice_signal/'+_fbEncodeKey(roomCode)) : null; }
-function _voiceIsInitiator(myId, otherId){ return String(myId) < String(otherId); }
-function _voiceLimiter(ctx){
-  const c = ctx.createDynamicsCompressor();
-  c.threshold.value = -16; c.knee.value = 22; c.ratio.value = 10; c.attack.value = 0.003; c.release.value = 0.18;
-  return c;
-}
-
-function removeVoiceWidget(){ const el=document.getElementById('voice-widget'); if(el) el.remove(); }
-function ensureVoiceStyles(){
-  const old = document.getElementById('voice-widget-style');
-  if(old) old.remove(); // نتأكد إننا دايمًا بنستخدم أحدث نسخة من الاستايل
-  const st = document.createElement('style');
-  st.id = 'voice-widget-style';
-  st.textContent = `
-    @keyframes voicePulse{ 0%{box-shadow:0 0 0 0 rgba(95,224,164,.55);} 100%{box-shadow:0 0 0 12px rgba(95,224,164,0);} }
-    .voice-widget{position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); right:12px; z-index:500;
-      display:flex; flex-direction:column; align-items:center; gap:5px; direction:rtl;}
-    .voice-widget.voice-widget-idle{flex-direction:row; align-items:center; gap:9px;}
-    .voice-mic-btn{position:relative; width:46px; height:46px; border-radius:50%; border:1px solid rgba(255,255,255,.14);
-      background:#241f45; box-shadow:0 4px 14px rgba(0,0,0,.35);
-      display:flex; align-items:center; justify-content:center; color:#cfd3ff; cursor:pointer;
-      transition:transform .15s ease, background .2s ease, color .2s ease, border-color .2s ease;}
-    .voice-mic-btn svg{width:18px; height:18px;}
-    .voice-mic-btn:hover{background:#2d2758;}
-    .voice-mic-btn:active{transform:scale(.92);}
-    .voice-mic-btn.idle{background:#241f45; color:#a99dff; border-color:rgba(169,157,255,.4);}
-    .voice-mic-btn.muted{background:#3a2230; color:#ff9a9a; border-color:rgba(255,107,107,.4);}
-    .voice-mic-btn.speaking{animation:voicePulse 1.1s ease-out infinite;}
-    .voice-mic-btn:disabled{opacity:.5; cursor:not-allowed;}
-    .voice-peer-badge{position:absolute; bottom:-3px; left:-3px; min-width:17px; height:17px; padding:0 4px; border-radius:999px;
-      background:#5FE0A4; color:#0c2b22; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center;
-      border:2px solid rgba(15,12,40,.9);}
-    .voice-status-mini{font-size:9.5px; color:#cfd3ff; background:rgba(20,17,40,.78); padding:2px 7px; border-radius:999px;
-      max-width:96px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .voice-hint{background:#1c1938; color:#ece9ff; font-size:11.5px; font-weight:600; padding:7px 12px; border-radius:12px;
-      border:1px solid rgba(169,157,255,.3); box-shadow:0 6px 16px rgba(0,0,0,.35); white-space:nowrap; position:relative;
-      animation:voiceHintIn .25s ease-out;}
-    .voice-hint:after{content:''; position:absolute; top:50%; right:-5px; transform:translateY(-50%) rotate(45deg);
-      width:9px; height:9px; background:#1c1938; border-right:1px solid rgba(169,157,255,.3); border-top:1px solid rgba(169,157,255,.3);}
-    @keyframes voiceHintIn{from{opacity:0; transform:translateX(6px);} to{opacity:1; transform:translateX(0);}}
-  `;
-  document.head.appendChild(st);
-}
-function renderVoiceWidget(){
-  const idle = !VOICE.enabled && !!VOICE.idleRoom;
-  if(!VOICE.enabled && !idle){ removeVoiceWidget(); return; }
-  ensureVoiceStyles();
-  let el = document.getElementById('voice-widget');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'voice-widget';
-    document.body.appendChild(el);
-    el.addEventListener('click', (e)=>{
-      const btn = e.target.closest('[data-vaction]');
-      if(!btn) return;
-      if(btn.dataset.vaction==='mute') voiceToggleMute();
-      else if(btn.dataset.vaction==='enable') voiceEnableFromIdle();
-    });
-  }
-  if(idle){
-    el.className = 'voice-widget voice-widget-idle';
-    el.innerHTML = `
-      <button type="button" class="voice-mic-btn idle" data-vaction="enable" title="شغّل المايك">${ICO.micOff}</button>
-      <div class="voice-hint"><span>شغّل المايك لو حابب 🎙️</span></div>
-    `;
-    return;
-  }
-  el.className = 'voice-widget';
-  const ids = Object.keys(VOICE.peers);
-  const micOk = !!VOICE.rawStream;
-  const statusTxt = !micOk ? 'مفيش إذن مايك 🚫' : (ids.length ? `متصل مع ${ids.length} 🎧` : 'مستني الباقي…');
-  el.innerHTML = `
-    <button type="button" class="voice-mic-btn ${VOICE.muted?'muted':''} ${(!VOICE.muted && VOICE.speaking)?'speaking':''}" data-vaction="mute" ${micOk?'':'disabled'} title="${VOICE.muted?'رجّع الصوت':'اكتم صوتي'}">
-      ${VOICE.muted ? ICO.micOff : ICO.mic}
-      ${ids.length ? `<span class="voice-peer-badge">${ids.length}</span>` : ''}
-    </button>
-    <span class="voice-status-mini">${statusTxt}</span>
-  `;
-}
-function voiceEnableFromIdle(){
-  if(!VOICE.idleRoom || !VOICE.idlePid) return;
-  voiceStart(VOICE.idleRoom, VOICE.idlePid);
-}
-
-/* ---- simple speaking-detector: بيقيس مستوى الصوت اللحظي عشان يلوّن دائرة اللي بيتكلم ---- */
-function voiceAttachSpeakingMeter(stream, onLevel){
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const src = ctx.createMediaStreamSource(stream);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 512;
-    src.connect(analyser);
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    let raf = null;
-    const tick = ()=>{
-      analyser.getByteTimeDomainData(data);
-      let sum = 0;
-      for(let i=0;i<data.length;i++){ const v=(data[i]-128)/128; sum += v*v; }
-      const level = Math.sqrt(sum/data.length);
-      onLevel(level > 0.045);
-      raf = requestAnimationFrame(tick);
-    };
-    tick();
-    return ()=>{ if(raf) cancelAnimationFrame(raf); try{ ctx.close(); }catch(e){} };
-  }catch(e){ return ()=>{}; }
-}
-
-async function voiceStart(roomCode, myId){
-  if(!_fbDb || !roomCode || !myId) return;
-  if(VOICE.enabled && VOICE.roomCode===roomCode && VOICE.myId===myId) return;
-  await voiceStop();
-  VOICE.roomCode = roomCode; VOICE.myId = myId; VOICE.muted = false;
-  try{
-    VOICE.rawStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}, video:false});
-  }catch(e){
-    VOICE.rawStream = null;
-    VOICE.enabled = true; // سيب الويدجت ظاهر عشان يفهم إن المشكلة إذن الميكروفون
-    VOICE.idleRoom = null; VOICE.idlePid = null;
-    showToast('محتاج تسمح بالميكروفون عشان تتكلم مع أصحابك في الغرفة 🎙️', true);
-    renderVoiceWidget();
-    return;
-  }
-  VOICE.enabled = true;
-  VOICE.idleRoom = null; VOICE.idlePid = null;
-
-  // بنكبّر صوت الميكروفون رقميًا (Gain) قبل ما نبعته، وبنمرره على Limiter عشان يفضل واضح ومايتقطعش.
-  // لو المتصفح رفض يشغّل الـ AudioContext (سياسة autoplay)، بنرجع نبعت الصوت الخام عادي عشان الصوت
-  // مايتقطعش خالص، وبعدين بنحاول نرفّعه لحظة ما نحس بأي تفاعل من المستخدم (voiceTryUpgradeToBoostedInput).
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    await ctx.resume().catch(()=>{});
-    if(ctx.state==='running'){
-      const src = ctx.createMediaStreamSource(VOICE.rawStream);
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = VOICE_INPUT_GAIN;
-      const limiter = _voiceLimiter(ctx);
-      const dest = ctx.createMediaStreamDestination();
-      src.connect(gainNode).connect(limiter).connect(dest);
-      VOICE.audioCtx = ctx;
-      VOICE.sendStream = dest.stream;
-      VOICE._localGraphNodes = {src, gainNode, limiter, dest};
-    } else {
-      try{ ctx.close(); }catch(e2){}
-      VOICE.sendStream = VOICE.rawStream;
-    }
-  }catch(e){
-    VOICE.sendStream = VOICE.rawStream; // fallback: ابعت الصوت الخام من غير تكبير لو المتصفح مايدعمش الـ Web Audio graph
-  }
-
-  VOICE.stopMeter = voiceAttachSpeakingMeter(VOICE.rawStream, (speaking)=>{ VOICE.speaking = speaking; if(document.getElementById('voice-widget')) renderVoiceWidget(); });
-
-  const root = voiceRoot(roomCode);
-  const myRef = root.child(_fbEncodeKey(myId));
-  try{ await myRef.remove(); }catch(e){} // نظف أي بقايا من جلسة سابقة قبل ما نبدأ
-  myRef.child('presence').set({online:true, muted:false, ts:Date.now()});
-  myRef.child('presence').onDisconnect().remove();
-  myRef.onDisconnect().remove();
-
-  VOICE.peersRef = root;
-  VOICE.peersCb = root.on('value', snap=>{
-    const val = snap.val() || {};
-    Object.keys(val).forEach(key=>{
-      const rpid = _fbDecodeKey(key);
-      if(rpid===myId) return;
-      const online = !!(val[key] && val[key].presence && val[key].presence.online);
-      if(online && !VOICE.peers[rpid]) voiceEnsurePeer(rpid, _voiceIsInitiator(myId, rpid));
-      else if(!online && VOICE.peers[rpid]) voiceTeardownPeer(rpid);
-    });
-    Object.keys(VOICE.peers).forEach(rpid=>{ if(!val[_fbEncodeKey(rpid)]) voiceTeardownPeer(rpid); });
-    renderVoiceWidget();
-  });
-  renderVoiceWidget();
-}
-
-function voiceEnsurePeer(otherId, isInitiator){
-  if(VOICE.peers[otherId]) return VOICE.peers[otherId];
-  const pc = new RTCPeerConnection({ iceServers: VOICE_ICE_SERVERS });
-  const audioEl = document.createElement('audio');
-  audioEl.autoplay = true; audioEl.playsInline = true; audioEl.style.display='none'; audioEl.volume = 1;
-  audioEl.dataset.voicePeer = otherId;
-  document.body.appendChild(audioEl);
-  const peer = { pc, audioEl, otherId, madeOffer:false, speaking:false, stopMeter:null };
-  VOICE.peers[otherId] = peer;
-
-  const sendStream = VOICE.sendStream || VOICE.rawStream;
-  if(sendStream) sendStream.getTracks().forEach(t=> pc.addTrack(t, sendStream));
-
-  pc.ontrack = (ev)=>{
-    const remoteStream = ev.streams[0];
-    audioEl.srcObject = remoteStream;
-    audioEl.volume = 1;
-    // مهم: بنخرّج صوت الشخص التاني من مصدر واحد بس (مش الـ audio element + مسار Web Audio منفصل مع بعض)
-    // كان في السابق الصوت بيتشغل مرتين في نفس الوقت (مرة من الـ <audio> ومرة من AudioContext.destination)،
-    // وده اللي كان بيسبب صدى/تكرار عالي في الصوت وبيوصل تاني للميكروفون كـ"إكو". دلوقتي بنستخدم
-    // createMediaElementSource اللي بياخد مخرج الـ audio element نفسه ويوجهه لمسار واحد بس (Gain -> Limiter -> السماعة).
-    if(!peer._graphNodes){
-      try{
-        let ctx = VOICE.audioCtx;
-        if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); VOICE.audioCtx = ctx; }
-        ctx.resume().catch(()=>{});
-        const srcNode = ctx.createMediaElementSource(audioEl); // ده بياخد تحكم كامل في مخرج العنصر، فمفيش تكرار صوت خالص
-        const gainNode = ctx.createGain();
-        gainNode.gain.value = VOICE_OUTPUT_GAIN;
-        const limiter = _voiceLimiter(ctx);
-        srcNode.connect(gainNode).connect(limiter).connect(ctx.destination);
-        peer._graphNodes = {srcNode, gainNode, limiter};
-      }catch(e){
-        // لو المتصفح مايدعمش createMediaElementSource، الصوت هيفضل شغال عادي من الـ audio element بس (مسار واحد برضه، من غير تكبير زيادة)
-      }
-    }
-    audioEl.play().catch(()=>{});
-    if(peer.stopMeter) peer.stopMeter();
-    peer.stopMeter = voiceAttachSpeakingMeter(remoteStream, (speaking)=>{ peer.speaking = speaking; });
-  };
-  pc.onicecandidate = (ev)=>{
-    if(ev.candidate && VOICE.roomCode){
-      voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('candidates').push(ev.candidate.toJSON());
-    }
-  };
-
-  const inboxFromRef = voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).child('inbox').child(_fbEncodeKey(otherId));
-  const offerCb = inboxFromRef.child('offer').on('value', async snap=>{
-    const offer = snap.val();
-    if(!offer || pc.currentRemoteDescription || pc.signalingState==='closed') return;
-    try{
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('answer').set({type:answer.type, sdp:answer.sdp});
-    }catch(e){}
-  });
-  const answerCb = inboxFromRef.child('answer').on('value', async snap=>{
-    const answer = snap.val();
-    if(!answer || !peer.madeOffer || pc.currentRemoteDescription || pc.signalingState==='closed') return;
-    try{ await pc.setRemoteDescription(new RTCSessionDescription(answer)); }catch(e){}
-  });
-  const candCb = inboxFromRef.child('candidates').on('child_added', snap=>{
-    const cand = snap.val();
-    if(cand && pc.signalingState!=='closed') pc.addIceCandidate(new RTCIceCandidate(cand)).catch(()=>{});
-  });
-  peer._unsub = ()=>{
-    try{ inboxFromRef.child('offer').off('value', offerCb); }catch(e){}
-    try{ inboxFromRef.child('answer').off('value', answerCb); }catch(e){}
-    try{ inboxFromRef.child('candidates').off('child_added', candCb); }catch(e){}
-  };
-
-  if(isInitiator){
-    (async ()=>{
-      try{
-        peer.madeOffer = true;
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('offer').set({type:offer.type, sdp:offer.sdp});
-      }catch(e){}
-    })();
-  }
-  return peer;
-}
-
-function voiceTeardownPeer(otherId){
-  const peer = VOICE.peers[otherId];
-  if(!peer) return;
-  try{ peer._unsub && peer._unsub(); }catch(e){}
-  try{ peer.stopMeter && peer.stopMeter(); }catch(e){}
-  try{ peer.pc.close(); }catch(e){}
-  try{ peer.audioEl.remove(); }catch(e){}
-  delete VOICE.peers[otherId];
-}
-
-/* لو الميكروفون اشتغل من غير تكبير (لأن المتصفح رفض يشغّل الـ AudioContext وقت الدخول)، بنحاول
-   نرفّعه أول ما نحس بأي ضغطة/لمسة من المستخدم — وبنستبدل التراك اللي بيتبعت للاعبين التانيين
-   من غير ما نعمل اتصال جديد (replaceTrack) عشان الصوت ميتقطعش. */
-async function voiceTryUpgradeToBoostedInput(){
-  if(!VOICE.enabled || !VOICE.rawStream || VOICE.sendStream !== VOICE.rawStream) return;
-  try{
-    let ctx = VOICE.audioCtx;
-    if(!ctx || ctx.state==='closed'){ ctx = new (window.AudioContext||window.webkitAudioContext)(); }
-    await ctx.resume().catch(()=>{});
-    if(ctx.state!=='running') return;
-    const src = ctx.createMediaStreamSource(VOICE.rawStream);
-    const gainNode = ctx.createGain();
-    gainNode.gain.value = VOICE_INPUT_GAIN;
-    const limiter = _voiceLimiter(ctx);
-    const dest = ctx.createMediaStreamDestination();
-    src.connect(gainNode).connect(limiter).connect(dest);
-    VOICE.audioCtx = ctx;
-    VOICE.sendStream = dest.stream;
-    VOICE._localGraphNodes = {src, gainNode, limiter, dest};
-    const newTrack = dest.stream.getAudioTracks()[0];
-    if(newTrack){
-      Object.values(VOICE.peers).forEach(peer=>{
-        const sender = (peer.pc.getSenders()||[]).find(s=> s.track && s.track.kind==='audio');
-        if(sender) sender.replaceTrack(newTrack).catch(()=>{});
-      });
-    }
-  }catch(e){}
-}
-function _voiceResumeAndUpgrade(){
-  if(!VOICE.enabled) return;
-  if(VOICE.audioCtx && VOICE.audioCtx.state==='suspended') VOICE.audioCtx.resume().catch(()=>{});
-  voiceTryUpgradeToBoostedInput();
-}
-document.addEventListener('click', _voiceResumeAndUpgrade, { passive:true });
-document.addEventListener('touchend', _voiceResumeAndUpgrade, { passive:true });
-
-async function voiceStop(){
-  if(VOICE.peersRef && VOICE.peersCb){ try{ VOICE.peersRef.off('value', VOICE.peersCb); }catch(e){} }
-  Object.keys(VOICE.peers).forEach(voiceTeardownPeer);
-  try{ VOICE.stopMeter && VOICE.stopMeter(); }catch(e){}
-  if(VOICE.rawStream){ try{ VOICE.rawStream.getTracks().forEach(t=>t.stop()); }catch(e){} }
-  if(VOICE.audioCtx){ try{ VOICE.audioCtx.close(); }catch(e){} }
-  if(_fbDb && VOICE.roomCode && VOICE.myId){
-    try{ await voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).remove(); }catch(e){}
-  }
-  VOICE.enabled=false; VOICE.roomCode=null; VOICE.myId=null; VOICE.rawStream=null; VOICE.sendStream=null; VOICE.audioCtx=null; VOICE.muted=false; VOICE.speaking=false; VOICE._localGraphNodes=null;
-  VOICE.peersRef=null; VOICE.peersCb=null; VOICE.peers={};
-  removeVoiceWidget();
-}
-
-function voiceToggleMute(){
-  if(!VOICE.rawStream) return;
-  VOICE.muted = !VOICE.muted;
-  VOICE.rawStream.getAudioTracks().forEach(t=> t.enabled = !VOICE.muted);
-  if(VOICE.roomCode && VOICE.myId && _fbDb){
-    voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).child('presence').update({muted:VOICE.muted, ts:Date.now()});
-  }
-  vibrate(10);
-  renderVoiceWidget();
-}
-
-/* بيتنادى بعد أي تنقل في التطبيق (go/goBack): يفتح الصوت لو دخلنا غرفة لعب فعلية، ويقفله لو خرجنا */
-function handleVoiceForView(){
-  const inLiveRoom = typeof state.view==='string' && state.view.indexOf('room-')===0 && !!state.roomCode && !state.roomSpectate && !!state.pid;
-  if(inLiveRoom){
-    if(VOICE.enabled && VOICE.roomCode===state.roomCode && VOICE.myId===state.pid) return; // already running for this room, widget already showing
-    if(VOICE.enabled) voiceStop(); // switched room/player while voice was running elsewhere
-    // ما بنشغّلش المايك أوتوماتيك؛ بنسيب زرار جاهز واللاعب هو اللي يشغّله لو حابب
-    VOICE.idleRoom = state.roomCode; VOICE.idlePid = state.pid;
-    renderVoiceWidget();
-  } else {
-    VOICE.idleRoom = null; VOICE.idlePid = null;
-    if(VOICE.enabled) voiceStop(); else removeVoiceWidget();
-  }
-}
 let watchListPollInterval = null;
 function startWatchListPolling(){
   if(watchListPollInterval) return;
@@ -10707,17 +10370,21 @@ function roomChatWidget(){
   const open = !!state.roomChatOpen;
   const emojiBtns = ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('');
   const msgBtns = ROOM_QUICK_MSGS.map(m=>`<button type="button" class="room-chat-msg-btn" data-action="room-quick-msg" data-msg="${escapeHtml(m)}">${escapeHtml(m)}</button>`).join('');
+  const chatIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>`;
+  const closeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+  const sendIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
   return `
   <div class="room-chat-widget">
-    <button type="button" class="room-chat-tab" data-action="toggle-room-chat" aria-label="شات">${open ? ICO.chev : '💬'}</button>
     <div class="room-chat-panel ${open?'open':''}">
+      <div class="room-chat-head"><span class="room-chat-head-dot"></span><span class="room-chat-head-title">شات سريع</span></div>
       <div class="room-chat-emoji-row">${emojiBtns}</div>
       <div class="room-chat-msgs-grid">${msgBtns}</div>
       <div class="room-chat-input-row">
         <input type="text" id="room-chat-free-input" class="field" placeholder="اكتب أي حاجة تتبعت..." maxlength="60" />
-        <button type="button" class="room-chat-send" data-action="room-chat-send-free" aria-label="إرسال">${ICO.chev}</button>
+        <button type="button" class="room-chat-send" data-action="room-chat-send-free" aria-label="إرسال">${sendIcon}</button>
       </div>
     </div>
+    <button type="button" class="room-chat-launcher ${open?'open':''}" data-action="toggle-room-chat" aria-label="شات">${open ? closeIcon : chatIcon}</button>
   </div>`;
 }
 function vsPhotoHtml(pid){
@@ -10974,7 +10641,6 @@ function renderChatPage(){
         <label class="chat-attach-btn" title="صورة">📷<input type="file" accept="image/*" id="chat-photo-input" style="display:none;" /></label>
         <label class="chat-attach-btn" title="فيديو">🎥<input type="file" accept="video/*" id="chat-video-input" style="display:none;" /></label>
         <input type="text" id="chat-text-input" class="field" placeholder="اكتب رسالة..." />
-        <button type="button" class="chat-voice-btn ${state.chatRecording?'recording':''}" data-action="toggle-chat-voice">${state.chatRecording?'⏹️':'🎙️'}</button>
         <button type="button" class="chat-send-btn" data-action="send-chat-text">${ICO.chev}</button>
       </div>
     </div>
@@ -11038,42 +10704,6 @@ async function doSendChatVideo(file){
   reader.onload = async ()=>{ await sendChatMediaMessage('video', reader.result, null); };
   reader.onerror = ()=> showToast('تعذّر قراءة الفيديو', true);
   reader.readAsDataURL(file);
-}
-let _chatRecorder = null, _chatRecordChunks = [], _chatRecordStart = 0, _chatRecordTimer = null;
-async function toggleChatVoiceRecording(){
-  if(state.chatRecording){ stopChatVoiceRecording(); return; }
-  if(typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showToast('المتصفح ده مش بيدعم تسجيل الصوت', true);
-    return;
-  }
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
-    _chatRecordChunks = [];
-    _chatRecorder = new MediaRecorder(stream);
-    _chatRecorder.ondataavailable = (e)=>{ if(e.data && e.data.size>0) _chatRecordChunks.push(e.data); };
-    _chatRecorder.onstop = async ()=>{
-      stream.getTracks().forEach(t=>t.stop());
-      const durationSec = Math.max(1, Math.round((Date.now()-_chatRecordStart)/1000));
-      const blob = new Blob(_chatRecordChunks, { type:'audio/webm' });
-      const reader = new FileReader();
-      reader.onload = async ()=>{ await sendChatMediaMessage('voice', reader.result, durationSec); };
-      reader.readAsDataURL(blob);
-    };
-    _chatRecorder.start();
-    _chatRecordStart = Date.now();
-    state.chatRecording = true;
-    render();
-    _chatRecordTimer = setTimeout(()=>{ if(_chatRecorder && _chatRecorder.state==='recording') stopChatVoiceRecording(); }, 60000); // حد أقصى دقيقة للرسالة الصوتية
-  }catch(e){
-    console.error('getUserMedia failed:', e);
-    showToast('محتاجين إذن الميكروفون عشان تسجل رسالة صوتية', true);
-  }
-}
-function stopChatVoiceRecording(){
-  if(_chatRecordTimer){ clearTimeout(_chatRecordTimer); _chatRecordTimer = null; }
-  if(_chatRecorder && _chatRecorder.state==='recording') _chatRecorder.stop();
-  state.chatRecording = false;
-  render();
 }
 function openMyAvatarLightbox(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -14101,7 +13731,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-myphoto'){ openMyPhotosLightbox(parseInt(el.dataset.idx,10)||0); }
   else if(action==='send-chat-text'){ doSendChatText(); }
   else if(action==='chat-insert-emoji'){ doChatInsertEmoji(el.dataset.emoji); }
-  else if(action==='toggle-chat-voice'){ toggleChatVoiceRecording(); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
