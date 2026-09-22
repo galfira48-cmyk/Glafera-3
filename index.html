@@ -2685,11 +2685,47 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-code-input{flex:1; text-align:center; letter-spacing:6px; font-family:'Cairo',sans-serif; font-weight:800; font-size:22px;
     padding:14px 10px; border-radius:14px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); color:var(--text);}
-  .room-waiting{text-align:center; padding:20px 10px;}
+  .room-waiting{text-align:center; padding:6px 4px 4px;}
+  /* ---------- كارت كود الغرفة الاحترافي ---------- */
+  .room-code-card{position:relative; overflow:hidden; background:linear-gradient(165deg, var(--surface), var(--surface-2));
+    border:1px solid var(--border); border-radius:24px; padding:22px 18px 20px; box-shadow:0 14px 30px -18px rgba(0,0,0,.5);}
+  .room-code-card::before{content:''; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 0%, rgba(244,183,64,.16), transparent 62%); pointer-events:none;}
+  .room-code-eyebrow{position:relative; display:flex; align-items:center; justify-content:center; gap:6px;
+    font-family:'Cairo',sans-serif; font-size:12px; font-weight:800; color:var(--text-muted); letter-spacing:.3px; margin-bottom:12px;}
+  .room-code-eyebrow svg{width:14px; height:14px; opacity:.85;}
+  .room-code-value{position:relative; font-family:'Cairo',sans-serif; font-weight:900; font-size:40px; line-height:1;
+    color:var(--gold); letter-spacing:9px; direction:ltr; text-shadow:0 2px 16px rgba(244,183,64,.35);}
+  .room-code-copy{position:relative; margin:16px auto 0; display:flex; align-items:center; justify-content:center; gap:7px;
+    background:var(--bg-2); border:1px solid var(--border); border-radius:999px; padding:9px 20px; font-family:'Tajawal',sans-serif;
+    font-size:12.5px; font-weight:700; color:var(--text); cursor:pointer; width:max-content;}
+  .room-code-copy svg{width:14px; height:14px; flex-shrink:0;}
+  .room-code-copy:active{transform:scale(.95);}
+  .room-code-copy.is-copied{color:var(--good); border-color:rgba(95,224,164,.4);}
+  .room-wait-status{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px;
+    font-family:'Tajawal',sans-serif; font-size:12.5px; font-weight:700; color:var(--text-muted);}
+  .room-wait-dots{display:inline-flex; gap:3px;}
+  .room-wait-dots span{width:5px; height:5px; border-radius:50%; background:var(--gold); display:inline-block;
+    animation:roomWaitPulse 1.2s ease-in-out infinite;}
+  .room-wait-dots span:nth-child(2){animation-delay:.2s;}
+  .room-wait-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes roomWaitPulse{0%,60%,100%{opacity:.3; transform:scale(.75);} 30%{opacity:1; transform:scale(1);}}
+  /* legacy alias kept so any old markup still renders sanely */
   .room-code-display{font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--text);
     background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--gold); border-radius:20px;
     padding:18px; display:inline-block; min-width:200px;}
   .room-code-display b{font-size:38px; color:var(--gold); letter-spacing:8px;}
+  /* ---------- كارت رسوم ومكافآت المعركة (منظم بدل الجملة المزنوقة) ---------- */
+  .stakes-card{position:relative; display:flex; align-items:flex-start; gap:12px; text-align:right;
+    background:linear-gradient(160deg, rgba(244,183,64,.13), rgba(244,183,64,.02)); border:1px solid rgba(244,183,64,.3);
+    border-radius:18px; padding:14px 16px; margin-top:14px;}
+  .stakes-card-ico{flex-shrink:0; width:36px; height:36px; border-radius:12px; background:rgba(244,183,64,.16);
+    display:flex; align-items:center; justify-content:center; font-size:17px;}
+  .stakes-card-body{flex:1; min-width:0;}
+  .stakes-card-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--text); margin-bottom:8px;}
+  .stakes-row{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:11.5px;
+    font-weight:600; color:var(--text-muted); padding:6px 0;}
+  .stakes-row + .stakes-row{border-top:1px dashed var(--border);}
+  .stakes-row b{font-family:'Cairo',sans-serif; font-weight:900; font-size:13.5px; color:var(--gold); white-space:nowrap;}
 
   /* ============================= GAMES HUB — GLASS TILES ============================= */
   .gh-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:6px;}
@@ -8076,8 +8112,8 @@ function renderRoomLudoLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      <div class="room-code-display">كود الغرفة<br><b>${room.code}</b></div>
-      <div class="hint" style="text-align:center;margin:10px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🎲</div>
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🎲</div>
       <div class="ls-list">${slots}</div>
       ${isHost
         ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-ludo-start" ${ps.length<2?'disabled':''}>🎲 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
@@ -9201,8 +9237,8 @@ function renderRoomUnoLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      <div class="room-code-display">كود الغرفة<br><b>${room.code}</b></div>
-      <div class="hint" style="text-align:center;margin:10px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
         ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-uno-start" ${ps.length<2?'disabled':''}>🃏 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
@@ -9356,12 +9392,29 @@ function renderRoomsLobby(){
     <div class="gh-grid">${tiles}</div>
   `;
 }
+function roomCodeCard(code){
+  return `
+    <div class="room-code-card">
+      <div class="room-code-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        كود الغرفة
+      </div>
+      <div class="room-code-value">${code}</div>
+      <button type="button" class="room-code-copy" data-action="copy-room-code" data-code="${code}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A2.5 2.5 0 012 12.5v-8A2.5 2.5 0 014.5 2h8A2.5 2.5 0 0115 4.5V5"/></svg>
+        <span>نسخ الكود</span>
+      </button>
+    </div>`;
+}
 function renderRoomWaiting(room){
   return `
     <div class="room-waiting">
-      <div class="room-code-display">كود الغرفة<br><b>${room.code}</b></div>
-      <div class="hint" style="text-align:center;margin-top:10px;">شارك الكود مع صاحبك عشان ينضم للغرفة</div>
-      <div class="hint" style="text-align:center;margin-top:6px;">⏳ في انتظار انضمام صديقك...</div>
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin-top:14px;">شارك الكود مع صاحبك عشان ينضم للغرفة</div>
+      <div class="room-wait-status">
+        <span class="room-wait-dots"><span></span><span></span><span></span></span>
+        في انتظار انضمام صديقك...
+      </div>
     </div>
   `;
 }
@@ -9374,7 +9427,14 @@ function renderRoomXo(){
     const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
     const reward = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoWinReward) || 0;
     const need = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoWinsNeeded) || 3;
-    const feeNote = fee>0 ? `<div class="xo-stakes-banner" style="margin-top:14px;">💰 أول ما صاحبك ينضم، هيتخصم <b>${fee}</b> نقطة من كل واحد فيكم — والفايز (أول ما يوصل ${need} فوز) ياخد <b>${reward}</b> نقطة</div>` : '';
+    const feeNote = fee>0 ? `<div class="stakes-card">
+      <div class="stakes-card-ico">💰</div>
+      <div class="stakes-card-body">
+        <div class="stakes-card-title">رسوم ومكافآت المعركة</div>
+        <div class="stakes-row"><span>اشتراك كل لاعب أول ما صاحبك ينضم</span><b>${fee} نقطة</b></div>
+        <div class="stakes-row"><span>مكافأة الفايز (أول ${need} فوز)</span><b>${reward} نقطة</b></div>
+      </div>
+    </div>` : '';
     return `<div class="back-row"><button class="icon-btn" data-action="leave-room">${ICO.back}</button><div class="back-title">إكس أو - غرفة</div></div>${renderRoomWaiting(room)}${feeNote}`;
   }
   const mySymbol = room.hostId===state.pid ? 'X' : 'O';
@@ -9382,7 +9442,14 @@ function renderRoomXo(){
   const oppName = room.hostId===state.pid ? room.guestName : room.hostName;
   const myId = state.pid, oppId = room.hostId===state.pid ? room.guestId : room.hostId;
   const need = (room.stakes && room.stakes.winsNeeded) || (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.xoWinsNeeded) || 3;
-  const feeBanner = room.entryFeeCharged ? `<div class="xo-stakes-banner">💰 كل لاعب دفع <b>${room.stakes?room.stakes.entryFee:0}</b> نقطة اشتراك — أول ما حد يوصل <b>${need}</b> فوز ياخد المعركة و<b>${room.stakes?room.stakes.winReward:0}</b> نقطة</div>` : '';
+  const feeBanner = room.entryFeeCharged ? `<div class="stakes-card">
+      <div class="stakes-card-ico">💰</div>
+      <div class="stakes-card-body">
+        <div class="stakes-card-title">رسوم ومكافآت المعركة</div>
+        <div class="stakes-row"><span>اشتراك كل لاعب (متخصم بالفعل)</span><b>${room.stakes?room.stakes.entryFee:0} نقطة</b></div>
+        <div class="stakes-row"><span>مكافأة الفايز (أول ${need} فوز)</span><b>${room.stakes?room.stakes.winReward:0} نقطة</b></div>
+      </div>
+    </div>` : '';
   if(room.matchOver){
     const iWon = room.matchWinnerSymbol === mySymbol;
     const reward = (room.stakes && room.stakes.winReward) || 0;
@@ -13362,6 +13429,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='create-room'){ const gt = el.dataset.game; showRoomFeeModal('create', ()=>createGameRoom(gt)); }
   else if(action==='join-room'){ const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
+  else if(action==='copy-room-code'){ doCopyRoomCode(el); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
   else if(action==='room-domino-tile'){ doRoomDominoMove(parseInt(el.dataset.idx,10)); }
@@ -15066,6 +15134,34 @@ function closeNotifPanel(){
   const overlay = document.getElementById('notif-overlay');
   if(overlay) overlay.remove();
   render();
+}
+
+/* ============================= COPY ROOM CODE ============================= */
+async function doCopyRoomCode(btn){
+  const code = btn && btn.dataset ? btn.dataset.code : '';
+  if(!code) return;
+  try{
+    await navigator.clipboard.writeText(code);
+  }catch(e){
+    try{
+      const tmp = document.createElement('textarea');
+      tmp.value = code; tmp.style.position='fixed'; tmp.style.opacity='0';
+      document.body.appendChild(tmp); tmp.select();
+      document.execCommand('copy'); tmp.remove();
+    }catch(e2){ showToast('انسخ الكود يدويًا: '+code, true); return; }
+  }
+  showToast('تم نسخ كود الغرفة ✅');
+  if(btn){
+    const label = btn.querySelector('span');
+    const prevText = label ? label.textContent : '';
+    btn.classList.add('is-copied');
+    if(label) label.textContent = 'اتنسخ!';
+    clearTimeout(btn._copyResetT);
+    btn._copyResetT = setTimeout(()=>{
+      btn.classList.remove('is-copied');
+      if(label) label.textContent = prevText || 'نسخ الكود';
+    }, 1600);
+  }
 }
 
 /* ============================= INVITE A FRIEND ============================= */
