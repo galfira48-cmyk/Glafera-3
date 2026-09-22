@@ -2589,6 +2589,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ls-toggle button{width:38px; height:34px; border-radius:9px; border:none; background:transparent; font-size:18px; opacity:.5; padding:0;}
   .ls-toggle button.on{background:linear-gradient(145deg,var(--pa),var(--pb)); opacity:1; box-shadow:0 2px 8px rgba(0,0,0,.35);}
   .ludo-online{width:100%; margin-top:10px;}
+  .ls-color-picker{display:flex; gap:12px; margin:2px 0 16px; flex-wrap:wrap;}
+  .ls-color-swatch{position:relative; width:44px; height:44px; border-radius:50%; padding:0; border:3px solid transparent;
+    background:linear-gradient(145deg,var(--pa,var(--pc)),var(--pc)); box-shadow:0 4px 12px rgba(var(--pr),.4), inset 0 2px 3px rgba(255,255,255,.4);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:17px; transition:transform .2s, border-color .2s;}
+  .ls-color-swatch.on{border-color:#fff; transform:scale(1.1); box-shadow:0 0 0 3px var(--pc), 0 6px 16px rgba(var(--pr),.55);}
   /* لاعبين */
   .ludo-players{display:grid; gap:8px; margin:2px 0 12px;}
   .lp-chip{position:relative; padding:14px 4px 9px; border-radius:18px; text-align:center; min-width:0;
@@ -2676,7 +2681,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     100%{transform:translate(-50%,var(--ty)) scale(calc(var(--s,1)*.95)) rotate(360deg);}
   }
   /* الزهر */
-  .ludo-dock{display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
+  .ludo-dock{position:relative; display:flex; flex-direction:column; align-items:center; gap:10px; margin:0 0 8px;}
+  .ludo-mybadge{position:absolute; left:4px; bottom:4px; display:flex; flex-direction:column; align-items:center; gap:3px; z-index:2;}
+  .ludo-mybadge .lp-avatar-wrap{width:40px; height:40px;}
+  .ludo-mybadge .pl-avatar{width:40px; height:40px; box-shadow:0 0 0 2px var(--surface), 0 0 0 3.5px var(--pc), 0 4px 10px rgba(0,0,0,.35);}
+  .ludo-mybadge span{font-size:9.5px; font-weight:800; color:#fff; background:rgba(var(--pr),.85); padding:2px 7px; border-radius:8px; white-space:nowrap;}
   .ludo-dice{width:80px; height:80px; padding:0; border-radius:22px; display:block; background:linear-gradient(145deg,#FFFFFF,#E6DFCD); border:3.5px solid var(--dc);
     box-shadow:0 10px 20px rgba(0,0,0,.5), inset 0 -6px 10px rgba(0,0,0,.12), inset 0 4px 6px rgba(255,255,255,.8);}
   .ludo-dice svg{width:100%; height:100%; display:block;}
@@ -7732,6 +7741,7 @@ function ludoDockHtml(L, ctx){
   const dis = ctx.ready ? '' : 'disabled';
   return `
     <div class="ludo-dock">
+      ${ludoMyBadgeHtml(L)}
       <button type="button" class="ludo-dice no-ripple${ctx.ready?' ready':''}" id="ludo-dice" data-action="ludo-roll" style="--dc:${pal.solid};--dr:${pal.rgb};" ${dis} aria-label="ارمي الزهر">${ludoDiceFace(L.dice, pal.b)}</button>
       <div class="ludo-msg" id="ludo-msg">${escapeHtml(L.msg||'')}</div>
     </div>`;
@@ -7811,7 +7821,7 @@ function ludoMyName(){
   return p ? String(p.name).trim().split(/\s+/)[0] : 'انت';
 }
 function ludoDefaultCfg(){
-  return {n:4, types:['human','bot','bot','bot'], names:[ludoMyName(),'لاعب 2','لاعب 3','لاعب 4']};
+  return {n:4, types:['human','bot','bot','bot'], names:[ludoMyName(),'لاعب 2','لاعب 3','لاعب 4'], myColor:null};
 }
 function ludoNewCtrl(prev){
   return {stage:'setup', cfg: prev ? prev.cfg : ludoDefaultCfg(), L:null, disp:null, busy:false, dead:false};
@@ -7828,8 +7838,23 @@ function ludoSaveNames(G){
     if(el) G.cfg.names[i] = el.value.slice(0,12);
   }
 }
+function ludoOrderedColors(cfg){
+  const base = LUDO_SEAT_COLORS[cfg.n];
+  if(cfg.myColor==null || cfg.types[0]!=='human') return base;
+  const pool = [0,1,2,3].filter(c=>c!==cfg.myColor);
+  return [cfg.myColor, ...pool].slice(0, cfg.n);
+}
+function ludoMyBadgeHtml(L){
+  const meSeat = L.seats.findIndex(s=>s.pid===state.pid);
+  if(meSeat<0) return '';
+  const s = L.seats[meSeat], pal = LUDO_PAL[s.color];
+  return `<div class="ludo-mybadge" style="--pc:${pal.solid};--pr:${pal.rgb};" title="لونك: ${pal.name}">
+    <div class="lp-avatar-wrap">${ludoAvatarHtml(s)}</div>
+    <span>${pal.emoji} لونك</span>
+  </div>`;
+}
 function ludoSeatsFromCfg(cfg){
-  const cols = LUDO_SEAT_COLORS[cfg.n];
+  const cols = ludoOrderedColors(cfg);
   const bots = cfg.types.slice(0,cfg.n).filter(t=>t==='bot').length;
   let b = 0;
   return cols.map((col,i)=>{
@@ -7861,9 +7886,15 @@ function renderLudoGame(){
   if(G.stage==='setup') return head + renderLudoSetup(G);
   return head + ludoPlayHtml(G.L, ludoLocalCtx(G));
 }
+function ludoColorPickerHtml(c){
+  if(c.types[0]!=='human') return '';
+  const sel = c.myColor!=null ? c.myColor : ludoOrderedColors(c)[0];
+  const swatches = LUDO_PAL.map((pal,ci)=>`<button type="button" class="ls-color-swatch${sel===ci?' on':''}" data-action="ludo-color" data-c="${ci}" style="--pc:${pal.solid};--pa:${pal.a};--pr:${pal.rgb};" aria-label="${pal.name}">${sel===ci?'✓':''}</button>`).join('');
+  return `<div class="ls-label">لون لعبك 🎨</div><div class="ls-color-picker">${swatches}</div>`;
+}
 function renderLudoSetup(G){
   const c = G.cfg;
-  const cols = LUDO_SEAT_COLORS[c.n];
+  const cols = ludoOrderedColors(c);
   const countChips = [2,3,4].map(n=>`<button type="button" class="ls-chip${c.n===n?' on':''}" data-action="ludo-count" data-n="${n}">${n} لاعبين</button>`).join('');
   const rows = cols.map((col,i)=>{
     const pal = LUDO_PAL[col];
@@ -7892,6 +7923,7 @@ function renderLudoSetup(G){
     </div>
     <div class="ls-label">عدد اللاعبين</div>
     <div class="ls-chips">${countChips}</div>
+    ${ludoColorPickerHtml(c)}
     <div class="ls-label">اللاعبين (👤 إنسان / 🤖 جهاز)</div>
     <div class="ls-list">${rows}</div>
     <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="ludo-start">🎲 ابدأ اللعب</button>
@@ -7913,6 +7945,11 @@ function doLudoSeatType(i, type){
     if(humans===0){ showToast('لازم يبقى فيه لاعب واحد على الأقل', true); return; }
   }
   c.types[i] = type;
+  render();
+}
+function doLudoColor(ci){
+  const G = state.ludo; if(!G || G.stage!=='setup') return;
+  G.cfg.myColor = ci;
   render();
 }
 function doLudoPreset(p){
@@ -13368,6 +13405,38 @@ const SND = {
   unoDrawPenalty(){
     [1,2,3].forEach(i=> setTimeout(()=>luxTone(220-i*20, .12, 'sawtooth', .07, {wet:.15}), i*70));
   },
+  ludoButton(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return;
+      const ctx = window.__glavCtx || (window.__glavCtx = new Ctx());
+      if(ctx.state==='suspended'){ ctx.resume(); }
+      const now = ctx.currentTime;
+      /* crisp high click transient (attack) */
+      const dur = 0.02;
+      const bufSize = Math.floor(ctx.sampleRate*dur);
+      const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<bufSize;i++){ data[i] = (Math.random()*2-1) * Math.pow(1-i/bufSize, 2.5); }
+      const noise = ctx.createBufferSource(); noise.buffer = buffer;
+      const nf = ctx.createBiquadFilter(); nf.type='highpass'; nf.frequency.value = 4800;
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.0001, now);
+      ng.gain.exponentialRampToValueAtTime(.22, now+0.002);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+      noise.connect(nf); nf.connect(ng); ng.connect(getMasterOut(ctx));
+      noise.start(now);
+      /* round pitched "pop" body ~880Hz */
+      const osc = ctx.createOscillator(), og = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(840, now+0.09);
+      og.gain.setValueAtTime(0.0001, now);
+      og.gain.exponentialRampToValueAtTime(.24, now+0.006);
+      og.gain.exponentialRampToValueAtTime(0.0001, now+0.1);
+      osc.connect(og); og.connect(getMasterOut(ctx));
+      osc.start(now); osc.stop(now+0.11);
+    }catch(e){}
+  },
   fanfare(){
     tick(.6);
     luxTone(98, .4, 'sine', .18, {wet:.22, cutoff:1800});
@@ -13772,6 +13841,10 @@ function closeScanModal(){
 }
 
 /* ============================= EVENTS ============================= */
+const LUDO_BUTTON_ACTIONS = new Set([
+  'ludo-roll','ludo-seat-type','ludo-color','ludo-count','ludo-preset','ludo-start','ludo-setup','ludo-again',
+  'room-ludo-start','room-ludo-skip'
+]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
   'room-rps-pick','room-rps-next','room-c4-color','room-c4-col','room-c4-next',
@@ -13799,6 +13872,7 @@ document.addEventListener('click', (e)=>{
   if(state.radialMenuOpen && action!=='toggle-radial-menu' && action!=='radial-tap'){ state.radialMenuOpen = false; }
 
   if(action==='back'){ /* silent */ }
+  else if(LUDO_BUTTON_ACTIONS.has(action)){ SND.ludoButton(); }
   else { SND.click(); }
 
   if(action==='fill-code'){ fillOtpBoxes(el.dataset.code); }
@@ -14085,6 +14159,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='domino-yard-close'){ doDominoYardClose(); }
   else if(action==='ludo-count'){ doLudoCount(parseInt(el.dataset.n,10)); }
   else if(action==='ludo-seat-type'){ doLudoSeatType(parseInt(el.dataset.i,10), el.dataset.type); }
+  else if(action==='ludo-color'){ doLudoColor(parseInt(el.dataset.c,10)); }
   else if(action==='ludo-preset'){ doLudoPreset(el.dataset.p); }
   else if(action==='ludo-start'){ doLudoStart(); }
   else if(action==='ludo-roll'){ doLudoRoll(); }
