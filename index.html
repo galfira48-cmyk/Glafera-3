@@ -14684,12 +14684,13 @@ function renderAdminBulkPointsCard(){
   return `
     <div class="card" style="margin-bottom:14px;border-color:rgba(244,183,64,.35);">
       <div class="admin-session-name" style="margin-bottom:10px;">🎁 إضافة نقاط لجميع المشاركين</div>
-      <div class="hint" style="margin-bottom:10px;">اكتب عدد النقاط، وهيتضاف نفس العدد لكل مشارك مسجّل (${PARTICIPANTS.length}) مرة واحدة.</div>
-      <div style="display:flex;gap:8px;">
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="bulk-points-input" class="field" placeholder="عدد النقاط" style="flex:1;" />
-        <button type="button" class="btn btn-outline" style="padding:10px 8px;font-size:12px;color:var(--danger);" data-action="admin-bulk-points" data-sign="-1">➖ خصم للجميع</button>
-        <button type="button" class="btn btn-primary" style="padding:10px 14px;font-size:12px;" data-action="admin-bulk-points" data-sign="1">➕ إضافة للجميع</button>
+      <div class="hint" style="margin-bottom:2px;">اكتب عدد النقاط، وهيتضاف نفس العدد لكل مشارك مسجّل (${PARTICIPANTS.length}) مرة واحدة.</div>
+      <div class="point-stepper">
+        <button type="button" class="ps-btn ps-minus" data-action="admin-bulk-points" data-sign="-1">−</button>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="bulk-points-input" placeholder="0" />
+        <button type="button" class="ps-btn ps-plus" data-action="admin-bulk-points" data-sign="1">+</button>
       </div>
+      <div class="hint" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
     </div>`;
 }
 async function doAdminBulkAddPoints(sign){
