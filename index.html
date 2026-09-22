@@ -8998,7 +8998,7 @@ function showChallengeTypeModal(gameType){
 }
 async function createGameRoom(gameType, paid){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(gameType==='xo'){
+  if(gameType==='xo' && paid){
     const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
     if(fee>0){
       BONUS = await loadBonus();
@@ -9084,7 +9084,7 @@ async function joinGameRoom(code){
   }
   if(room.hostId===state.pid){ /* rejoining as host */ }
   else if(!room.guestId || room.guestId===state.pid){
-    if(room.game==='xo' && !room.entryFeeCharged){
+    if(room.game==='xo' && room.paid && !room.entryFeeCharged){
       const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
       if(fee>0){
         BONUS = await loadBonus();
@@ -9185,6 +9185,7 @@ async function applyLeaveRoomPenalty(code){
       }
     }
   }catch(e){}
+  const myName = (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
   try{
     BONUS = await loadBonus();
     BONUS[state.pid] = (BONUS[state.pid]||0) - penalty;
@@ -9194,8 +9195,8 @@ async function applyLeaveRoomPenalty(code){
       if(share>0) recipients.forEach(id=>{ BONUS[id] = (BONUS[id]||0) + share; });
     }
     await saveBonus(BONUS);
-    pushNotification(state.pid, `🚪 خسرت ${penalty} نقطة بسبب الخروج من غرفة اللعب أثناء الدور`, '⚠️');
-    if(share>0) recipients.forEach(id=> pushNotification(id, `🎁 حد خرج من غرفتكم فاخدت +${share} نقطة تعويض`, '🎁'));
+    pushNotification(state.pid, `🚪 خرجت من المعركة أثناء دورك، اتخصم ${penalty} نقطة`, '⚠️');
+    if(share>0) recipients.forEach(id=> pushNotification(id, `🎁 ${myName} غادر المعركة، وحصلت على +${share} نقطة تعويضًا`, '🎁'));
   }catch(e){}
   showToast(`تم خصم ${penalty} نقطة`, true);
 }
@@ -9239,6 +9240,7 @@ async function leaveGameRoom(){
             room.hostName = room.players[0].name;
           }
           roomTouch(room);
+          room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
         }
       }
     } else if(room.game==='uno'){
@@ -9268,6 +9270,7 @@ async function leaveGameRoom(){
         } else {
           if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; }
           roomTouch(room);
+          room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
         }
       }
     } else {
@@ -9458,16 +9461,55 @@ async function doRoomDominoNext(){
   render();
 }
 let roomPollInterval = null;
+function closeRoomLeftAlert(){
+  const el = document.getElementById('room-left-overlay');
+  if(el) el.remove();
+}
+function showRoomLeftAlert(opponentName, penalty){
+  closeRoomLeftAlert();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay confirm-overlay';
+  overlay.id = 'room-left-overlay';
+  const title = opponentName ? `${escapeHtml(opponentName)} غادر المعركة` : 'الخصم غادر المعركة';
+  const sub = penalty>0 ? `حصلت على <b>+${penalty} نقطة</b> تعويضًا عن انسحابه 🎁` : 'المعركة انتهت';
+  overlay.innerHTML = `
+    <div class="confirm-card">
+      <div class="confirm-icon">🚪</div>
+      <div class="confirm-msg">${title}</div>
+      <div class="confirm-sub">${sub}</div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-primary" id="room-left-ok-btn" style="width:100%;">تمام 👍</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('room-left-ok-btn').addEventListener('click', ()=>{
+    closeRoomLeftAlert();
+    leaveGameRoom();
+  });
+}
 function startRoomPolling(){
   stopRoomPolling();
   roomPollInterval = setInterval(async ()=>{
     if(!state.roomCode) return;
     try{
+      const prevRoom = GAME_ROOMS[state.roomCode] || null;
       const fresh = await loadGameRooms();
-      const before = JSON.stringify(GAME_ROOMS[state.roomCode]||null);
-      const after = JSON.stringify(fresh[state.roomCode]||null);
+      const freshRoom = fresh[state.roomCode] || null;
+      const before = JSON.stringify(prevRoom);
+      const after = JSON.stringify(freshRoom);
       GAME_ROOMS = fresh;
-      if(before!==after) render();
+      if(before!==after){
+        /* الغرفة اختفت فجأة وكانت شغالة فعلاً: يبقى الخصم خرج، نبلغ اللاعب الباقي بشكل واضح */
+        if(prevRoom && !freshRoom && prevRoom.status==='playing' && !state.roomSpectate){
+          const opponentName = (prevRoom.game==='ludo' || prevRoom.game==='uno')
+            ? null
+            : (prevRoom.hostId===state.pid ? prevRoom.guestName : prevRoom.hostName);
+          showRoomLeftAlert(opponentName, currentLeaveRoomPenalty());
+          return;
+        }
+        render();
+      }
     }catch(e){}
   }, 2000);
   startReactPolling();
@@ -10030,7 +10072,7 @@ function renderRoomXo(){
     const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
     const reward = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoWinReward) || 0;
     const need = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoWinsNeeded) || 3;
-    const feeNote = fee>0 ? `<div class="stakes-card">
+    const feeNote = (room.paid && fee>0) ? `<div class="stakes-card">
       <div class="stakes-card-ico">💰</div>
       <div class="stakes-card-body">
         <div class="stakes-card-title">رسوم ومكافآت المعركة</div>
@@ -17259,9 +17301,34 @@ function startLivePolling(){
   }, 6000);
 }
 
+/* ============================= HARDWARE / BROWSER BACK BUTTON ============================= */
+/* بدل ما زرار الرجوع بتاع الموبايل يقفل الموقع خالص، بيرجع صفحة جوه التطبيق زي زرار الرجوع اللي في الشاشة */
+function popTopOverlay(){
+  const overlays = document.querySelectorAll('.modal-overlay');
+  if(overlays.length){
+    overlays[overlays.length-1].remove();
+    return true;
+  }
+  return false;
+}
+function handleHardwareBack(){
+  if(popTopOverlay()) return true;
+  if(state.friendTile){ setFriendTile(null); return true; }
+  if(state.history && state.history.length>0){ goBack(); return true; }
+  return false;
+}
+function armBackTrap(){
+  try{ history.pushState({glaferaNav:true}, '', location.href); }catch(e){}
+}
+window.addEventListener('popstate', function(){
+  if(handleHardwareBack()) armBackTrap();
+  /* لو معندناش حاجة نرجعها جوه التطبيق، سيبها تقفل عادي */
+});
+
 /* ============================= INIT ============================= */
 (async function init(){
   initLuxuryParticles();
+  armBackTrap();
   try{
     await Promise.race([
       refreshAllData(),
