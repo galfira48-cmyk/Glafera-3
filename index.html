@@ -8965,7 +8965,38 @@ async function showRoomFeeModal(kind, onPaid){
     onPaid();
   });
 }
-async function createGameRoom(gameType){
+function closeChallengeTypeModal(){
+  const el = document.getElementById('challenge-type-overlay');
+  if(el) el.remove();
+}
+function showChallengeTypeModal(gameType){
+  closeChallengeTypeModal();
+  const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.roomCreateFee) || 0;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay confirm-overlay';
+  overlay.id = 'challenge-type-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-card">
+      <div class="confirm-icon">⚔️</div>
+      <div class="confirm-msg">اختار نوع التحدي</div>
+      <div class="confirm-sub">تحدي بكوين هتدفع فيه ${fee} نقطة وهتاخد مكافآت، وتحدي مجاني تلعبه من غير أي نقط</div>
+      <div class="confirm-actions" style="flex-direction:column;">
+        <button type="button" class="btn btn-primary" id="challenge-coin-btn" style="width:100%;">🪙 تحدي بكوين</button>
+        <button type="button" class="btn btn-ghost" id="challenge-free-btn" style="width:100%;">🆓 تحدي مجاني</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('challenge-coin-btn').addEventListener('click', ()=>{
+    closeChallengeTypeModal();
+    showRoomFeeModal('create', ()=>createGameRoom(gameType, true));
+  });
+  document.getElementById('challenge-free-btn').addEventListener('click', ()=>{
+    closeChallengeTypeModal();
+    createGameRoom(gameType, false);
+  });
+}
+async function createGameRoom(gameType, paid){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   if(gameType==='xo'){
     const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
@@ -8977,7 +9008,7 @@ async function createGameRoom(gameType){
   GAME_ROOMS = await loadGameRooms();
   const code = genRoomCode();
   const room = {
-    code, game:gameType, status:'waiting',
+    code, game:gameType, status:'waiting', paid: !!paid,
     hostId: state.pid, hostName: p ? p.name : 'مضيف',
     guestId:null, guestName:null,
     updatedAt: Date.now()
@@ -9026,7 +9057,7 @@ async function attemptJoinRoom(rawCode){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const alreadyIn = room.hostId===state.pid || room.guestId===state.pid || (room.players && room.players.some(x=>x.id===state.pid));
-  if(alreadyIn){ joinGameRoom(code); return; }
+  if(alreadyIn || !room.paid){ joinGameRoom(code); return; }
   showRoomFeeModal('join', ()=>joinGameRoom(code));
 }
 async function joinGameRoom(code){
@@ -9975,9 +10006,13 @@ function roomCodeCard(code){
     </div>`;
 }
 function renderRoomWaiting(room){
+  const badge = room.paid
+    ? `<div class="hint" style="text-align:center;margin-top:8px;">🪙 غرفة بكوين — رسوم الانضمام ${(GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.roomJoinFee)||0} نقطة</div>`
+    : `<div class="hint" style="text-align:center;margin-top:8px;">🆓 غرفة مجانية — انضمام بدون نقط</div>`;
   return `
     <div class="room-waiting">
       ${roomCodeCard(room.code)}
+      ${badge}
       <div class="hint" style="text-align:center;margin-top:14px;">شارك الكود مع صاحبك عشان ينضم للغرفة</div>
       <div class="room-wait-status">
         <span class="room-wait-dots"><span></span><span></span><span></span></span>
@@ -14050,7 +14085,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='friend-tile-open'){ setFriendTile('menu'); }
   else if(action==='friend-join-show'){ setFriendTile('join'); }
   else if(action==='friend-tile-close'){ setFriendTile(state.friendTile==='join' ? 'menu' : null); }
-  else if(action==='create-room'){ const gt = el.dataset.game; showRoomFeeModal('create', ()=>createGameRoom(gt)); }
+  else if(action==='create-room'){ const gt = el.dataset.game; showChallengeTypeModal(gt); }
   else if(action==='join-room'){ const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
   else if(action==='copy-room-code'){ doCopyRoomCode(el); }
