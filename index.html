@@ -17131,7 +17131,7 @@ function doLoginWithCode(code){
   if(!p){ showToast('كود الدخول غير صحيح', true); return; }
   const extra = myExtra(p.id);
   document.documentElement.dataset.theme = extra.mode==='light' ? 'light' : 'dark';
-  state = Object.assign(FRESH_STATE(), { view:'welcome', pid:p.id });
+  state = Object.assign(FRESH_STATE(), { view:'profile', pid:p.id });
   render();
   bgMusicArmed = true;
   applyMusicState();
