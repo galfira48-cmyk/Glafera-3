@@ -4330,6 +4330,7 @@ const ICO = {
   clock:`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
   pin:`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
   mic:`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><path d="M12 19v4"/></svg>`,
+  micOff:`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9.4V4a3 3 0 00-5.94-.6"/><path d="M9 9v3a3 3 0 004.6 2.9"/><path d="M19 10v2a7 7 0 01-1.24 4"/><path d="M5 10v2a7 7 0 0010 6.2"/><path d="M12 19v4"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
   download:`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>`,
   bell:`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
   gift:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M12 8a2.5 2.5 0 10-2.5-2.5c0 1.5 2.5 2.5 2.5 2.5z"/><path d="M12 8a2.5 2.5 0 102.5-2.5c0 1.5-2.5 2.5-2.5 2.5z"/></svg>`,
@@ -9522,7 +9523,7 @@ function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval
    قاعدة بيانات Firebase اللي اللعبة أصلاً بتستخدمها، فمفيش سيرفر إضافي مطلوب.
    صوت الميكروفون والصوت الجاي من الطرف التاني بيتكبروا رقميًا (Web Audio Gain + Limiter)
    عشان يبقوا أوضح وأعلى من غير ما "يفرقع" أو يتشوه. */
-const VOICE = { enabled:false, roomCode:null, myId:null, rawStream:null, sendStream:null, audioCtx:null, muted:false, peers:{}, peersRef:null, peersCb:null };
+const VOICE = { enabled:false, roomCode:null, myId:null, rawStream:null, sendStream:null, audioCtx:null, muted:false, peers:{}, peersRef:null, peersCb:null, idleRoom:null, idlePid:null };
 const VOICE_ICE_SERVERS = [{ urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302'] }];
 const VOICE_INPUT_GAIN = 1.6;   // تكبير صوت ميكروفوني قبل ما يتبعت لأصحابي (متوسط عشان ميبوظش/يتقطعش)
 const VOICE_OUTPUT_GAIN = 1.5;  // تكبير صوت اللي بييجي من كل واحد فيهم (تكبير واحد بس، مش مضاعف)
@@ -9545,47 +9546,71 @@ function ensureVoiceStyles(){
     @keyframes voicePulse{ 0%{box-shadow:0 0 0 0 rgba(95,224,164,.55);} 100%{box-shadow:0 0 0 12px rgba(95,224,164,0);} }
     .voice-widget{position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); right:12px; z-index:500;
       display:flex; flex-direction:column; align-items:center; gap:5px; direction:rtl;}
-    .voice-mic-btn{position:relative; width:50px; height:50px; border-radius:50%; border:2px solid rgba(255,255,255,.28);
-      background:linear-gradient(145deg,#845EC2,#3FDCC9); box-shadow:0 6px 16px rgba(0,0,0,.4);
-      display:flex; align-items:center; justify-content:center; font-size:21px; color:#fff; cursor:pointer;
-      transition:transform .15s ease, background .2s ease;}
-    .voice-mic-btn:active{transform:scale(.9);}
-    .voice-mic-btn.muted{background:linear-gradient(145deg,#FF6B6B,#e0644f);}
+    .voice-widget.voice-widget-idle{flex-direction:row; align-items:center; gap:9px;}
+    .voice-mic-btn{position:relative; width:46px; height:46px; border-radius:50%; border:1px solid rgba(255,255,255,.14);
+      background:#241f45; box-shadow:0 4px 14px rgba(0,0,0,.35);
+      display:flex; align-items:center; justify-content:center; color:#cfd3ff; cursor:pointer;
+      transition:transform .15s ease, background .2s ease, color .2s ease, border-color .2s ease;}
+    .voice-mic-btn svg{width:18px; height:18px;}
+    .voice-mic-btn:hover{background:#2d2758;}
+    .voice-mic-btn:active{transform:scale(.92);}
+    .voice-mic-btn.idle{background:#241f45; color:#a99dff; border-color:rgba(169,157,255,.4);}
+    .voice-mic-btn.muted{background:#3a2230; color:#ff9a9a; border-color:rgba(255,107,107,.4);}
     .voice-mic-btn.speaking{animation:voicePulse 1.1s ease-out infinite;}
     .voice-mic-btn:disabled{opacity:.5; cursor:not-allowed;}
-    .voice-peer-badge{position:absolute; bottom:-3px; left:-3px; min-width:18px; height:18px; padding:0 4px; border-radius:999px;
-      background:#5FE0A4; color:#0c2b22; font-size:10.5px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    .voice-peer-badge{position:absolute; bottom:-3px; left:-3px; min-width:17px; height:17px; padding:0 4px; border-radius:999px;
+      background:#5FE0A4; color:#0c2b22; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center;
       border:2px solid rgba(15,12,40,.9);}
-    .voice-status-mini{font-size:9.5px; color:#fff; background:rgba(15,12,40,.72); padding:2px 7px; border-radius:999px;
+    .voice-status-mini{font-size:9.5px; color:#cfd3ff; background:rgba(20,17,40,.78); padding:2px 7px; border-radius:999px;
       max-width:96px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .voice-hint{background:#1c1938; color:#ece9ff; font-size:11.5px; font-weight:600; padding:7px 12px; border-radius:12px;
+      border:1px solid rgba(169,157,255,.3); box-shadow:0 6px 16px rgba(0,0,0,.35); white-space:nowrap; position:relative;
+      animation:voiceHintIn .25s ease-out;}
+    .voice-hint:after{content:''; position:absolute; top:50%; right:-5px; transform:translateY(-50%) rotate(45deg);
+      width:9px; height:9px; background:#1c1938; border-right:1px solid rgba(169,157,255,.3); border-top:1px solid rgba(169,157,255,.3);}
+    @keyframes voiceHintIn{from{opacity:0; transform:translateX(6px);} to{opacity:1; transform:translateX(0);}}
   `;
   document.head.appendChild(st);
 }
 function renderVoiceWidget(){
-  if(!VOICE.enabled){ removeVoiceWidget(); return; }
+  const idle = !VOICE.enabled && !!VOICE.idleRoom;
+  if(!VOICE.enabled && !idle){ removeVoiceWidget(); return; }
   ensureVoiceStyles();
   let el = document.getElementById('voice-widget');
   if(!el){
     el = document.createElement('div');
     el.id = 'voice-widget';
-    el.className = 'voice-widget';
     document.body.appendChild(el);
     el.addEventListener('click', (e)=>{
       const btn = e.target.closest('[data-vaction]');
       if(!btn) return;
       if(btn.dataset.vaction==='mute') voiceToggleMute();
+      else if(btn.dataset.vaction==='enable') voiceEnableFromIdle();
     });
   }
+  if(idle){
+    el.className = 'voice-widget voice-widget-idle';
+    el.innerHTML = `
+      <button type="button" class="voice-mic-btn idle" data-vaction="enable" title="شغّل المايك">${ICO.micOff}</button>
+      <div class="voice-hint"><span>شغّل المايك لو حابب 🎙️</span></div>
+    `;
+    return;
+  }
+  el.className = 'voice-widget';
   const ids = Object.keys(VOICE.peers);
   const micOk = !!VOICE.rawStream;
   const statusTxt = !micOk ? 'مفيش إذن مايك 🚫' : (ids.length ? `متصل مع ${ids.length} 🎧` : 'مستني الباقي…');
   el.innerHTML = `
     <button type="button" class="voice-mic-btn ${VOICE.muted?'muted':''} ${(!VOICE.muted && VOICE.speaking)?'speaking':''}" data-vaction="mute" ${micOk?'':'disabled'} title="${VOICE.muted?'رجّع الصوت':'اكتم صوتي'}">
-      ${VOICE.muted ? '🔇' : '🎙️'}
+      ${VOICE.muted ? ICO.micOff : ICO.mic}
       ${ids.length ? `<span class="voice-peer-badge">${ids.length}</span>` : ''}
     </button>
     <span class="voice-status-mini">${statusTxt}</span>
   `;
+}
+function voiceEnableFromIdle(){
+  if(!VOICE.idleRoom || !VOICE.idlePid) return;
+  voiceStart(VOICE.idleRoom, VOICE.idlePid);
 }
 
 /* ---- simple speaking-detector: بيقيس مستوى الصوت اللحظي عشان يلوّن دائرة اللي بيتكلم ---- */
@@ -9621,11 +9646,13 @@ async function voiceStart(roomCode, myId){
   }catch(e){
     VOICE.rawStream = null;
     VOICE.enabled = true; // سيب الويدجت ظاهر عشان يفهم إن المشكلة إذن الميكروفون
+    VOICE.idleRoom = null; VOICE.idlePid = null;
     showToast('محتاج تسمح بالميكروفون عشان تتكلم مع أصحابك في الغرفة 🎙️', true);
     renderVoiceWidget();
     return;
   }
   VOICE.enabled = true;
+  VOICE.idleRoom = null; VOICE.idlePid = null;
 
   // بنكبّر صوت الميكروفون رقميًا (Gain) قبل ما نبعته، وبنمرره على Limiter عشان يفضل واضح ومايتقطعش.
   // لو المتصفح رفض يشغّل الـ AudioContext (سياسة autoplay)، بنرجع نبعت الصوت الخام عادي عشان الصوت
@@ -9836,9 +9863,14 @@ function voiceToggleMute(){
 function handleVoiceForView(){
   const inLiveRoom = typeof state.view==='string' && state.view.indexOf('room-')===0 && !!state.roomCode && !state.roomSpectate && !!state.pid;
   if(inLiveRoom){
-    if(!(VOICE.enabled && VOICE.roomCode===state.roomCode && VOICE.myId===state.pid)) voiceStart(state.roomCode, state.pid);
-  } else if(VOICE.enabled){
-    voiceStop();
+    if(VOICE.enabled && VOICE.roomCode===state.roomCode && VOICE.myId===state.pid) return; // already running for this room, widget already showing
+    if(VOICE.enabled) voiceStop(); // switched room/player while voice was running elsewhere
+    // ما بنشغّلش المايك أوتوماتيك؛ بنسيب زرار جاهز واللاعب هو اللي يشغّله لو حابب
+    VOICE.idleRoom = state.roomCode; VOICE.idlePid = state.pid;
+    renderVoiceWidget();
+  } else {
+    VOICE.idleRoom = null; VOICE.idlePid = null;
+    if(VOICE.enabled) voiceStop(); else removeVoiceWidget();
   }
 }
 let watchListPollInterval = null;
