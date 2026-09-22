@@ -2439,6 +2439,68 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .domino-tile{position:relative;}
   .domino-tile.drawn{animation:dtDrawn .55s cubic-bezier(.34,1.56,.64,1);}
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
+  /* ===================== UNO ===================== */
+  .uno-wrap{display:flex; flex-direction:column; gap:10px;}
+  .uno-opp-strip{display:flex; gap:8px; overflow-x:auto; padding:4px 2px 8px; -webkit-overflow-scrolling:touch;}
+  .uno-opp{position:relative; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:64px; padding:8px 6px 7px; border-radius:16px; background:var(--surface-2); border:1.5px solid var(--border); transition:box-shadow .2s, border-color .2s;}
+  .uno-opp.is-turn{border-color:var(--gold); box-shadow:0 0 0 2px rgba(244,183,64,.35), 0 4px 14px rgba(244,183,64,.25);}
+  .uno-opp-name{font-size:11px; font-weight:800; color:var(--text); max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .uno-opp-count{font-size:11px; font-weight:800; color:var(--text-muted); display:flex; align-items:center; gap:2px;}
+  .uno-catch-btn{margin-top:2px; border:none; border-radius:10px; padding:4px 8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; background:linear-gradient(145deg,#FF6B6B,#C81E3A); color:#fff; cursor:pointer; animation:unoPulse 1s infinite;}
+  @keyframes unoPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.07);}}
+  .uno-mid{display:flex; align-items:center; justify-content:center; gap:18px; padding:14px 0 10px; position:relative;}
+  .uno-color-dot{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 2px 6px rgba(0,0,0,.3);}
+  .uno-draw-pile{position:relative; border:none; background:none; padding:0; cursor:pointer;}
+  .uno-draw-pile:disabled{opacity:.5; cursor:default;}
+  .uno-draw-count{position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:1px 6px; font-size:10px; font-weight:800; color:var(--text-muted);}
+  .uno-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:14.5px; color:var(--text); margin:2px 0 6px;}
+  .uno-card{position:relative; width:52px; height:78px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55); border:none; padding:0; cursor:default; font-family:'Cairo',sans-serif;}
+  .uno-card.mini{width:30px; height:44px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.5);}
+  .uno-card[data-color="red"]{background:linear-gradient(150deg,#FF6B6B,#C81E3A);}
+  .uno-card[data-color="yellow"]{background:linear-gradient(150deg,#FFE066,#E0A400); color:#5A4200;}
+  .uno-card[data-color="green"]{background:linear-gradient(150deg,#79D989,#1E8E3E);}
+  .uno-card[data-color="blue"]{background:linear-gradient(150deg,#63A4FF,#1450B8);}
+  .uno-card[data-color="wild"]{background:conic-gradient(from 200deg,#FF6B6B,#FFE066,#79D989,#63A4FF,#FF6B6B);}
+  .uno-card .uno-center{font-size:24px; font-weight:900; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.4); transform:rotate(-18deg); font-style:italic;}
+  .uno-card.mini .uno-center{font-size:14px;}
+  .uno-card[data-color="yellow"] .uno-center{color:#fff;}
+  .uno-card .uno-corner{position:absolute; font-size:10px; font-weight:900; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .uno-card.mini .uno-corner{display:none;}
+  .uno-card .uno-corner.tl{top:5px; left:6px;}
+  .uno-card .uno-corner.br{bottom:5px; right:6px; transform:rotate(180deg);}
+  .uno-card.uno-back{background:linear-gradient(150deg,#2B2560,#171449); display:flex; align-items:center; justify-content:center;}
+  .uno-back-logo{font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:var(--gold); border:2px solid var(--gold); border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transform:rotate(-20deg);}
+  .uno-card.mini .uno-back-logo{width:20px; height:20px; font-size:8px; border-width:1.5px;}
+  .uno-card.playable{cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 14px rgba(244,183,64,.55);}
+  .uno-card.playable:active{transform:translateY(-6px);}
+  .uno-card.dim{opacity:.42;}
+  .uno-hand-scroller{display:flex; gap:6px; overflow-x:auto; padding:10px 4px 14px; -webkit-overflow-scrolling:touch;}
+  .uno-hand-scroller .uno-card{transition:transform .15s;}
+  .uno-hand-count{text-align:center; font-size:12px; font-weight:800; color:var(--text-muted); margin-top:-4px;}
+  .uno-actions-row{display:flex; gap:8px; margin-top:4px;}
+  .uno-actions-row .btn{flex:1;}
+  .uno-uno-btn{width:100%; margin-top:6px; border:none; border-radius:14px; padding:12px; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px;
+    background:linear-gradient(145deg,#FFD93D,#FF6B6B); color:#3A0E0E; cursor:pointer; animation:unoPulse .8s infinite; box-shadow:0 6px 16px rgba(255,107,107,.4);}
+  .uno-color-overlay{position:fixed; inset:0; z-index:60; background:rgba(6,5,20,.68); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; animation:dylFade .2s ease;}
+  .uno-color-card{background:var(--surface); border-radius:20px; padding:20px; width:280px; max-width:88vw; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
+  .uno-color-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15.5px; color:var(--text); margin-bottom:14px;}
+  .uno-color-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .uno-color-btn{border:none; border-radius:14px; height:56px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);}
+  .uno-color-btn[data-color="red"]{background:linear-gradient(150deg,#FF6B6B,#C81E3A);}
+  .uno-color-btn[data-color="yellow"]{background:linear-gradient(150deg,#FFE066,#E0A400);}
+  .uno-color-btn[data-color="green"]{background:linear-gradient(150deg,#79D989,#1E8E3E);}
+  .uno-color-btn[data-color="blue"]{background:linear-gradient(150deg,#63A4FF,#1450B8);}
+  .uno-color-btn:active{transform:scale(.94);}
+  .uno-win-card{margin:2px 0 6px; padding:20px 16px 16px; border-radius:18px; text-align:center; border:1.5px solid var(--gold);
+    background:linear-gradient(160deg, rgba(244,183,64,.15), rgba(255,107,107,.1)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1);}
+  .uno-win-ico{font-size:40px; margin-bottom:6px;}
+  .uno-win-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:var(--text); margin-bottom:4px;}
+  .uno-win-sub{font-size:13px; color:var(--text-muted); font-weight:700;}
+  .uno-lobby-list{display:flex; flex-direction:column; gap:8px; margin:12px 0;}
+  .uno-lobby-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border);}
+  .uno-lobby-row.empty{opacity:.5; justify-content:center;}
+  .uno-lobby-pname{font-size:13px; font-weight:800; color:var(--text); flex:1;}
   /* ===================== LUDO ===================== */
   .ludo-hero{text-align:center; padding:6px 0 10px;}
   .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #F00315; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
@@ -5856,10 +5918,12 @@ const GAMES_CATALOG = [
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
+  {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
 ];
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'وصّل 4 قطع قبل خصمك', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
-  memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة'
+  memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
+  uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب'
 };
 function ghGameTile(g, sub, action, i){
   return `
@@ -8137,6 +8201,366 @@ async function doRoomLudoNext(){
   render();
 }
 
+/* ============================= GAMES: UNO (شامل: منفرد ضد بوتات + غرفة أصحاب) ============================= */
+const UNO_COLORS = ['red','yellow','green','blue'];
+const UNO_COLOR_NAMES = {red:'أحمر', yellow:'أصفر', green:'أخضر', blue:'أزرق'};
+function unoFullDeck(){
+  const deck = []; let uid = 0;
+  UNO_COLORS.forEach(c=>{
+    deck.push({id:'u'+(uid++), color:c, type:'number', value:0});
+    for(let n=1;n<=9;n++){
+      deck.push({id:'u'+(uid++), color:c, type:'number', value:n});
+      deck.push({id:'u'+(uid++), color:c, type:'number', value:n});
+    }
+    for(let k=0;k<2;k++){
+      deck.push({id:'u'+(uid++), color:c, type:'skip'});
+      deck.push({id:'u'+(uid++), color:c, type:'reverse'});
+      deck.push({id:'u'+(uid++), color:c, type:'draw2'});
+    }
+  });
+  for(let k=0;k<4;k++){
+    deck.push({id:'u'+(uid++), color:'wild', type:'wild'});
+    deck.push({id:'u'+(uid++), color:'wild', type:'wild4'});
+  }
+  return deck;
+}
+function unoCardVisual(card){
+  if(card.type==='number') return String(card.value);
+  if(card.type==='skip') return '🚫';
+  if(card.type==='reverse') return '🔁';
+  if(card.type==='draw2') return '+2';
+  if(card.type==='wild') return '★';
+  if(card.type==='wild4') return '+4';
+  return '?';
+}
+function unoCardHtml(card, opts){
+  opts = opts || {};
+  if(opts.back){
+    return `<div class="uno-card uno-back ${opts.mini?'mini':''}"><span class="uno-back-logo">UNO</span></div>`;
+  }
+  const color = card.color==='wild' ? (card.chosen || 'wild') : card.color;
+  const v = unoCardVisual(card);
+  const cls = ['uno-card', opts.mini?'mini':'', opts.selectable?'playable':'', opts.dim?'dim':''].filter(Boolean).join(' ');
+  if(opts.selectable){
+    return `<button type="button" class="${cls}" data-color="${color}" data-action="${opts.action}" data-cid="${card.id}">
+      <span class="uno-corner tl">${v}</span><span class="uno-center">${v}</span><span class="uno-corner br">${v}</span>
+    </button>`;
+  }
+  return `<div class="${cls}" data-color="${color}">
+    <span class="uno-corner tl">${v}</span><span class="uno-center">${v}</span><span class="uno-corner br">${v}</span>
+  </div>`;
+}
+function unoTopCard(g){ return g.discard[g.discard.length-1]; }
+function unoCardPlayable(g, card){
+  const top = unoTopCard(g);
+  if(card.type==='wild' || card.type==='wild4') return true;
+  if(card.color===g.color) return true;
+  if(card.type==='number' && top.type==='number' && card.value===top.value) return true;
+  if(card.type!=='number' && card.type===top.type) return true;
+  return false;
+}
+function unoBestColor(hand){
+  const counts = {};
+  (hand||[]).forEach(c=>{ if(c.color && c.color!=='wild') counts[c.color] = (counts[c.color]||0)+1; });
+  let best = null, bestN = -1;
+  UNO_COLORS.forEach(c=>{ if((counts[c]||0)>bestN){ bestN = counts[c]||0; best = c; } });
+  return best || UNO_COLORS[Math.floor(Math.random()*4)];
+}
+function unoNextIdx(g, fromIdx, dir){
+  const n = g.players.length;
+  return ((fromIdx + dir) % n + n) % n;
+}
+function unoAdvance(g, skip){
+  const steps = skip ? 2 : 1;
+  g.turnIdx = ((g.turnIdx + g.dir*steps) % g.players.length + g.players.length) % g.players.length;
+  g.drewThisTurn = false;
+}
+function unoDrawOne(g){
+  if(g.deck.length===0){
+    if(g.discard.length<=1) return null;
+    const top = g.discard.pop();
+    g.deck = shuffleArray(g.discard);
+    g.discard = [top];
+  }
+  return g.deck.pop();
+}
+function unoDrawN(g, key, n){
+  const hand = g.hands[key];
+  for(let i=0;i<n;i++){ const c = unoDrawOne(g); if(c) hand.push(c); }
+}
+function unoNewGame(players){
+  const deck = shuffleArray(unoFullDeck());
+  const hands = {};
+  players.forEach(p=>{ hands[p.key] = deck.splice(0,7); });
+  let first = deck.pop();
+  while(first.type==='wild4'){ deck.unshift(first); first = deck.pop(); }
+  const g = {
+    players, hands, deck, discard:[first],
+    turnIdx:0, dir:1,
+    color: first.color==='wild' ? UNO_COLORS[Math.floor(Math.random()*4)] : first.color,
+    drewThisTurn:false, unoPending:null, unoCalledFlag:false,
+    winner:null, log:null
+  };
+  if(first.type==='skip') unoAdvance(g,true);
+  else if(first.type==='reverse'){ if(players.length===2) unoAdvance(g,true); else { g.dir=-1; } }
+  else if(first.type==='draw2'){ unoDrawN(g, players[0].key, 2); unoAdvance(g,true); }
+  return g;
+}
+function unoPlayCard(g, key, cardId, chosenColor){
+  const hand = g.hands[key];
+  const idx = hand.findIndex(c=>c.id===cardId);
+  if(idx<0) return false;
+  const card = hand[idx];
+  if(!unoCardPlayable(g, card)) return false;
+  hand.splice(idx,1);
+  if(card.type==='wild' || card.type==='wild4'){
+    card.chosen = chosenColor || unoBestColor(hand);
+    g.discard.push(card);
+    g.color = card.chosen;
+  } else {
+    g.discard.push(card);
+    g.color = card.color;
+  }
+  if(hand.length===1){ g.unoPending = key; g.unoCalledFlag = false; }
+  else if(g.unoPending===key){ g.unoPending = null; }
+  if(hand.length===0){
+    g.winner = key;
+    g.wins = g.wins || {};
+    g.wins[key] = (g.wins[key]||0)+1;
+    return true;
+  }
+  const curIdx = g.turnIdx;
+  if(card.type==='skip'){ unoAdvance(g,true); }
+  else if(card.type==='reverse'){
+    if(g.players.length===2){ unoAdvance(g,true); }
+    else { g.dir *= -1; unoAdvance(g,false); }
+  } else if(card.type==='draw2'){
+    const nxt = unoNextIdx(g, curIdx, g.dir);
+    unoDrawN(g, g.players[nxt].key, 2);
+    unoAdvance(g,true);
+  } else if(card.type==='wild4'){
+    const nxt = unoNextIdx(g, curIdx, g.dir);
+    unoDrawN(g, g.players[nxt].key, 4);
+    unoAdvance(g,true);
+  } else { unoAdvance(g,false); }
+  return true;
+}
+function unoBotTakeTurn(g, key){
+  if(g.unoPending && g.unoPending!==key && !g.unoCalledFlag && g.hands[g.unoPending] && g.hands[g.unoPending].length===1){
+    if(Math.random()<0.5){ unoDrawN(g, g.unoPending, 2); g.log = '🚨 ' + (g.players.find(p=>p.key===g.unoPending)||{}).name + ' نسي يقول أونو!'; g.unoPending = null; }
+  }
+  const hand = g.hands[key];
+  const playable = hand.filter(c=>unoCardPlayable(g,c));
+  if(playable.length===0){
+    const card = unoDrawOne(g);
+    if(!card){ unoAdvance(g,false); return; }
+    hand.push(card);
+    if(unoCardPlayable(g, card)){
+      const color = (card.type==='wild'||card.type==='wild4') ? unoBestColor(hand.filter(c=>c.id!==card.id)) : undefined;
+      unoPlayCard(g, key, card.id, color);
+    } else { unoAdvance(g,false); }
+  } else {
+    const nonWild = playable.filter(c=>c.type!=='wild' && c.type!=='wild4');
+    let choice = playable[0];
+    if(nonWild.length){
+      const counts = {};
+      hand.forEach(c=>{ if(c.color && c.color!=='wild') counts[c.color]=(counts[c.color]||0)+1; });
+      nonWild.sort((a,b)=>(counts[b.color]||0)-(counts[a.color]||0));
+      choice = nonWild[0];
+    }
+    const color = (choice.type==='wild'||choice.type==='wild4') ? unoBestColor(hand.filter(c=>c.id!==choice.id)) : undefined;
+    unoPlayCard(g, key, choice.id, color);
+  }
+  if(g.hands[key] && g.hands[key].length===1) g.unoCalledFlag = true;
+}
+function unoAlive(g){ return state.uno===g && state.view==='game-uno'; }
+function unoLater(g, ms, fn){ setTimeout(()=>{ if(!unoAlive(g) || g.winner) return; fn(); }, ms); }
+function unoRunBots(g, silent){
+  if(g.winner) return;
+  const cur = g.players[g.turnIdx];
+  if(!cur.isBot) { if(!silent) render(); return; }
+  if(!silent) render();
+  unoLater(g, 850, ()=>{
+    unoBotTakeTurn(g, cur.key);
+    render();
+    if(g.winner){ vibrate([20,20,30]); SND.coinChime(); }
+    else unoRunBots(g);
+  });
+}
+function initUnoGame(){
+  const me = PARTICIPANTS.find(x=>x.id===state.pid);
+  const players = [
+    {key:'me', name: me?me.name:'أنا', isBot:false},
+    {key:'bot1', name:'بوتي 🤖', isBot:true},
+    {key:'bot2', name:'روبوتيكا 🤖', isBot:true},
+    {key:'bot3', name:'زد9 🤖', isBot:true},
+  ];
+  const prevWins = state.uno ? state.uno.wins : null;
+  state.uno = unoNewGame(players);
+  if(prevWins) state.uno.wins = prevWins;
+  state.unoColorPick = null;
+}
+function doUnoNextRound(){
+  const wins = state.uno ? state.uno.wins : null;
+  initUnoGame();
+  if(wins) state.uno.wins = wins;
+  unoRunBots(state.uno);
+}
+function doUnoPlay(cardId){
+  const g = state.uno;
+  if(!g || g.winner) return;
+  const cur = g.players[g.turnIdx];
+  if(cur.key!=='me') return;
+  const card = g.hands.me.find(c=>c.id===cardId);
+  if(!card || !unoCardPlayable(g, card)) return;
+  if(card.type==='wild' || card.type==='wild4'){
+    state.unoColorPick = {cardId, prefix:''};
+    render();
+    return;
+  }
+  SND.click();
+  unoPlayCard(g, 'me', cardId);
+  render();
+  if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
+  else unoRunBots(g);
+}
+function doUnoColorChoice(color){
+  const g = state.uno;
+  const pick = state.unoColorPick;
+  if(!g || !pick) return;
+  state.unoColorPick = null;
+  SND.click();
+  unoPlayCard(g, 'me', pick.cardId, color);
+  render();
+  if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
+  else unoRunBots(g);
+}
+function doUnoDraw(){
+  const g = state.uno;
+  if(!g || g.winner || g.drewThisTurn) return;
+  const cur = g.players[g.turnIdx];
+  if(cur.key!=='me') return;
+  const card = unoDrawOne(g);
+  if(card) g.hands.me.push(card);
+  g.drewThisTurn = true;
+  SND.click();
+  render();
+}
+function doUnoEndTurn(){
+  const g = state.uno;
+  if(!g || g.winner || !g.drewThisTurn) return;
+  const cur = g.players[g.turnIdx];
+  if(cur.key!=='me') return;
+  unoAdvance(g, false);
+  render();
+  unoRunBots(g);
+}
+function doUnoCallUno(){
+  const g = state.uno;
+  if(!g) return;
+  if(g.unoPending==='me'){ g.unoCalledFlag = true; SND.click(); render(); }
+}
+function doUnoCatch(targetKey){
+  const g = state.uno;
+  if(!g || g.winner) return;
+  if(g.unoPending===targetKey && !g.unoCalledFlag){
+    unoDrawN(g, targetKey, 2);
+    g.log = '🚨 مسكته! سحب كرتين';
+    g.unoPending = null;
+    SND.click(); vibrate([15,15]);
+    render();
+  }
+}
+function unoStatusText(g, myKey){
+  if(g.winner) return null;
+  const cur = g.players[g.turnIdx];
+  return cur.key===myKey ? 'دورك! 🎯' : `دور ${escapeHtml(cur.name)}...`;
+}
+function unoColorOverlayHtml(prefix){
+  if(!state.unoColorPick || state.unoColorPick.prefix!==prefix) return '';
+  return `<div class="uno-color-overlay">
+    <div class="uno-color-card">
+      <div class="uno-color-title">🎨 اختار لون</div>
+      <div class="uno-color-grid">
+        ${UNO_COLORS.map(c=>`<button type="button" class="uno-color-btn" data-color="${c}" data-action="${prefix}uno-color"></button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function unoOpponentsHtml(g, myKey, prefix){
+  return `<div class="uno-opp-strip">${g.players.filter(p=>p.key!==myKey).map(p=>{
+    const cnt = (g.hands[p.key]||[]).length;
+    const isTurn = !g.winner && g.players[g.turnIdx].key===p.key;
+    const canCatch = g.unoPending===p.key && !g.unoCalledFlag;
+    return `<div class="uno-opp ${isTurn?'is-turn':''}">
+      ${p.isBot ? gameAiAvatar('','sm') : gameAvatar(p.key,'','sm')}
+      <div class="uno-opp-name">${escapeHtml(p.name)}</div>
+      <div class="uno-opp-count">🂠${cnt}</div>
+      ${canCatch ? `<button type="button" class="uno-catch-btn" data-action="${prefix}uno-catch" data-key="${p.key}">🚨 امسكه!</button>` : ''}
+    </div>`;
+  }).join('')}</div>`;
+}
+function unoTableHtml(g, myKey, prefix){
+  const myHand = g.hands[myKey] || [];
+  const top = unoTopCard(g);
+  const canAct = !g.winner && g.players[g.turnIdx].key===myKey;
+  const handHtml = myHand.map(c=>{
+    const sel = canAct && unoCardPlayable(g,c);
+    return unoCardHtml(c, {selectable:sel, action:prefix+'uno-play'});
+  }).join('');
+  const drawDisabled = !canAct || g.drewThisTurn;
+  const showEndTurn = canAct && g.drewThisTurn;
+  const showUnoBtn = g.unoPending===myKey && !g.unoCalledFlag;
+  const statusTxt = unoStatusText(g, myKey);
+  return `
+    <div class="uno-wrap">
+      ${unoOpponentsHtml(g, myKey, prefix)}
+      <div class="uno-mid">
+        ${unoCardHtml(top,{})}
+        <button type="button" class="uno-draw-pile" data-action="${prefix}uno-draw" ${drawDisabled?'disabled':''}>
+          ${unoCardHtml({type:'x'},{back:true})}
+          <span class="uno-draw-count">${g.deck.length}</span>
+        </button>
+      </div>
+      <div class="uno-color-dot" style="background:${UNO_GRAD(g.color)}"></div>
+      ${statusTxt ? `<div class="uno-status">${statusTxt}</div>` : ''}
+      ${showEndTurn ? `<div class="uno-actions-row"><button type="button" class="btn btn-outline" data-action="${prefix}uno-endturn">⏭️ خلّص دوري</button></div>` : ''}
+      ${showUnoBtn ? `<button type="button" class="uno-uno-btn" data-action="${prefix}uno-uno">🎉 UNO!</button>` : ''}
+      <div class="uno-hand-scroller">${handHtml}</div>
+      <div class="uno-hand-count">🃏 عندك ${myHand.length} ورقة</div>
+    </div>
+    ${unoColorOverlayHtml(prefix)}
+  `;
+}
+function UNO_GRAD(color){
+  const m = {red:'linear-gradient(150deg,#FF6B6B,#C81E3A)', yellow:'linear-gradient(150deg,#FFE066,#E0A400)',
+    green:'linear-gradient(150deg,#79D989,#1E8E3E)', blue:'linear-gradient(150deg,#63A4FF,#1450B8)'};
+  return m[color] || '#888';
+}
+function unoWinHtml(g, myKey, prefix, nextAction){
+  const iWon = g.winner===myKey;
+  const winnerP = g.players.find(p=>p.key===g.winner);
+  const others = g.players.filter(p=>p.key!==g.winner).map(p=>`${escapeHtml(p.name)}: ${g.hands[p.key].length} ورقة`).join(' • ');
+  return `
+    <div class="uno-win-card">
+      <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
+      <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
+      <div class="uno-win-sub">${others}</div>
+    </div>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:6px;" data-action="${nextAction}">🔄 جولة جديدة</button>
+  `;
+}
+function renderUnoGame(){
+  if(!state.uno) initUnoGame();
+  const g = state.uno;
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">أونو</div>
+    </div>
+    ${g.winner ? unoWinHtml(g,'me','','uno-next') : unoTableHtml(g,'me','')}
+  `;
+}
 /* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
 // يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
 function gameAvatar(pid, badgeText, size, dotColorId){
@@ -8299,6 +8723,8 @@ async function createGameRoom(gameType){
       scoreHost:0, scoreGuest:0, scoreDraw:0});
   } else if(gameType==='ludo'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], ludo:null});
+  } else if(gameType==='uno'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], uno:null});
   } else if(gameType==='connect4'){
     Object.assign(room, {board:newC4Board(), turn:'host', round:0, hostColor:null, guestColor:null,
       winner:null, winCells:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
@@ -8338,7 +8764,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo'){
+  if(room.game==='ludo' || room.game==='uno'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -8350,7 +8776,7 @@ async function joinGameRoom(code){
     state.roomCode = code;
     state.roomJoinInput = '';
     startRoomPolling();
-    go('room-ludo');
+    go('room-'+room.game);
     return;
   }
   if(room.hostId===state.pid){ /* rejoining as host */ }
@@ -8509,6 +8935,35 @@ async function leaveGameRoom(){
             room.hostId = room.players[0].id;
             room.hostName = room.players[0].name;
           }
+          roomTouch(room);
+        }
+      }
+    } else if(room.game==='uno'){
+      const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
+        || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
+      room.players = (room.players||[]).filter(p=>p.id!==state.pid);
+      if(room.uno){
+        const G = room.uno;
+        const myIdx = G.players.findIndex(pl=>pl.key===state.pid);
+        if(myIdx>=0){
+          const leftover = G.hands[state.pid]||[];
+          delete G.hands[state.pid];
+          G.deck = shuffleArray((G.deck||[]).concat(leftover));
+          G.players.splice(myIdx,1);
+          if(G.players.length<2){
+            delete GAME_ROOMS[code];
+          } else {
+            if(G.turnIdx>=G.players.length) G.turnIdx = 0;
+            G.unoPending = null;
+            G.log = '🚪 ' + myName + ' خرج من اللعبة';
+            roomTouch(room);
+          }
+        }
+      } else {
+        if(room.players.length===0){
+          delete GAME_ROOMS[code];
+        } else {
+          if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; }
           roomTouch(room);
         }
       }
@@ -8733,7 +9188,156 @@ const ROOM_GAMES = [
   {id:'memory',   sub:'مين يلاقي أزواج أكتر؟'},
   {id:'numguess', sub:'خمّنوا الرقم بالدور'},
   {id:'math',     sub:'سباق — الأسرع ياخد النقطة'},
+  {id:'uno',      sub:'لحد 4 أصحاب، خلّص ورقك الأول'},
 ];
+/* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
+function renderRoomUnoLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      <div class="room-code-display">كود الغرفة<br><b>${room.code}</b></div>
+      <div class="hint" style="text-align:center;margin:10px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-uno-start" ${ps.length<2?'disabled':''}>🃏 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
+    </div>`;
+}
+function renderRoomUno(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('أونو', room);
+  if(room.status==='waiting' || !room.uno) return roomHead('أونو', room) + renderRoomUnoLobby(room);
+  const G = room.uno;
+  const myKey = state.pid;
+  return roomHead('أونو', room) + (G.winner ? unoWinHtml(G, myKey, 'room-', 'room-uno-next') : unoTableHtml(G, myKey, 'room-'));
+}
+async function doRoomUnoStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='uno' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  const players = ps.map(p=>({key:p.id, name:p.name, isBot:false}));
+  room.uno = unoNewGame(players);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomUnoPlay(cardId){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno || room.uno.winner) return;
+  const G = room.uno;
+  const cur = G.players[G.turnIdx];
+  if(!cur || cur.key!==state.pid) return;
+  const card = (G.hands[state.pid]||[]).find(c=>c.id===cardId);
+  if(!card || !unoCardPlayable(G, card)) return;
+  if(card.type==='wild' || card.type==='wild4'){
+    state.unoColorPick = {cardId, prefix:'room-'};
+    render();
+    return;
+  }
+  SND.click();
+  unoPlayCard(G, state.pid, cardId);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
+}
+async function doRoomUnoColorChoice(color){
+  const pick = state.unoColorPick;
+  if(!pick || pick.prefix!=='room-') return;
+  state.unoColorPick = null;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno || room.uno.winner) return;
+  const G = room.uno;
+  const cur = G.players[G.turnIdx];
+  if(!cur || cur.key!==state.pid) return;
+  SND.click();
+  unoPlayCard(G, state.pid, pick.cardId, color);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
+}
+async function doRoomUnoDraw(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno || room.uno.winner) return;
+  const G = room.uno;
+  if(G.drewThisTurn) return;
+  const cur = G.players[G.turnIdx];
+  if(!cur || cur.key!==state.pid) return;
+  const card = unoDrawOne(G);
+  if(card) (G.hands[state.pid]=G.hands[state.pid]||[]).push(card);
+  G.drewThisTurn = true;
+  SND.click();
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomUnoEndTurn(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno || room.uno.winner) return;
+  const G = room.uno;
+  if(!G.drewThisTurn) return;
+  const cur = G.players[G.turnIdx];
+  if(!cur || cur.key!==state.pid) return;
+  unoAdvance(G, false);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomUnoCallUno(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno) return;
+  const G = room.uno;
+  if(G.unoPending===state.pid){
+    G.unoCalledFlag = true;
+    SND.click();
+    roomTouch(room);
+    await saveGameRooms(GAME_ROOMS);
+    render();
+  }
+}
+async function doRoomUnoCatch(targetKey){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno || room.uno.winner) return;
+  const G = room.uno;
+  if(G.unoPending===targetKey && !G.unoCalledFlag){
+    unoDrawN(G, targetKey, 2);
+    G.log = '🚨 اتمسك!';
+    G.unoPending = null;
+    SND.click(); vibrate([15,15]);
+    roomTouch(room);
+    await saveGameRooms(GAME_ROOMS);
+    render();
+  }
+}
+async function doRoomUnoNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.uno) return;
+  const oldWins = room.uno.wins;
+  const players = room.uno.players.map(p=>({key:p.key, name:p.name, isBot:false}));
+  room.uno = unoNewGame(players);
+  if(oldWins) room.uno.wins = oldWins;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
 function renderRoomsLobby(){
   const tiles = ROOM_GAMES.map((rg,i)=>{
     const g = GAMES_CATALOG.find(x=>x.id===rg.id);
@@ -11432,6 +12036,7 @@ function render(){
   else if(state.view==='game-rps') html = renderRpsGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
   else if(state.view==='game-math') html = renderMathGame();
+  else if(state.view==='game-uno') html = renderUnoGame();
   else if(state.view==='game-rooms') html = renderRoomsLobby();
   else if(state.view==='room-xo') html = renderRoomXo();
   else if(state.view==='room-domino') html = renderRoomDomino();
@@ -11441,6 +12046,7 @@ function render(){
   else if(state.view==='room-memory') html = renderRoomMemory();
   else if(state.view==='room-numguess') html = renderRoomNumGuess();
   else if(state.view==='room-math') html = renderRoomMath();
+  else if(state.view==='room-uno') html = renderRoomUno();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='pass') html = renderPassPage();
   else if(state.view==='stay') html = renderStayPage();
@@ -12555,6 +13161,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-rps-pick','room-rps-next','room-c4-color','room-c4-col','room-c4-next',
   'room-memory-card','room-memory-next','room-num-key','room-num-next','room-math-pick','room-math-next',
   'room-ludo-start','room-ludo-skip','ludo-token','ludo-roll',
+  'room-uno-start','room-uno-play','room-uno-draw','room-uno-endturn','room-uno-color','room-uno-uno','room-uno-catch','room-uno-next',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
@@ -12719,6 +13326,7 @@ document.addEventListener('click', (e)=>{
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
     else if(gid==='numguess') initNumberGame();
     else if(gid==='math') initMathGame();
+    else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
     go('game-'+gid);
   }
   else if(action==='open-dish'){ openDishSheet(el.dataset.cid, el.dataset.did); }
@@ -12773,6 +13381,21 @@ document.addEventListener('click', (e)=>{
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
   else if(action==='math-reset'){ initMathGame(); render(); }
+  else if(action==='uno-play'){ doUnoPlay(el.dataset.cid); }
+  else if(action==='uno-draw'){ doUnoDraw(); }
+  else if(action==='uno-endturn'){ doUnoEndTurn(); }
+  else if(action==='uno-color'){ doUnoColorChoice(el.dataset.color); }
+  else if(action==='uno-uno'){ doUnoCallUno(); }
+  else if(action==='uno-catch'){ doUnoCatch(el.dataset.key); }
+  else if(action==='uno-next'){ doUnoNextRound(); }
+  else if(action==='room-uno-start'){ doRoomUnoStart(); }
+  else if(action==='room-uno-play'){ doRoomUnoPlay(el.dataset.cid); }
+  else if(action==='room-uno-draw'){ doRoomUnoDraw(); }
+  else if(action==='room-uno-endturn'){ doRoomUnoEndTurn(); }
+  else if(action==='room-uno-color'){ doRoomUnoColorChoice(el.dataset.color); }
+  else if(action==='room-uno-uno'){ doRoomUnoCallUno(); }
+  else if(action==='room-uno-catch'){ doRoomUnoCatch(el.dataset.key); }
+  else if(action==='room-uno-next'){ doRoomUnoNext(); }
   else if(action==='xo-cell'){ doXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='xo-mode'){
     const m = el.dataset.mode;
