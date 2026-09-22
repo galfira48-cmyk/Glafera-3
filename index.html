@@ -2439,64 +2439,95 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .domino-tile{position:relative;}
   .domino-tile.drawn{animation:dtDrawn .55s cubic-bezier(.34,1.56,.64,1);}
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
-  /* ===================== UNO ===================== */
-  .uno-wrap{display:flex; flex-direction:column; gap:10px;}
-  .uno-opp-strip{display:flex; gap:8px; overflow-x:auto; padding:4px 2px 8px; -webkit-overflow-scrolling:touch;}
-  .uno-opp{position:relative; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:64px; padding:8px 6px 7px; border-radius:16px; background:var(--surface-2); border:1.5px solid var(--border); transition:box-shadow .2s, border-color .2s;}
-  .uno-opp.is-turn{border-color:var(--gold); box-shadow:0 0 0 2px rgba(244,183,64,.35), 0 4px 14px rgba(244,183,64,.25);}
-  .uno-opp-name{font-size:11px; font-weight:800; color:var(--text); max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .uno-opp-count{font-size:11px; font-weight:800; color:var(--text-muted); display:flex; align-items:center; gap:2px;}
-  .uno-catch-btn{margin-top:2px; border:none; border-radius:10px; padding:4px 8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; background:linear-gradient(145deg,#FF6B6B,#C81E3A); color:#fff; cursor:pointer; animation:unoPulse 1s infinite;}
-  @keyframes unoPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.07);}}
-  .uno-mid{display:flex; align-items:center; justify-content:center; gap:18px; padding:14px 0 10px; position:relative;}
-  .uno-color-dot{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 2px 6px rgba(0,0,0,.3);}
+  /* ===================== UNO (landscape table view) ===================== */
+  .uno-stage{position:fixed; inset:0; z-index:70; background:#08150d; overflow:hidden;}
+  .uno-rotor{position:fixed; top:50%; left:50%; width:100vh; height:100vw; transform:translate(-50%,-50%) rotate(90deg); transform-origin:center center; overflow:hidden;}
+  @media (orientation:landscape){ .uno-rotor{width:100vw; height:100vh; transform:translate(-50%,-50%) rotate(0deg);} }
+  .uno-felt{position:absolute; inset:4%; border-radius:46%; background:radial-gradient(circle at 50% 42%, #2f8f52, #1c6b3c 55%, #124e2c 100%);
+    box-shadow:0 0 0 14px #6b4423, 0 0 0 18px #4a2f18, inset 0 0 60px rgba(0,0,0,.35), 0 20px 50px rgba(0,0,0,.5);}
+  .uno-topbar{position:absolute; top:10px; left:10px; right:10px; display:flex; align-items:center; justify-content:space-between; z-index:5;}
+  .uno-round-ico{width:34px; height:34px; border-radius:50%; background:rgba(10,20,14,.55); border:1px solid rgba(255,255,255,.18); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; backdrop-filter:blur(2px);}
+  .uno-clock{width:38px; height:38px; border-radius:50%; background:radial-gradient(circle,#fff,#e7e2d8); border:3px solid #c8461e; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 3px 8px rgba(0,0,0,.4);}
+  .uno-me-tag{position:absolute; top:52px; left:10px; display:flex; flex-direction:column; align-items:center; gap:3px; z-index:4;}
+  .uno-seat{position:absolute; display:flex; flex-direction:column; align-items:center; gap:3px; z-index:4;}
+  .uno-seat-top{top:8px; left:50%; transform:translateX(-50%);}
+  .uno-seat-right{top:42%; right:4%; transform:translateY(-50%);}
+  .uno-seat-corner{bottom:16%; right:6%;}
+  .uno-seat-avatar-wrap{position:relative; width:60px; height:60px; border-radius:50%; padding:3px; background:rgba(0,0,0,.25);}
+  .uno-seat.is-turn .uno-seat-avatar-wrap, .uno-me-tag.is-turn .uno-seat-avatar-wrap{background:linear-gradient(145deg,var(--gold),#fff2c9); animation:unoTurnGlow 1.4s infinite;}
+  @keyframes unoTurnGlow{0%,100%{box-shadow:0 0 0 3px rgba(244,183,64,.35),0 0 10px rgba(244,183,64,.5);} 50%{box-shadow:0 0 0 5px rgba(244,183,64,.55),0 0 22px rgba(244,183,64,.85);}}
+  .uno-seat-avatar-wrap .pl-avatar, .uno-seat-avatar-wrap .pl-ai{width:100%; height:100%; font-size:19px; margin:0;}
+  .uno-seat-name{font-size:11px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); max-width:78px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .uno-seat-count{font-size:10.5px; font-weight:800; color:#ffe9b0; display:flex; align-items:center; gap:2px; text-shadow:0 1px 2px rgba(0,0,0,.6);}
+  .uno-catch-btn{border:none; border-radius:10px; padding:4px 9px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10px; background:linear-gradient(145deg,#FF6B6B,#C81E3A); color:#fff; cursor:pointer; animation:unoPulse 1s infinite;}
+  @keyframes unoPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
+  .uno-fan{position:relative; width:76px; height:44px;}
+  .uno-seat-right .uno-fan, .uno-seat-corner .uno-fan{width:30px; height:76px;}
+  .uno-fan-card{position:absolute; top:50%; left:50%;}
+  .uno-center{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; gap:16px; z-index:3;}
+  .uno-dir-arrows{position:absolute; inset:-46px; pointer-events:none;}
+  .uno-dir-arrows svg{width:100%; height:100%;}
+  .uno-discard-stack{position:relative;}
+  .uno-color-dot{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.4); z-index:2;}
   .uno-draw-pile{position:relative; border:none; background:none; padding:0; cursor:pointer;}
   .uno-draw-pile:disabled{opacity:.5; cursor:default;}
-  .uno-draw-count{position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:1px 6px; font-size:10px; font-weight:800; color:var(--text-muted);}
-  .uno-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:14.5px; color:var(--text); margin:2px 0 6px;}
-  .uno-card{position:relative; width:52px; height:78px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55); border:none; padding:0; cursor:default; font-family:'Cairo',sans-serif;}
-  .uno-card.mini{width:30px; height:44px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.5);}
-  .uno-card[data-color="red"]{background:linear-gradient(150deg,#FF6B6B,#C81E3A);}
-  .uno-card[data-color="yellow"]{background:linear-gradient(150deg,#FFE066,#E0A400); color:#5A4200;}
-  .uno-card[data-color="green"]{background:linear-gradient(150deg,#79D989,#1E8E3E);}
-  .uno-card[data-color="blue"]{background:linear-gradient(150deg,#63A4FF,#1450B8);}
-  .uno-card[data-color="wild"]{background:conic-gradient(from 200deg,#FF6B6B,#FFE066,#79D989,#63A4FF,#FF6B6B);}
-  .uno-card .uno-center{font-size:24px; font-weight:900; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.4); transform:rotate(-18deg); font-style:italic;}
-  .uno-card.mini .uno-center{font-size:14px;}
-  .uno-card[data-color="yellow"] .uno-center{color:#fff;}
-  .uno-card .uno-corner{position:absolute; font-size:10px; font-weight:900; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .uno-draw-pile .uno-card.uno-back{box-shadow:0 2px 0 #14102f, 0 4px 0 #14102f, 0 6px 0 #14102f, 0 3px 10px rgba(0,0,0,.5), inset 0 0 0 3px rgba(255,255,255,.55);}
+  .uno-draw-count{position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); background:#fff; border:1px solid rgba(0,0,0,.15); border-radius:9px; padding:1px 6px; font-size:10px; font-weight:800; color:#333;}
+  .uno-status{position:absolute; top:80px; left:50%; transform:translateX(-50%); text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:13.5px; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.6); background:rgba(0,0,0,.28); padding:4px 12px; border-radius:999px; z-index:4; white-space:nowrap;}
+  .uno-card{position:relative; width:50px; height:74px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 0 3px #fff, inset 0 0 0 4.5px rgba(0,0,0,.65); border:none; padding:0; cursor:default; font-family:'Cairo',sans-serif; overflow:hidden;}
+  .uno-card.mini{width:28px; height:42px; border-radius:5px; box-shadow:0 2px 5px rgba(0,0,0,.4), inset 0 0 0 2px #fff, inset 0 0 0 3px rgba(0,0,0,.65);}
+  .uno-card[data-color="red"]{background:linear-gradient(155deg,#F3392E,#C4141B 65%,#A00E15);}
+  .uno-card[data-color="yellow"]{background:linear-gradient(155deg,#FFDA1E,#F6B800 65%,#D99900);}
+  .uno-card[data-color="green"]{background:linear-gradient(155deg,#3FBE4C,#1E9E30 65%,#127A22);}
+  .uno-card[data-color="blue"]{background:linear-gradient(155deg,#2E8CE0,#0F63C4 65%,#0A4A96);}
+  .uno-card[data-color="wild"]{background:linear-gradient(155deg,#2b2b2f,#111114 65%,#000);}
+  .uno-card .uno-oval{position:absolute; top:6%; left:9%; right:9%; bottom:6%; background:#fff; border-radius:50%; transform:rotate(-20deg); box-shadow:0 0 0 1.5px rgba(0,0,0,.15) inset; z-index:0;}
+  .uno-card[data-color="wild"] .uno-oval{background:conic-gradient(from 200deg,#F3392E,#FFDA1E,#3FBE4C,#2E8CE0,#F3392E);}
+  .uno-card .uno-center-pip{position:relative; z-index:1; font-size:24px; font-weight:900; color:#111; text-shadow:0 0 0 #000; -webkit-text-stroke:1.5px #111; transform:rotate(-20deg); font-style:italic; letter-spacing:-1px;}
+  .uno-card[data-color="red"] .uno-center-pip{color:#E4161C;}
+  .uno-card[data-color="yellow"] .uno-center-pip{color:#F6B800;}
+  .uno-card[data-color="green"] .uno-center-pip{color:#1E9E30;}
+  .uno-card[data-color="blue"] .uno-center-pip{color:#0F63C4;}
+  .uno-card[data-color="wild"] .uno-center-pip{color:#fff; -webkit-text-stroke:1.5px #000;}
+  .uno-card.mini .uno-center-pip{font-size:13px; -webkit-text-stroke:.8px #111;}
+  .uno-card .uno-corner{position:absolute; font-size:11px; font-weight:900; color:#fff; -webkit-text-stroke:.6px #000; font-style:italic; z-index:1;}
   .uno-card.mini .uno-corner{display:none;}
-  .uno-card .uno-corner.tl{top:5px; left:6px;}
-  .uno-card .uno-corner.br{bottom:5px; right:6px; transform:rotate(180deg);}
-  .uno-card.uno-back{background:linear-gradient(150deg,#2B2560,#171449); display:flex; align-items:center; justify-content:center;}
-  .uno-back-logo{font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:var(--gold); border:2px solid var(--gold); border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transform:rotate(-20deg);}
-  .uno-card.mini .uno-back-logo{width:20px; height:20px; font-size:8px; border-width:1.5px;}
+  .uno-card .uno-corner.tl{top:4px; left:5px;}
+  .uno-card .uno-corner.br{bottom:4px; right:5px; transform:rotate(180deg);}
+  .uno-card.uno-back{background:linear-gradient(155deg,#F3392E,#C4141B 60%,#8E0E13); box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 0 3px #fff, inset 0 0 0 4.5px rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center;}
+  .uno-back-logo{font-family:'Cairo',sans-serif; font-weight:900; font-style:italic; font-size:15px; letter-spacing:-.5px; color:#fff; -webkit-text-stroke:1px rgba(0,0,0,.35); transform:rotate(-16deg);}
+  .uno-card.mini .uno-back-logo{font-size:9px;}
   .uno-card.playable{cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 14px rgba(244,183,64,.55);}
-  .uno-card.playable:active{transform:translateY(-6px);}
+  .uno-card.playable:active{transform:translateY(-8px);}
   .uno-card.dim{opacity:.42;}
-  .uno-hand-scroller{display:flex; gap:6px; overflow-x:auto; padding:10px 4px 14px; -webkit-overflow-scrolling:touch;}
+  .uno-bottom-row{position:absolute; left:0; right:0; bottom:8px; display:flex; align-items:flex-end; gap:8px; padding:0 10px; z-index:4;}
+  .uno-call-btn{flex-shrink:0; width:70px; height:70px; border-radius:50%; border:3px solid #fff; background:radial-gradient(circle at 35% 30%, #ff8a7a, #d6301e 70%); color:#fff;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:11px; line-height:1.15; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,0,0,.45); text-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .uno-call-btn.is-active{animation:unoPulse .8s infinite; box-shadow:0 0 0 4px rgba(255,217,61,.5), 0 6px 16px rgba(0,0,0,.45);}
+  .uno-call-btn:disabled{opacity:.42; cursor:default; animation:none;}
+  .uno-hand-scroller{flex:1; display:flex; gap:5px; overflow-x:auto; padding:6px 2px 4px; -webkit-overflow-scrolling:touch; align-items:flex-end;}
   .uno-hand-scroller .uno-card{transition:transform .15s;}
-  .uno-hand-count{text-align:center; font-size:12px; font-weight:800; color:var(--text-muted); margin-top:-4px;}
-  .uno-actions-row{display:flex; gap:8px; margin-top:4px;}
-  .uno-actions-row .btn{flex:1;}
-  .uno-uno-btn{width:100%; margin-top:6px; border:none; border-radius:14px; padding:12px; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px;
-    background:linear-gradient(145deg,#FFD93D,#FF6B6B); color:#3A0E0E; cursor:pointer; animation:unoPulse .8s infinite; box-shadow:0 6px 16px rgba(255,107,107,.4);}
-  .uno-color-overlay{position:fixed; inset:0; z-index:60; background:rgba(6,5,20,.68); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; animation:dylFade .2s ease;}
-  .uno-color-card{background:var(--surface); border-radius:20px; padding:20px; width:280px; max-width:88vw; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
-  .uno-color-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15.5px; color:var(--text); margin-bottom:14px;}
+  .uno-hand-count{flex-shrink:0; font-size:10.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); align-self:center; white-space:nowrap;}
+  .uno-actions-row{position:absolute; bottom:98px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:5;}
+  .uno-color-overlay{position:absolute; inset:0; z-index:60; background:rgba(6,5,20,.68); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; animation:dylFade .2s ease;}
+  .uno-color-card{background:var(--surface); border-radius:20px; padding:20px; width:240px; max-width:70%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
+  .uno-color-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:var(--text); margin-bottom:14px;}
   .uno-color-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .uno-color-btn{border:none; border-radius:14px; height:56px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);}
+  .uno-color-btn{border:none; border-radius:14px; height:50px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);}
   .uno-color-btn[data-color="red"]{background:linear-gradient(150deg,#FF6B6B,#C81E3A);}
   .uno-color-btn[data-color="yellow"]{background:linear-gradient(150deg,#FFE066,#E0A400);}
   .uno-color-btn[data-color="green"]{background:linear-gradient(150deg,#79D989,#1E8E3E);}
   .uno-color-btn[data-color="blue"]{background:linear-gradient(150deg,#63A4FF,#1450B8);}
   .uno-color-btn:active{transform:scale(.94);}
-  .uno-win-card{margin:2px 0 6px; padding:20px 16px 16px; border-radius:18px; text-align:center; border:1.5px solid var(--gold);
-    background:linear-gradient(160deg, rgba(244,183,64,.15), rgba(255,107,107,.1)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1);}
+  .uno-win-overlay{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; padding:20px;}
+  .uno-win-card{width:min(320px,84%); padding:20px 16px 16px; border-radius:18px; text-align:center; border:1.5px solid var(--gold);
+    background:linear-gradient(160deg, rgba(244,183,64,.94), rgba(255,107,107,.88)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1); box-shadow:0 20px 50px rgba(0,0,0,.5);}
   .uno-win-ico{font-size:40px; margin-bottom:6px;}
-  .uno-win-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:var(--text); margin-bottom:4px;}
-  .uno-win-sub{font-size:13px; color:var(--text-muted); font-weight:700;}
+  .uno-win-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#2A1400; margin-bottom:4px;}
+  .uno-win-sub{font-size:13px; color:#3A2400; font-weight:700;}
   .uno-lobby-list{display:flex; flex-direction:column; gap:8px; margin:12px 0;}
   .uno-lobby-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border);}
   .uno-lobby-row.empty{opacity:.5; justify-content:center;}
@@ -8266,8 +8297,8 @@ function unoFullDeck(){
 }
 function unoCardVisual(card){
   if(card.type==='number') return String(card.value);
-  if(card.type==='skip') return '🚫';
-  if(card.type==='reverse') return '🔁';
+  if(card.type==='skip') return '⊘';
+  if(card.type==='reverse') return '⇄';
   if(card.type==='draw2') return '+2';
   if(card.type==='wild') return '★';
   if(card.type==='wild4') return '+4';
@@ -8283,12 +8314,44 @@ function unoCardHtml(card, opts){
   const cls = ['uno-card', opts.mini?'mini':'', opts.selectable?'playable':'', opts.dim?'dim':''].filter(Boolean).join(' ');
   if(opts.selectable){
     return `<button type="button" class="${cls}" data-color="${color}" data-action="${opts.action}" data-cid="${card.id}">
-      <span class="uno-corner tl">${v}</span><span class="uno-center">${v}</span><span class="uno-corner br">${v}</span>
+      <span class="uno-oval"></span><span class="uno-corner tl">${v}</span><span class="uno-center-pip">${v}</span><span class="uno-corner br">${v}</span>
     </button>`;
   }
   return `<div class="${cls}" data-color="${color}">
-    <span class="uno-corner tl">${v}</span><span class="uno-center">${v}</span><span class="uno-corner br">${v}</span>
+    <span class="uno-oval"></span><span class="uno-corner tl">${v}</span><span class="uno-center-pip">${v}</span><span class="uno-corner br">${v}</span>
   </div>`;
+}
+function unoMiniFanHtml(count, vertical){
+  const n = Math.max(0, Math.min(count, 5));
+  let out = '';
+  for(let i=0;i<n;i++){
+    const off = i - (n-1)/2;
+    const rot = off*9;
+    const pos = vertical ? `top:${50+off*17}%; left:50%;` : `left:${50+off*17}%; top:50%;`;
+    out += `<div class="uno-fan-card" style="${pos} transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${i};">${unoCardHtml({},{mini:true,back:true})}</div>`;
+  }
+  return `<div class="uno-fan">${out}</div>`;
+}
+function unoDirArrowsHtml(dir){
+  return `<div class="uno-dir-arrows" style="transform:${dir<0?'scaleX(-1)':'none'}">
+    <svg viewBox="0 0 140 140">
+      <path d="M30 70a40 40 0 0 1 70-30" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M96 30l7 13-14 1z" fill="rgba(255,255,255,.6)"/>
+      <path d="M110 70a40 40 0 0 1 -70 30" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M44 110l-7-13 14-1z" fill="rgba(255,255,255,.6)"/>
+    </svg>
+  </div>`;
+}
+function unoStageShell(prefix, innerHtml){
+  const backAction = prefix==='room-' ? 'leave-room' : 'back';
+  return `<div class="uno-stage"><div class="uno-rotor">
+    <div class="uno-felt"></div>
+    <div class="uno-topbar">
+      <button type="button" class="uno-round-ico" data-action="${backAction}" style="transform:scaleX(-1);">${ICO.back}</button>
+      <div class="uno-clock">⏱️</div>
+    </div>
+    ${innerHtml}
+  </div></div>`;
 }
 function unoTopCard(g){ return g.discard[g.discard.length-1]; }
 function unoCardPlayable(g, card){
@@ -8528,22 +8591,28 @@ function unoColorOverlayHtml(prefix){
   </div>`;
 }
 function unoOpponentsHtml(g, myKey, prefix){
-  return `<div class="uno-opp-strip">${g.players.filter(p=>p.key!==myKey).map(p=>{
+  const seatClasses = ['uno-seat-top','uno-seat-right','uno-seat-corner'];
+  return g.players.filter(p=>p.key!==myKey).map((p,i)=>{
     const cnt = (g.hands[p.key]||[]).length;
     const isTurn = !g.winner && g.players[g.turnIdx].key===p.key;
     const canCatch = g.unoPending===p.key && !g.unoCalledFlag;
-    return `<div class="uno-opp ${isTurn?'is-turn':''}">
-      ${p.isBot ? gameAiAvatar('','sm') : gameAvatar(p.key,'','sm')}
-      <div class="uno-opp-name">${escapeHtml(p.name)}</div>
-      <div class="uno-opp-count">🂠${cnt}</div>
+    const seatCls = seatClasses[i] || 'uno-seat-top';
+    const vertical = seatCls!=='uno-seat-top';
+    return `<div class="uno-seat ${seatCls} ${isTurn?'is-turn':''}">
+      ${unoMiniFanHtml(cnt, vertical)}
+      <div class="uno-seat-avatar-wrap">${p.isBot ? gameAiAvatar('') : gameAvatar(p.key,'')}</div>
+      <div class="uno-seat-name">${escapeHtml(p.name)}</div>
+      <div class="uno-seat-count">🂠${cnt}</div>
       ${canCatch ? `<button type="button" class="uno-catch-btn" data-action="${prefix}uno-catch" data-key="${p.key}">🚨 امسكه!</button>` : ''}
     </div>`;
-  }).join('')}</div>`;
+  }).join('');
 }
 function unoTableHtml(g, myKey, prefix){
   const myHand = g.hands[myKey] || [];
   const top = unoTopCard(g);
   const canAct = !g.winner && g.players[g.turnIdx].key===myKey;
+  const meP = g.players.find(p=>p.key===myKey) || {};
+  const isMyTurn = !g.winner && g.players[g.turnIdx].key===myKey;
   const handHtml = myHand.map(c=>{
     const sel = canAct && unoCardPlayable(g,c);
     return unoCardHtml(c, {selectable:sel, action:prefix+'uno-play'});
@@ -8552,25 +8621,33 @@ function unoTableHtml(g, myKey, prefix){
   const showEndTurn = canAct && g.drewThisTurn;
   const showUnoBtn = g.unoPending===myKey && !g.unoCalledFlag;
   const statusTxt = unoStatusText(g, myKey);
-  return `
-    <div class="uno-wrap">
-      ${unoOpponentsHtml(g, myKey, prefix)}
-      <div class="uno-mid">
+  const inner = `
+    <div class="uno-me-tag ${isMyTurn?'is-turn':''}">
+      <div class="uno-seat-avatar-wrap">${gameAvatar(state.pid,'')}</div>
+      <div class="uno-seat-name">${escapeHtml(meP.name||'')}</div>
+    </div>
+    ${unoOpponentsHtml(g, myKey, prefix)}
+    <div class="uno-center">
+      ${unoDirArrowsHtml(g.dir)}
+      <div class="uno-discard-stack">
         ${unoCardHtml(top,{})}
-        <button type="button" class="uno-draw-pile" data-action="${prefix}uno-draw" ${drawDisabled?'disabled':''}>
-          ${unoCardHtml({type:'x'},{back:true})}
-          <span class="uno-draw-count">${g.deck.length}</span>
-        </button>
+        <div class="uno-color-dot" style="background:${UNO_GRAD(g.color)}"></div>
       </div>
-      <div class="uno-color-dot" style="background:${UNO_GRAD(g.color)}"></div>
-      ${statusTxt ? `<div class="uno-status">${statusTxt}</div>` : ''}
-      ${showEndTurn ? `<div class="uno-actions-row"><button type="button" class="btn btn-outline" data-action="${prefix}uno-endturn">⏭️ خلّص دوري</button></div>` : ''}
-      ${showUnoBtn ? `<button type="button" class="uno-uno-btn" data-action="${prefix}uno-uno">🎉 UNO!</button>` : ''}
+      <button type="button" class="uno-draw-pile" data-action="${prefix}uno-draw" ${drawDisabled?'disabled':''}>
+        ${unoCardHtml({type:'x'},{back:true})}
+        <span class="uno-draw-count">${g.deck.length}</span>
+      </button>
+    </div>
+    ${statusTxt ? `<div class="uno-status">${statusTxt}</div>` : ''}
+    ${showEndTurn ? `<div class="uno-actions-row"><button type="button" class="btn btn-outline" data-action="${prefix}uno-endturn">⏭️ خلّص دوري</button></div>` : ''}
+    <div class="uno-bottom-row">
+      <button type="button" class="uno-call-btn ${showUnoBtn?'is-active':''}" data-action="${prefix}uno-uno" ${showUnoBtn?'':'disabled'}>CALL<br>UNO</button>
       <div class="uno-hand-scroller">${handHtml}</div>
-      <div class="uno-hand-count">🃏 عندك ${myHand.length} ورقة</div>
+      <div class="uno-hand-count">🃏${myHand.length}</div>
     </div>
     ${unoColorOverlayHtml(prefix)}
   `;
+  return unoStageShell(prefix, inner);
 }
 function UNO_GRAD(color){
   const m = {red:'linear-gradient(150deg,#FF6B6B,#C81E3A)', yellow:'linear-gradient(150deg,#FFE066,#E0A400)',
@@ -8581,25 +8658,22 @@ function unoWinHtml(g, myKey, prefix, nextAction){
   const iWon = g.winner===myKey;
   const winnerP = g.players.find(p=>p.key===g.winner);
   const others = g.players.filter(p=>p.key!==g.winner).map(p=>`${escapeHtml(p.name)}: ${g.hands[p.key].length} ورقة`).join(' • ');
-  return `
-    <div class="uno-win-card">
-      <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
-      <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
-      <div class="uno-win-sub">${others}</div>
+  const inner = `
+    <div class="uno-win-overlay">
+      <div class="uno-win-card">
+        <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
+        <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
+        <div class="uno-win-sub">${others}</div>
+        <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="${nextAction}">🔄 جولة جديدة</button>
+      </div>
     </div>
-    <button type="button" class="btn btn-primary" style="width:100%;margin-top:6px;" data-action="${nextAction}">🔄 جولة جديدة</button>
   `;
+  return unoStageShell(prefix, inner);
 }
 function renderUnoGame(){
   if(!state.uno) initUnoGame();
   const g = state.uno;
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">أونو</div>
-    </div>
-    ${g.winner ? unoWinHtml(g,'me','','uno-next') : unoTableHtml(g,'me','')}
-  `;
+  return g.winner ? unoWinHtml(g,'me','','uno-next') : unoTableHtml(g,'me','');
 }
 /* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
 // يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
@@ -9576,7 +9650,7 @@ function renderRoomUno(){
   if(room.status==='waiting' || !room.uno) return roomHead('أونو', room) + renderRoomUnoLobby(room);
   const G = room.uno;
   const myKey = state.pid;
-  return roomHead('أونو', room) + (G.winner ? unoWinHtml(G, myKey, 'room-', 'room-uno-next') : unoTableHtml(G, myKey, 'room-'));
+  return G.winner ? unoWinHtml(G, myKey, 'room-', 'room-uno-next') : unoTableHtml(G, myKey, 'room-');
 }
 async function doRoomUnoStart(){
   GAME_ROOMS = await loadGameRooms();
