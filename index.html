@@ -4235,6 +4235,7 @@ function go(view, extra={}){
   SND.whoosh();
   Object.assign(state, {view}, extra);
   render();
+  if(typeof handleVoiceForView==='function') handleVoiceForView();
 }
 function goBack(){
   if(typeof closeDishSheet==='function') closeDishSheet(true);
@@ -4243,6 +4244,7 @@ function goBack(){
   SND.whoosh(true);
   if(prev){ Object.assign(state, prev); } else { state.view='profile'; }
   render();
+  if(typeof handleVoiceForView==='function') handleVoiceForView();
 }
 
 /* ============================= ICONS ============================= */
@@ -9008,6 +9010,7 @@ async function leaveGameRoom(){
       delete GAME_ROOMS[code];
     }
     await saveGameRooms(GAME_ROOMS);
+    if(!GAME_ROOMS[code] && typeof voiceRoot==='function'){ try{ voiceRoot(code).remove(); }catch(e){} }
   }catch(e){}
 }
 async function doRoomXoMove(idx){
@@ -9205,6 +9208,238 @@ function startRoomPolling(){
   startReactPolling();
 }
 function stopRoomPolling(){ if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval=null; } stopReactPolling(); }
+
+/* ============================= VOICE CHAT (WebRTC mesh, signaled over Firebase) =============================
+   لما اللاعب يدخل غرفة لعب حقيقية (مش مشاهدة)، بنفتحله مايك ونعمل اتصال صوتي مباشر (WebRTC)
+   مع كل اللاعبين التانيين في نفس الغرفة. الإشارات (offer/answer/ICE) بتتبعت عن طريق نفس
+   قاعدة بيانات Firebase اللي اللعبة أصلاً بتستخدمها، فمفيش سيرفر إضافي مطلوب. */
+const VOICE = { enabled:false, roomCode:null, myId:null, localStream:null, muted:false, peers:{}, peersRef:null, peersCb:null };
+const VOICE_ICE_SERVERS = [{ urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302'] }];
+
+function voiceRoot(roomCode){ return _fbDb ? _fbDb.ref(_FB_ROOT+'/voice_signal/'+_fbEncodeKey(roomCode)) : null; }
+function _voiceIsInitiator(myId, otherId){ return String(myId) < String(otherId); }
+
+function removeVoiceWidget(){ const el=document.getElementById('voice-widget'); if(el) el.remove(); }
+function ensureVoiceStyles(){
+  if(document.getElementById('voice-widget-style')) return;
+  const st = document.createElement('style');
+  st.id = 'voice-widget-style';
+  st.textContent = `
+    .voice-widget{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:500;
+      display:flex; align-items:center; gap:10px; background:rgba(20,16,50,.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:8px 16px 8px 8px; box-shadow:0 8px 24px rgba(0,0,0,.35); direction:rtl;
+      font-family:inherit; max-width:92vw;}
+    .voice-mute-btn{width:38px;height:38px;min-width:38px;border-radius:50%;border:none;background:linear-gradient(145deg,#5FE0A4,#3FDCC9);
+      font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#0c2b22;transition:transform .15s ease, box-shadow .15s ease;}
+    .voice-mute-btn:active{transform:scale(.92);}
+    .voice-mute-btn.muted{background:linear-gradient(145deg,#FF6B6B,#e0644f); color:#fff;}
+    .voice-mute-btn.speaking{box-shadow:0 0 0 4px rgba(95,224,164,.45);}
+    .voice-mute-btn:disabled{opacity:.5;cursor:not-allowed;}
+    .voice-status{color:#fff;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .voice-peers{display:flex;gap:4px;}
+    .voice-peer-dot{width:9px;height:9px;border-radius:50%;background:#5FE0A4;opacity:.35;transition:opacity .15s ease;}
+    .voice-peer-dot.speaking{opacity:1; box-shadow:0 0 6px #5FE0A4;}
+  `;
+  document.head.appendChild(st);
+}
+function renderVoiceWidget(){
+  if(!VOICE.enabled){ removeVoiceWidget(); return; }
+  ensureVoiceStyles();
+  let el = document.getElementById('voice-widget');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'voice-widget';
+    el.className = 'voice-widget';
+    document.body.appendChild(el);
+    el.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-vaction]');
+      if(!btn) return;
+      if(btn.dataset.vaction==='mute') voiceToggleMute();
+    });
+  }
+  const ids = Object.keys(VOICE.peers);
+  const micOk = !!VOICE.localStream;
+  const statusTxt = !micOk ? 'مفيش إذن ميكروفون 🚫'
+    : ids.length ? `متصل صوتيًا مع ${ids.length} 🎧`
+    : 'مستني الباقي يدخلوا الصوت…';
+  const dots = ids.map(id=>`<span class="voice-peer-dot ${VOICE.peers[id].speaking?'speaking':''}"></span>`).join('');
+  el.innerHTML = `
+    <button type="button" class="voice-mute-btn ${VOICE.muted?'muted':''} ${VOICE.speaking?'speaking':''}" data-vaction="mute" ${micOk?'':'disabled'} title="${VOICE.muted?'رجّع الصوت':'اكتم صوتي'}">
+      ${VOICE.muted ? '🔇' : '🎙️'}
+    </button>
+    <span class="voice-status">${statusTxt}</span>
+    <span class="voice-peers">${dots}</span>
+  `;
+}
+
+/* ---- simple speaking-detector: بيقيس مستوى الصوت اللحظي عشان يلوّن دائرة اللي بيتكلم ---- */
+function voiceAttachSpeakingMeter(stream, onLevel){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    src.connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let raf = null;
+    const tick = ()=>{
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for(let i=0;i<data.length;i++){ const v=(data[i]-128)/128; sum += v*v; }
+      const level = Math.sqrt(sum/data.length);
+      onLevel(level > 0.045);
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return ()=>{ if(raf) cancelAnimationFrame(raf); try{ ctx.close(); }catch(e){} };
+  }catch(e){ return ()=>{}; }
+}
+
+async function voiceStart(roomCode, myId){
+  if(!_fbDb || !roomCode || !myId) return;
+  if(VOICE.enabled && VOICE.roomCode===roomCode && VOICE.myId===myId) return;
+  await voiceStop();
+  VOICE.roomCode = roomCode; VOICE.myId = myId; VOICE.muted = false;
+  try{
+    VOICE.localStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}, video:false});
+  }catch(e){
+    VOICE.localStream = null;
+    VOICE.enabled = true; // keep widget visible so the user knows mic access is what's missing
+    showToast('محتاج تسمح بالميكروفون عشان تتكلم مع أصحابك في الغرفة 🎙️', true);
+    renderVoiceWidget();
+    return;
+  }
+  VOICE.enabled = true;
+  VOICE.stopMeter = voiceAttachSpeakingMeter(VOICE.localStream, (speaking)=>{ VOICE.speaking = speaking; if(document.getElementById('voice-widget')) renderVoiceWidget(); });
+
+  const root = voiceRoot(roomCode);
+  const myRef = root.child(_fbEncodeKey(myId));
+  try{ await myRef.remove(); }catch(e){} // نظف أي بقايا من جلسة سابقة قبل ما نبدأ
+  myRef.child('presence').set({online:true, muted:false, ts:Date.now()});
+  myRef.child('presence').onDisconnect().remove();
+  myRef.onDisconnect().remove();
+
+  VOICE.peersRef = root;
+  VOICE.peersCb = root.on('value', snap=>{
+    const val = snap.val() || {};
+    Object.keys(val).forEach(key=>{
+      const rpid = _fbDecodeKey(key);
+      if(rpid===myId) return;
+      const online = !!(val[key] && val[key].presence && val[key].presence.online);
+      if(online && !VOICE.peers[rpid]) voiceEnsurePeer(rpid, _voiceIsInitiator(myId, rpid));
+      else if(!online && VOICE.peers[rpid]) voiceTeardownPeer(rpid);
+    });
+    Object.keys(VOICE.peers).forEach(rpid=>{ if(!val[_fbEncodeKey(rpid)]) voiceTeardownPeer(rpid); });
+    renderVoiceWidget();
+  });
+  renderVoiceWidget();
+}
+
+function voiceEnsurePeer(otherId, isInitiator){
+  if(VOICE.peers[otherId]) return VOICE.peers[otherId];
+  const pc = new RTCPeerConnection({ iceServers: VOICE_ICE_SERVERS });
+  const audioEl = document.createElement('audio');
+  audioEl.autoplay = true; audioEl.playsInline = true; audioEl.style.display='none';
+  audioEl.dataset.voicePeer = otherId;
+  document.body.appendChild(audioEl);
+  const peer = { pc, audioEl, otherId, madeOffer:false, speaking:false, stopMeter:null };
+  VOICE.peers[otherId] = peer;
+
+  if(VOICE.localStream) VOICE.localStream.getTracks().forEach(t=> pc.addTrack(t, VOICE.localStream));
+
+  pc.ontrack = (ev)=>{
+    audioEl.srcObject = ev.streams[0];
+    if(peer.stopMeter) peer.stopMeter();
+    peer.stopMeter = voiceAttachSpeakingMeter(ev.streams[0], (speaking)=>{ peer.speaking = speaking; if(document.getElementById('voice-widget')) renderVoiceWidget(); });
+  };
+  pc.onicecandidate = (ev)=>{
+    if(ev.candidate && VOICE.roomCode){
+      voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('candidates').push(ev.candidate.toJSON());
+    }
+  };
+
+  const inboxFromRef = voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).child('inbox').child(_fbEncodeKey(otherId));
+  const offerCb = inboxFromRef.child('offer').on('value', async snap=>{
+    const offer = snap.val();
+    if(!offer || pc.currentRemoteDescription || pc.signalingState==='closed') return;
+    try{
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('answer').set({type:answer.type, sdp:answer.sdp});
+    }catch(e){}
+  });
+  const answerCb = inboxFromRef.child('answer').on('value', async snap=>{
+    const answer = snap.val();
+    if(!answer || !peer.madeOffer || pc.currentRemoteDescription || pc.signalingState==='closed') return;
+    try{ await pc.setRemoteDescription(new RTCSessionDescription(answer)); }catch(e){}
+  });
+  const candCb = inboxFromRef.child('candidates').on('child_added', snap=>{
+    const cand = snap.val();
+    if(cand && pc.signalingState!=='closed') pc.addIceCandidate(new RTCIceCandidate(cand)).catch(()=>{});
+  });
+  peer._unsub = ()=>{
+    try{ inboxFromRef.child('offer').off('value', offerCb); }catch(e){}
+    try{ inboxFromRef.child('answer').off('value', answerCb); }catch(e){}
+    try{ inboxFromRef.child('candidates').off('child_added', candCb); }catch(e){}
+  };
+
+  if(isInitiator){
+    (async ()=>{
+      try{
+        peer.madeOffer = true;
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        voiceRoot(VOICE.roomCode).child(_fbEncodeKey(otherId)).child('inbox').child(_fbEncodeKey(VOICE.myId)).child('offer').set({type:offer.type, sdp:offer.sdp});
+      }catch(e){}
+    })();
+  }
+  return peer;
+}
+
+function voiceTeardownPeer(otherId){
+  const peer = VOICE.peers[otherId];
+  if(!peer) return;
+  try{ peer._unsub && peer._unsub(); }catch(e){}
+  try{ peer.stopMeter && peer.stopMeter(); }catch(e){}
+  try{ peer.pc.close(); }catch(e){}
+  try{ peer.audioEl.remove(); }catch(e){}
+  delete VOICE.peers[otherId];
+}
+
+async function voiceStop(){
+  if(VOICE.peersRef && VOICE.peersCb){ try{ VOICE.peersRef.off('value', VOICE.peersCb); }catch(e){} }
+  Object.keys(VOICE.peers).forEach(voiceTeardownPeer);
+  try{ VOICE.stopMeter && VOICE.stopMeter(); }catch(e){}
+  if(VOICE.localStream){ try{ VOICE.localStream.getTracks().forEach(t=>t.stop()); }catch(e){} }
+  if(_fbDb && VOICE.roomCode && VOICE.myId){
+    try{ await voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).remove(); }catch(e){}
+  }
+  VOICE.enabled=false; VOICE.roomCode=null; VOICE.myId=null; VOICE.localStream=null; VOICE.muted=false; VOICE.speaking=false;
+  VOICE.peersRef=null; VOICE.peersCb=null; VOICE.peers={};
+  removeVoiceWidget();
+}
+
+function voiceToggleMute(){
+  if(!VOICE.localStream) return;
+  VOICE.muted = !VOICE.muted;
+  VOICE.localStream.getAudioTracks().forEach(t=> t.enabled = !VOICE.muted);
+  if(VOICE.roomCode && VOICE.myId && _fbDb){
+    voiceRoot(VOICE.roomCode).child(_fbEncodeKey(VOICE.myId)).child('presence').update({muted:VOICE.muted, ts:Date.now()});
+  }
+  vibrate(10);
+  renderVoiceWidget();
+}
+
+/* بيتنادى بعد أي تنقل في التطبيق (go/goBack): يفتح الصوت لو دخلنا غرفة لعب فعلية، ويقفله لو خرجنا */
+function handleVoiceForView(){
+  const inLiveRoom = typeof state.view==='string' && state.view.indexOf('room-')===0 && !!state.roomCode && !state.roomSpectate && !!state.pid;
+  if(inLiveRoom){
+    if(!(VOICE.enabled && VOICE.roomCode===state.roomCode && VOICE.myId===state.pid)) voiceStart(state.roomCode, state.pid);
+  } else if(VOICE.enabled){
+    voiceStop();
+  }
+}
 let watchListPollInterval = null;
 function startWatchListPolling(){
   if(watchListPollInterval) return;
