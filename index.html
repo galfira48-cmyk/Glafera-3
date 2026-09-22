@@ -7986,23 +7986,73 @@ function ludoPaintTokens(G, ctx){
   });
 }
 function ludoTick(f, d, g){ try{ luxTone(f, d||.07, 'sine', g||.04, {cutoff:2200, wet:.12}); }catch(e){} }
+/* Realistic dice-cup rattle: short noise "knocks" (dice clacking together) with a body tone,
+   then a slightly heavier double-knock as the dice settle/land. */
+function diceKnock(vol, pitch){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    const ctx = window.__glavCtx || (window.__glavCtx = new Ctx());
+    if(ctx.state==='suspended'){ ctx.resume(); }
+    const now = ctx.currentTime;
+    const dur = 0.05;
+    const bufSize = Math.floor(ctx.sampleRate*dur);
+    const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufSize;i++){ data[i] = (Math.random()*2-1) * Math.pow(1-i/bufSize, 2.2); }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = pitch || (1500+Math.random()*1400);
+    filter.Q.value = 1.1;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.0001, now);
+    ng.gain.exponentialRampToValueAtTime(vol||0.3, now+0.003);
+    ng.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+    noise.connect(filter); filter.connect(ng); ng.connect(getMasterOut(ctx));
+    noise.start(now);
+    const osc = ctx.createOscillator();
+    const og = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = (pitch || 1800) * 0.24;
+    og.gain.setValueAtTime(0.0001, now);
+    og.gain.exponentialRampToValueAtTime((vol||0.3)*0.55, now+0.004);
+    og.gain.exponentialRampToValueAtTime(0.0001, now+dur*1.4);
+    osc.connect(og); og.connect(getMasterOut(ctx));
+    osc.start(now); osc.stop(now+dur*1.5);
+  }catch(e){}
+}
+function diceRattle(){
+  try{
+    let t = 0;
+    const hits = 7 + Math.floor(Math.random()*3);
+    for(let i=0;i<hits;i++){
+      const gap = 42 + Math.random()*38;
+      t += gap;
+      const decay = 1 - (i/hits)*0.35;
+      setTimeout(()=>diceKnock(0.22*decay, 1400+Math.random()*1600), t);
+    }
+    setTimeout(()=>{ diceKnock(0.4, 620); }, t+70);
+    setTimeout(()=>{ diceKnock(0.22, 900); }, t+130);
+  }catch(e){}
+}
 function ludoDiceAnim(L, v, aliveFn){
   return new Promise(res=>{
     const el = document.getElementById('ludo-dice');
     if(!el){ res(); return; }
     const col = LUDO_PAL[L.seats[L.turn].color].b;
     el.classList.add('rolling');
+    diceRattle();
     let n = 0;
     const iv = setInterval(()=>{
       if(!aliveFn()){ clearInterval(iv); res(); return; }
       n++;
       el.innerHTML = ludoDiceFace(1+Math.floor(Math.random()*6), col);
-      if(n%2===0) ludoTick(380+Math.random()*260, .05, .035);
       if(n>=9){
         clearInterval(iv);
         el.classList.remove('rolling');
         el.innerHTML = ludoDiceFace(v, col);
-        ludoTick(720, .12, .05);
         res();
       }
     }, 70);
