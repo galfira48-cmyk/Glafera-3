@@ -409,6 +409,26 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .btn-outline{background:transparent; border:1.5px solid var(--teal); color:var(--teal);}
   .btn-ghost{background:var(--surface); border:1px solid var(--border); color:var(--text);}
   .btn:disabled{opacity:.5;}
+  /* ---------- professional "Next" pill button (post-round transition) ---------- */
+  .btn-next-pro{display:flex; align-items:center; justify-content:center; gap:12px; width:100%;
+    padding:14px 22px; margin-top:16px; border-radius:999px; direction:ltr;
+    border:1.5px solid rgba(244,183,64,.65);
+    background:linear-gradient(160deg, rgba(130,160,210,.38), rgba(28,38,68,.65));
+    box-shadow:0 10px 26px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -3px 8px rgba(0,0,0,.28);
+    color:var(--gold); font-family:'Cairo',sans-serif; font-weight:900; font-size:16px;
+    letter-spacing:1.5px; text-transform:uppercase; position:relative; overflow:hidden;
+    transition:transform .16s ease, box-shadow .16s ease;}
+  .btn-next-pro:active{transform:scale(.97);}
+  .btn-next-pro .bnp-arrow{width:30px; height:30px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(244,183,64,.12) 62%, transparent 72%), rgba(28,38,68,.5);
+    border:1.5px solid rgba(244,183,64,.7); box-shadow:inset 0 0 7px rgba(244,183,64,.35);}
+  .btn-next-pro .bnp-arrow svg{width:14px; height:14px;}
+  .btn-next-pro.launch{animation:bnpLaunch .38s cubic-bezier(.4,0,.2,1) forwards; pointer-events:none;}
+  @keyframes bnpLaunch{
+    0%{transform:scale(1); opacity:1;}
+    45%{transform:scale(1.045); box-shadow:0 10px 30px rgba(244,183,64,.55), inset 0 1px 0 rgba(255,255,255,.4);}
+    100%{transform:scale(.9) translateX(22px); opacity:0;}
+  }
   .chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
 
   /* ============================= OTP EMBOSSED CODE INPUT ============================= */
@@ -6599,7 +6619,7 @@ function renderXoGame(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
-    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="xo-reset">Next</button>
+    ${g.winner ? nextProBtn('xo-reset') : ''}
   `;
 }
 
@@ -7184,7 +7204,7 @@ function renderConnect4Game(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="c4-board">${cellsHtml}</div>
-    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="c4-reset">Next</button>
+    ${g.winner ? nextProBtn('c4-reset') : ''}
   `;
 }
 
@@ -7636,7 +7656,7 @@ function renderDominoGame(){
     <div class="domino-result">
       <div class="dr-title">${statusText}</div>
       ${g.blocked ? `<div class="dr-sub">نقطك: ${g.ptsR} • نقط ${oppName}: ${g.ptsY} (الأقل هو اللي بيكسب)</div>` : '<div class="dr-sub">عايز تلعب تاني؟</div>'}
-      <button type="button" class="btn btn-primary" style="letter-spacing:1px;text-transform:uppercase;" data-action="domino-reset">Next</button>
+      ${nextProBtn('domino-reset')}
     </div>` : '';
   const passHtml = g.mustPass ? `<button type="button" class="btn btn-primary" style="width:100%;margin:12px 0 0;" data-action="domino-pass">⏭️ عدّي الدور</button>` : '';
   return `
@@ -8066,7 +8086,7 @@ function ludoResultHtml(L, ctx){
     return `<div class="lr-row${i===0?' first':''}" style="--pc:${pal.solid}"><span class="lr-medal">${medals[i]}</span><span class="lr-dot"></span><span class="lr-name">${escapeHtml(s.name)}</span><span class="lr-home">🏠 ${x.home}/4</span></div>`;
   }).join('');
   const btn = ctx.canNew
-    ? `<button type="button" class="btn btn-primary" style="letter-spacing:1px;text-transform:uppercase;" data-action="ludo-again">Next</button>` + (ctx.mode==='local' ? `<button type="button" class="btn btn-outline" style="margin-top:8px;" data-action="ludo-setup">⚙️ تغيير اللاعبين</button>` : '')
+    ? `${nextProBtn('ludo-again')}` + (ctx.mode==='local' ? `<button type="button" class="btn btn-outline" style="margin-top:8px;" data-action="ludo-setup">⚙️ تغيير اللاعبين</button>` : '')
     : `<div class="dr-sub" style="margin:6px 0 0;">⏳ في انتظار صاحب الغرفة يبدأ جولة جديدة</div>`;
   const w = L.seats[L.winner];
   return `
@@ -9085,7 +9105,7 @@ function unoWinHtml(g, myKey, prefix, nextAction){
         <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
         <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
         <div class="uno-win-sub">${others}</div>
-        <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;letter-spacing:1px;text-transform:uppercase;" data-action="${nextAction}">Next</button>
+        ${nextProBtn(nextAction)}
       </div>
     </div>
   `;
@@ -9118,6 +9138,12 @@ function gameAiAvatar(badgeText, size, dotColorId){
 }
 function scorePill(avatarHtml, score, cls, active){
   return `<div class="xo-score-pill has-av ${cls||''}${active?' turn':''}">${avatarHtml}<b>${score}</b></div>`;
+}
+function nextProBtn(action, extraStyle){
+  return `<button type="button" class="btn-next-pro" ${extraStyle?`style="${extraStyle}"`:''} data-action="${action}">
+    <span>Next</span>
+    <span class="bnp-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  </button>`;
 }
 
 /* ---- Connect Four colors (each player picks their own disc color) ---- */
@@ -10092,7 +10118,7 @@ function renderRoomXo(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-xo-next">Next</button>` : ''}
+    ${room.winner ? nextProBtn('room-xo-next') : ''}
   `;
 }
 function renderRoomRps(){
@@ -10139,7 +10165,7 @@ function renderRoomRps(){
     <div class="rps-choices">
       ${['rock','paper','scissors'].map(c=>`<button type="button" class="rps-btn" data-action="room-rps-pick" data-choice="${c}" ${myPick?'disabled':''}>${RPS_ICONS[c]}<span>${RPS_LABELS[c]}</span></button>`).join('')}
     </div>
-    ${bothPicked ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-rps-next">Next</button>` : ''}
+    ${bothPicked ? nextProBtn('room-rps-next') : ''}
   `;
 }
 function renderRoomDomino(){
@@ -10198,7 +10224,7 @@ function renderRoomDomino(){
     ${pendingButtons}
     <div class="domino-hand-label">قطعك:</div>
     <div class="domino-hand">${handHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-domino-next">Next</button>` : ''}
+    ${room.winner ? nextProBtn('room-domino-next') : ''}
   `;
 }
 
@@ -10331,7 +10357,7 @@ function renderRoomC4(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="c4-board">${cellsHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-c4-next">Next</button>` : ''}
+    ${room.winner ? nextProBtn('room-c4-next') : ''}
   `;
 }
 
@@ -10424,7 +10450,7 @@ function renderRoomMemory(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="memory-grid">${cellsHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-memory-next">Next</button>` : ''}
+    ${room.winner ? nextProBtn('room-memory-next') : ''}
   `;
 }
 
@@ -10497,7 +10523,7 @@ function renderRoomNumGuess(){
     <div class="xo-status">${statusText}</div>
     <div class="numguess-keypad">${keys}</div>
     ${historyHtml ? `<div class="memory-stats-row" style="margin-top:12px;flex-wrap:wrap;">${historyHtml}</div>` : ''}
-    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:12px;letter-spacing:1px;text-transform:uppercase;" data-action="room-num-next">Next</button>` : ''}
+    ${room.winner ? nextProBtn('room-num-next') : ''}
   `;
 }
 
@@ -10559,7 +10585,7 @@ function renderRoomMath(){
     <div class="rps-choices">
       ${room.problem.options.map(o=>`<button type="button" class="rps-btn" data-action="room-math-pick" data-val="${o}" ${iLocked?'disabled':''}>${o}</button>`).join('')}
     </div>`}
-    ${room.finished ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-math-next">Next</button>` : ''}
+    ${room.finished ? nextProBtn('room-math-next') : ''}
   `;
 }
 
@@ -13921,6 +13947,10 @@ function closeScanModal(){
 }
 
 /* ============================= EVENTS ============================= */
+const NEXT_PRO_ACTIONS = new Set([
+  'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
+  'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next'
+]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
   'room-rps-pick','room-rps-next','room-c4-color','room-c4-col','room-c4-next',
@@ -13943,6 +13973,14 @@ document.addEventListener('click', (e)=>{
   const el = e.target.closest('[data-action]');
   if(!el) return;
   const action = el.dataset.action;
+
+  if(NEXT_PRO_ACTIONS.has(action) && !el.dataset.animFired){
+    el.dataset.animFired = '1';
+    el.classList.add('launch');
+    SND.click();
+    setTimeout(()=>{ el.click(); }, 380);
+    return;
+  }
 
   if(state.roomSpectate && SPECTATE_BLOCKED_ACTIONS.has(action)){
     showToast('👀 إنت بس بتتفرج — مينفعش تلعب في المعركة دي', true);
