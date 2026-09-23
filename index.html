@@ -1248,6 +1248,26 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes vmsgRing{0%{transform:scale(.92); opacity:.9}100%{transform:scale(1.35); opacity:0}}
   @keyframes vmsgDraw{to{stroke-dashoffset:0}}
   @media (prefers-reduced-motion:reduce){ .vmsg-card,.vmsg-overlay,.vmsg-ico::after,.vmsg-draw{animation:none !important;} .vmsg-draw{stroke-dashoffset:0;} }
+  /* ---------- نافذة الرقم السري الأنيقة (3 خانات) ---------- */
+  .pinmodal-overlay{background:rgba(5,6,18,.66); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); z-index:320; padding:24px; animation:vmsgFade .22s ease both;}
+  .pinmodal-overlay.leaving{animation:vmsgFadeOut .18s ease forwards;}
+  .pinmodal-card{position:relative; width:100%; max-width:330px; text-align:center; padding:30px 22px 22px; border-radius:26px; overflow:hidden;
+    background:linear-gradient(165deg,#1a1330,#241a3d 55%,#1a1330); border:1px solid rgba(244,183,64,.28);
+    box-shadow:0 24px 60px -18px rgba(0,0,0,.65); animation:vmsgPop .28s cubic-bezier(.2,.9,.3,1.2) both;}
+  .pinmodal-card::before{content:''; position:absolute; top:0; left:14%; right:14%; height:2px; background:linear-gradient(90deg,transparent,var(--gold,#f4b740),transparent);}
+  .pinmodal-ico{width:56px; height:56px; margin:0 auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:linear-gradient(140deg,var(--gold,#f4b740),var(--gold-2,#e8952c)); box-shadow:0 8px 20px -6px rgba(244,183,64,.55);}
+  .pinmodal-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; margin-bottom:6px; color:var(--text);}
+  .pinmodal-text{font-size:13px; line-height:1.75; color:var(--text-muted); margin-bottom:20px;}
+  .pinmodal-boxes{display:flex; justify-content:center; gap:14px; margin-bottom:8px;}
+  .pinmodal-box{width:54px; height:60px; border-radius:14px; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:24px;
+    background:#0f0c1e; color:var(--gold,#f4b740); border:1.5px solid rgba(79,214,208,.5); outline:none;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.5); transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;}
+  .pinmodal-box:focus{border-color:var(--gold,#f4b740); box-shadow:inset 0 2px 6px rgba(0,0,0,.5),0 0 0 3px rgba(244,183,64,.22); transform:translateY(-1px);}
+  .pinmodal-err{min-height:18px; font-size:12.5px; font-weight:700; color:var(--danger,#ef5d6f); margin-bottom:6px;}
+  .pinmodal-actions{display:flex; gap:10px; margin-top:14px;}
+  .pinmodal-shake{animation:pinmodalShake .35s ease;}
+  @keyframes pinmodalShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -3693,6 +3713,78 @@ function showExpiredDialog(){
     { rows:[['انتهت بتاريخ', exp?fmtVisaDate(exp):'—'], ['رسوم التجديد', visaRenewFee()+' نقطة']],
       primary:{label:'تجديد الفيزا', onClick:openVisaPage}, secondary:{label:'لاحقًا'} });
 }
+/* ---------- نافذة أنيقة لإدخال الرقم السري (3 خانات) بدل الحقل الثابت في الصفحة ---------- */
+function showPinEntryModal(opts){
+  opts = opts || {};
+  document.querySelectorAll('.pinmodal-overlay').forEach(o=>o.remove());
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay pinmodal-overlay'; ov.id = 'pinmodal-overlay';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `
+    <div class="pinmodal-card">
+      <div class="pinmodal-ico">🔒</div>
+      <div class="pinmodal-title">${opts.title || 'أدخل الرقم السري'}</div>
+      <div class="pinmodal-text">${opts.text || 'اكتب الرقم السري (CVV) المكوّن من 3 أرقام الموجود على ظهر بطاقتك'}</div>
+      <div class="pinmodal-boxes" dir="ltr">
+        <input class="pinmodal-box" id="pinm-b0" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input class="pinmodal-box" id="pinm-b1" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input class="pinmodal-box" id="pinm-b2" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+      </div>
+      <div class="pinmodal-err" id="pinm-err"></div>
+      <div class="pinmodal-actions">
+        <button type="button" class="vmsg-btn ghost" id="pinm-cancel">إلغاء</button>
+        <button type="button" class="vmsg-btn primary" id="pinm-ok">تم</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  const card = ov.querySelector('.pinmodal-card');
+  const boxes = [0,1,2].map(i=>document.getElementById('pinm-b'+i));
+  const errEl = document.getElementById('pinm-err');
+  const okBtn = document.getElementById('pinm-ok');
+  const cancelBtn = document.getElementById('pinm-cancel');
+  let closed = false, submitting = false;
+  const close = ()=>{ if(closed) return; closed = true; ov.classList.add('leaving'); setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 180); };
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input', ()=>{
+      b.value = b.value.replace(/[^0-9]/g,'').slice(-1);
+      errEl.textContent = '';
+      if(b.value && i<2){ boxes[i+1].focus(); }
+      else if(b.value && i===2){ submit(); }
+    });
+    b.addEventListener('keydown', (e)=>{
+      if(e.key==='Backspace' && !b.value && i>0){ boxes[i-1].focus(); }
+      else if(e.key==='Enter'){ submit(); }
+    });
+  });
+  setTimeout(()=>{ boxes[0].focus(); }, 60);
+  async function submit(){
+    if(submitting) return;
+    const pin = boxes.map(b=>b.value).join('');
+    if(!/^\d{3}$/.test(pin)){
+      errEl.textContent = 'اكتب الأرقام الثلاثة كاملة.';
+      card.classList.remove('pinmodal-shake'); void card.offsetWidth; card.classList.add('pinmodal-shake');
+      vibrate([20,10,20]);
+      return;
+    }
+    submitting = true; okBtn.disabled = true;
+    let ok = true;
+    try{ ok = opts.onSubmit ? await opts.onSubmit(pin) : true; }
+    catch(e){ ok = false; }
+    submitting = false; okBtn.disabled = false;
+    if(ok===false){
+      boxes.forEach(b=>b.value='');
+      boxes[0].focus();
+      errEl.textContent = opts.errorText || 'الرقم السري غير صحيح.';
+      card.classList.remove('pinmodal-shake'); void card.offsetWidth; card.classList.add('pinmodal-shake');
+      vibrate([25,15,25]);
+      return;
+    }
+    close();
+  }
+  okBtn.addEventListener('click', submit);
+  cancelBtn.addEventListener('click', ()=>{ close(); if(opts.onCancel) opts.onCancel(); });
+  ov.addEventListener('click', (e)=>{ if(e.target===ov){ close(); if(opts.onCancel) opts.onCancel(); } });
+}
 /* بوابة للعمليات اللي بتستخدم رصيد الفيزا: لازم تكون صالحة */
 function requireVisaValid(){
   if(visaExpired(state.pid)){ showExpiredDialog(); return false; }
@@ -3902,8 +3994,6 @@ function renderVisaPage(){
       <label class="vp-label" for="visa-amt">المبلغ</label>
       <input id="visa-amt" class="field" type="number" inputmode="numeric" min="1" placeholder="عدد النقاط المراد تحويلها" />
       <div class="vp-chips">${tChips}</div>
-      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
-      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-transfer">تحويل الآن</button>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-copy-number">📋 نسخ رقم بطاقتي</button>
       <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة.</div>
@@ -3921,8 +4011,6 @@ function renderVisaPage(){
       ${tab==='withdraw' ? `<div class="vp-prog"><i style="width:${pct}%"></i></div>
         <div class="vp-hint">${bal>=min ? 'السحب متاح، والنقاط بتتضاف لنقاط الفقرات' : `السحب بيتفتح عند ${min} نقطة (فاضل ${min-bal})`}</div>` :
         `<div class="vp-hint">النقاط بتتخصم من نقاط الفقرات وتتضاف لرصيد الفيزا</div>`}
-      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
-      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="${tab==='deposit'?'visa-deposit':'visa-withdraw'}">${tab==='deposit'?'إيداع في الفيزا':'سحب لنقاط الفقرات'}</button>
     </div>`;
   const canW = bal>=fee, canP = total>=fee;
@@ -3940,8 +4028,6 @@ function renderVisaPage(){
         <div><small>نقاط الفقرات</small><b>${total}</b></div>
       </div>
       <div class="vp-fee-row"><span>رسوم التجديد</span><b>${fee} نقطة</b></div>
-      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
-      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-renew" data-src="wallet" ${canW?'':'disabled'}>💳 تجديد من رصيد الفيزا</button>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-renew" data-src="points" ${canP?'':'disabled'}>🏅 تجديد من نقاط الفقرات</button>
       ${(!canW && !canP) ? `<div class="vp-empty" style="margin:12px 0 0;">رصيدك لا يكفي لرسوم التجديد (${fee} نقطة)، اجمع نقاطًا من الفقرات ثم جدّد.</div>` : ''}
@@ -3965,24 +4051,21 @@ async function visaRefresh(){
   [WALLET, VISA_CARDS, BONUS, OWNED_CARD_THEMES, CUSTOM_CARD_REQUESTS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus(), loadOwnedCardThemes(), loadCustomCardRequests()]);
   render();
 }
-async function visaCheckPin(pid){
-  const pinEl = document.getElementById('visa-pin');
-  const pin = cleanPin(pinEl ? pinEl.value : '');
-  if(!/^\d{3}$/.test(pin)){
-    visaMsg('warn','الرقم السري مطلوب','اكتب الرقم السري (3 أرقام) الموجود على ظهر البطاقة لإتمام العملية.',{onClose:()=>{ if(pinEl) pinEl.focus(); }});
-    return false;
-  }
-  if(!(await verifyVisaPin(pid, pin))){
-    visaMsg('error','الرقم السري غير صحيح','تأكد من الرقم السري وحاول مرة أخرى.',{onClose:()=>{ if(pinEl){ pinEl.value=''; pinEl.focus(); } }});
-    return false;
-  }
-  return true;
-}
 async function doVisaMove(kind){
   const pid = state.pid, amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
   if(visaExpired(pid)){ showExpiredDialog(); return; }
   if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد '+(kind==='deposit'?'إيداعها':'سحبها')+'.'); return; }
-  if(!(await visaCheckPin(pid))) return;
+  showPinEntryModal({
+    title: kind==='deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب',
+    text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
+    onSubmit: async (pin)=>{
+      if(!(await verifyVisaPin(pid, pin))) return false;
+      await executeVisaMove(kind, pid, amt);
+      return true;
+    }
+  });
+}
+async function executeVisaMove(kind, pid, amt){
   [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
   const bal = WALLET[pid]||0;
   let title, text;
@@ -4037,7 +4120,17 @@ async function doVisaTransfer(){
   const amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
   if(digits.length!==16){ visaMsg('warn','رقم البطاقة غير مكتمل','اكتب رقم بطاقة المستلم كاملًا (16 رقم) كما يظهر على وجه بطاقته.',{onClose:()=>{ if(toEl) toEl.focus(); }}); return; }
   if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد تحويلها.'); return; }
-  if(!(await visaCheckPin(pid))) return;
+  showPinEntryModal({
+    title: 'تأكيد التحويل',
+    text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
+    onSubmit: async (pin)=>{
+      if(!(await verifyVisaPin(pid, pin))) return false;
+      await continueVisaTransfer(pid, digits, amt);
+      return true;
+    }
+  });
+}
+async function continueVisaTransfer(pid, digits, amt){
   const [w, fresh] = await Promise.all([loadWallet(), loadVisaCards()]);
   WALLET = w; if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh;
   const to = visaLookupByNumber(digits);
@@ -4083,7 +4176,18 @@ async function doVisaRenew(src){
   if(window.__visaRenewing) return;
   const pid = state.pid, fee = visaRenewFee();
   if(!visaExpired(pid)){ render(); return; }
-  if(!(await visaCheckPin(pid))) return;
+  showPinEntryModal({
+    title: 'تأكيد التجديد',
+    text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
+    onSubmit: async (pin)=>{
+      if(!(await verifyVisaPin(pid, pin))) return false;
+      await executeVisaRenew(pid, src, fee);
+      return true;
+    }
+  });
+}
+async function executeVisaRenew(pid, src, fee){
+  if(window.__visaRenewing) return;
   window.__visaRenewing = true;
   try{
     [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
