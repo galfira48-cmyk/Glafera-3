@@ -1151,6 +1151,51 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
 
+  /* ---------- فيزا الألعاب ---------- */
+  .vc-scene{perspective:1100px; width:100%; max-width:340px; margin:6px auto 0; cursor:pointer;}
+  .vc-inner{position:relative; width:100%; aspect-ratio:1.586; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.3,.7,.2,1);}
+  .vc-inner.flip{transform:rotateY(180deg);}
+  .vc-face{position:absolute; inset:0; border-radius:20px; padding:18px 20px; direction:ltr; color:#fff; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    background:radial-gradient(120% 90% at 8% 0%,var(--a) 0%,transparent 58%),radial-gradient(90% 80% at 100% 28%,var(--b) 0%,transparent 62%),radial-gradient(100% 90% at 42% 112%,var(--c) 0%,transparent 60%),var(--base);
+    box-shadow:0 18px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.18); display:flex; flex-direction:column; justify-content:space-between;}
+  .vc-face::before{content:''; position:absolute; inset:0; mix-blend-mode:overlay; opacity:.55; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .03' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 -.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") center/cover;}
+  .vc-face::after{content:''; position:absolute; inset:0; background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.22) 48%,transparent 60%); pointer-events:none;}
+  .vc-back{transform:rotateY(180deg); padding:0;}
+  .vc-face > *{position:relative; z-index:1;}
+  .vc-top{display:flex; justify-content:space-between; align-items:center;}
+  .vc-brand{font-family:'Playfair Display',serif; font-weight:800; font-size:20px; font-style:italic;}
+  .vc-tag{font-family:'Cairo',sans-serif; font-weight:800; font-size:10px; letter-spacing:1.5px; opacity:.85;}
+  .vc-mid{display:flex; align-items:center; gap:10px;}
+  .vc-chip{width:42px; height:32px; border-radius:7px; background:linear-gradient(135deg,#f6dc9a,#c9962c 55%,#f0d488); box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);}
+  .vc-nfc{width:22px; height:22px; opacity:.85;}
+  .vc-num{font-family:'Cairo',sans-serif; font-weight:700; font-size:19px; letter-spacing:2.5px; text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .vc-bot{display:flex; justify-content:space-between; align-items:flex-end; gap:10px;}
+  .vc-bot small,.vc-back-bal small{display:block; font-size:10px; opacity:.8; font-weight:500;}
+  .vc-bot b{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; display:block; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .vc-strip{height:44px; margin-top:26px; background:rgba(0,0,0,.82);}
+  .vc-back-bal{margin:22px 20px 0; padding:12px 16px; background:rgba(255,255,255,.16); border-radius:12px; backdrop-filter:blur(4px); text-align:right; direction:rtl;}
+  .vc-back-bal b{font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; margin-inline-end:6px;}
+  .vp-hint{font-size:12px; color:var(--text-muted); line-height:1.7;}
+  .vp-panel{background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:16px; margin-bottom:14px;}
+  .vp-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; margin-bottom:10px;}
+  .vp-stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+  .vp-stats div{background:var(--bg-2); border:1px solid var(--border); border-radius:14px; padding:10px 12px; text-align:center;}
+  .vp-stats small{display:block; font-size:11.5px; color:var(--text-muted);}
+  .vp-stats b{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--gold-2);}
+  .vp-empty{font-size:12.5px; line-height:1.7; color:var(--danger); background:color-mix(in srgb,var(--danger) 10%,transparent); border-radius:12px; padding:9px 12px; margin-bottom:12px; text-align:center;}
+  .vp-tabs{display:flex; background:var(--bg-2); border-radius:14px; padding:4px; margin-bottom:12px;}
+  .vp-tabs button{flex:1; padding:9px; border-radius:11px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--text-muted);}
+  .vp-tabs button.on{background:linear-gradient(95deg,var(--gold),var(--gold-2)); color:#221900;}
+  .vp-chips{display:flex; gap:8px; margin:10px 0 6px; flex-wrap:wrap;}
+  .vp-chip{padding:6px 14px; border-radius:999px; background:var(--bg-2); border:1px solid var(--border); color:var(--text); font-weight:700; font-size:12.5px;}
+  .vp-prog{height:6px; border-radius:6px; background:var(--bg-2); overflow:hidden; margin:8px 0 6px;}
+  .vp-prog i{display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-2)); border-radius:6px;}
+  .vp-sws{display:flex; gap:12px; margin-bottom:12px;}
+  .vp-sw{width:36px; height:36px; border-radius:50%; border:2px solid transparent;}
+  .vp-sw.on{border-color:var(--text); box-shadow:0 0 0 3px var(--bg-2) inset;}
+  @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} }
+
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
   .rl-card{background:var(--bg-2); border:1px solid var(--border); border-radius:26px; padding:28px 22px 22px; max-width:340px; width:100%;
     box-shadow:0 24px 60px rgba(0,0,0,.45); text-align:center; animation:confirmPop .26s ease;}
@@ -3484,6 +3529,108 @@ async function loadBonus(){
 }
 async function saveBonus(obj){
   try{ await window.storage.set('glavera-bonus', JSON.stringify(obj), true); }catch(e){}
+}
+/* ============================= VISA (فيزا الألعاب) ============================= */
+let WALLET = {}, VISA_CARDS = {};
+async function loadWallet(){ try{ const r = await window.storage.get('glavera-visa-wallet', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; } }
+async function saveWallet(o){ try{ await window.storage.set('glavera-visa-wallet', JSON.stringify(o), true); }catch(e){} }
+async function loadVisaCards(){ try{ const r = await window.storage.get('glavera-visa-cards', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; } }
+async function saveVisaCards(o){ try{ await window.storage.set('glavera-visa-cards', JSON.stringify(o), true); }catch(e){} }
+const VISA_THEMES = {
+  aurora:{name:'أورورا', base:'#2a1b5e', a:'#c04fd6', b:'#2ec5c0', c:'#ff7eb6'},
+  gold:{name:'ذهبي', base:'#3b2a0a', a:'#f4b740', b:'#fff0b8', c:'#a86a12'},
+  midnight:{name:'ليلي', base:'#0b1026', a:'#3a5bd9', b:'#7c83fd', c:'#22d3ee'},
+  emerald:{name:'زمردي', base:'#06241a', a:'#2ecc91', b:'#c9f7e2', c:'#0f7a55'},
+  rose:{name:'وردي', base:'#3a0f24', a:'#ff5e8a', b:'#ffc4d6', c:'#a12b6b'}
+};
+function visaNumber(pid){
+  let h = 2166136261; const t = String(pid);
+  for(let i=0;i<t.length;i++){ h ^= t.charCodeAt(i); h = Math.imul(h,16777619)>>>0; }
+  let d = '5'; while(d.length<16){ h = (Math.imul(h,1103515245)+12345)>>>0; d += String(h%10); }
+  return d.replace(/(\d{4})(?=\d)/g,'$1 ');
+}
+function visaMin(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaMinWithdraw) || 600; }
+function visaShort(fee, bal){
+  showToast(bal<=0 ? 'الفيزا فارغة 💳 يرجى شحنها من صفحة فيزا الألعاب' : `رصيد الفيزا لا يكفي (${bal} من ${fee}) — يرجى شحن الفيزا`, true);
+}
+function visaCardHtml(pid, draft){
+  const c = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, draft||{});
+  const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
+  const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
+  const bal = WALLET[pid]||0;
+  return `<div class="vc-scene" data-action="visa-flip"><div class="vc-inner" id="vc-inner">
+    <div class="vc-face vc-front" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+      <div class="vc-top"><span class="vc-brand">Glafera</span><span class="vc-tag">GAME CARD</span></div>
+      <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
+      <div class="vc-num">${visaNumber(pid)}</div>
+      <div class="vc-bot"><div><small>حامل البطاقة</small><b dir="auto">${escapeHtml(nm)}</b></div><div><small>الصلاحية</small><b>12/30</b></div></div>
+    </div>
+    <div class="vc-face vc-back" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+      <div class="vc-strip"></div>
+      <div class="vc-back-bal"><small>الرصيد الحالي</small><b>${bal}</b><span>نقطة</span></div>
+    </div></div></div>`;
+}
+function renderVisaPage(){
+  const pid = state.pid;
+  const bal = WALLET[pid]||0, total = participantTotal(pid), min = visaMin();
+  const tab = state.visaTab==='withdraw' ? 'withdraw' : 'deposit';
+  const cur = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, state.visaDraft||{});
+  const pct = Math.min(100, Math.round(bal/min*100));
+  const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
+    .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
+  const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
+    return `<button type="button" class="vp-sw ${cur.theme===k?'on':''}" data-action="visa-theme" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></button>`; }).join('');
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزا الألعاب</div></div>
+    ${visaCardHtml(pid, state.visaDraft)}
+    <div class="vp-hint" style="text-align:center;margin:8px 0 14px;">اضغط على البطاقة لقلبها</div>
+    <div class="vp-panel">
+      <div class="vp-stats">
+        <div><small>رصيد الفيزا</small><b>${bal}</b></div>
+        <div><small>نقاط الفقرات</small><b>${total}</b></div>
+      </div>
+      ${bal<=0 ? `<div class="vp-empty">الفيزا فارغة، أودع نقاطًا من نقاط الفقرات عشان تقدر تلعب وتدخل الغرف.</div>` : ''}
+      <div class="vp-tabs">
+        <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit">إيداع</button>
+        <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw">سحب</button>
+      </div>
+      <input id="visa-amt" class="field" type="number" inputmode="numeric" min="1" placeholder="${tab==='deposit'?'عدد النقاط المراد إيداعها':'عدد النقاط المراد سحبها'}" />
+      <div class="vp-chips">${chips}</div>
+      ${tab==='withdraw' ? `<div class="vp-prog"><i style="width:${pct}%"></i></div>
+        <div class="vp-hint">${bal>=min ? 'السحب متاح، والنقاط بتتضاف لنقاط الفقرات' : `السحب بيتفتح عند ${min} نقطة (فاضل ${min-bal})`}</div>` :
+        `<div class="vp-hint">النقاط بتتخصم من نقاط الفقرات وتتضاف لرصيد الفيزا</div>`}
+      <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="${tab==='deposit'?'visa-deposit':'visa-withdraw'}">${tab==='deposit'?'إيداع في الفيزا':'سحب لنقاط الفقرات'}</button>
+    </div>
+    <div class="vp-panel">
+      <div class="vp-title">صمّم فيزتك</div>
+      <div class="vp-sws">${swatches}</div>
+      <input id="visa-holder" class="field" maxlength="22" placeholder="الاسم على البطاقة" value="${escapeHtml(cur.holder||'')}" />
+      <button type="button" class="btn btn-ghost" style="margin-top:10px;" data-action="visa-save-design">حفظ التصميم</button>
+    </div>`;
+}
+async function visaRefresh(){
+  [WALLET, VISA_CARDS, BONUS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus()]);
+  render();
+}
+async function doVisaMove(kind){
+  const pid = state.pid, amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
+  if(amt<=0){ showToast('اكتب عدد النقاط الأول', true); return; }
+  [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
+  const bal = WALLET[pid]||0;
+  if(kind==='deposit'){
+    if(amt>participantTotal(pid)){ showToast('نقاط الفقرات لا تكفي لهذا الإيداع', true); return; }
+    BONUS[pid] = (BONUS[pid]||0) - amt; WALLET[pid] = bal + amt;
+    showToast(`تم إيداع ${amt} نقطة في الفيزا 💳`);
+  } else {
+    const min = visaMin();
+    if(bal<min){ showToast(`السحب متاح عند وصول رصيد الفيزا إلى ${min} نقطة`, true); return; }
+    if(amt<min){ showToast(`أقل قيمة للسحب ${min} نقطة`, true); return; }
+    if(amt>bal){ showToast('المبلغ أكبر من رصيد الفيزا', true); return; }
+    WALLET[pid] = bal - amt; BONUS[pid] = (BONUS[pid]||0) + amt;
+    showToast(`تم سحب ${amt} نقطة لنقاط الفقرات ✅`);
+  }
+  await saveWallet(WALLET); await saveBonus(BONUS);
+  vibrate([15,10,25]); render();
 }
 /* نقاط صندوق الهدايا اليومي برضو منفصلة عن مجموع النقاط لنفس السبب */
 async function loadGiftPoints(){
@@ -6304,9 +6451,9 @@ function myGameStats(pid){ return GAME_STATS[pid] || (GAME_STATS[pid] = {}); }
 async function awardSoloGamePoints(pts, title){
   if(state.pid && pts>0){
     try{
-      BONUS = await loadBonus();
-      BONUS[state.pid] = (BONUS[state.pid]||0) + pts;
-      await saveBonus(BONUS);
+      WALLET = await loadWallet();
+      WALLET[state.pid] = (WALLET[state.pid]||0) + pts;
+      await saveWallet(WALLET);
       pushNotification(state.pid, `${title} +${pts} نقطة 🏆`, '🏆');
     }catch(e){}
   }
@@ -6447,6 +6594,12 @@ function renderGamesHub(){
       <span class="gh-title">مشاهدة المعركة</span>
       <span class="gh-sub">اتفرج على أصحابك وهما بيلعبوا لايڤ</span>
     </button>`;
+  const visaTile = `
+    <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#2EC5C0,#6C3FD0); --i:4" data-action="open-visa">
+      <span class="gh-ico">💳</span>
+      <span class="gh-title">فيزا الألعاب</span>
+      <span class="gh-sub">اشحن رصيدك واسحب أرباحك</span>
+    </button>`;
   const stickerStoreTile = `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#FF9AD5,#845EC2); --i:3" data-action="open-sticker-store">
       <span class="gh-ico">🛍️</span>
@@ -6463,7 +6616,7 @@ function renderGamesHub(){
       <div class="opinion-hero-title">استراحة تفاعلية</div>
       <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
     </div>
-    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}</div>
+    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${visaTile}</div>
     ${renderGamesFriendsLeaderboard()}
   `;
 }
@@ -8441,13 +8594,13 @@ async function awardLudoPlacementPoints(L){
       wins.push({pid:seat.pid, place:i+1, pts});
     });
     if(!wins.length) return;
-    BONUS = await loadBonus();
+    WALLET = await loadWallet();
     wins.forEach(w=>{
-      BONUS[w.pid] = (BONUS[w.pid]||0) + w.pts;
+      WALLET[w.pid] = (WALLET[w.pid]||0) + w.pts;
       const medal = w.place===1?'🥇':(w.place===2?'🥈':'🥉');
       pushNotification(w.pid, `${medal} خلصت في المركز ${w.place} في اللودو واخدت +${w.pts} نقطة`, '🏆');
     });
-    await saveBonus(BONUS);
+    await saveWallet(WALLET);
   }catch(e){}
 }
 /* ---------- ذكاء الجهاز ---------- */
@@ -9824,10 +9977,10 @@ async function showRoomFeeModal(kind, onPaid){
     ? ((GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.roomJoinFee)||0)
     : ((GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.roomCreateFee)||0);
   if(fee<=0){ onPaid(); return; }
-  BONUS = await loadBonus();
-  const bal = BONUS[state.pid]||0;
+  WALLET = await loadWallet();
+  const bal = WALLET[state.pid]||0;
   const title = kind==='join' ? 'رسوم الانضمام للغرفة' : 'رسوم إنشاء الغرفة';
-  const msg = kind==='join' ? 'هيتم خصم الرسوم دي من رصيدك عشان تنضم للغرفة وتبدأ اللعب' : 'هيتم خصم الرسوم دي من رصيدك عشان تفتح غرفة جديدة وتستناك أصحابك';
+  const msg = kind==='join' ? 'هيتم خصم الرسوم دي من رصيد فيزتك عشان تنضم للغرفة وتبدأ اللعب' : 'هيتم خصم الرسوم دي من رصيد فيزتك عشان تفتح غرفة جديدة وتستناك أصحابك';
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay fee-overlay';
   overlay.id = 'room-fee-overlay';
@@ -9849,7 +10002,7 @@ async function showRoomFeeModal(kind, onPaid){
       <div class="fee-body">
         <div class="fee-title">${title}</div>
         <div class="fee-msg">${msg}</div>
-        <div class="fee-balance">💰 رصيدك الحالي: ${bal} نقطة</div>
+        <div class="fee-balance">💳 رصيد الفيزا: ${bal} نقطة</div>
         <div class="fee-actions">
           <button type="button" class="btn fee-back-btn" id="fee-back-btn">رجوع</button>
           <button type="button" class="btn fee-pay-btn" id="fee-pay-btn">ادفع ${fee} 🪙</button>
@@ -9861,11 +10014,11 @@ async function showRoomFeeModal(kind, onPaid){
   document.getElementById('fee-close-btn').addEventListener('click', closeRoomFeeModal);
   document.getElementById('fee-back-btn').addEventListener('click', closeRoomFeeModal);
   document.getElementById('fee-pay-btn').addEventListener('click', async ()=>{
-    BONUS = await loadBonus();
-    const curBal = BONUS[state.pid]||0;
-    if(curBal < fee){ showToast(`محتاج ${fee} نقطة على الأقل عشان تكمل`, true); return; }
-    BONUS[state.pid] = curBal - fee;
-    await saveBonus(BONUS);
+    WALLET = await loadWallet();
+    const curBal = WALLET[state.pid]||0;
+    if(curBal < fee){ visaShort(fee, curBal); return; }
+    WALLET[state.pid] = curBal - fee;
+    await saveWallet(WALLET);
     pushNotification(state.pid, `💰 اتخصم ${fee} نقطة ${kind==='join'?'رسوم انضمام لغرفة':'رسوم إنشاء غرفة'}`, '💰');
     closeRoomFeeModal();
     onPaid();
@@ -9907,8 +10060,8 @@ async function createGameRoom(gameType, paid){
   if(gameType==='xo' && paid){
     const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
     if(fee>0){
-      BONUS = await loadBonus();
-      if((BONUS[state.pid]||0) < fee){ showToast(`محتاج ${fee} نقطة على الأقل عشان تفتح معركة إكس أو`, true); return; }
+      WALLET = await loadWallet();
+      if((WALLET[state.pid]||0) < fee){ visaShort(fee, WALLET[state.pid]||0); return; }
     }
   }
   GAME_ROOMS = await loadGameRooms();
@@ -9993,13 +10146,13 @@ async function joinGameRoom(code){
     if(room.game==='xo' && room.paid && !room.entryFeeCharged){
       const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.xoEntryFee) || 0;
       if(fee>0){
-        BONUS = await loadBonus();
-        const hostBal = BONUS[room.hostId]||0, myBal = BONUS[state.pid]||0;
-        if(myBal<fee){ showToast(`محتاج ${fee} نقطة على الأقل عشان تدخل المعركة`, true); return; }
-        if(hostBal<fee){ showToast('صاحب الغرفة مش معاه نقط كفاية دلوقتي، جرب تاني بعدين', true); return; }
-        BONUS[room.hostId] = hostBal - fee;
-        BONUS[state.pid] = myBal - fee;
-        await saveBonus(BONUS);
+        WALLET = await loadWallet();
+        const hostBal = WALLET[room.hostId]||0, myBal = WALLET[state.pid]||0;
+        if(myBal<fee){ visaShort(fee, myBal); return; }
+        if(hostBal<fee){ showToast('رصيد فيزا صاحب الغرفة لا يكفي حاليًا، جرّب بعد قليل', true); return; }
+        WALLET[room.hostId] = hostBal - fee;
+        WALLET[state.pid] = myBal - fee;
+        await saveWallet(WALLET);
         pushNotification(room.hostId, `💰 اتخصم ${fee} نقطة رسوم اشتراك في معركة إكس أو`, '💰');
         pushNotification(state.pid, `💰 اتخصم ${fee} نقطة رسوم اشتراك في معركة إكس أو`, '💰');
       }
@@ -10093,14 +10246,14 @@ async function applyLeaveRoomPenalty(code){
   }catch(e){}
   const myName = (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
   try{
-    BONUS = await loadBonus();
-    BONUS[state.pid] = (BONUS[state.pid]||0) - penalty;
+    WALLET = await loadWallet();
+    WALLET[state.pid] = Math.max(0,(WALLET[state.pid]||0) - penalty);
     let share = 0;
     if(recipients.length){
       share = Math.floor(penalty / recipients.length);
-      if(share>0) recipients.forEach(id=>{ BONUS[id] = (BONUS[id]||0) + share; });
+      if(share>0) recipients.forEach(id=>{ WALLET[id] = (WALLET[id]||0) + share; });
     }
-    await saveBonus(BONUS);
+    await saveWallet(WALLET);
     pushNotification(state.pid, `🚪 خرجت من المعركة أثناء دورك، اتخصم ${penalty} نقطة`, '⚠️');
     if(share>0) recipients.forEach(id=> pushNotification(id, `🎁 ${myName} غادر المعركة — أُضيفت +${share} نقطة إلى رصيدك تعويضًا عن انسحابه`, '🎁'));
   }catch(e){}
@@ -10221,9 +10374,9 @@ async function doRoomXoMove(idx){
   if(matchJustEnded){
     try{
       if(reward>0 && matchWinnerPid){
-        BONUS = await loadBonus();
-        BONUS[matchWinnerPid] = (BONUS[matchWinnerPid]||0) + reward;
-        await saveBonus(BONUS);
+        WALLET = await loadWallet();
+        WALLET[matchWinnerPid] = (WALLET[matchWinnerPid]||0) + reward;
+        await saveWallet(WALLET);
       }
       pushNotification(matchWinnerPid, `🏆 مبروك! كسبت معركة إكس أو وأخدت +${reward} نقطة`, '🏆');
       pushNotification(matchLoserPid, `😭 خسرت معركة إكس أو... حظ أوفر المرة الجاية`, '😭');
@@ -10386,7 +10539,7 @@ function showRoomLeftAlert(opponentName, penalty){
         </div>
         <div>
           <div class="rl-reward-num"><span dir="ltr" id="rl-reward-val">+0</span><small>نقطة</small></div>
-          <div class="rl-reward-txt">تعويض عن الانسحاب أُضيف لرصيدك</div>
+          <div class="rl-reward-txt">تعويض عن الانسحاب أُضيف لفيزتك</div>
         </div>
       </div>` : '';
   overlay.innerHTML = `
@@ -13400,6 +13553,7 @@ function render(){
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
+  else if(state.view==='visa') html = renderVisaPage();
   else if(state.view==='games-solo') html = renderSoloGames();
   else if(state.view==='watch-rooms') html = renderWatchRooms();
   else if(state.view==='sticker-store') html = renderStickerStorePage();
@@ -14819,6 +14973,17 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-save-dish-name'){ doAdminSaveDishName(el.dataset.cid, el.dataset.did); }
   else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
+  else if(action==='open-visa'){ state.friendTile = null; state.visaDraft = null; state.visaTab = 'deposit'; go('visa'); visaRefresh(); }
+  else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
+  else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
+  else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
+  else if(action==='visa-theme'){ const h=document.getElementById('visa-holder'); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:h?h.value:''}); render(); }
+  else if(action==='visa-deposit'){ doVisaMove('deposit'); }
+  else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
+  else if(action==='visa-save-design'){
+    const h=document.getElementById('visa-holder'); const d=Object.assign({theme:'aurora'}, VISA_CARDS[state.pid]||{}, state.visaDraft||{}, {holder:(h?h.value:'').trim()});
+    loadVisaCards().then(async all=>{ all[state.pid]=d; VISA_CARDS=all; await saveVisaCards(all); state.visaDraft=null; showToast('تم حفظ تصميم الفيزا 💳'); render(); });
+  }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
   else if(action==='open-sticker-store'){
