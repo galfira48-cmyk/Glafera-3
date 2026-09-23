@@ -17488,6 +17488,7 @@ window.addEventListener('popstate', function(){
 (async function init(){
   initLuxuryParticles();
   armBackTrap();
+  render(); // اعرض الفتيلة فورًا قبل تحميل البيانات من السيرفر
   try{
     await Promise.race([
       refreshAllData(),
