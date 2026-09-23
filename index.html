@@ -1420,6 +1420,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vc-num-row{display:block !important;}
   .vc-num{display:flex !important; width:100%; justify-content:space-between; align-items:center; font-size:18px !important; letter-spacing:1.5px !important; padding:2px 0;}
   .vc-num i{font-style:normal;}
+  /* ===== Premium card finish ===== */
+  .vc-front:not(.vc-custom){background:linear-gradient(158deg,rgba(255,255,255,.14) 0%,transparent 38%,rgba(0,0,0,.38) 100%),radial-gradient(120% 90% at 8% 0%,var(--a) 0%,transparent 58%),radial-gradient(90% 80% at 100% 28%,var(--b) 0%,transparent 62%),radial-gradient(100% 90% at 42% 112%,var(--c) 0%,transparent 60%),var(--base);}
+  .vc-front{box-shadow:0 26px 46px -14px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.2), inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.45);}
+  .vc-face > .vc-guil{position:absolute; inset:0; z-index:0; pointer-events:none; mix-blend-mode:overlay; opacity:.7;
+    background:repeating-radial-gradient(circle at 108% -8%,transparent 0 7px,rgba(255,255,255,.09) 7px 8px),repeating-radial-gradient(circle at -8% 112%,transparent 0 9px,rgba(255,255,255,.07) 9px 10px);
+    -webkit-mask-image:linear-gradient(135deg,transparent 12%,#000 45%,#000 70%,transparent 96%); mask-image:linear-gradient(135deg,transparent 12%,#000 45%,#000 70%,transparent 96%);}
+  .vc-custom .vc-guil{display:none;}
+  .vc-brand{background:linear-gradient(180deg,#fffaf0 0%,#f4dc9c 42%,#b98a33 56%,#f8e6ae 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent !important; text-shadow:none !important; filter:drop-shadow(0 1px 1px rgba(0,0,0,.55)); font-size:21px !important; letter-spacing:4px !important;}
+  .vc-tag{padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.34); background:rgba(255,255,255,.08); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); opacity:.95 !important;}
+  .vc-num i{background:linear-gradient(180deg,#ffffff 0%,#f1e8d2 55%,#c9b98f 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 1px 0 rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(255,255,255,.3));}
+  .vc-num{text-shadow:none !important;}
+  .vc-bot{padding-top:9px; border-top:1px solid rgba(255,255,255,.16);}
+  .vc-expired .vc-brand,.vc-expired .vc-num i{filter:grayscale(1);}
+  .vp-history-link{position:relative; background:linear-gradient(120deg,rgba(244,183,64,.12),transparent 70%),var(--bg-2); border-color:color-mix(in srgb,var(--gold) 26%,var(--border)); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); padding:13px; letter-spacing:.2px;}
+  .vp-history-link::after{content:'‹'; position:absolute; inset-inline-end:16px; top:50%; transform:translateY(-52%); color:var(--gold-2); font-size:20px; font-weight:900;}
+  .vp-history-link:active{transform:scale(.99);}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} .vc-face::after{animation:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -4136,7 +4152,7 @@ function visaCardHtml(pid, draft, isNew){
   const vcEnter = (Date.now() - (window.__vcSeenAt||0)) > 30000; window.__vcSeenAt = Date.now();
   const vcVip = !customImg && CARD_THEME_TIER[c.theme]==='vip';
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
-    <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i>
+    <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
       <div class="vc-top"><span class="vc-brand">Glafira</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
