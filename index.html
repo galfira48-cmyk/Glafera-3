@@ -2242,21 +2242,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-chat-widget{position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:75;
     display:flex; flex-direction:column; align-items:flex-end; gap:14px;}
 
-  .room-chat-launcher{position:relative; flex:none; width:58px; height:58px; border-radius:50%; border:none; padding:0; cursor:pointer;
+  .room-chat-launcher{position:relative; flex:none; width:56px; height:56px; border-radius:18px; border:1px solid rgba(244,183,64,.4); padding:0; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(155deg, var(--gold-2) 0%, var(--gold) 58%, #a9790d 100%);
-    box-shadow:0 12px 28px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.4), inset 0 -8px 16px rgba(0,0,0,.14);
+    background:linear-gradient(165deg, rgba(58,49,142,.96), rgba(19,15,56,.98));
+    box-shadow:0 14px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+    backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4);
     -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-    transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .25s ease, box-shadow .25s ease;}
-  .room-chat-launcher::before{content:''; position:absolute; inset:-7px; border-radius:50%; border:1.5px solid rgba(244,183,64,.5); animation:roomChatRing 2.6s ease-out infinite;}
-  .room-chat-launcher:active{transform:scale(.9);}
-  .room-chat-launcher svg{position:relative; z-index:1; width:24px; height:24px; color:#241a4d; transition:transform .3s ease;}
-  .room-chat-launcher.open{background:linear-gradient(155deg, #332a72, #16123c);
-    box-shadow:0 12px 28px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);}
-  .room-chat-launcher.open svg{color:var(--gold-2);}
-  .room-chat-launcher.open::before{display:none;}
-  @keyframes roomChatRing{0%{transform:scale(1); opacity:.8;} 100%{transform:scale(1.4); opacity:0;}}
-  @media (prefers-reduced-motion:reduce){ .room-chat-launcher::before{animation:none;} }
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, border-color .25s ease, background .25s ease;}
+  .room-chat-launcher::after{content:''; position:absolute; inset:0; border-radius:18px;
+    background:radial-gradient(circle at 30% 22%, rgba(255,255,255,.14), transparent 55%); pointer-events:none;}
+  .room-chat-launcher:active{transform:scale(.92);}
+  .room-chat-launcher svg{position:relative; z-index:1; width:22px; height:22px; color:var(--gold-2); transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+  .room-chat-launcher.open{background:linear-gradient(165deg, rgba(36,26,77,.98), rgba(14,11,38,.99)); border-color:rgba(244,183,64,.65);
+    box-shadow:0 14px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);}
+  .room-chat-launcher.open svg{color:var(--gold-2); transform:rotate(90deg);}
+  @media (max-width:380px){ .room-chat-panel{width:232px;} .room-chat-launcher{width:50px; height:50px; border-radius:16px;} }
 
   .room-chat-panel{width:278px; max-width:82vw; max-height:min(430px,62vh); overflow-y:auto;
     padding:16px 14px 14px; border-radius:24px; transform-origin:bottom right;
@@ -2286,7 +2286,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     transition:transform .15s ease, filter .15s ease;}
   .room-chat-send svg{width:16px; height:16px;}
   .room-chat-send:active{transform:scale(.9); filter:brightness(.95);}
-  @media (max-width:380px){ .room-chat-panel{width:232px;} .room-chat-launcher{width:52px; height:52px;} }
+
+  .room-chat-sticker-toggle{width:36px; height:36px; font-size:19px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-bottom:10px; -webkit-tap-highlight-color:transparent;}
+  .room-chat-sticker-toggle:active{transform:scale(.92);}
+  .room-chat-sticker-panel{display:none; grid-template-columns:repeat(5,1fr); gap:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:10px; margin-bottom:10px; max-height:160px; overflow-y:auto;}
+  .room-chat-sticker-panel.open{display:grid;}
+  .room-chat-sticker-btn{background:none; border:none; cursor:pointer; padding:3px; border-radius:8px; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;}
+  .room-chat-sticker-btn img{width:100%; height:100%; max-width:38px; max-height:38px; object-fit:contain;}
+  .room-chat-sticker-btn:active{background:rgba(244,183,64,.2); transform:scale(.9);}
 
   .react-float.is-text .rf-emoji{width:auto; height:auto; min-width:44px; max-width:170px; border-radius:14px; padding:7px 12px; font-size:13px;
     font-weight:800; font-family:inherit; color:var(--text); background:linear-gradient(180deg, rgba(50,42,124,.94), rgba(24,19,66,.96));
@@ -2299,6 +2306,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:radial-gradient(circle at 50% 38%, rgba(255,255,255,.24), rgba(255,255,255,.07) 62%, transparent 74%);
     filter:drop-shadow(0 8px 14px rgba(0,0,0,.45)); animation:reactPop .5s cubic-bezier(.34,1.8,.5,1) both;}
   .react-float .pl-avatar{width:34px; height:34px; font-size:12px; box-shadow:0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,.4);}
+  .react-float .rf-emoji img{width:64%; height:64%; object-fit:contain; filter:none;}
+  .react-toast .rt-emoji img{width:22px; height:22px; object-fit:contain; vertical-align:middle;}
   @keyframes reactUp{0%{opacity:0; transform:translateY(20px);} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0; transform:translateY(-300px) translateX(var(--dx,0px));}}
   @keyframes reactPop{from{transform:scale(.2) rotate(-25deg);} to{transform:scale(1) rotate(0);}}
   /* ---- كارت تفاعل الخصم (القديم — بقى مستخدم بس كـ fallback لو احتجناه) ---- */
@@ -4422,6 +4431,58 @@ function avgRatingOverall(){
 const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
 let state = FRESH_STATE();
 
+/* ============================= جلسة الجهاز الواحد (منع فتح نفس الكود من جهازين في نفس الوقت) ============================= */
+const DEVICE_SESSION_ID = 'sess'+Date.now()+Math.random().toString(36).slice(2,10);
+let _deviceKickCheckBusy = false;
+async function claimDeviceSession(pid){
+  if(!pid) return;
+  try{ await window.storage.set('glavera-active-session-'+pid, JSON.stringify({sessionId:DEVICE_SESSION_ID, ts:Date.now()}), true); }
+  catch(e){ console.error('claimDeviceSession failed:', e); }
+}
+async function clearDeviceSession(pid){
+  if(!pid) return;
+  try{ await window.storage.delete('glavera-active-session-'+pid, true); }catch(e){}
+}
+async function checkDeviceSessionKicked(){
+  if(!state.pid || _deviceKickCheckBusy) return;
+  _deviceKickCheckBusy = true;
+  try{
+    const r = await window.storage.get('glavera-active-session-'+state.pid, true);
+    _deviceKickCheckBusy = false;
+    if(!r || !r.value) return;
+    const data = JSON.parse(r.value);
+    if(data && data.sessionId && data.sessionId !== DEVICE_SESSION_ID){
+      showDeviceKickedOverlay();
+    }
+  }catch(e){ _deviceKickCheckBusy = false; }
+}
+function showDeviceKickedOverlay(){
+  if(document.getElementById('device-kicked-overlay')) return;
+  const backdrop = document.createElement('div');
+  backdrop.className = 'lightbox-backdrop';
+  backdrop.id = 'device-kicked-overlay';
+  backdrop.style.zIndex = '99999';
+  backdrop.innerHTML = `
+    <div style="max-width:320px;width:86%;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 22px;text-align:center;">
+      <div style="font-size:44px;margin-bottom:10px;">📵</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;margin-bottom:8px;">تم فتح حسابك من جهاز تاني!</div>
+      <div class="hint" style="margin-bottom:18px;">مينفعش تستخدم نفس الكود من جهازين في نفس الوقت. لو الجهاز ده هو اللي هتكمّل بيه، دوس "استخدم من هنا"</div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:10px;" id="device-kicked-reclaim">📲 استخدم من هنا</button>
+      <button type="button" class="btn btn-outline" style="width:100%;" id="device-kicked-logout">🚪 خروج</button>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  document.getElementById('device-kicked-reclaim').addEventListener('click', async ()=>{
+    await claimDeviceSession(state.pid);
+    backdrop.remove();
+    showToast('✅ تم تفعيل الحساب من الجهاز ده');
+  });
+  document.getElementById('device-kicked-logout').addEventListener('click', ()=>{
+    backdrop.remove();
+    stopAmbient(); state = FRESH_STATE(); render();
+  });
+}
+
 function go(view, extra={}){
   state.history.push({view:state.view, dayId:state.dayId, sessionId:state.sessionId, lbTab:state.lbTab});
   state.navDir = 'fwd';
@@ -4585,7 +4646,6 @@ const NAV_TILE_ITEMS = [
   {page:'chefs',   icon:'👨‍🍳', labelKey:'nav_chefs',   subKey:'nav_chefs_sub',   color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {page:'myphotos', icon:'📷', labelKey:'nav_myphotos', subKey:'nav_myphotos_sub', color:'linear-gradient(145deg,#FF9A8B,#FF6A88)'},
-  {page:'chat', icon:'💬', labelKey:'nav_chat', subKey:'nav_chat_sub', color:'linear-gradient(145deg,#43E97B,#38F9D7)'},
   {page:'pass',    icon:'🪪', labelKey:'nav_pass',    subKey:'nav_pass_sub',    color:'linear-gradient(145deg,#FFDE94,#3FDCC9)'},
   {page:'certificate',icon:'🎓', labelKey:'nav_certificate', subKey:'nav_certificate_sub', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'},
   {page:'settings',icon:'⚙️', labelKey:'nav_settings', subKey:'nav_settings_sub', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
@@ -6218,8 +6278,8 @@ function renderGamesHub(){
   `;
 }
 /* ============================= GAMES: WATCH THE BATTLE (مشاهدة المعركة) ============================= */
-/* لو الغرفة ماتلمستش (مفيش حركة/دور) من أكتر من 5 دقايق، يبقى غالبًا اللاعبين قفلوا التطبيق من غير ما يخرجوا رسميًا */
-const ROOM_STALE_MS = 5*60*1000;
+/* لو الغرفة ماتلمستش (مفيش نبضة/حركة) من أكتر من 40 ثانية، يبقى غالبًا اللاعبين قفلوا التطبيق من غير ما يخرجوا رسميًا — قللناها من 5 دقايق عشان المعارك المنتهية تختفي من "مشاهدة المعركة" بسرعة */
+const ROOM_STALE_MS = 40*1000;
 function liveRoomsList(){
   return Object.values(GAME_ROOMS||{})
     .filter(r=>{
@@ -9023,8 +9083,8 @@ async function loadGameRooms(){
 async function saveGameRooms(obj){
   try{ await window.storage.set('glavera-game-rooms', JSON.stringify(obj), true); }catch(e){}
 }
-/* بتشيل الغرف المهجورة خالص (مفيش حركة فيها من ساعتين) عشان متتراكمش على السيرفر */
-const ROOM_ABANDONED_MS = 2*60*60*1000;
+/* بتشيل الغرف المهجورة خالص (مفيش حركة فيها من ربع ساعة) عشان متتراكمش على السيرفر */
+const ROOM_ABANDONED_MS = 15*60*1000;
 async function pruneAbandonedGameRooms(rooms){
   let changed = false;
   Object.keys(rooms||{}).forEach(code=>{
@@ -9619,8 +9679,10 @@ function showRoomLeftAlert(opponentName, penalty){
     leaveGameRoom();
   });
 }
+let _roomLastHeartbeat = 0;
 function startRoomPolling(){
   stopRoomPolling();
+  _roomLastHeartbeat = 0;
   roomPollInterval = setInterval(async ()=>{
     if(!state.roomCode) return;
     try{
@@ -9630,6 +9692,14 @@ function startRoomPolling(){
       const before = JSON.stringify(prevRoom);
       const after = JSON.stringify(freshRoom);
       GAME_ROOMS = fresh;
+      /* نبضة حياة: طول ما اللاعب (مش المتفرج) فاتح الغرفة، نلمسها كل ~20 ثانية حتى لو مش بيتحرك،
+         عشان "مشاهدة المعركة" تعرف إن المعركة لسه شغالة فعلاً ومتختفيش من غير داعي؛ وأول ما يقفل
+         التطبيق من غير ما يخرج رسمي، النبضة بتوقف والغرفة تختفي من القايمة خلال ثواني قليلة بدل ساعتين */
+      if(freshRoom && !state.roomSpectate && Date.now()-_roomLastHeartbeat > 20000){
+        _roomLastHeartbeat = Date.now();
+        freshRoom.updatedAt = Date.now();
+        saveGameRooms(fresh);
+      }
       if(before!==after){
         /* الغرفة اختفت فجأة وكانت شغالة فعلاً: يبقى الخصم خرج، نبلغ اللاعب الباقي بشكل واضح */
         if(prevRoom && !freshRoom && prevRoom.status==='playing' && !state.roomSpectate){
@@ -10427,8 +10497,13 @@ const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','�
 const ROOM_QUICK_MSGS = ['أهلاً! 👋','مبروك! 🎉','يلا بسرعة!','دورك!','حظ سعيد! 🍀','برافو عليك!','ايه ده! 😅','لعبة تانية؟'];
 function roomChatWidget(){
   const open = !!state.roomChatOpen;
+  const stickersOpen = !!state.roomChatStickerPanelOpen;
   const emojiBtns = ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('');
   const msgBtns = ROOM_QUICK_MSGS.map(m=>`<button type="button" class="room-chat-msg-btn" data-action="room-quick-msg" data-msg="${escapeHtml(m)}">${escapeHtml(m)}</button>`).join('');
+  const stickerBtns = CUSTOM_STICKERS.map(s=>{
+    const url = STICKER_IMG_CACHE[s.id];
+    return `<button type="button" class="room-chat-sticker-btn" data-action="room-send-sticker" data-id="${s.id}">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'استيكر')}" />` : '⏳'}</button>`;
+  }).join('');
   const chatIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>`;
   const closeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
   const sendIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
@@ -10436,6 +10511,8 @@ function roomChatWidget(){
   <div class="room-chat-widget">
     <div class="room-chat-panel ${open?'open':''}">
       <div class="room-chat-head"><span class="room-chat-head-dot"></span><span class="room-chat-head-title">شات سريع</span></div>
+      ${CUSTOM_STICKERS.length ? `<button type="button" class="room-chat-sticker-toggle" data-action="toggle-room-chat-sticker-panel" title="استيكر">😊</button>` : ''}
+      <div class="room-chat-sticker-panel ${stickersOpen?'open':''}" id="room-chat-sticker-panel">${stickerBtns}</div>
       <div class="room-chat-emoji-row">${emojiBtns}</div>
       <div class="room-chat-msgs-grid">${msgBtns}</div>
       <div class="room-chat-input-row">
@@ -10492,7 +10569,9 @@ function showReactionToast(content, pid, kind){
   const name = p ? p.name.split(' ')[0] : 'حد في الغرفة';
   const el = document.createElement('div');
   el.className = 'react-toast';
-  const contentHtml = kind==='text' ? `<span class="rt-text">${escapeHtml(content)}</span>` : `<span class="rt-emoji">${content}</span>`;
+  const contentHtml = kind==='text' ? `<span class="rt-text">${escapeHtml(content)}</span>`
+    : kind==='sticker' ? `<span class="rt-emoji">${STICKER_IMG_CACHE[content] ? `<img src="${STICKER_IMG_CACHE[content]}" alt="استيكر" />` : '⏳'}</span>`
+    : `<span class="rt-emoji">${content}</span>`;
   el.innerHTML = `${gameAvatar(pid)}<span class="rt-name">${escapeHtml(name)}</span>${contentHtml}`;
   layer.appendChild(el);
   tone(720, 0.08, 'sine', 0.05);
@@ -10500,14 +10579,15 @@ function showReactionToast(content, pid, kind){
   setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 2250);
 }
 function showReactionFloat(content, pid, kind){
-  if(pid && pid!==state.pid){ showOpponentReaction(content, pid, kind); return; }
   let layer = document.getElementById('react-layer');
   if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
   const el = document.createElement('div');
   el.className = 'react-float' + (kind==='text' ? ' is-text' : '');
   el.style.left = (14 + Math.random()*62) + '%';
   el.style.setProperty('--dx', (Math.random()*80-40).toFixed(0)+'px');
-  const contentHtml = kind==='text' ? escapeHtml(content) : content;
+  const contentHtml = kind==='text' ? escapeHtml(content)
+    : kind==='sticker' ? (STICKER_IMG_CACHE[content] ? `<img src="${STICKER_IMG_CACHE[content]}" alt="استيكر" />` : '⏳')
+    : content;
   el.innerHTML = `<span class="rf-emoji">${contentHtml}</span>${gameAvatar(pid)}`;
   layer.appendChild(el);
   vibrate(12);
@@ -10515,9 +10595,10 @@ function showReactionFloat(content, pid, kind){
 }
 let lastReactTs = 0;
 async function sendRoomReaction(content, btn, kind){
-  kind = kind==='text' ? 'text' : 'emoji';
+  kind = (kind==='text' || kind==='sticker') ? kind : 'emoji';
   if(kind==='emoji' && ROOM_EMOJIS.indexOf(content)<0) return;
   if(kind==='text'){ content = String(content||'').trim().slice(0,60); if(!content) return; }
+  if(kind==='sticker' && !CUSTOM_STICKERS.some(s=>s.id===content)) return;
   if(!state.roomCode) return;
   const now = Date.now();
   if(now-lastReactTs<1100) return;
@@ -10527,6 +10608,7 @@ async function sendRoomReaction(content, btn, kind){
   state.roomReactSeen = payload.n;
   showReactionFloat(content, state.pid, kind);
   state.roomChatOpen = false;
+  state.roomChatStickerPanelOpen = false;
   render();
   try{ await window.storage.set('glavera-react-'+state.roomCode, JSON.stringify(payload), true); }catch(e){}
 }
@@ -10540,7 +10622,7 @@ function doSendRoomFreeText(){
 let reactPollInterval = null;
 function startReactPolling(){
   stopReactPolling();
-  state.roomReactInit = false; state.roomReactSeen = null; state.roomChatOpen = false;
+  state.roomReactInit = false; state.roomReactSeen = null; state.roomChatOpen = false; state.roomChatStickerPanelOpen = false;
   reactPollInterval = setInterval(async ()=>{
     if(!state.roomCode) return;
     let p = null;
@@ -10548,9 +10630,10 @@ function startReactPolling(){
     if(!state.roomReactInit){ state.roomReactInit = true; if(p) state.roomReactSeen = p.n; return; } // ما نعيدش تفاعلات قديمة
     if(p && p.n!==state.roomReactSeen){
       state.roomReactSeen = p.n;
-      const kind = p.kind==='text' ? 'text' : 'emoji';
-      const content = kind==='text' ? p.content : (p.emoji || p.content);
-      if(p.by!==state.pid && (kind==='text' ? !!content : ROOM_EMOJIS.indexOf(content)>-1)) showReactionFloat(content, p.by, kind);
+      const kind = (p.kind==='text' || p.kind==='sticker') ? p.kind : 'emoji';
+      const content = kind==='emoji' ? (p.emoji || p.content) : p.content;
+      const valid = kind==='text' ? !!content : kind==='sticker' ? !!content : ROOM_EMOJIS.indexOf(content)>-1;
+      if(p.by!==state.pid && valid) showReactionFloat(content, p.by, kind);
     }
   }, 1200);
 }
@@ -12567,7 +12650,6 @@ function render(){
   else if(state.view==='opinion') html = renderOpinionPage();
   else if(state.view==='capabilities') html = renderCapabilitiesPage();
   else if(state.view==='myphotos') html = renderMyPhotosPage();
-  else if(state.view==='chat') html = renderChatPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
@@ -12657,7 +12739,6 @@ function render(){
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
   if(state.view==='admin' && state.adminTab==='stickers'){ attachStickerAdminInputs(); }
   if(state.view==='admin' && state.adminTab==='participants' && state.editingParticipantId){ attachParticipantPhotoInputs(); }
-  if(state.view==='chat'){ attachChatInputs(); }
   if(state.view==='admin' && state.editingSessionId){
     const info = SESSION_INFO[state.editingSessionId] || {};
     if(info.customQrText) drawCustomSessionQr(state.editingSessionId, info.customQrText);
@@ -13803,7 +13884,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='submit-login'){ doLogin(); }
   else if(action==='submit-manual-code'){ doManualSubmit(); }
   else if(action==='back'){ goBack(); }
-  else if(action==='logout'){ stopAmbient(); state = FRESH_STATE(); render(); }
+  else if(action==='logout'){ const outPid = state.pid; stopAmbient(); state = FRESH_STATE(); render(); if(outPid) clearDeviceSession(outPid); }
   else if(action==='open-day'){
     const day = DAYS.find(d=>d.id===el.dataset.day);
     if(day && day.locked){ shakeLockedEl(el); showLockedToast('day'); }
@@ -13988,7 +14069,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-react'){ sendRoomReaction(el.dataset.emoji, el, 'emoji'); }
   else if(action==='room-quick-msg'){ sendRoomReaction(el.dataset.msg, el, 'text'); }
   else if(action==='room-chat-send-free'){ doSendRoomFreeText(); }
-  else if(action==='toggle-room-chat'){ state.roomChatOpen = !state.roomChatOpen; render(); }
+  else if(action==='toggle-room-chat-sticker-panel'){ state.roomChatStickerPanelOpen = !state.roomChatStickerPanelOpen; render(); }
+  else if(action==='room-send-sticker'){ sendRoomReaction(el.dataset.id, el, 'sticker'); }
+  else if(action==='toggle-room-chat'){ state.roomChatOpen = !state.roomChatOpen; if(!state.roomChatOpen) state.roomChatStickerPanelOpen = false; render(); }
   else if(action==='room-c4-color'){ doRoomC4Color(el.dataset.color); }
   else if(action==='room-c4-col'){ doRoomC4Move(parseInt(el.dataset.col,10)); }
   else if(action==='room-c4-next'){ doRoomC4Next(); }
@@ -17034,6 +17117,7 @@ function doLoginWithCode(code){
   const extra = myExtra(p.id);
   document.documentElement.dataset.theme = extra.mode==='light' ? 'light' : 'dark';
   state = Object.assign(FRESH_STATE(), { view:'profile', pid:p.id });
+  claimDeviceSession(p.id);
   render();
   bgMusicArmed = true;
   applyMusicState();
@@ -17197,6 +17281,7 @@ function checkUpcomingSessionAlerts(){
 function startLivePolling(){
   setInterval(async ()=>{
     if(document.hidden) return;
+    if(state.pid) checkDeviceSessionKicked();
     checkUpcomingSessionAlerts();
     checkDailyMessage();
     checkConfTimeAlerts();
@@ -17260,18 +17345,6 @@ function startLivePolling(){
   setInterval(async ()=>{
     if(document.hidden) return;
     try{
-      if(state.view==='chat'){
-        const fresh = await loadChatMessages();
-        const lastFresh = fresh[fresh.length-1], lastMine = CHAT_MESSAGES[CHAT_MESSAGES.length-1];
-        const changed = fresh.length !== CHAT_MESSAGES.length || (lastFresh && lastMine && lastFresh.id !== lastMine.id);
-        if(changed){ CHAT_MESSAGES = fresh; render(); }
-        const freshStickers = await loadCustomStickers();
-        if(JSON.stringify(freshStickers) !== JSON.stringify(CUSTOM_STICKERS)){
-          CUSTOM_STICKERS = freshStickers;
-          await preloadStickerImages(CUSTOM_STICKERS);
-          render();
-        }
-      }
       if(state.view==='admin' && state.adminTab==='stickers'){
         const freshStickers = await loadCustomStickers();
         if(JSON.stringify(freshStickers) !== JSON.stringify(CUSTOM_STICKERS)){
