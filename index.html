@@ -13487,6 +13487,7 @@ function renderAdminParticipantsTab(){
     ${justAddedCard}
     <button type="button" class="btn btn-primary" style="margin-bottom:14px;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
     ${renderAdminBulkPointsCard()}
+    ${renderAdminGamePointsCard()}
     ${renderAdminPointsResetCard()}
     ${renderAdminVisaResetCard()}
     <input type="text" class="field admin-search-input" data-filter-target=".admin-participant-tile" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />
@@ -15101,6 +15102,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-reset-all-visas'){ confirmResetAllVisas(); }
   else if(action==='admin-restore-visas'){ confirmRestoreVisas(); }
   else if(action==='admin-bulk-points'){ doAdminBulkAddPoints(parseInt(el.dataset.sign,10)); }
+  else if(action==='admin-game-points'){ confirmAdminGamePoints(parseInt(el.dataset.sign,10)); }
   else if(action==='cancel-edit-participant'){ state.editingParticipantId = null; render(); }
   else if(action==='save-participant'){ doSaveParticipant(el.dataset.pid); }
   else if(action==='admin-cancel-checkin'){ confirmCancelCheckin(el.dataset.pid, el.dataset.session); }
@@ -16872,6 +16874,64 @@ async function doAdminBulkAddPoints(sign){
     if(input) input.value = '';
     render();
   } finally { _pointsOpBusy = false; }
+}
+/* ============================= ADMIN: نقاط الألعاب (رصيد الفيزا) لجميع المشاركين ============================= */
+/* بتضيف/تخصم نفس العدد من رصيد فيزا الألعاب لكل المشاركين (الأساسيين والمضافين). التعديل بيتم كـ transaction على Firebase
+   عشان لو حد لعب أو دفع رسوم غرفة في نفس اللحظة رصيده ما يتلخبطش. */
+let _gamePointsBusy = false;
+function renderAdminGamePointsCard(){
+  return `
+    <div class="card" style="margin-bottom:14px;border-color:rgba(63,220,201,.4);">
+      <div class="admin-session-name" style="margin-bottom:10px;">🎮 إضافة نقاط ألعاب لجميع المشاركين</div>
+      <div class="hint" style="margin-bottom:2px;">دي بتضيف في رصيد فيزا الألعاب (اللي بيدفعوا منه رسوم الغرف واللعب) لكل مشارك مسجّل (${PARTICIPANTS.length}) مرة واحدة.</div>
+      <div class="point-stepper">
+        <button type="button" class="ps-btn ps-minus" data-action="admin-game-points" data-sign="-1">−</button>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="game-points-input" value="200" />
+        <button type="button" class="ps-btn ps-plus" data-action="admin-game-points" data-sign="1">+</button>
+      </div>
+      <div class="hint" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
+    </div>`;
+}
+function confirmAdminGamePoints(sign){
+  if(_gamePointsBusy) return;
+  const input = document.getElementById('game-points-input');
+  const magnitude = input ? Math.abs(parseInt(normalizeDigits(input.value),10)||0) : 0;
+  if(!magnitude){ showToast('اكتب قيمة النقاط الأول', true); return; }
+  if(!PARTICIPANTS.length){ showToast('لا يوجد مشاركين مسجّلين', true); return; }
+  const val = magnitude * (sign||1);
+  showConfirmDialog(val>0 ? `إضافة ${magnitude} نقطة ألعاب لكل المشاركين؟` : `خصم ${magnitude} نقطة ألعاب من كل المشاركين؟`, ()=>doAdminGamePoints(val), {
+    icon: val>0 ? '🎮' : '⚠️', confirmLabel: val>0 ? 'إضافة للجميع' : 'خصم من الجميع',
+    sub: `هيتم ${val>0?'إضافة':'خصم'} ${magnitude} نقطة ${val>0?'إلى':'من'} رصيد فيزا الألعاب لـ ${PARTICIPANTS.length} مشارك. اضغط مرة واحدة بس عشان متتكررش.`
+  });
+}
+async function doAdminGamePoints(val){
+  if(_gamePointsBusy) return;
+  _gamePointsBusy = true;
+  try{
+    showToast('⏳ جاري تحديث نقاط الألعاب لجميع المشاركين...');
+    const ids = PARTICIPANTS.map(p=>p.id);
+    const apply = (curStr)=>{
+      let o = {};
+      try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+      if(!o || typeof o!=='object') o = {};
+      ids.forEach(id=>{ o[id] = Math.max(0, (Number(o[id])||0) + val); });
+      return JSON.stringify(o);
+    };
+    let res = null;
+    if(window.storage && window.storage.update){
+      res = await window.storage.update('glavera-visa-wallet', apply, true, 20000);
+    } else {
+      const cur = await window.storage.get('glavera-visa-wallet', true);
+      res = await window.storage.set('glavera-visa-wallet', apply(cur ? cur.value : null), true);
+    }
+    if(!res){ showToast('تعذر الحفظ على السيرفر — مفيش حاجة اتغيرت. تحقق من الاتصال وحاول تاني', true, 6000); return; }
+    try{ WALLET = JSON.parse(res.value) || {}; }catch(e){ WALLET = await loadWallet(); }
+    ids.forEach(id=>{
+      pushNotification(id, val>0 ? `🎮 حصلت على ${val} نقطة ألعاب في فيزتك من المنظمين` : `تم خصم ${Math.abs(val)} نقطة ألعاب من فيزتك`, val>0?'🎮':'⚠️');
+    });
+    showToast(val>0 ? `✅ تمت إضافة ${val} نقطة ألعاب لكل المشاركين (${ids.length})` : `✅ تم خصم ${Math.abs(val)} نقطة ألعاب من كل المشاركين (${ids.length})`);
+    render();
+  } finally { _gamePointsBusy = false; }
 }
 function renderAdminPointsResetCard(){
   if(!_pointsBackupLoaded){
