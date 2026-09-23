@@ -2432,6 +2432,28 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .c4-dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
   .xo-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; margin-bottom:12px;
     min-height:20px; color:var(--text);}
+  .bil-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#171449,#0c0a24); overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .bil-shell{max-width:720px; margin:0 auto; padding:12px 10px 24px;}
+  .bil-topbar{padding:4px 2px 2px;}
+  .bil-back{margin-bottom:6px;}
+  .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .bil-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 4px; border-radius:14px; background:rgba(255,255,255,.06); color:#fff; font-family:Tajawal,Arial; font-size:11.5px; border:1.5px solid transparent; transition:.2s;}
+  .bil-side.on{border-color:#F4B740; background:rgba(244,183,64,.16);}
+  .bil-side b{font-size:12.5px;}
+  .bil-side small{opacity:.75; font-size:10.5px;}
+  .bil-side-ico{font-size:15px;}
+  .bil-clock{width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#F4B740,#B5790F); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,.35); flex-shrink:0;}
+  .bil-clock span{color:#1a1220; font-weight:900; font-size:17px; font-family:Tajawal,Arial;}
+  .bil-clock.danger{background:radial-gradient(circle at 35% 30%,#FF6B5B,#B5230F); animation:bilPulse .6s infinite;}
+  @keyframes bilPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  .bil-mode-switch{margin-top:10px;}
+  .bil-groups-row{display:flex; gap:10px; margin:10px 0 6px;}
+  .bil-status{text-align:center; color:#fff; font-family:Tajawal,Arial; font-weight:700; font-size:13.5px; margin:8px 0 8px; min-height:18px;}
+  .bil-table-wrap{position:relative; width:100%; margin:0 auto; padding:0 16px;}
+  .bil-table-wrap canvas{width:100%; height:auto; display:block; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.45); touch-action:none;}
+  .bil-power-wrap{position:absolute; top:8%; bottom:8%; left:0; width:11px; background:rgba(0,0,0,.35); border-radius:6px; overflow:hidden; display:flex; align-items:flex-end;}
+  .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740,#E2382A); transition:height .05s linear;}
+  .bil-hint{text-align:center; color:rgba(255,255,255,.55); font-family:Tajawal,Arial; font-size:11px; margin-top:10px;}
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
   .xo-cell{aspect-ratio:1/1; border-radius:18px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); font-family:'Cairo',sans-serif; font-weight:900; font-size:34px;
@@ -6288,11 +6310,13 @@ const GAMES_CATALOG = [
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
+  {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
 ];
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'وصّل 4 قطع قبل خصمك', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
-  uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب'
+  uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
+  billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم'
 };
 function ghGameTile(g, sub, action, i){
   return `
@@ -7241,6 +7265,476 @@ function renderConnect4Game(){
   `;
 }
 
+
+/* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
+const BIL = { W:640, H:320, RAIL:22, R:11, POCKET_R:19, FRICTION:0.988, MIN_V:0.05, MAX_PULL:150, MAX_POWER:23, SHOT_SECONDS:20 };
+const BIL_COLORS = {1:'#F3C23D',2:'#2C6FEA',3:'#E2382A',4:'#7B3FA0',5:'#EE7A1E',6:'#1E8A4C',7:'#7A2E2E',8:'#161616'};
+function bilBallColor(num){ return BIL_COLORS[ num>8 ? num-8 : num ] || '#ccc'; }
+function bilPockets(){
+  const {W,H,RAIL} = BIL;
+  return [ {x:RAIL,y:RAIL}, {x:W/2,y:RAIL}, {x:W-RAIL,y:RAIL}, {x:RAIL,y:H-RAIL}, {x:W/2,y:H-RAIL}, {x:W-RAIL,y:H-RAIL} ];
+}
+function bilDiamonds(){
+  const {W,H,RAIL} = BIL;
+  const pts = [];
+  const longSpots = [0.2,0.35,0.5,0.65,0.8];
+  longSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
+  const shortSpots = [0.33,0.66];
+  shortSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
+  return pts;
+}
+function bilRack(){
+  /* triangle apex on the left, opening toward the right — cue ball breaks from the left side */
+  const ROWS = [[1],[9,2],[10,8,3],[4,11,5,12],[13,6,14,7,15]];
+  const {W,H,RAIL,R} = BIL;
+  const apexX = RAIL + (W-2*RAIL)*0.66, cy = H/2, dr = R*1.01, colGap = R*1.732*1.03;
+  const out = [];
+  ROWS.forEach((row,ri)=>{
+    const n = row.length, colX = apexX + ri*colGap, startY = cy - (n-1)*dr;
+    row.forEach((num,ci)=> out.push({num, x:colX, y:startY+ci*2*dr}));
+  });
+  return out;
+}
+function bilCueSpot(){ return {x: BIL.RAIL + (BIL.W-2*BIL.RAIL)*0.22, y: BIL.H/2}; }
+function initBilliardsGame(){
+  const prevMode = state.billiards ? state.billiards.mode : 'ai';
+  const prevScore = state.billiards ? {a:state.billiards.scoreA, b:state.billiards.scoreB} : {a:0,b:0};
+  bilClearClock();
+  const spot = bilCueSpot();
+  const balls = [{id:'cue', num:0, type:'cue', x:spot.x, y:spot.y, vx:0, vy:0, in:false}];
+  bilRack().forEach(p=> balls.push({ id:'b'+p.num, num:p.num, type: p.num===8?'eight':(p.num<=7?'solid':'stripe'), x:p.x, y:p.y, vx:0, vy:0, in:false }));
+  state.billiards = {
+    mode: prevMode, balls, turn:'A', groups:{A:null,B:null},
+    scoreA: prevScore.a, scoreB: prevScore.b, winner:null, msg:'اضرب الكرة البيضاء لتبدأ 🎱',
+    moving:false, _shot:null, _raf:null, _clockTimer:null, shotClock: BIL.SHOT_SECONDS
+  };
+}
+function bilGroupLeft(g, group){ return g.balls.filter(b=>!b.in && b.type===group).length; }
+function bilOtherPlayer(p){ return p==='A' ? 'B' : 'A'; }
+
+/* ---------- shot clock ---------- */
+function bilClearClock(){
+  const g = state.billiards;
+  if(g && g._clockTimer){ clearInterval(g._clockTimer); g._clockTimer=null; }
+}
+function bilStartClock(){
+  const g = state.billiards;
+  bilClearClock();
+  if(!g || g.winner) return;
+  g.shotClock = BIL.SHOT_SECONDS;
+  bilUpdateClockUI();
+  g._clockTimer = setInterval(()=>{
+    const gg = state.billiards;
+    if(!gg || gg.winner || gg.moving) return;
+    gg.shotClock--;
+    bilUpdateClockUI();
+    if(gg.shotClock<=0){ bilClearClock(); bilAutoRandomShot(); }
+  }, 1000);
+}
+function bilUpdateClockUI(){
+  const g = state.billiards; if(!g) return;
+  const wrap = document.getElementById('bil-clock'); const num = document.getElementById('bil-clock-num');
+  if(num) num.textContent = Math.max(0, g.shotClock);
+  if(wrap) wrap.classList.toggle('danger', g.shotClock<=5);
+}
+function bilAutoRandomShot(){
+  const g = state.billiards;
+  if(!g || g.winner || g.moving) return;
+  const ang = Math.random()*Math.PI*2;
+  bilFireShot(Math.cos(ang), Math.sin(ang), BIL.MAX_POWER*(0.3+Math.random()*0.3));
+}
+
+/* ---------- overlay shell ---------- */
+let BIL_CTX = null, BIL_CANVAS = null;
+let BIL_AIM = null;
+function openBilliardsGame(){
+  initBilliardsGame();
+  const old = document.getElementById('bil-overlay');
+  if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'bil-overlay';
+  overlay.className = 'bil-overlay';
+  overlay.innerHTML = `<div id="bil-shell" class="bil-shell"></div>`;
+  document.body.appendChild(overlay);
+  bilRenderShell();
+  bilStartClock();
+  SND.click();
+}
+function closeBilliardsGame(){
+  bilClearClock();
+  const g = state.billiards;
+  if(g && g._raf){ cancelAnimationFrame(g._raf); g._raf = null; }
+  BIL_CTX = null; BIL_CANVAS = null; BIL_AIM = null;
+  const overlay = document.getElementById('bil-overlay');
+  if(overlay) overlay.remove();
+  SND.back();
+}
+function bilSetMode(mode){
+  if(!state.billiards) return;
+  initBilliardsGame();
+  state.billiards.mode = mode;
+  bilRenderShell();
+  bilStartClock();
+}
+function bilResetGame(){
+  initBilliardsGame();
+  bilRenderShell();
+  bilStartClock();
+}
+function bilGroupIcon(type){ return type==='solid' ? '⬤' : (type==='stripe' ? '🎯' : '❔'); }
+function bilGroupLabel(type){ return type==='solid' ? 'مصمتة' : (type==='stripe' ? 'مخططة' : 'لسه مش محدد'); }
+function bilRenderShell(){
+  const g = state.billiards;
+  if(!g) return;
+  const shell = document.getElementById('bil-shell');
+  if(!shell) return;
+  let statusText;
+  if(g.winner){
+    statusText = g.winner==='A' ? '🏆 فزت! برافو عليك' : (g.mode==='ai' ? '🤖 فاز الجهاز، حظ أوفر المرة الجاية' : '🏆 فاز اللاعب الثاني');
+  } else if(g.mode==='ai' && g.turn==='B'){
+    statusText = '🤖 الجهاز بيسدد...';
+  } else {
+    statusText = g.turn==='A' ? 'دورك: اسحب من الكرة البيضاء وسيبها 🎱' : 'دور اللاعب الثاني 🎱';
+  }
+  const gA = bilGroupLabel(g.groups.A), gB = bilGroupLabel(g.groups.B);
+  shell.innerHTML = `
+    <div class="bil-topbar">
+      <button class="icon-btn bil-back" data-action="billiards-close">${ICO.back}</button>
+      <div class="bil-vs-row">
+        <div class="bil-side ${g.turn==='A'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.A)}</span><b>أنت</b><small>${gA}</small></div>
+        <div class="bil-clock" id="bil-clock"><span id="bil-clock-num">${g.shotClock}</span></div>
+        <div class="bil-side ${g.turn==='B'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.B)}</span><b>${g.mode==='ai'?'الجهاز':'اللاعب 2'}</b><small>${gB}</small></div>
+      </div>
+    </div>
+    <div class="game-mode-switch bil-mode-switch">
+      <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="billiards-mode" data-mode="ai">🤖 ضد الجهاز</button>
+      <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="billiards-mode" data-mode="2p">👥 لاعبين اتنين</button>
+    </div>
+    <div class="bil-status">${statusText}</div>
+    <div class="bil-table-wrap">
+      <div class="bil-power-wrap" id="bil-power-wrap" style="display:none;"><div class="bil-power-bar" id="bil-power-bar"></div></div>
+      <canvas id="bil-canvas" width="${BIL.W}" height="${BIL.H}"></canvas>
+    </div>
+    <div class="bil-hint">${g.winner ? '' : 'اسحب من الكرة البيضاء بعكس اتجاه الضربة، وسيب إصبعك عشان تضرب 🎯'}</div>
+    ${g.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="billiards-reset">🔄 لعبة جديدة</button>` : ''}
+  `;
+  bilMountCanvas();
+}
+function bilMountCanvas(){
+  BIL_CANVAS = document.getElementById('bil-canvas');
+  if(!BIL_CANVAS) return;
+  BIL_CTX = BIL_CANVAS.getContext('2d');
+  BIL_AIM = null;
+  BIL_CANVAS.onpointerdown = bilPointerDown;
+  BIL_CANVAS.onpointermove = bilPointerMove;
+  BIL_CANVAS.onpointerup = bilPointerUp;
+  BIL_CANVAS.onpointercancel = bilPointerUp;
+  bilDraw();
+}
+function bilCanvasPoint(e){
+  const rect = BIL_CANVAS.getBoundingClientRect();
+  const sx = BIL.W/rect.width, sy = BIL.H/rect.height;
+  return { x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy };
+}
+function bilHumanCanShoot(){
+  const g = state.billiards;
+  if(!g || g.winner || g.moving) return false;
+  if(g.mode==='ai' && g.turn!=='A') return false;
+  return true;
+}
+function bilPointerDown(e){
+  if(!bilHumanCanShoot()) return;
+  const p = bilCanvasPoint(e);
+  BIL_AIM = { active:true, cx:p.x, cy:p.y };
+  try{ BIL_CANVAS.setPointerCapture(e.pointerId); }catch(err){}
+  bilDraw();
+}
+function bilPointerMove(e){
+  if(!BIL_AIM || !BIL_AIM.active) return;
+  const p = bilCanvasPoint(e);
+  BIL_AIM.cx = p.x; BIL_AIM.cy = p.y;
+  const cue = state.billiards.balls.find(b=>b.id==='cue');
+  const pull = Math.min(BIL.MAX_PULL, Math.hypot(BIL_AIM.cx-cue.x, BIL_AIM.cy-cue.y));
+  const pw = document.getElementById('bil-power-wrap'), pb = document.getElementById('bil-power-bar');
+  if(pw && pb){ pw.style.display='block'; pb.style.height = Math.round(pull/BIL.MAX_PULL*100)+'%'; }
+  bilDraw();
+}
+function bilPointerUp(e){
+  if(!BIL_AIM || !BIL_AIM.active){ BIL_AIM=null; return; }
+  const cue = state.billiards.balls.find(b=>b.id==='cue');
+  const dx0 = BIL_AIM.cx-cue.x, dy0 = BIL_AIM.cy-cue.y;
+  const pull = Math.min(BIL.MAX_PULL, Math.hypot(dx0,dy0));
+  BIL_AIM.active = false;
+  const pw = document.getElementById('bil-power-wrap');
+  if(pw) pw.style.display='none';
+  if(pull > 8){
+    const power = (pull/BIL.MAX_PULL) * BIL.MAX_POWER;
+    bilFireShot(-dx0, -dy0, power);
+  }
+  BIL_AIM = null;
+  bilDraw();
+}
+
+/* ---------- physics ---------- */
+function bilFireShot(dx,dy,power){
+  const g = state.billiards;
+  if(!g || g.moving || g.winner) return;
+  bilClearClock();
+  const len = Math.hypot(dx,dy) || 1;
+  const cue = g.balls.find(b=>b.id==='cue');
+  cue.vx = (dx/len)*power; cue.vy = (dy/len)*power;
+  g.moving = true;
+  g._shot = { firstContact:null, potted:[] };
+  luxTone(180,.05,'sine',.05,{cutoff:900,wet:.1});
+  bilAnimate();
+}
+function bilPot(b, shot){
+  b.in = true; b.vx = 0; b.vy = 0;
+  shot.potted.push({num:b.num, type:b.type});
+  luxTone(1200,.09,'sine',.05,{chorus:true,wet:.2});
+  vibrate([12]);
+}
+function bilStep(){
+  const g = state.billiards;
+  const shot = g._shot;
+  const balls = g.balls.filter(b=>!b.in);
+  let moving = false;
+  const {RAIL,W,H,R,FRICTION,MIN_V} = BIL;
+  for(const b of balls){
+    const sp = Math.hypot(b.vx,b.vy);
+    if(sp < MIN_V){ b.vx=0; b.vy=0; continue; }
+    moving = true;
+    b.x += b.vx; b.y += b.vy;
+    b.vx *= FRICTION; b.vy *= FRICTION;
+  }
+  const pockets = bilPockets();
+  for(const b of balls){
+    if(b.in) continue;
+    for(const p of pockets){
+      if(Math.hypot(b.x-p.x,b.y-p.y) < BIL.POCKET_R){ bilPot(b, shot); break; }
+    }
+  }
+  for(const b of balls){
+    if(b.in) continue;
+    if(b.x-R < RAIL){ b.x = RAIL+R; b.vx = -b.vx*0.9; }
+    if(b.x+R > W-RAIL){ b.x = W-RAIL-R; b.vx = -b.vx*0.9; }
+    if(b.y-R < RAIL){ b.y = RAIL+R; b.vy = -b.vy*0.9; }
+    if(b.y+R > H-RAIL){ b.y = H-RAIL-R; b.vy = -b.vy*0.9; }
+  }
+  const live = g.balls.filter(b=>!b.in);
+  for(let i=0;i<live.length;i++){
+    for(let j=i+1;j<live.length;j++){
+      const a=live[i], b=live[j];
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy);
+      if(d>0 && d < R*2){
+        if(a.id==='cue' && !shot.firstContact) shot.firstContact = b.type;
+        else if(b.id==='cue' && !shot.firstContact) shot.firstContact = a.type;
+        const overlap = (R*2-d)/2, nx=dx/d, ny=dy/d;
+        a.x -= nx*overlap; a.y -= ny*overlap;
+        b.x += nx*overlap; b.y += ny*overlap;
+        const va = a.vx*nx+a.vy*ny, vb = b.vx*nx+b.vy*ny, diff = vb-va;
+        a.vx += diff*nx; a.vy += diff*ny;
+        b.vx -= diff*nx; b.vy -= diff*ny;
+        luxTone(700,.05,'triangle',.03,{cutoff:2500,wet:.1});
+      }
+    }
+  }
+  return moving;
+}
+function bilAnimate(){
+  const g = state.billiards;
+  if(!g) return;
+  const moving = bilStep();
+  bilDraw();
+  if(moving){ g._raf = requestAnimationFrame(bilAnimate); }
+  else { g.moving = false; g._raf = null; bilResolveShot(); }
+}
+function bilResolveShot(){
+  const g = state.billiards;
+  const shot = g._shot;
+  const shooter = g.turn, other = bilOtherPlayer(shooter);
+  const legalPots = shot.potted.filter(p=>p.type!=='cue');
+  const scratched = shot.potted.some(p=>p.type==='cue');
+  let requiredType = null;
+  if(g.groups[shooter]){
+    requiredType = bilGroupLeft(g, g.groups[shooter])>0 ? g.groups[shooter] : 'eight';
+  }
+  let foul = scratched;
+  if(!shot.firstContact) foul = true;
+  else if(requiredType){ if(shot.firstContact !== requiredType) foul = true; }
+  else if(shot.firstContact==='eight') foul = true;
+  if(!foul && !g.groups[shooter]){
+    const firstOwn = legalPots.find(p=>p.type==='solid'||p.type==='stripe');
+    if(firstOwn){ g.groups[shooter]=firstOwn.type; g.groups[other]= firstOwn.type==='solid'?'stripe':'solid'; }
+  }
+  const potted8 = legalPots.some(p=>p.type==='eight');
+  if(potted8){
+    const cleared = g.groups[shooter] ? bilGroupLeft(g, g.groups[shooter])===0 : false;
+    if(foul || !cleared){ bilEndGame(other); } else { bilEndGame(shooter); }
+    return;
+  }
+  if(scratched){
+    const spot = bilCueSpot();
+    const cue = g.balls.find(b=>b.id==='cue');
+    cue.in=false; cue.x=spot.x; cue.y=spot.y; cue.vx=0; cue.vy=0;
+  }
+  const pottedOwn = !foul && legalPots.some(p=> g.groups[shooter] ? p.type===g.groups[shooter] : (p.type==='solid'||p.type==='stripe'));
+  if(foul){
+    g.turn = other;
+    g.msg = scratched ? '😬 الكرة البيضا نزلت! دور الخصم' : '❌ ضربة خطأ — لمست كورة مش بتاعتك الأول';
+  } else if(pottedOwn){
+    g.msg = '🎯 تسديدة موفقة! كمّل';
+  } else {
+    g.turn = other;
+    g.msg = null;
+  }
+  bilRenderShell();
+  if(!g.winner){
+    bilStartClock();
+    if(g.mode==='ai' && g.turn==='B') setTimeout(bilBotTurn, 950);
+  }
+}
+function bilEndGame(winner){
+  const g = state.billiards;
+  bilClearClock();
+  g.winner = winner;
+  if(winner==='A'){ g.scoreA++; } else { g.scoreB++; }
+  bilRenderShell();
+  if(winner==='A'){
+    vibrate([20,20,30]); launchConfetti();
+    if(g.mode==='ai'){
+      const reward = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.soloBilliardsReward) || 0;
+      if(reward>0) awardSoloGamePoints(reward, 'مبروك! كسبت مباراة البلياردو'); else SND.coinChime();
+    } else { SND.coinChime(); }
+  } else if(g.mode==='2p'){
+    vibrate([20,20,30]); launchConfetti(); SND.coinChime();
+  }
+}
+
+/* ---------- bot AI ---------- */
+function bilBotTurn(){
+  const g = state.billiards;
+  if(!g || g.winner || g.moving || g.turn!=='B') return;
+  const shot = bilBotChooseShot();
+  if(shot) bilFireShot(shot.dx, shot.dy, shot.power);
+  else bilFireShot((Math.random()-0.5), (Math.random()-0.5)||1, BIL.MAX_POWER*0.5);
+}
+function bilBotChooseShot(){
+  const g = state.billiards;
+  const cue = g.balls.find(b=>b.id==='cue');
+  const required = g.groups.B ? (bilGroupLeft(g,g.groups.B)>0 ? g.groups.B : 'eight') : null;
+  const candidates = g.balls.filter(b=>!b.in && b.id!=='cue' && (required ? b.type===required : (b.type==='solid'||b.type==='stripe')));
+  const pockets = bilPockets();
+  let best = null;
+  for(const ball of candidates){
+    for(const pocket of pockets){
+      const toPocket = { x:pocket.x-ball.x, y:pocket.y-ball.y };
+      const dPocket = Math.hypot(toPocket.x,toPocket.y);
+      if(dPocket<1) continue;
+      const nx = toPocket.x/dPocket, ny = toPocket.y/dPocket;
+      const contact = { x: ball.x - nx*(BIL.R*2), y: ball.y - ny*(BIL.R*2) };
+      const dCue = Math.hypot(contact.x-cue.x, contact.y-cue.y);
+      if(dCue<1) continue;
+      const dirX = (contact.x-cue.x)/dCue, dirY=(contact.y-cue.y)/dCue;
+      const cutDot = dirX*nx + dirY*ny;
+      if(cutDot < 0.25) continue;
+      const score = cutDot*260 - (dCue+dPocket)*0.35;
+      if(!best || score>best.score) best = { score, dx:dirX, dy:dirY, dist:dCue+dPocket };
+    }
+  }
+  if(!best) return null;
+  const jitter = (Math.random()-0.5)*0.05;
+  const dx = best.dx + jitter, dy = best.dy + jitter*0.6;
+  const power = Math.min(BIL.MAX_POWER, 8 + best.dist*0.09);
+  return { dx, dy, power };
+}
+
+/* ---------- rendering ---------- */
+function bilDraw(){
+  if(!BIL_CTX) return;
+  const ctx = BIL_CTX, {W,H,RAIL} = BIL;
+  const g = state.billiards;
+  ctx.clearRect(0,0,W,H);
+  const railGrad = ctx.createLinearGradient(0,0,W,H);
+  railGrad.addColorStop(0,'#6b4322'); railGrad.addColorStop(1,'#452a14');
+  ctx.fillStyle = railGrad;
+  ctx.fillRect(0,0,W,H);
+  const feltGrad = ctx.createRadialGradient(W/2,H/2,20,W/2,H/2,W*0.55);
+  feltGrad.addColorStop(0,'#1c8a52'); feltGrad.addColorStop(1,'#0d5c36');
+  ctx.fillStyle = feltGrad;
+  ctx.fillRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
+  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth=2;
+  ctx.strokeRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
+  bilDiamonds().forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.4,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fill();
+  });
+  bilPockets().forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R,0,Math.PI*2);
+    ctx.fillStyle = '#0a0a0a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,.15)'; ctx.lineWidth=2; ctx.stroke();
+  });
+  if(g){
+    if(BIL_AIM && BIL_AIM.active && bilHumanCanShoot()){
+      const cue = g.balls.find(b=>b.id==='cue');
+      const dx = cue.x-BIL_AIM.cx, dy = cue.y-BIL_AIM.cy;
+      const len = Math.hypot(dx,dy)||1;
+      const ux=dx/len, uy=dy/len;
+      let travel = 900, hitBall=false;
+      for(const b of g.balls){
+        if(b.in || b.id==='cue') continue;
+        const t = ((b.x-cue.x)*ux + (b.y-cue.y)*uy);
+        if(t<=0) continue;
+        const px = cue.x+ux*t, py = cue.y+uy*t;
+        if(Math.hypot(px-b.x,py-b.y) < BIL.R*2){ if(t<travel){ travel=t; hitBall=true; } }
+      }
+      const tX = cue.x+ux*travel, tY = cue.y+uy*travel;
+      ctx.beginPath(); ctx.moveTo(cue.x,cue.y); ctx.lineTo(tX,tY);
+      ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1.6; ctx.setLineDash([6,6]);
+      ctx.stroke(); ctx.setLineDash([]);
+      if(hitBall){
+        ctx.beginPath(); ctx.arc(tX,tY,BIL.R,0,Math.PI*2);
+        ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=1.4; ctx.setLineDash([3,3]);
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      const pull = Math.min(BIL.MAX_PULL, len);
+      const stickBackX = cue.x - ux*(BIL.R+16+pull), stickBackY = cue.y - uy*(BIL.R+16+pull);
+      const stickFrontX = cue.x - ux*(BIL.R+6), stickFrontY = cue.y - uy*(BIL.R+6);
+      ctx.beginPath(); ctx.moveTo(stickBackX,stickBackY); ctx.lineTo(stickFrontX,stickFrontY);
+      ctx.strokeStyle='#c99a5c'; ctx.lineWidth=5.5; ctx.lineCap='round'; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(stickFrontX,stickFrontY); ctx.lineTo(stickFrontX-ux*10,stickFrontY-uy*10);
+      ctx.strokeStyle='#2b2b2b'; ctx.lineWidth=5.5; ctx.lineCap='round'; ctx.stroke();
+    }
+    g.balls.forEach(b=>{
+      if(b.in) return;
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(b.x,b.y+BIL.R*0.75,BIL.R*0.85,BIL.R*0.35,0,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,.28)'; ctx.fill();
+      ctx.restore();
+      const grad = ctx.createRadialGradient(b.x-BIL.R*0.35,b.y-BIL.R*0.35,1,b.x,b.y,BIL.R);
+      if(b.type==='cue'){ grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#d9d9d2'); }
+      else if(b.type==='stripe'){ grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#eeeeee'); }
+      else { const c = bilBallColor(b.num); grad.addColorStop(0, c); grad.addColorStop(1, c); }
+      ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
+      if(b.type==='stripe'){
+        ctx.save();
+        ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2); ctx.clip();
+        ctx.fillStyle = bilBallColor(b.num);
+        ctx.fillRect(b.x-BIL.R, b.y-BIL.R*0.42, BIL.R*2, BIL.R*0.84);
+        ctx.restore();
+      }
+      if(b.type!=='cue'){
+        ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R*0.42,0,Math.PI*2);
+        ctx.fillStyle='#fff'; ctx.fill();
+        ctx.fillStyle='#111'; ctx.font='bold '+(BIL.R*0.5)+'px Tajawal, Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(String(b.num), b.x, b.y+0.5);
+      }
+      ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=0.8; ctx.stroke();
+    });
+  }
+}
 /* ============================= GAMES: DOMINO ============================= */
 const DOMINO_PIPS = {0:[],1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
 function dominoHalfHtml(n){
@@ -14173,6 +14667,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='remove-conf-logo'){ confirmRemoveConfLogo(); }
   else if(action==='open-game'){
     const gid = el.dataset.game;
+    if(gid==='billiards'){ openBilliardsGame(); return; }
     if(gid==='xo') initXoGame();
     else if(gid==='connect4') initConnect4Game();
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
@@ -14184,6 +14679,9 @@ document.addEventListener('click', (e)=>{
     else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
     go('game-'+gid);
   }
+  else if(action==='billiards-close'){ closeBilliardsGame(); }
+  else if(action==='billiards-mode'){ bilSetMode(el.dataset.mode); }
+  else if(action==='billiards-reset'){ bilResetGame(); }
   else if(action==='open-dish'){ openDishSheet(el.dataset.cid, el.dataset.did); }
   else if(action==='close-dish-sheet'){ closeDishSheet(); }
   else if(action==='ds-star'){ dsSetStars(parseInt(el.dataset.n,10)||0); }
