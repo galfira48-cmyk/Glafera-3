@@ -2273,21 +2273,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-chat-widget{position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:75;
     display:flex; flex-direction:column; align-items:flex-end; gap:14px;}
 
-  .room-chat-launcher{position:relative; flex:none; width:56px; height:56px; border-radius:18px; border:1px solid rgba(244,183,64,.4); padding:0; cursor:pointer;
+  .room-chat-launcher{position:relative; flex:none; width:58px; height:58px; border-radius:50%; border:2px solid rgba(90,180,255,.55); padding:0; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(165deg, rgba(58,49,142,.96), rgba(19,15,56,.98));
-    box-shadow:0 14px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
-    backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4);
+    background:radial-gradient(circle at 32% 26%, rgba(150,205,255,.9), rgba(35,90,180,.85) 38%, rgba(8,18,45,.96) 72%, rgba(3,8,22,.98) 100%);
+    box-shadow:0 0 0 1px rgba(90,180,255,.22), 0 14px 30px rgba(0,10,35,.55), inset 0 2px 5px rgba(255,255,255,.4), inset 0 -8px 16px rgba(0,20,55,.65);
     -webkit-tap-highlight-color:transparent; touch-action:manipulation;
     transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, border-color .25s ease, background .25s ease;}
-  .room-chat-launcher::after{content:''; position:absolute; inset:0; border-radius:18px;
-    background:radial-gradient(circle at 30% 22%, rgba(255,255,255,.14), transparent 55%); pointer-events:none;}
+  .room-chat-launcher::before{content:''; position:absolute; top:9%; left:16%; width:42%; height:26%; border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.75), transparent 72%); filter:blur(.5px); pointer-events:none;}
+  .room-chat-launcher::after{content:''; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 30% 22%, rgba(255,255,255,.1), transparent 55%); pointer-events:none;}
   .room-chat-launcher:active{transform:scale(.92);}
-  .room-chat-launcher svg{position:relative; z-index:1; width:22px; height:22px; color:var(--gold-2); transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
-  .room-chat-launcher.open{background:linear-gradient(165deg, rgba(36,26,77,.98), rgba(14,11,38,.99)); border-color:rgba(244,183,64,.65);
-    box-shadow:0 14px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);}
-  .room-chat-launcher.open svg{color:var(--gold-2); transform:rotate(90deg);}
-  @media (max-width:380px){ .room-chat-panel{width:232px;} .room-chat-launcher{width:50px; height:50px; border-radius:16px;} }
+  .room-chat-launcher svg{position:relative; z-index:1; width:23px; height:23px; color:#8fe0ff; filter:drop-shadow(0 0 4px rgba(110,210,255,.95)) drop-shadow(0 0 11px rgba(70,170,255,.65)); transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+  .room-chat-launcher.open{background:radial-gradient(circle at 32% 26%, rgba(150,205,255,.7), rgba(25,70,150,.9) 38%, rgba(6,14,36,.98) 72%, rgba(2,5,16,1) 100%); border-color:rgba(110,210,255,.75);
+    box-shadow:0 0 0 1px rgba(90,180,255,.32), 0 14px 30px rgba(0,10,35,.65), inset 0 2px 5px rgba(255,255,255,.3), inset 0 -8px 16px rgba(0,20,55,.7);}
+  .room-chat-launcher.open svg{color:#8fe0ff; transform:rotate(90deg);}
+  @media (max-width:380px){ .room-chat-panel{width:232px;} .room-chat-launcher{width:52px; height:52px;} }
 
   .room-chat-panel{width:278px; max-width:82vw; max-height:min(430px,62vh); overflow-y:auto;
     padding:16px 14px 14px; border-radius:24px; transform-origin:bottom right;
@@ -10604,7 +10605,7 @@ function roomChatWidget(){
     const url = STICKER_IMG_CACHE[s.id];
     return `<button type="button" class="room-chat-sticker-btn" data-action="room-send-sticker" data-id="${s.id}">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'استيكر')}" />` : '⏳'}</button>`;
   }).join('');
-  const chatIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>`;
+  const chatIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5h12A2.5 2.5 0 0120.5 7v6A2.5 2.5 0 0118 15.5h-6.2L8 19v-3.5H6A2.5 2.5 0 013.5 13V7A2.5 2.5 0 016 4.5z"/><circle cx="8.2" cy="10" r=".95" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r=".95" fill="currentColor" stroke="none"/><circle cx="15.8" cy="10" r=".95" fill="currentColor" stroke="none"/></svg>`;
   const closeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
   const sendIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
   return `
