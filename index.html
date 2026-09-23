@@ -1151,6 +1151,28 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
 
+  /* ---------- رسالة "الخصم غادر المعركة" ---------- */
+  .rl-card{background:var(--bg-2); border:1px solid var(--border); border-radius:26px; padding:28px 22px 22px; max-width:340px; width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,.45); text-align:center; animation:confirmPop .26s ease;}
+  .rl-badge{width:64px; height:64px; margin:0 auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--danger) 14%, transparent); border:1px solid color-mix(in srgb, var(--danger) 35%, transparent); color:var(--danger);}
+  .rl-badge svg{width:30px; height:30px;}
+  .rl-status{display:inline-block; font-family:'Cairo',sans-serif; font-weight:700; font-size:12px; color:var(--text-muted);
+    padding:3px 12px; border-radius:999px; background:var(--surface); border:1px solid var(--border); margin-bottom:10px;}
+  .rl-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; line-height:1.5; color:var(--text); margin:0;}
+  .rl-title bdi{color:var(--gold-2);}
+  .rl-desc{font-size:13.5px; line-height:1.8; color:var(--text-muted); margin:6px 0 0;}
+  .rl-reward{display:flex; align-items:center; gap:14px; margin-top:20px; padding:14px 16px; text-align:start;
+    background:color-mix(in srgb, var(--gold) 10%, var(--surface)); border:1px solid color-mix(in srgb, var(--gold) 38%, transparent); border-radius:18px;}
+  .rl-coin{flex:0 0 auto; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(145deg,var(--gold-2),var(--gold)); color:#221900; box-shadow:0 4px 14px rgba(244,183,64,.3);}
+  .rl-coin svg{width:22px; height:22px;}
+  .rl-reward-num{font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; line-height:1.15; color:var(--gold-2); display:flex; align-items:baseline; gap:6px;}
+  .rl-reward-num small{font-size:14px; font-weight:800; color:var(--text);}
+  .rl-reward-txt{font-size:12.5px; color:var(--text-muted); line-height:1.6; margin-top:2px;}
+  .rl-btn{margin-top:20px;}
+  @media (prefers-reduced-motion:reduce){ .rl-card{animation:none;} }
+
   /* ============================= FEE / PAYMENT MODAL (room create/join) ============================= */
   .fee-overlay{background:rgba(4,3,14,.88); padding:18px; z-index:210;}
   .fee-card{position:relative; width:100%; max-width:340px; border-radius:28px; overflow:hidden;
@@ -10080,7 +10102,7 @@ async function applyLeaveRoomPenalty(code){
     }
     await saveBonus(BONUS);
     pushNotification(state.pid, `🚪 خرجت من المعركة أثناء دورك، اتخصم ${penalty} نقطة`, '⚠️');
-    if(share>0) recipients.forEach(id=> pushNotification(id, `🎁 ${myName} غادر المعركة، وحصلت على +${share} نقطة تعويضًا`, '🎁'));
+    if(share>0) recipients.forEach(id=> pushNotification(id, `🎁 ${myName} غادر المعركة — أُضيفت +${share} نقطة إلى رصيدك تعويضًا عن انسحابه`, '🎁'));
   }catch(e){}
   showToast(`تم خصم ${penalty} نقطة`, true);
 }
@@ -10354,23 +10376,53 @@ function showRoomLeftAlert(opponentName, penalty){
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay confirm-overlay';
   overlay.id = 'room-left-overlay';
-  const title = opponentName ? `${escapeHtml(opponentName)} غادر المعركة` : 'الخصم غادر المعركة';
-  const sub = penalty>0 ? `حصلت على <b>+${penalty} نقطة</b> تعويضًا عن انسحابه 🎁` : 'المعركة انتهت';
+  const title = opponentName
+    ? `<bdi dir="auto">${escapeHtml(opponentName)}</bdi> غادر المعركة`
+    : 'الخصم غادر المعركة';
+  const reward = penalty>0 ? `
+      <div class="rl-reward">
+        <div class="rl-coin" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+        </div>
+        <div>
+          <div class="rl-reward-num"><span dir="ltr" id="rl-reward-val">+0</span><small>نقطة</small></div>
+          <div class="rl-reward-txt">تعويض عن الانسحاب أُضيف لرصيدك</div>
+        </div>
+      </div>` : '';
   overlay.innerHTML = `
-    <div class="confirm-card">
-      <div class="confirm-icon">🚪</div>
-      <div class="confirm-msg">${title}</div>
-      <div class="confirm-sub">${sub}</div>
-      <div class="confirm-actions">
-        <button type="button" class="btn btn-primary" id="room-left-ok-btn" style="width:100%;">تمام 👍</button>
+    <div class="rl-card" role="alertdialog" aria-modal="true" aria-labelledby="rl-title">
+      <div class="rl-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
       </div>
+      <div class="rl-status">انتهت المعركة</div>
+      <h2 class="rl-title" id="rl-title">${title}</h2>
+      <p class="rl-desc">${penalty>0 ? 'انسحب الخصم قبل نهاية المعركة.' : 'انتهت المعركة بمغادرة الخصم.'}</p>
+      ${reward}
+      <button type="button" class="btn btn-primary rl-btn" id="room-left-ok-btn">متابعة</button>
     </div>
   `;
   document.body.appendChild(overlay);
-  document.getElementById('room-left-ok-btn').addEventListener('click', ()=>{
+  const okBtn = document.getElementById('room-left-ok-btn');
+  okBtn.addEventListener('click', ()=>{
     closeRoomLeftAlert();
     leaveGameRoom();
   });
+  /* عدّاد النقاط: حركة واحدة قصيرة بتوضّح المكسب، وبتتلغي لو المستخدم مفعّل تقليل الحركة */
+  const valEl = document.getElementById('rl-reward-val');
+  if(valEl){
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce){ valEl.textContent = '+'+penalty; }
+    else{
+      const t0 = performance.now(), dur = 800;
+      const tick = (now)=>{
+        if(!document.body.contains(valEl)) return;
+        const k = Math.min(1,(now-t0)/dur);
+        valEl.textContent = '+'+Math.round(penalty*(1-Math.pow(1-k,3)));
+        if(k<1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
 }
 let _roomLastHeartbeat = 0;
 function startRoomPolling(){
