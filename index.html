@@ -3926,8 +3926,15 @@ function visaPinOf(pid){ return (VISA_CARDS[pid]||{}).pin || null; }
 function visaPinPlainOf(pid){ return (VISA_CARDS[pid]||{}).pinPlain || null; }
 /* الفيزا "اتنشأت" لما المشارك يكتب اسمه ورقمه السري (3 أرقام على ظهر البطاقة) من صفحة فيزتي */
 function visaCreated(pid){ return !!visaPinOf(pid); }
-/* التصميم الأساسي (aurora) مجاني لكل مشارك، والباقي بيتشرى من Shop */
-function ownsCardTheme(pid, k){ return k==='aurora' || (OWNED_CARD_THEMES[pid]||[]).indexOf(k)>-1; }
+/* كل تصاميم الكارد بتتشرى من Shop — مفيش تصميم مجاني */
+function ownsCardTheme(pid, k){ return (OWNED_CARD_THEMES[pid]||[]).indexOf(k)>-1; }
+/* التصميم اللي بيتعرض فعليًا: لو المحفوظ مش مملوك يرجع لأول تصميم اشتراه، ولو لسه ما اشترى حاجة بيظهر شكل محايد (مش مملوك) */
+function effectiveCardTheme(pid, theme){
+  if(theme==='custom') return theme;
+  if(theme && ownsCardTheme(pid, theme)) return theme;
+  const o = OWNED_CARD_THEMES[pid] || [];
+  return o.length ? o[0] : 'aurora';
+}
 function hasVisa(pid){
   return visaCreated(pid) || (OWNED_CARD_THEMES[pid]||[]).length>0 || !!customCardImageFor(pid);
 }
@@ -3973,6 +3980,7 @@ function defaultCardTheme(pid){
 }
 function visaCardHtml(pid, draft, isNew){
   const c = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, draft||{});
+  c.theme = effectiveCardTheme(pid, c.theme);
   const customImg = c.theme==='custom' ? customCardImageFor(pid) : null;
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
   const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
@@ -4065,13 +4073,14 @@ function renderVisaPage(){
   const bal = WALLET[pid]||0, total = participantTotal(pid), min = visaMin();
   const tab = state.visaTab==='withdraw' ? 'withdraw' : (state.visaTab==='transfer' ? 'transfer' : 'deposit');
   const cur = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, state.visaDraft||{});
+  cur.theme = effectiveCardTheme(pid, cur.theme);
   const pct = Math.min(100, Math.round(bal/min*100));
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
   const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
     const isOwned = ownsCardTheme(pid, k);
-    return `<button type="button" class="vp-sw ${cur.theme===k?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
+    return `<button type="button" class="vp-sw ${(cur.theme===k && isOwned)?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
     + (customCardImageFor(pid) ? `<button type="button" class="vp-sw ${cur.theme==='custom'?'on':''}" data-action="visa-theme" data-k="custom" aria-label="مخصص" style="background-image:url('${customCardImageFor(pid)}');background-size:cover;background-position:center;">${cur.theme==='custom'?'':''}</button>` : '');
   const expired = visaExpired(pid), expTs = visaExpiresAt(pid), daysLeft = visaDaysLeft(pid);
   const fee = visaRenewFee();
@@ -7447,7 +7456,7 @@ function renderShopCardTab(){
     const price = cardTierPrice(tier);
     const items = groups[tier].map(k=>{
       const t = VISA_THEMES[k];
-      const isOwned = k==='aurora' || owned.indexOf(k)>-1;
+      const isOwned = owned.indexOf(k)>-1;
       return `<div class="card-store-item ${isOwned?'owned':''}">
         <div class="card-store-swatch" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></div>
         <div class="card-store-name">${t.name}</div>
@@ -15911,7 +15920,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){
     const h=document.getElementById('visa-holder'); const cc=Object.assign({theme:defaultCardTheme(state.pid)}, VISA_CARDS[state.pid]||{}, state.visaDraft||{});
-    updateVisaCard(state.pid, {theme:cc.theme, holder:(h?h.value:'').trim()}).then(ok=>{ if(!ok){ visaMsg('error','تعذّر حفظ التصميم','حدثت مشكلة في الاتصال، حاول مرة أخرى.'); return; } state.visaDraft=null; render(); visaMsg('success','تم حفظ التصميم','تم تحديث تصميم فيزتك والاسم المكتوب عليها.'); });
+    updateVisaCard(state.pid, {theme:effectiveCardTheme(state.pid, cc.theme), holder:(h?h.value:'').trim()}).then(ok=>{ if(!ok){ visaMsg('error','تعذّر حفظ التصميم','حدثت مشكلة في الاتصال، حاول مرة أخرى.'); return; } state.visaDraft=null; render(); visaMsg('success','تم حفظ التصميم','تم تحديث تصميم فيزتك والاسم المكتوب عليها.'); });
   }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
