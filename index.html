@@ -2973,6 +2973,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .stakes-row b{font-family:'Cairo',sans-serif; font-weight:900; font-size:13.5px; color:var(--gold); white-space:nowrap;}
 
   /* ============================= GAMES HUB — GLASS TILES ============================= */
+  .gh-lb-podium{display:flex; align-items:flex-end; justify-content:center; gap:12px; margin:18px 0 16px;}
+  .gh-lb-podium-item{position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; width:78px;}
+  .gh-lb-podium-item .avatar{width:50px; height:50px; font-size:16px; font-weight:800;}
+  .gh-lb-podium-item.p1 .avatar{width:62px; height:62px; font-size:19px; box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--gold), 0 0 16px rgba(244,183,64,.55);}
+  .gh-lb-podium-item.p2 .avatar{box-shadow:0 0 0 3px var(--surface), 0 0 0 5px #C9CADB;}
+  .gh-lb-podium-item.p3 .avatar{box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--coral, #EE4B4B);}
+  .gh-lb-podium-medal{font-size:20px; line-height:1; margin-bottom:-2px;}
+  .gh-lb-podium-item.p1 .gh-lb-podium-medal{font-size:24px;}
+  .gh-lb-podium-name{font-family:'Cairo',sans-serif; font-size:11.5px; font-weight:700; max-width:78px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .gh-lb-podium-pts{font-family:'Cairo',sans-serif; font-weight:900; color:var(--gold); font-size:12px;}
+  .gh-lb-podium-bar{order:99; width:100%; border-radius:12px 12px 4px 4px; background:linear-gradient(180deg, rgba(244,183,64,.22), rgba(244,183,64,.02));}
+  .gh-lb-podium-item.p1 .gh-lb-podium-bar{height:46px;}
+  .gh-lb-podium-item.p2 .gh-lb-podium-bar{height:30px; background:linear-gradient(180deg, rgba(200,200,220,.22), rgba(200,200,220,.02));}
+  .gh-lb-podium-item.p3 .gh-lb-podium-bar{height:20px; background:linear-gradient(180deg, rgba(238,75,75,.20), rgba(238,75,75,.02));}
+  .gh-lb-me{border-top:2px dashed var(--border); margin-top:6px; padding-top:14px !important;}
   .gh-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:6px;}
   .gh-grid > .gh-tile:last-child:nth-child(odd){grid-column:1 / -1; width:calc(50% - 7px); justify-self:center;}
   .gh-tile{position:relative; aspect-ratio:1/1; border-radius:26px; overflow:hidden; isolation:isolate; color:var(--text);
@@ -6326,6 +6341,53 @@ function ghGameTile(g, sub, action, i){
       <span class="gh-sub">${sub}</span>
     </button>`;
 }
+/* ============================= GAMES: FRIENDS LEADERBOARD (ترتيب وتصنيف الأصدقاء) ============================= */
+function renderGamesFriendsLeaderboard(){
+  const list = rankedParticipants();
+  if(!list.length) return '';
+  const top3 = list.slice(0,3);
+  const rest = list.slice(3,8);
+  const podiumOrder = [1,0,2]; // نعرض التاني ثم الأول ثم التالت زي منصة التتويج
+  const podium = top3.length ? `
+    <div class="gh-lb-podium">
+      ${podiumOrder.filter(i=>top3[i]).map(i=>{
+        const p = top3[i]; const t = teamOf(p.teamId);
+        const medal = ['🥇','🥈','🥉'][i];
+        return `<div class="gh-lb-podium-item p${i+1}">
+          <div class="gh-lb-podium-bar"></div>
+          <div class="gh-lb-podium-medal">${medal}</div>
+          <div class="avatar" style="background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
+          <div class="gh-lb-podium-name">${escapeHtml(p.name)}${p.id===state.pid?' '+tr('lb_you'):''}</div>
+          <div class="gh-lb-podium-pts">${p.total} ${tr('lb_pts')}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+  const restRows = rest.map((p,idx)=>{
+    const i = idx+3, t = teamOf(p.teamId);
+    return `<div class="lb-row">
+      <div class="lb-rank">${i+1}</div>
+      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
+      <div class="lb-name">${escapeHtml(p.name)}${p.id===state.pid?' '+tr('lb_you'):''}</div>
+      <div class="lb-pts">${p.total} ${tr('lb_pts')}</div>
+    </div>`;
+  }).join('');
+  const myIdx = list.findIndex(p=>p.id===state.pid);
+  let meRow = '';
+  if(myIdx > 7){
+    const p = list[myIdx], t = teamOf(p.teamId);
+    meRow = `<div class="lb-row gh-lb-me">
+      <div class="lb-rank">${myIdx+1}</div>
+      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
+      <div class="lb-name">${escapeHtml(p.name)} ${tr('lb_you')}</div>
+      <div class="lb-pts">${p.total} ${tr('lb_pts')}</div>
+    </div>`;
+  }
+  return `
+    <div class="section-title">🏆 ترتيب وتصنيف الأصدقاء<span class="sub" data-action="open-leaderboard" style="cursor:pointer;">عرض الكل ${ICO.chev}</span></div>
+    ${podium}
+    ${(restRows||meRow) ? `<div class="card">${restRows}${meRow}</div>` : ''}
+  `;
+}
 function renderGamesHub(){
   const ft = state.friendTile || null;
   const friendTile = `
@@ -6380,6 +6442,7 @@ function renderGamesHub(){
       <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
     </div>
     <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}</div>
+    ${renderGamesFriendsLeaderboard()}
   `;
 }
 /* ============================= STICKER STORE (متجر الاستيكر) ============================= */
