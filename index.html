@@ -2026,6 +2026,17 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-sticker-thumb{ width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
   .admin-sticker-thumb img{ max-width:100%; max-height:100%; object-fit:contain; }
   .admin-sticker-del{ position:absolute; top:4px; left:4px; width:22px; height:22px; border-radius:50%; border:none; background:rgba(255,60,60,.9); color:#fff; font-size:12px; cursor:pointer; }
+  .admin-sticker-price-input{ width:100%; margin-top:6px; padding:5px 6px; font-size:11.5px; text-align:center; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); }
+  .sticker-store-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+  .sticker-store-item{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .sticker-store-item.owned{ border-color:rgba(95,224,164,.5); background:rgba(95,224,164,.08); }
+  .sticker-store-thumb{ width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+  .sticker-store-thumb img{ max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 4px 8px rgba(0,0,0,.25)); }
+  .sticker-store-buy{ width:100%; border:none; border-radius:999px; padding:7px 6px; font-size:11px; font-weight:800; cursor:pointer;
+    background:linear-gradient(155deg, var(--gold-2), var(--gold)); color:#241a4d; -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease;}
+  .sticker-store-buy:active{ transform:scale(.94); }
+  .sticker-store-owned{ width:100%; text-align:center; font-size:11px; font-weight:800; color:var(--good); padding:7px 0; }
   .chat-input-row{ display:flex; align-items:center; gap:6px; }
   .chat-input-row .field{ flex:1; margin:0; }
   .chat-attach-btn{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
@@ -2287,7 +2298,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-chat-send svg{width:16px; height:16px;}
   .room-chat-send:active{transform:scale(.9); filter:brightness(.95);}
 
-  .room-chat-sticker-toggle{width:36px; height:36px; font-size:19px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-bottom:10px; -webkit-tap-highlight-color:transparent;}
+  .room-chat-sticker-toggle{width:auto; height:32px; padding:0 14px; font-size:11.5px; font-weight:800; letter-spacing:.3px; font-family:'Cairo',sans-serif; color:var(--gold-2); background:rgba(244,183,64,.1); border:1px solid rgba(244,183,64,.35); border-radius:999px; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-bottom:10px; -webkit-tap-highlight-color:transparent;}
   .room-chat-sticker-toggle:active{transform:scale(.92);}
   .room-chat-sticker-panel{display:none; grid-template-columns:repeat(5,1fr); gap:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:10px; margin-bottom:10px; max-height:160px; overflow-y:auto;}
   .room-chat-sticker-panel.open{display:grid;}
@@ -2307,6 +2318,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     filter:drop-shadow(0 8px 14px rgba(0,0,0,.45)); animation:reactPop .5s cubic-bezier(.34,1.8,.5,1) both;}
   .react-float .pl-avatar{width:34px; height:34px; font-size:12px; box-shadow:0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,.4);}
   .react-float .rf-emoji img{width:64%; height:64%; object-fit:contain; filter:none;}
+  .react-float.is-sticker .rf-emoji{width:132px; height:132px; background:none; filter:none; box-shadow:none;}
+  .react-float.is-sticker .rf-emoji img{width:100%; height:100%; filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));}
   .react-toast .rt-emoji img{width:22px; height:22px; object-fit:contain; vertical-align:middle;}
   @keyframes reactUp{0%{opacity:0; transform:translateY(20px);} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0; transform:translateY(-300px) translateX(var(--dx,0px));}}
   @keyframes reactPop{from{transform:scale(.2) rotate(-25deg);} to{transform:scale(1) rotate(0);}}
@@ -3706,8 +3719,17 @@ async function preloadChatMedia(messages){
 }
 
 /* ---- مكتبة الاستيكرات (يرفعها الأدمن، وتظهر لكل المشاركين في الشات — أساس متجر الاستيكرات لاحقًا) ---- */
-let CUSTOM_STICKERS = []; // [{id, name}]
+let CUSTOM_STICKERS = []; // [{id, name, price}]
+let OWNED_STICKERS = {}; // {pid: [stickerId,...]}
 const STICKER_IMG_CACHE = {};
+async function loadOwnedStickers(){
+  try{ const r = await window.storage.get('glavera-owned-stickers', true); return r && r.value ? JSON.parse(r.value) : {}; }
+  catch(e){ console.error('loadOwnedStickers failed:', e); return {}; }
+}
+async function saveOwnedStickers(obj){
+  try{ await window.storage.set('glavera-owned-stickers', JSON.stringify(obj), true); return true; }
+  catch(e){ console.error('saveOwnedStickers failed:', e); return false; }
+}
 async function loadCustomStickers(){
   try{ const r = await window.storage.get('glavera-stickers-list', true); return r && r.value ? JSON.parse(r.value) : []; }
   catch(e){ console.error('loadCustomStickers failed:', e); return []; }
@@ -6264,6 +6286,12 @@ function renderGamesHub(){
       <span class="gh-title">مشاهدة المعركة</span>
       <span class="gh-sub">اتفرج على أصحابك وهما بيلعبوا لايڤ</span>
     </button>`;
+  const stickerStoreTile = `
+    <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#FF9AD5,#845EC2); --i:3" data-action="open-sticker-store">
+      <span class="gh-ico">🛍️</span>
+      <span class="gh-title">متجر الاستيكر</span>
+      <span class="gh-sub">اشتري استيكرات جديدة بنقاطك</span>
+    </button>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -6274,8 +6302,52 @@ function renderGamesHub(){
       <div class="opinion-hero-title">استراحة تفاعلية</div>
       <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
     </div>
-    <div class="gh-grid">${friendTile}${soloTile}${watchTile}</div>
+    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}</div>
   `;
+}
+/* ============================= STICKER STORE (متجر الاستيكر) ============================= */
+function renderStickerStorePage(){
+  const bal = BONUS[state.pid]||0;
+  const owned = OWNED_STICKERS[state.pid] || [];
+  const items = CUSTOM_STICKERS.map(s=>{
+    const url = STICKER_IMG_CACHE[s.id];
+    const isOwned = owned.indexOf(s.id)>-1;
+    const price = s.price||0;
+    return `<div class="sticker-store-item ${isOwned?'owned':''}">
+      <div class="sticker-store-thumb">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'استيكر')}" />` : '⏳'}</div>
+      ${isOwned
+        ? `<div class="sticker-store-owned">✅ عندك</div>`
+        : `<button type="button" class="sticker-store-buy" data-action="buy-sticker" data-id="${s.id}" data-price="${price}">اشتري بـ ${price} 🌟</button>`}
+    </div>`;
+  }).join('');
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">متجر الاستيكر</div>
+    </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">🛍️</div>
+      <div class="opinion-hero-title">متجر الاستيكر</div>
+      <div class="opinion-hero-sub">رصيدك الحالي: ${bal} نقطة</div>
+    </div>
+    ${items ? `<div class="sticker-store-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات في المتجر</div>`}
+  `;
+}
+async function doBuySticker(id, price){
+  price = Math.max(0, Number(price)||0);
+  BONUS = await loadBonus();
+  const bal = BONUS[state.pid]||0;
+  if(bal < price){ showToast(`محتاج ${price-bal} نقطة كمان عشان تشتري الاستيكر ده`, true); return; }
+  OWNED_STICKERS = await loadOwnedStickers();
+  const owned = OWNED_STICKERS[state.pid] || [];
+  if(owned.indexOf(id)>-1){ render(); return; }
+  BONUS[state.pid] = bal - price;
+  owned.push(id);
+  OWNED_STICKERS[state.pid] = owned;
+  await saveBonus(BONUS);
+  await saveOwnedStickers(OWNED_STICKERS);
+  showToast('✅ اتشترى الاستيكر بنجاح');
+  render();
 }
 /* ============================= GAMES: WATCH THE BATTLE (مشاهدة المعركة) ============================= */
 /* لو الغرفة ماتلمستش (مفيش نبضة/حركة) من أكتر من 40 ثانية، يبقى غالبًا اللاعبين قفلوا التطبيق من غير ما يخرجوا رسميًا — قللناها من 5 دقايق عشان المعارك المنتهية تختفي من "مشاهدة المعركة" بسرعة */
@@ -10500,7 +10572,9 @@ function roomChatWidget(){
   const stickersOpen = !!state.roomChatStickerPanelOpen;
   const emojiBtns = ROOM_EMOJIS.map(e=>`<button type="button" class="emoji-btn" data-action="room-react" data-emoji="${e}" aria-label="emoji">${e}</button>`).join('');
   const msgBtns = ROOM_QUICK_MSGS.map(m=>`<button type="button" class="room-chat-msg-btn" data-action="room-quick-msg" data-msg="${escapeHtml(m)}">${escapeHtml(m)}</button>`).join('');
-  const stickerBtns = CUSTOM_STICKERS.map(s=>{
+  const ownedIds = OWNED_STICKERS[state.pid] || [];
+  const ownedStickers = CUSTOM_STICKERS.filter(s=>ownedIds.indexOf(s.id)>-1);
+  const stickerBtns = ownedStickers.map(s=>{
     const url = STICKER_IMG_CACHE[s.id];
     return `<button type="button" class="room-chat-sticker-btn" data-action="room-send-sticker" data-id="${s.id}">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'استيكر')}" />` : '⏳'}</button>`;
   }).join('');
@@ -10511,7 +10585,7 @@ function roomChatWidget(){
   <div class="room-chat-widget">
     <div class="room-chat-panel ${open?'open':''}">
       <div class="room-chat-head"><span class="room-chat-head-dot"></span><span class="room-chat-head-title">شات سريع</span></div>
-      ${CUSTOM_STICKERS.length ? `<button type="button" class="room-chat-sticker-toggle" data-action="toggle-room-chat-sticker-panel" title="استيكر">😊</button>` : ''}
+      ${ownedStickers.length ? `<button type="button" class="room-chat-sticker-toggle" data-action="toggle-room-chat-sticker-panel" title="استيكر">Stickers</button>` : ''}
       <div class="room-chat-sticker-panel ${stickersOpen?'open':''}" id="room-chat-sticker-panel">${stickerBtns}</div>
       <div class="room-chat-emoji-row">${emojiBtns}</div>
       <div class="room-chat-msgs-grid">${msgBtns}</div>
@@ -10582,7 +10656,7 @@ function showReactionFloat(content, pid, kind){
   let layer = document.getElementById('react-layer');
   if(!layer){ layer = document.createElement('div'); layer.id = 'react-layer'; document.body.appendChild(layer); }
   const el = document.createElement('div');
-  el.className = 'react-float' + (kind==='text' ? ' is-text' : '');
+  el.className = 'react-float' + (kind==='text' ? ' is-text' : '') + (kind==='sticker' ? ' is-sticker' : '');
   el.style.left = (14 + Math.random()*62) + '%';
   el.style.setProperty('--dx', (Math.random()*80-40).toFixed(0)+'px');
   const contentHtml = kind==='text' ? escapeHtml(content)
@@ -10598,7 +10672,7 @@ async function sendRoomReaction(content, btn, kind){
   kind = (kind==='text' || kind==='sticker') ? kind : 'emoji';
   if(kind==='emoji' && ROOM_EMOJIS.indexOf(content)<0) return;
   if(kind==='text'){ content = String(content||'').trim().slice(0,60); if(!content) return; }
-  if(kind==='sticker' && !CUSTOM_STICKERS.some(s=>s.id===content)) return;
+  if(kind==='sticker' && (OWNED_STICKERS[state.pid]||[]).indexOf(content)<0) return;
   if(!state.roomCode) return;
   const now = Date.now();
   if(now-lastReactTs<1100) return;
@@ -12655,6 +12729,7 @@ function render(){
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='games-solo') html = renderSoloGames();
   else if(state.view==='watch-rooms') html = renderWatchRooms();
+  else if(state.view==='sticker-store') html = renderStickerStorePage();
   else if(state.view==='chefs') html = renderChefsPage();
   else if(state.view==='chef-meals') html = renderChefMealsPage();
   else if(state.view==='chef-dishes') html = renderChefDishesPage();
@@ -14051,6 +14126,14 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
+  else if(action==='open-sticker-store'){
+    state.friendTile = null; go('sticker-store');
+    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers()]).then(([bonus, owned, stickers])=>{
+      BONUS = bonus; OWNED_STICKERS = owned; CUSTOM_STICKERS = stickers;
+      preloadStickerImages(CUSTOM_STICKERS).then(()=>render());
+    });
+  }
+  else if(action==='buy-sticker'){ doBuySticker(el.dataset.id, el.dataset.price); }
   else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-tile-open'){ setFriendTile('menu'); }
   else if(action==='friend-join-show'){ setFriendTile('join'); }
@@ -14863,13 +14946,15 @@ function renderAdminStickersTab(){
     const url = STICKER_IMG_CACHE[s.id];
     return `<div class="admin-sticker-item">
       <div class="admin-sticker-thumb">${url ? `<img src="${url}" alt="${escapeHtml(s.name||'')}" />` : '⏳'}</div>
+      <input type="number" class="admin-sticker-price-input" data-action-input="admin-sticker-price" data-id="${s.id}" min="0" value="${s.price||0}" placeholder="السعر" />
       <button type="button" class="admin-sticker-del" title="حذف" data-action="admin-delete-sticker" data-id="${s.id}">✕</button>
     </div>`;
   }).join('');
   return `
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎨 رفع استيكرات جديدة</div>
-      <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف، وهتظهر فورًا لكل المشاركين في خانة الاستيكر بالشات — دي نفس المكتبة اللي هيتبنى عليها متجر الاستيكرات بعدين</div>
+      <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف — هتتضاف لمتجر الاستيكر، والمشارك يقدر يشتريها بنقاطه وتتضاف لقائمة استيكراته هو بس</div>
+      <input type="number" id="sticker-admin-price" class="field" min="0" placeholder="السعر بالنقط لكل استيكر هيتم رفعه دلوقتي" style="margin-bottom:10px;" />
       <label class="btn btn-primary" style="display:inline-block;text-align:center;cursor:pointer;">
         📤 اختيار صور استيكر
         <input type="file" accept="image/*" multiple id="sticker-admin-upload" style="display:none;" />
@@ -14881,14 +14966,32 @@ function renderAdminStickersTab(){
 }
 function attachStickerAdminInputs(){
   const inputEl = document.getElementById('sticker-admin-upload');
-  if(!inputEl || inputEl.dataset.bound) return;
-  inputEl.dataset.bound = '1';
-  inputEl.addEventListener('change', ()=>{
-    const files = Array.from(inputEl.files || []);
-    if(files.length) doAdminUploadStickers(files, inputEl);
+  if(inputEl && !inputEl.dataset.bound){
+    inputEl.dataset.bound = '1';
+    inputEl.addEventListener('change', ()=>{
+      const files = Array.from(inputEl.files || []);
+      const priceEl = document.getElementById('sticker-admin-price');
+      const price = priceEl ? Math.max(0, parseInt(priceEl.value,10)||0) : 0;
+      if(files.length) doAdminUploadStickers(files, inputEl, price);
+    });
+  }
+  document.querySelectorAll('.admin-sticker-price-input').forEach(el=>{
+    if(el.dataset.bound) return;
+    el.dataset.bound = '1';
+    el.addEventListener('change', ()=>{
+      const id = el.dataset.id;
+      const price = Math.max(0, parseInt(el.value,10)||0);
+      doAdminSetStickerPrice(id, price);
+    });
   });
 }
-async function doAdminUploadStickers(files, inputEl){
+async function doAdminSetStickerPrice(id, price){
+  const s = CUSTOM_STICKERS.find(x=>x.id===id);
+  if(!s) return;
+  s.price = price;
+  await saveCustomStickersWithRetry(CUSTOM_STICKERS);
+}
+async function doAdminUploadStickers(files, inputEl, price){
   showToast('جاري رفع الاستيكرات...');
   let okCount = 0;
   for(let i=0;i<files.length;i++){
@@ -14897,7 +15000,7 @@ async function doAdminUploadStickers(files, inputEl){
     const id = 'stk'+Date.now()+Math.random().toString(36).slice(2,6);
     STICKER_IMG_CACHE[id] = dataUrl;
     const saved = await saveStickerImage(id, dataUrl);
-    if(saved){ CUSTOM_STICKERS.push({id, name:''}); okCount++; render(); }
+    if(saved){ CUSTOM_STICKERS.push({id, name:'', price: price||0}); okCount++; render(); }
   }
   if(inputEl) inputEl.value = '';
   if(okCount){
@@ -17154,14 +17257,14 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, GAME_POINTS_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers()
+    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
