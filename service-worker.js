@@ -1,4 +1,4 @@
-const CACHE_NAME = 'glavera3-v9';
+const CACHE_NAME = 'glavera3-v11';
 const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
 
 self.addEventListener('install', (event) => {
@@ -30,5 +30,16 @@ self.addEventListener('fetch', (event) => {
         return res;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+// لما المستخدم يضغط على إشعار عملية الفيزا: افتح/ركّز التطبيق
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) { if ('focus' in c) return c.focus(); }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
+    })
   );
 });
