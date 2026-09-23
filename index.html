@@ -1192,7 +1192,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-prog{height:6px; border-radius:6px; background:var(--bg-2); overflow:hidden; margin:8px 0 6px;}
   .vp-prog i{display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-2)); border-radius:6px;}
   .vp-sws{display:flex; gap:12px; margin-bottom:12px;}
-  .vp-sw{width:36px; height:36px; border-radius:50%; border:2px solid transparent;}
+  .vp-sw{width:36px; height:36px; border-radius:50%; border:2px solid transparent; display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .vp-sw.locked{opacity:.45; filter:grayscale(.4);}
   .vp-sw.on{border-color:var(--text); box-shadow:0 0 0 3px var(--bg-2) inset;}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} }
 
@@ -2133,6 +2134,24 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     transition:transform .15s ease;}
   .sticker-store-buy:active{ transform:scale(.94); }
   .sticker-store-owned{ width:100%; text-align:center; font-size:11px; font-weight:800; color:var(--good); padding:7px 0; }
+  .shop-tier-label{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; margin:14px 0 8px; color:var(--text-muted); }
+  .card-store-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .card-store-item{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; }
+  .card-store-item.owned{ border-color:rgba(95,224,164,.5); background:rgba(95,224,164,.08); }
+  .card-store-swatch{ width:100%; aspect-ratio:16/10; border-radius:12px; }
+  .card-store-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; }
+  .card-store-custom-thumb{ width:100%; aspect-ratio:16/10; border-radius:12px; background-size:cover; background-position:center; border:1px solid var(--border); }
+  .shop-custom-box{ background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:16px; text-align:center; }
+  .shop-custom-upload{ width:100%; aspect-ratio:4/3; border-radius:14px; border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; cursor:pointer; overflow:hidden; background:var(--bg-2); }
+  .shop-custom-upload img{ width:100%; height:100%; object-fit:cover; }
+  .shop-custom-status{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .shop-custom-status-badge{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; padding:6px 14px; border-radius:999px; }
+  .shop-custom-status-badge.pending{ background:rgba(244,183,64,.15); color:var(--gold,#F4B740); border:1px solid rgba(244,183,64,.35); }
+  .shop-custom-status-badge.ready{ background:rgba(95,224,164,.15); color:var(--good); border:1px solid rgba(95,224,164,.4); }
+  .shop-custom-status-badge.received{ background:rgba(95,224,164,.1); color:var(--good); border:1px solid rgba(95,224,164,.25); }
+  .admin-cc-item{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }
+  .admin-cc-row{ display:flex; gap:10px; align-items:flex-start; }
+  .admin-cc-photo{ width:76px; height:76px; border-radius:10px; object-fit:cover; flex-shrink:0; }
   .chat-input-row{ display:flex; align-items:center; gap:6px; }
   .chat-input-row .field{ flex:1; margin:0; }
   .chat-attach-btn{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
@@ -3553,19 +3572,28 @@ function visaMin(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaMin
 function visaShort(fee, bal){
   showToast(bal<=0 ? 'الفيزا فارغة 💳 يرجى شحنها من صفحة فيزا الألعاب' : `رصيد الفيزا لا يكفي (${bal} من ${fee}) — يرجى شحن الفيزا`, true);
 }
+function customCardImageFor(pid){
+  const done = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.pid===pid && r.status==='received' && r.resultImage);
+  return done.length ? done[done.length-1].resultImage : null;
+}
 function visaCardHtml(pid, draft){
   const c = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, draft||{});
+  const customImg = c.theme==='custom' ? customCardImageFor(pid) : null;
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
   const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
   const bal = WALLET[pid]||0;
+  const frontStyle = customImg
+    ? `background-image:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55)),url('${customImg}'); background-size:cover; background-position:center;`
+    : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
+  const backStyle = customImg ? `--base:#1a1330;--a:#845EC2;--b:#2ec5c0;--c:#ff7eb6;` : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
   return `<div class="vc-scene" data-action="visa-flip"><div class="vc-inner" id="vc-inner">
-    <div class="vc-face vc-front" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+    <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}">
       <div class="vc-top"><span class="vc-brand">Glafera</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num">${visaNumber(pid)}</div>
       <div class="vc-bot"><div><small>حامل البطاقة</small><b dir="auto">${escapeHtml(nm)}</b></div><div><small>الصلاحية</small><b>12/30</b></div></div>
     </div>
-    <div class="vc-face vc-back" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+    <div class="vc-face vc-back" style="${backStyle}">
       <div class="vc-strip"></div>
       <div class="vc-back-bal"><small>الرصيد الحالي</small><b>${bal}</b><span>نقطة</span></div>
     </div></div></div>`;
@@ -3578,8 +3606,11 @@ function renderVisaPage(){
   const pct = Math.min(100, Math.round(bal/min*100));
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
+  const ownedThemes = OWNED_CARD_THEMES[pid] || [];
   const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
-    return `<button type="button" class="vp-sw ${cur.theme===k?'on':''}" data-action="visa-theme" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></button>`; }).join('');
+    const isOwned = k==='aurora' || ownedThemes.indexOf(k)>-1;
+    return `<button type="button" class="vp-sw ${cur.theme===k?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
+    + (customCardImageFor(pid) ? `<button type="button" class="vp-sw ${cur.theme==='custom'?'on':''}" data-action="visa-theme" data-k="custom" aria-label="مخصص" style="background-image:url('${customCardImageFor(pid)}');background-size:cover;background-position:center;">${cur.theme==='custom'?'':''}</button>` : '');
   return `
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزا الألعاب</div></div>
     ${visaCardHtml(pid, state.visaDraft)}
@@ -3609,7 +3640,7 @@ function renderVisaPage(){
     </div>`;
 }
 async function visaRefresh(){
-  [WALLET, VISA_CARDS, BONUS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus()]);
+  [WALLET, VISA_CARDS, BONUS, OWNED_CARD_THEMES, CUSTOM_CARD_REQUESTS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus(), loadOwnedCardThemes(), loadCustomCardRequests()]);
   render();
 }
 async function doVisaMove(kind){
@@ -4018,6 +4049,45 @@ async function saveStickerImage(stickerId, dataUrl, attempt){
 }
 async function deleteStickerImage(stickerId){
   try{ await window.storage.delete('glavera-sticker-img-'+stickerId, true); }catch(e){}
+}
+/* ---- متجر الكروت (تصاميم فيزا الألعاب) وطلبات الكروت المخصصة — جزء من متجر Shop ---- */
+let OWNED_CARD_THEMES = {}; // {pid:[themeKey,...]}
+let SHOP_PRICES = { simple:20, vip:60, custom:150 };
+const CARD_THEME_TIER = { aurora:'simple', emerald:'simple', rose:'simple', gold:'vip', midnight:'vip' };
+async function loadOwnedCardThemes(){
+  try{ const r = await window.storage.get('glavera-owned-card-themes', true); return r && r.value ? JSON.parse(r.value) : {}; }
+  catch(e){ return {}; }
+}
+async function saveOwnedCardThemes(obj){
+  try{ await window.storage.set('glavera-owned-card-themes', JSON.stringify(obj), true); return true; }
+  catch(e){ console.error('saveOwnedCardThemes failed:', e); return false; }
+}
+async function loadShopPrices(){
+  const def = {simple:20, vip:60, custom:150};
+  try{ const r = await window.storage.get('glavera-shop-prices', true); return r && r.value ? Object.assign({}, def, JSON.parse(r.value)) : def; }
+  catch(e){ return def; }
+}
+async function saveShopPrices(obj){
+  try{ await window.storage.set('glavera-shop-prices', JSON.stringify(obj), true); return true; }
+  catch(e){ console.error('saveShopPrices failed:', e); return false; }
+}
+let CUSTOM_CARD_REQUESTS = []; // [{id, pid, name, photo, status:'pending'|'ready'|'received', resultImage, ts, resultTs}]
+async function loadCustomCardRequests(){
+  try{ const r = await window.storage.get('glavera-custom-card-requests', true); return r && r.value ? JSON.parse(r.value) : []; }
+  catch(e){ return []; }
+}
+async function saveCustomCardRequestsWithRetry(arr, attempt){
+  attempt = attempt || 1;
+  let ok = false;
+  try{ await window.storage.set('glavera-custom-card-requests', JSON.stringify(arr), true); ok = true; }
+  catch(e){ console.error('saveCustomCardRequests failed (attempt '+attempt+'):', e); }
+  if(ok) return true;
+  if(attempt < 3){ await sleep(800*attempt); return saveCustomCardRequestsWithRetry(arr, attempt+1); }
+  return false;
+}
+function myCustomCardRequest(pid){
+  const mine = CUSTOM_CARD_REQUESTS.filter(r=>r.pid===pid);
+  return mine.length ? mine[mine.length-1] : null;
 }
 async function preloadStickerImages(list){
   const ids = (list||[]).filter(s=>!STICKER_IMG_CACHE[s.id]).map(s=>s.id);
@@ -6603,8 +6673,8 @@ function renderGamesHub(){
   const stickerStoreTile = `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#FF9AD5,#845EC2); --i:3" data-action="open-sticker-store">
       <span class="gh-ico">🛍️</span>
-      <span class="gh-title">متجر الاستيكر</span>
-      <span class="gh-sub">اشتري استيكرات جديدة بنقاطك</span>
+      <span class="gh-title">Shop</span>
+      <span class="gh-sub">استيكرات، تصاميم كروت، وطلب كارد مخصص</span>
     </button>`;
   return `
     <div class="back-row">
@@ -6620,9 +6690,33 @@ function renderGamesHub(){
     ${renderGamesFriendsLeaderboard()}
   `;
 }
-/* ============================= STICKER STORE (متجر الاستيكر) ============================= */
-function renderStickerStorePage(){
+/* ============================= SHOP (المتجر) — استيكرات / كروت / مخصص ============================= */
+function renderShopPage(){
   const bal = BONUS[state.pid]||0;
+  const tab = state.shopTab==='card' ? 'card' : (state.shopTab==='custom' ? 'custom' : 'stickers');
+  let body = '';
+  if(tab==='stickers') body = renderShopStickersTab();
+  else if(tab==='card') body = renderShopCardTab();
+  else body = renderShopCustomTab();
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">Shop</div>
+    </div>
+    <div class="opinion-hero">
+      <div class="opinion-hero-ico">🛍️</div>
+      <div class="opinion-hero-title">Shop</div>
+      <div class="opinion-hero-sub">رصيدك الحالي: ${bal} نقطة</div>
+    </div>
+    <div class="vp-tabs">
+      <button type="button" class="${tab==='stickers'?'on':''}" data-action="shop-tab" data-t="stickers">استيكرات</button>
+      <button type="button" class="${tab==='card'?'on':''}" data-action="shop-tab" data-t="card">كارد</button>
+      <button type="button" class="${tab==='custom'?'on':''}" data-action="shop-tab" data-t="custom">مخصص</button>
+    </div>
+    ${body}
+  `;
+}
+function renderShopStickersTab(){
   const owned = OWNED_STICKERS[state.pid] || [];
   const items = CUSTOM_STICKERS.map(s=>{
     const url = STICKER_IMG_CACHE[s.id];
@@ -6635,18 +6729,7 @@ function renderStickerStorePage(){
         : `<button type="button" class="sticker-store-buy" data-action="buy-sticker" data-id="${s.id}" data-price="${price}">اشتري بـ ${price} 🌟</button>`}
     </div>`;
   }).join('');
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">متجر الاستيكر</div>
-    </div>
-    <div class="opinion-hero">
-      <div class="opinion-hero-ico">🛍️</div>
-      <div class="opinion-hero-title">متجر الاستيكر</div>
-      <div class="opinion-hero-sub">رصيدك الحالي: ${bal} نقطة</div>
-    </div>
-    ${items ? `<div class="sticker-store-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات في المتجر</div>`}
-  `;
+  return items ? `<div class="sticker-store-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات في المتجر</div>`;
 }
 async function doBuySticker(id, price){
   price = Math.max(0, Number(price)||0);
@@ -6662,6 +6745,130 @@ async function doBuySticker(id, price){
   await saveBonus(BONUS);
   await saveOwnedStickers(OWNED_STICKERS);
   showToast('✅ اتشترى الاستيكر بنجاح');
+  render();
+}
+/* ---- تاب الكارد: تصاميم بطاقة فيزا الألعاب — بسيطة و VIP ---- */
+function cardTierPrice(tier){ return (SHOP_PRICES && SHOP_PRICES[tier]) || (tier==='vip'?60:20); }
+function renderShopCardTab(){
+  const owned = OWNED_CARD_THEMES[state.pid] || [];
+  const groups = { simple:[], vip:[] };
+  Object.keys(VISA_THEMES).forEach(k=>{ const tier = CARD_THEME_TIER[k]||'simple'; groups[tier].push(k); });
+  const renderGroup = (tier, label)=>{
+    const price = cardTierPrice(tier);
+    const items = groups[tier].map(k=>{
+      const t = VISA_THEMES[k];
+      const isOwned = k==='aurora' || owned.indexOf(k)>-1; // aurora هي التصميم الافتراضي المجاني
+      return `<div class="card-store-item ${isOwned?'owned':''}">
+        <div class="card-store-swatch" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></div>
+        <div class="card-store-name">${t.name}</div>
+        ${isOwned
+          ? `<div class="sticker-store-owned">✅ عندك</div>`
+          : `<button type="button" class="sticker-store-buy" data-action="buy-card-theme" data-k="${k}" data-price="${price}">اشتري بـ ${price} 🌟</button>`}
+      </div>`;
+    }).join('');
+    return `<div class="shop-tier-label">${label} — ${price} 🌟</div><div class="card-store-grid">${items}</div>`;
+  };
+  return `
+    ${renderGroup('simple','🎨 تصاميم بسيطة')}
+    ${renderGroup('vip','👑 تصاميم VIP')}
+    <div class="hint" style="margin-top:12px;text-align:center;">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزا الألعاب</div>
+  `;
+}
+async function doBuyCardTheme(themeKey, price){
+  price = Math.max(0, Number(price)||0);
+  if(!VISA_THEMES[themeKey]) return;
+  BONUS = await loadBonus();
+  const bal = BONUS[state.pid]||0;
+  if(bal < price){ showToast(`محتاج ${price-bal} نقطة كمان عشان تشتري التصميم ده`, true); return; }
+  OWNED_CARD_THEMES = await loadOwnedCardThemes();
+  const owned = OWNED_CARD_THEMES[state.pid] || [];
+  if(owned.indexOf(themeKey)>-1){ render(); return; }
+  BONUS[state.pid] = bal - price;
+  owned.push(themeKey);
+  OWNED_CARD_THEMES[state.pid] = owned;
+  await saveBonus(BONUS);
+  await saveOwnedCardThemes(OWNED_CARD_THEMES);
+  showToast('✅ اتشترى تصميم الكارد بنجاح');
+  render();
+}
+/* ---- تاب المخصص: طلب تصميم كارد خاص من الأدمن ---- */
+function renderShopCustomTab(){
+  const pid = state.pid;
+  const price = cardTierPrice('custom');
+  const req = myCustomCardRequest(pid);
+  if(req && req.status!=='received'){
+    if(req.status==='pending'){
+      return `<div class="shop-custom-box"><div class="shop-custom-status">
+        <img src="${req.photo}" alt="طلبك" style="width:120px;height:120px;object-fit:cover;border-radius:14px;" />
+        <div class="shop-custom-status-badge pending">⏳ طلبك وصل للأدمن وبيتم تجهيزه</div>
+        <div class="hint">هتوصلك رسالة هنا لما الكارد المميز بتاعك يبقى جاهز</div>
+      </div></div>`;
+    }
+    return `<div class="shop-custom-box"><div class="shop-custom-status">
+      <img src="${req.resultImage}" alt="الكارد المخصص" style="width:150px;height:94px;object-fit:cover;border-radius:14px;box-shadow:0 8px 18px rgba(0,0,0,.35);" />
+      <div class="shop-custom-status-badge ready">🎉 الكارد المميز بتاعك جاهز!</div>
+      <button type="button" class="btn btn-primary" data-action="claim-custom-card">استلام الكارد 🎁</button>
+    </div></div>`;
+  }
+  const bal = BONUS[state.pid]||0;
+  return `
+    <div class="shop-custom-box">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">✨ اطلب كارد مخصص خاص بيك</div>
+      <div class="hint" style="margin:0 0 12px;">ابعت صورة عايز تكون تصميم كارتك عليها، الأدمن هيصمم لك كارد مميز بيها وهتستلمها هنا</div>
+      <label class="shop-custom-upload" id="custom-card-upload-label">
+        <span id="custom-card-upload-hint">📷 اختار صورة</span>
+        <input type="file" accept="image/*" id="custom-card-upload" style="display:none;" />
+      </label>
+      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="submit-custom-card" data-price="${price}" ${bal<price?'disabled':''}>
+        إرسال الطلب بـ ${price} 🌟
+      </button>
+      ${bal<price ? `<div class="hint" style="margin-top:6px;color:var(--danger,#FF6B6B);">محتاج ${price-bal} نقطة كمان</div>` : ''}
+    </div>
+  `;
+}
+function attachShopCustomInputs(){
+  const inputEl = document.getElementById('custom-card-upload');
+  if(inputEl && !inputEl.dataset.bound){
+    inputEl.dataset.bound = '1';
+    inputEl.addEventListener('change', ()=>{
+      const file = inputEl.files && inputEl.files[0];
+      if(!file) return;
+      readPhotoFileToDataUrl(file, 720, 0.85).then(dataUrl=>{
+        if(!dataUrl) return;
+        state.customCardDraftPhoto = dataUrl;
+        const label = document.getElementById('custom-card-upload-label');
+        if(label) label.innerHTML = `<img src="${dataUrl}" alt="الصورة المختارة" />`;
+      });
+    });
+  }
+}
+async function doSubmitCustomCard(price){
+  price = Math.max(0, Number(price)||0);
+  const photo = state.customCardDraftPhoto;
+  if(!photo){ showToast('اختار صورة الأول', true); return; }
+  BONUS = await loadBonus();
+  const bal = BONUS[state.pid]||0;
+  if(bal < price){ showToast(`محتاج ${price-bal} نقطة كمان عشان تطلب الكارد المخصص`, true); return; }
+  CUSTOM_CARD_REQUESTS = await loadCustomCardRequests();
+  const existing = myCustomCardRequest(state.pid);
+  if(existing && existing.status!=='received'){ render(); return; }
+  BONUS[state.pid] = bal - price;
+  await saveBonus(BONUS);
+  const name = (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || '';
+  CUSTOM_CARD_REQUESTS.push({ id:'cc'+Date.now()+Math.random().toString(36).slice(2,6), pid:state.pid, name, photo, status:'pending', resultImage:null, ts:Date.now(), resultTs:null });
+  const saved = await saveCustomCardRequestsWithRetry(CUSTOM_CARD_REQUESTS);
+  state.customCardDraftPhoto = null;
+  if(saved) showToast('✅ اترسل طلبك للأدمن، استنى الكارد المميز بتاعك');
+  else showToast('⚠️ حصلت مشكلة في إرسال الطلب، جرب تاني', true);
+  render();
+}
+async function doClaimCustomCard(){
+  CUSTOM_CARD_REQUESTS = await loadCustomCardRequests();
+  const req = myCustomCardRequest(state.pid);
+  if(!req || req.status!=='ready') { render(); return; }
+  req.status = 'received';
+  const saved = await saveCustomCardRequestsWithRetry(CUSTOM_CARD_REQUESTS);
+  if(saved) showToast('🎉 استلمت الكارد المميز بتاعك');
   render();
 }
 /* ============================= GAMES: WATCH THE BATTLE (مشاهدة المعركة) ============================= */
@@ -12998,13 +13205,14 @@ const ADMIN_HUB_ITEMS = [
   {tab:'opinions',   icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {tab:'reports',    icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {tab:'trash',      icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
-  {tab:'stickers',   icon:'🎨', label:'متجر الاستيكرات',      color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {tab:'stickers',   icon:'🎨', label:'Shop (المتجر)',        color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
+  const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const tiles = ADMIN_HUB_ITEMS.map(it=>{
-    const badge = it.tab==='questions'&&pendingQ ? pendingQ : (it.tab==='reports'&&pendingR ? pendingR : (it.tab==='trash'&&TRASH.length ? TRASH.length : 0));
+    const badge = it.tab==='questions'&&pendingQ ? pendingQ : (it.tab==='reports'&&pendingR ? pendingR : (it.tab==='trash'&&TRASH.length ? TRASH.length : (it.tab==='stickers'&&pendingCC ? pendingCC : 0)));
     return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}">
       ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
@@ -13556,7 +13764,7 @@ function render(){
   else if(state.view==='visa') html = renderVisaPage();
   else if(state.view==='games-solo') html = renderSoloGames();
   else if(state.view==='watch-rooms') html = renderWatchRooms();
-  else if(state.view==='sticker-store') html = renderStickerStorePage();
+  else if(state.view==='sticker-store') html = renderShopPage();
   else if(state.view==='chefs') html = renderChefsPage();
   else if(state.view==='chef-meals') html = renderChefMealsPage();
   else if(state.view==='chef-dishes') html = renderChefDishesPage();
@@ -13614,6 +13822,7 @@ function render(){
   if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
   if(state.view==='watch-rooms'){ if(!watchListPollInterval) startWatchListPolling(); } else { stopWatchListPolling(); }
   if(state.view==='gallery-album'){ attachGalleryAlbumEvents(); }
+  if(state.view==='sticker-store' && state.shopTab==='custom'){ attachShopCustomInputs(); }
 
   if(state.view==='profile' && state.radialMenuOpen){
     requestAnimationFrame(()=>{
@@ -14978,6 +15187,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
   else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
   else if(action==='visa-theme'){ const h=document.getElementById('visa-holder'); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:h?h.value:''}); render(); }
+  else if(action==='visa-theme-locked'){ showToast('التصميم ده لسه مش عندك — اشتريه من Shop 🛍️ (تاب كارد)', true); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){
@@ -14988,13 +15198,20 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
   else if(action==='open-sticker-store'){
     if(!CONF_SETTINGS.stickerStoreOpen){ showToast('الافتتاح قريب جدًا... انتظرونا 🛍️', true); return; }
-    state.friendTile = null; go('sticker-store');
-    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers()]).then(([bonus, owned, stickers])=>{
-      BONUS = bonus; OWNED_STICKERS = owned; CUSTOM_STICKERS = stickers;
-      preloadStickerImages(CUSTOM_STICKERS).then(()=>render());
-    });
+    state.friendTile = null; state.shopTab = 'stickers'; state.customCardDraftPhoto = null; go('sticker-store');
+    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers(), loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests()])
+      .then(([bonus, owned, stickers, ownedCards, prices, ccRequests])=>{
+        BONUS = bonus; OWNED_STICKERS = owned; CUSTOM_STICKERS = stickers;
+        OWNED_CARD_THEMES = ownedCards; SHOP_PRICES = prices; CUSTOM_CARD_REQUESTS = ccRequests;
+        preloadStickerImages(CUSTOM_STICKERS).then(()=>render());
+      });
   }
+  else if(action==='shop-tab'){ state.shopTab = el.dataset.t; render(); }
+  else if(action==='admin-shop-tab'){ state.shopAdminTab = el.dataset.t; render(); }
   else if(action==='buy-sticker'){ doBuySticker(el.dataset.id, el.dataset.price); }
+  else if(action==='buy-card-theme'){ doBuyCardTheme(el.dataset.k, el.dataset.price); }
+  else if(action==='submit-custom-card'){ doSubmitCustomCard(el.dataset.price); }
+  else if(action==='claim-custom-card'){ doClaimCustomCard(); }
   else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-tile-open'){ setFriendTile('menu'); }
   else if(action==='friend-join-show'){ setFriendTile('join'); }
@@ -15802,7 +16019,49 @@ function readStickerFileToDataUrl(file, maxSize){
     reader.readAsDataURL(file);
   });
 }
+function readPhotoFileToDataUrl(file, maxSize, quality){
+  return new Promise((resolve)=>{
+    if(!file){ resolve(null); return; }
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const size = maxSize || 720;
+        let w = img.width, h = img.height;
+        const longest = Math.max(w, h);
+        if(longest > size){
+          if(w>h){ h = Math.round(h*size/w); w = size; } else { w = Math.round(w*size/h); h = size; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality||0.85));
+      };
+      img.onerror = ()=>resolve(null);
+      img.src = reader.result;
+    };
+    reader.onerror = ()=>resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
 function renderAdminStickersTab(){
+  const sub = state.shopAdminTab==='prices' ? 'prices' : (state.shopAdminTab==='custom' ? 'custom' : 'stickers');
+  const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
+  const tabsHtml = `<div class="vp-tabs" style="margin-bottom:16px;">
+    <button type="button" class="${sub==='stickers'?'on':''}" data-action="admin-shop-tab" data-t="stickers">استيكرات</button>
+    <button type="button" class="${sub==='prices'?'on':''}" data-action="admin-shop-tab" data-t="prices">أسعار الكروت</button>
+    <button type="button" class="${sub==='custom'?'on':''}" data-action="admin-shop-tab" data-t="custom">طلبات مخصصة${pendingCC?` (${pendingCC})`:''}</button>
+  </div>`;
+  let body = '';
+  if(sub==='stickers') body = renderAdminStickersSubTab();
+  else if(sub==='prices') body = renderAdminShopPricesSubTab();
+  else body = renderAdminShopCustomSubTab();
+  return tabsHtml + body;
+}
+function renderAdminStickersSubTab(){
   const storeOpen = !!CONF_SETTINGS.stickerStoreOpen;
   const items = CUSTOM_STICKERS.map(s=>{
     const url = STICKER_IMG_CACHE[s.id];
@@ -15815,14 +16074,14 @@ function renderAdminStickersTab(){
   return `
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🛍️ متجر الاستيكر مفتوح؟</div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🛍️ الـ Shop مفتوح؟</div>
         <div class="hint" style="margin:2px 0 0;">${storeOpen?'المتجر مفتوح والمشاركين يقدروا يشتروا':'المتجر مقفول — المشاركين هياخدوا رسالة "الافتتاح قريب"'}</div>
       </div>
       <button type="button" class="switch ${storeOpen?'on':''}" data-action="toggle-sticker-store"></button>
     </div>
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎨 رفع استيكرات جديدة</div>
-      <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف — هتتضاف لمتجر الاستيكر، والمشارك يقدر يشتريها بنقاطه وتتضاف لقائمة استيكراته هو بس</div>
+      <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف — هتتضاف لتاب الاستيكرات في الـ Shop، والمشارك يقدر يشتريها بنقاطه وتتضاف لقائمة استيكراته هو بس</div>
       <input type="number" id="sticker-admin-price" class="field" min="0" placeholder="السعر بالنقط لكل استيكر هيتم رفعه دلوقتي" style="margin-bottom:10px;" />
       <label class="btn btn-primary" style="display:inline-block;text-align:center;cursor:pointer;">
         📤 اختيار صور استيكر
@@ -15832,6 +16091,43 @@ function renderAdminStickersTab(){
     <div class="admin-day-title">الاستيكرات الحالية (${CUSTOM_STICKERS.length})</div>
     ${items ? `<div class="admin-sticker-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات مرفوعة</div>`}
   `;
+}
+function renderAdminShopPricesSubTab(){
+  const p = Object.assign({simple:20,vip:60,custom:150}, SHOP_PRICES||{});
+  return `
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:10px;">💳 أسعار تصاميم تاب الكارد وطلب الكارد المخصص</div>
+      <div class="hint" style="margin:0 0 6px;">تصاميم بسيطة (${p.simple} 🌟)</div>
+      <input type="number" min="0" class="field" style="margin-bottom:10px;" data-action-input="shop-price" data-k="simple" value="${p.simple}" />
+      <div class="hint" style="margin:0 0 6px;">تصاميم VIP (${p.vip} 🌟)</div>
+      <input type="number" min="0" class="field" style="margin-bottom:10px;" data-action-input="shop-price" data-k="vip" value="${p.vip}" />
+      <div class="hint" style="margin:0 0 6px;">طلب كارد مخصص (${p.custom} 🌟)</div>
+      <input type="number" min="0" class="field" data-action-input="shop-price" data-k="custom" value="${p.custom}" />
+    </div>
+  `;
+}
+function renderAdminShopCustomSubTab(){
+  const list = (CUSTOM_CARD_REQUESTS||[]).slice().sort((a,b)=>b.ts-a.ts);
+  if(!list.length) return `<div class="empty-note">لسه مفيش طلبات كروت مخصصة</div>`;
+  const items = list.map(r=>{
+    const statusLabel = r.status==='pending' ? '⏳ مستني الأدمن' : (r.status==='ready' ? '✅ اترسل — مستني الاستلام' : '🎉 المشارك استلمه');
+    return `<div class="admin-cc-item">
+      <div class="admin-cc-row">
+        <img class="admin-cc-photo" src="${r.photo}" alt="صورة الطلب" />
+        <div style="flex:1;">
+          <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;">${escapeHtml(r.name||r.pid)}</div>
+          <div class="hint" style="margin:2px 0 6px;">${statusLabel}</div>
+          ${r.resultImage ? `<img src="${r.resultImage}" alt="التصميم النهائي" style="width:90px;height:56px;object-fit:cover;border-radius:8px;margin-bottom:6px;" />` : ''}
+          ${r.status==='pending' ? `
+            <label class="btn btn-primary" style="display:inline-block;text-align:center;cursor:pointer;font-size:11.5px;padding:8px 12px;">
+              📤 ارفع التصميم النهائي وابعته
+              <input type="file" accept="image/*" style="display:none;" data-action-input="admin-cc-upload" data-id="${r.id}" />
+            </label>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return items;
 }
 function attachStickerAdminInputs(){
   const inputEl = document.getElementById('sticker-admin-upload');
@@ -15853,6 +16149,46 @@ function attachStickerAdminInputs(){
       doAdminSetStickerPrice(id, price);
     });
   });
+  document.querySelectorAll('[data-action-input="shop-price"]').forEach(el=>{
+    if(el.dataset.bound) return;
+    el.dataset.bound = '1';
+    el.addEventListener('change', ()=>{
+      const k = el.dataset.k;
+      const val = Math.max(0, parseInt(el.value,10)||0);
+      doAdminSetShopPrice(k, val);
+    });
+  });
+  document.querySelectorAll('[data-action-input="admin-cc-upload"]').forEach(el=>{
+    if(el.dataset.bound) return;
+    el.dataset.bound = '1';
+    el.addEventListener('change', ()=>{
+      const file = el.files && el.files[0];
+      const id = el.dataset.id;
+      if(file && id) doAdminSendCustomCard(id, file, el);
+    });
+  });
+}
+async function doAdminSetShopPrice(key, value){
+  SHOP_PRICES = Object.assign({simple:20,vip:60,custom:150}, SHOP_PRICES||{});
+  SHOP_PRICES[key] = value;
+  await saveShopPrices(SHOP_PRICES);
+  showToast('✅ اتحفظ السعر');
+}
+async function doAdminSendCustomCard(reqId, file, inputEl){
+  showToast('جاري رفع التصميم...');
+  const dataUrl = await readPhotoFileToDataUrl(file, 900, 0.88);
+  if(!dataUrl){ showToast('⚠️ حصلت مشكلة في رفع الصورة، جرب تاني', true); return; }
+  CUSTOM_CARD_REQUESTS = await loadCustomCardRequests();
+  const req = CUSTOM_CARD_REQUESTS.find(r=>r.id===reqId);
+  if(!req){ render(); return; }
+  req.status = 'ready';
+  req.resultImage = dataUrl;
+  req.resultTs = Date.now();
+  if(inputEl) inputEl.value = '';
+  const saved = await saveCustomCardRequestsWithRetry(CUSTOM_CARD_REQUESTS);
+  if(saved) showToast('✅ اترسل الكارد المخصص للمشارك');
+  else showToast('⚠️ حصلت مشكلة في الحفظ، جرب تاني', true);
+  render();
 }
 async function doAdminSetStickerPrice(id, price){
   const s = CUSTOM_STICKERS.find(x=>x.id===id);
@@ -18132,14 +18468,16 @@ async function refreshAllData(){
    GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, GAME_POINTS_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS] = await Promise.all([
+   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS,
+   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
-    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers()
+    loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers(),
+    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
