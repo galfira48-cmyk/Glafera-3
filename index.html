@@ -1195,6 +1195,59 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-sw{width:36px; height:36px; border-radius:50%; border:2px solid transparent; display:flex; align-items:center; justify-content:center; font-size:14px;}
   .vp-sw.locked{opacity:.45; filter:grayscale(.4);}
   .vp-sw.on{border-color:var(--text); box-shadow:0 0 0 3px var(--bg-2) inset;}
+  .vc-strip{height:40px; margin-top:18px;}
+  .vc-cvv{margin:10px 20px 0; direction:ltr;}
+  .vc-cvv small{display:block; font-size:10px; opacity:.9; font-weight:800; letter-spacing:1.5px; text-align:right;}
+  .vc-cvv-box{margin-top:3px; background:#f6f1e6; color:#2b2416; border-radius:8px; padding:6px 12px; text-align:right; font-family:'Cairo',sans-serif; font-weight:900; letter-spacing:3px; font-size:16px; min-height:32px; line-height:1.6; box-shadow:inset 0 1px 3px rgba(0,0,0,.25);}
+  .vc-cvv-box.empty{color:rgba(43,36,22,.35);}
+  .vc-back-bal{margin:10px 20px 0; padding:7px 14px;}
+  .vc-back-bal b{font-size:22px;}
+  .vp-label{display:block; font-size:12px; color:var(--text-muted); font-weight:700; margin:12px 0 6px;}
+  .vp-label:first-child{margin-top:0;}
+  .vp-pin{text-align:center; letter-spacing:10px; font-family:'Cairo',sans-serif; font-weight:900; font-size:20px;}
+  .vc-expired .vc-front{--a:#5c5c68 !important; --b:#6b6b78 !important; --c:#3f3f4a !important; --base:#22222b !important;}
+  .vc-expired .vc-front .vc-chip{filter:grayscale(1) brightness(.8);}
+  .vc-face .vc-expired-stamp{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-12deg); z-index:3; padding:4px 20px; border:3px solid #ff6b6b; border-radius:12px;
+    color:#ff6b6b; font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; letter-spacing:2px; background:rgba(20,10,14,.55); text-shadow:0 1px 4px rgba(0,0,0,.5);}
+  .vp-renew{border-color:rgba(255,107,107,.35);}
+  .vp-renew-head{display:flex; gap:12px; align-items:flex-start; margin-bottom:12px;}
+  .vp-renew-ico{flex:0 0 auto; width:42px; height:42px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; background:color-mix(in srgb,var(--danger) 14%,transparent);}
+  .vp-cardno{direction:ltr; text-align:center; letter-spacing:2px; font-family:'Cairo',sans-serif; font-weight:800; font-size:18px;}
+  .vp-fee-row{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:12px; background:var(--bg-2); border:1px solid var(--border); font-size:13px; color:var(--text-muted);}
+  .vp-fee-row b{font-family:'Cairo',sans-serif; font-weight:900; font-size:16px; color:var(--gold-2);}
+  .vp-renew .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  /* ---------- رسالة الفيزا في منتصف الشاشة ---------- */
+  .vmsg-overlay{background:rgba(5,6,18,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); z-index:300; padding:24px; animation:vmsgFade .22s ease both;}
+  .vmsg-overlay.leaving{animation:vmsgFadeOut .18s ease forwards;}
+  .vmsg-card{--ta:#4fd6d0; --tb:#5b6cf0; position:relative; width:100%; max-width:330px; text-align:center; padding:34px 22px 20px; border-radius:28px; overflow:hidden;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 90%,#fff 10%),var(--surface)); border:1px solid color-mix(in srgb,var(--ta) 38%,transparent);
+    box-shadow:0 34px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 60px -10px color-mix(in srgb,var(--ta) 45%,transparent); animation:vmsgPop .42s cubic-bezier(.2,1.15,.3,1) both;}
+  .vmsg-card::before{content:''; position:absolute; top:0; left:12%; right:12%; height:2px; background:linear-gradient(90deg,transparent,var(--ta),transparent);}
+  .vmsg-card::after{content:''; position:absolute; top:-70px; left:50%; width:240px; height:160px; transform:translateX(-50%); pointer-events:none;
+    background:radial-gradient(closest-side,color-mix(in srgb,var(--ta) 30%,transparent),transparent);}
+  .vmsg-success{--ta:#3ddc97; --tb:#12a36a;} .vmsg-error{--ta:#ff6b6b; --tb:#c93a3a;} .vmsg-warn{--ta:#f7c948; --tb:#d98a12;} .vmsg-info{--ta:#4fd6d0; --tb:#5b6cf0;}
+  .vmsg-ico{position:relative; z-index:1; width:70px; height:70px; margin:0 auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(145deg,var(--ta),var(--tb)); box-shadow:0 12px 30px -6px color-mix(in srgb,var(--tb) 70%,transparent);}
+  .vmsg-ico::after{content:''; position:absolute; inset:-7px; border-radius:50%; border:1.5px solid color-mix(in srgb,var(--ta) 60%,transparent); animation:vmsgRing 1.9s ease-out infinite;}
+  .vmsg-ico svg{width:34px; height:34px;}
+  .vmsg-draw{stroke-dasharray:32; stroke-dashoffset:32; animation:vmsgDraw .5s .2s ease forwards;}
+  .vmsg-title{position:relative; z-index:1; font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; margin-bottom:8px; color:var(--text);}
+  .vmsg-text{position:relative; z-index:1; font-size:13.5px; line-height:1.85; color:var(--text-muted);}
+  .vmsg-rows{position:relative; z-index:1; margin-top:16px; border-radius:16px; background:var(--bg-2); border:1px solid var(--border); overflow:hidden;}
+  .vmsg-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px; font-size:13px; color:var(--text-muted);}
+  .vmsg-row + .vmsg-row{border-top:1px solid var(--border);}
+  .vmsg-row b{font-family:'Cairo',sans-serif; font-weight:800; color:var(--text); font-size:14px; direction:ltr;}
+  .vmsg-actions{position:relative; z-index:1; display:flex; gap:10px; margin-top:20px;}
+  .vmsg-btn{flex:1; padding:13px 10px; border-radius:15px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; transition:transform .12s ease;}
+  .vmsg-btn:active{transform:scale(.97);}
+  .vmsg-btn.primary{background:linear-gradient(95deg,var(--gold),var(--gold-2)); color:#221900; box-shadow:0 8px 20px -6px rgba(244,183,64,.55);}
+  .vmsg-btn.ghost{background:var(--bg-2); border:1px solid var(--border); color:var(--text);}
+  @keyframes vmsgFade{from{opacity:0}to{opacity:1}}
+  @keyframes vmsgFadeOut{to{opacity:0}}
+  @keyframes vmsgPop{from{opacity:0; transform:translateY(14px) scale(.9)}to{opacity:1; transform:none}}
+  @keyframes vmsgRing{0%{transform:scale(.92); opacity:.9}100%{transform:scale(1.35); opacity:0}}
+  @keyframes vmsgDraw{to{stroke-dashoffset:0}}
+  @media (prefers-reduced-motion:reduce){ .vmsg-card,.vmsg-overlay,.vmsg-ico::after,.vmsg-draw{animation:none !important;} .vmsg-draw{stroke-dashoffset:0;} }
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -3569,27 +3622,178 @@ function visaNumber(pid){
   return d.replace(/(\d{4})(?=\d)/g,'$1 ');
 }
 function visaMin(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaMinWithdraw) || 600; }
+function openVisaPage(){
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.remove());
+  state.friendTile = null; state.visaDraft = null; state.visaTab = 'deposit';
+  if(state.view!=='visa') go('visa');
+  visaRefresh();
+}
 function visaShort(fee, bal){
-  showToast(bal<=0 ? 'الفيزا فارغة 💳 يرجى شحنها من صفحة فيزتي' : `رصيد الفيزا لا يكفي (${bal} من ${fee}) — يرجى شحن الفيزا`, true);
+  visaMsg('warn', bal<=0 ? 'رصيد الفيزا فارغ' : 'رصيد الفيزا غير كافٍ',
+    bal<=0 ? 'يرجى شحن الفيزا من صفحة «فيزتي» للتمكن من اللعب ودخول الغرف.' : 'رصيدك الحالي لا يغطي هذه العملية، يرجى شحن الفيزا أولًا.',
+    { rows: bal<=0 ? null : [['رصيدك الحالي', bal+' نقطة'], ['المطلوب', fee+' نقطة']], primary:{label:'شحن الفيزا', onClick:openVisaPage}, secondary:{label:'إغلاق'} });
+}
+/* ---------- صلاحية الفيزا: أسبوعين من الإنشاء، وبعدها لازم تجديد ---------- */
+const VISA_DAY_MS = 86400000;
+function visaValidDays(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaValidDays) || 14; }
+function visaRenewFee(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaRenewFee) || 100; }
+function fmtVisaDate(ts){
+  const d = new Date(ts), z = n=>String(n).padStart(2,'0');
+  return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2);
+}
+function visaExpiresAt(pid){
+  const c = VISA_CARDS[pid] || {};
+  return c.expires || (c.created ? c.created + visaValidDays()*VISA_DAY_MS : 0);
+}
+function visaExpired(pid){
+  if(!visaCreated(pid)) return false;
+  const e = visaExpiresAt(pid);
+  return !!e && Date.now() >= e;
+}
+function arDays(n){ return n===1 ? 'يوم واحد' : n===2 ? 'يومان' : (n>=3 && n<=10) ? n+' أيام' : n+' يومًا'; }
+function visaDaysLeft(pid){ const e = visaExpiresAt(pid); return e ? Math.max(0, Math.ceil((e - Date.now())/VISA_DAY_MS)) : null; }
+/* ---------- رسالة احترافية في منتصف الشاشة (بدل التوست اللي بيطلع من تحت) ---------- */
+const VMSG_ICONS = {
+  success:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="vmsg-draw" d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  error:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M7 7l10 10M17 7L7 17"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M12 6.5v7"/><circle cx="12" cy="17.6" r=".6" fill="#fff"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M12 11v6"/><circle cx="12" cy="7.4" r=".6" fill="#fff"/></svg>'
+};
+function visaMsg(kind, title, text, opts){
+  opts = opts || {};
+  const old = document.getElementById('vmsg-overlay'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay vmsg-overlay'; ov.id = 'vmsg-overlay';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  const rows = (opts.rows||[]).map(r=>`<div class="vmsg-row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+  const prim = opts.primary || {label:'تمام'};
+  ov.innerHTML = `
+    <div class="vmsg-card vmsg-${kind}">
+      <div class="vmsg-ico">${VMSG_ICONS[kind]||VMSG_ICONS.info}</div>
+      <div class="vmsg-title">${title}</div>
+      <div class="vmsg-text">${text}</div>
+      ${rows ? `<div class="vmsg-rows">${rows}</div>` : ''}
+      <div class="vmsg-actions">
+        ${opts.secondary ? `<button type="button" class="vmsg-btn ghost" id="vmsg-sec">${opts.secondary.label}</button>` : ''}
+        <button type="button" class="vmsg-btn primary" id="vmsg-prim">${prim.label}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  const close = ()=>{ if(ov.parentNode){ ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 180); } };
+  ov.addEventListener('click', (e)=>{ if(e.target===ov){ close(); if(opts.onClose) opts.onClose(); } });
+  document.getElementById('vmsg-prim').addEventListener('click', ()=>{ close(); if(prim.onClick) prim.onClick(); else if(opts.onClose) opts.onClose(); });
+  const sec = document.getElementById('vmsg-sec');
+  if(sec) sec.addEventListener('click', ()=>{ close(); if(opts.secondary.onClick) opts.secondary.onClick(); else if(opts.onClose) opts.onClose(); });
+  if(kind==='error' || kind==='warn') vibrate([25,15,25]);
+}
+function showExpiredDialog(){
+  const pid = state.pid, exp = visaExpiresAt(pid);
+  visaMsg('warn', 'انتهت صلاحية الفيزا',
+    'لا يمكن استخدام الفيزا حاليًا في الإيداع أو السحب أو الألعاب. يرجى تجديد الفيزا للمتابعة.',
+    { rows:[['انتهت بتاريخ', exp?fmtVisaDate(exp):'—'], ['رسوم التجديد', visaRenewFee()+' نقطة']],
+      primary:{label:'تجديد الفيزا', onClick:openVisaPage}, secondary:{label:'لاحقًا'} });
+}
+/* بوابة للعمليات اللي بتستخدم رصيد الفيزا: لازم تكون صالحة */
+function requireVisaValid(){
+  if(visaExpired(state.pid)){ showExpiredDialog(); return false; }
+  return true;
+}
+/* تنبيه انتهاء الصلاحية: رسالة في المنتصف + إشعار، مرة واحدة لكل دورة صلاحية */
+async function checkVisaExpiry(){
+  const pid = state.pid;
+  if(!pid || window.__visaExpChk || !visaExpired(pid)) return;
+  if(((VISA_CARDS[pid]||{}).notifiedExpiry) === visaExpiresAt(pid)) return;
+  if(state.roomCode || document.querySelector('.modal-overlay')) return; /* مش هنقاطعه في نص لعبة أو رسالة تانية */
+  window.__visaExpChk = true;
+  try{
+    const fresh = await loadVisaCards();
+    if(fresh && fresh[pid]) VISA_CARDS = fresh;
+    if(!visaExpired(pid)) return;
+    const exp = visaExpiresAt(pid);
+    if((VISA_CARDS[pid]||{}).notifiedExpiry === exp) return;
+    const ok = await updateVisaCard(pid, { notifiedExpiry: exp });
+    if(!ok) return;
+    pushNotification(pid, '⏳ انتهت صلاحية فيزتك — يرجى تجديد الفيزا من صفحة فيزتي', '⏳');
+    if(!document.querySelector('.modal-overlay')) showExpiredDialog();
+    if(state.view==='games' || state.view==='visa') render();
+  } finally { window.__visaExpChk = false; }
+}
+/* خصم/إضافة رقم لمشارك في كائن مشترك بشكل ذرّي (transaction). minAfter اختياري لمنع الرصيد من النزول تحت حد معين */
+async function adjustSharedNumber(key, pid, delta, minAfter){
+  let blocked = false;
+  const apply = (curStr)=>{
+    let o = {};
+    try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+    if(!o || typeof o!=='object') o = {};
+    const nv = (Number(o[pid])||0) + delta;
+    if(curStr!==null && minAfter!==undefined && nv<minAfter){ blocked = true; return; }
+    o[pid] = nv;
+    return JSON.stringify(o);
+  };
+  let res = null;
+  if(window.storage && window.storage.update){
+    res = await window.storage.update(key, apply, true);
+  } else {
+    const cur = await window.storage.get(key, true);
+    res = await window.storage.set(key, apply(cur ? cur.value : null), true);
+  }
+  if(res) return 'ok';
+  return blocked ? 'short' : 'fail';
 }
 function customCardImageFor(pid){
   const done = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.pid===pid && r.status==='received' && r.resultImage);
   return done.length ? done[done.length-1].resultImage : null;
 }
 /* عنده فيزا فعلاً لو اشترى أي تصميم كارت أو استلم كارد مخصص */
+function visaPinOf(pid){ return (VISA_CARDS[pid]||{}).pin || null; }
+/* الفيزا "اتنشأت" لما المشارك يكتب اسمه ورقمه السري (3 أرقام على ظهر البطاقة) من صفحة فيزتي */
+function visaCreated(pid){ return !!visaPinOf(pid); }
+/* التصميم الأساسي (aurora) مجاني لكل مشارك، والباقي بيتشرى من Shop */
+function ownsCardTheme(pid, k){ return k==='aurora' || (OWNED_CARD_THEMES[pid]||[]).indexOf(k)>-1; }
 function hasVisa(pid){
-  return (OWNED_CARD_THEMES[pid]||[]).length>0 || !!customCardImageFor(pid);
+  return visaCreated(pid) || (OWNED_CARD_THEMES[pid]||[]).length>0 || !!customCardImageFor(pid);
+}
+async function visaPinHash(pid, pin){ return sha256Hex('glavera-visa:'+pid+':'+pin); }
+function cleanPin(v){ return String(normalizeDigits(v)||'').replace(/\D/g,'').slice(0,3); }
+/* تعديل كارت مشارك واحد بس بشكل ذرّي (transaction) عشان مانمسحش كروت غيره */
+async function updateVisaCard(pid, patch){
+  const apply = (curStr)=>{
+    let o = {};
+    try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+    if(!o || typeof o!=='object') o = {};
+    o[pid] = Object.assign({}, o[pid]||{}, patch);
+    return JSON.stringify(o);
+  };
+  let res = null;
+  if(window.storage && window.storage.update){
+    res = await window.storage.update('glavera-visa-cards', apply, true);
+  } else {
+    const cur = await window.storage.get('glavera-visa-cards', true);
+    res = await window.storage.set('glavera-visa-cards', apply(cur ? cur.value : null), true);
+  }
+  if(!res) return false;
+  try{ VISA_CARDS = JSON.parse(res.value) || {}; }catch(e){ VISA_CARDS = await loadVisaCards(); }
+  return true;
+}
+/* التحقق من الرقم السري — بيتستخدم في الإيداع والسحب وأي تحويل بيتضاف بعدين */
+async function verifyVisaPin(pid, pin){
+  const saved = visaPinOf(pid);
+  if(!saved || !/^\d{3}$/.test(pin)) return false;
+  return (await visaPinHash(pid, pin)) === saved;
 }
 function requireVisaForRooms(){
-  if(hasVisa(state.pid)) return true;
-  showToast('لازم يكون معاك فيزا الألعاب الأول 💳 روح اشترِ كارتك من الـ Shop', true);
-  return false;
+  if(!hasVisa(state.pid)){
+    visaMsg('info', 'أنشئ فيزتك أولًا', 'تحتاج إلى فيزا الألعاب لدخول الغرف واللعب. إنشاؤها يستغرق لحظات.',
+      { primary:{label:'إنشاء الفيزا', onClick:openVisaPage}, secondary:{label:'لاحقًا'} });
+    return false;
+  }
+  return requireVisaValid();
 }
 function defaultCardTheme(pid){
   const owned = OWNED_CARD_THEMES[pid] || [];
   return owned.length ? owned[0] : 'aurora';
 }
-function visaCardHtml(pid, draft){
+function visaCardHtml(pid, draft, isNew){
   const c = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, draft||{});
   const customImg = c.theme==='custom' ? customCardImageFor(pid) : null;
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
@@ -3599,52 +3803,157 @@ function visaCardHtml(pid, draft){
     ? `background-image:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55)),url('${customImg}'); background-size:cover; background-position:center;`
     : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
   const backStyle = customImg ? `--base:#1a1330;--a:#845EC2;--b:#2ec5c0;--c:#ff7eb6;` : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
-  return `<div class="vc-scene" data-action="visa-flip"><div class="vc-inner" id="vc-inner">
+  const numTxt = isNew ? '#### #### #### ####' : visaNumber(pid);
+  const expTs = isNew ? Date.now() + visaValidDays()*VISA_DAY_MS : visaExpiresAt(pid);
+  const expTxt = expTs ? fmtVisaDate(expTs) : '--/--/--';
+  const expired = !isNew && visaExpired(pid);
+  return `<div class="vc-scene ${expired?'vc-expired':''}" data-action="visa-flip"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}">
       <div class="vc-top"><span class="vc-brand">Glafera</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
-      <div class="vc-num">${visaNumber(pid)}</div>
-      <div class="vc-bot"><div><small>حامل البطاقة</small><b dir="auto">${escapeHtml(nm)}</b></div><div><small>الصلاحية</small><b>12/30</b></div></div>
+      <div class="vc-num">${numTxt}</div>
+      <div class="vc-bot"><div><small>حامل البطاقة</small><b dir="auto" class="vc-holder-live">${escapeHtml(nm)}</b></div><div><small>الصلاحية</small><b>${expTxt}</b></div></div>
+      ${expired ? '<div class="vc-expired-stamp">منتهية</div>' : ''}
     </div>
     <div class="vc-face vc-back" style="${backStyle}">
       <div class="vc-strip"></div>
-      <div class="vc-back-bal"><small>الرصيد الحالي</small><b>${bal}</b><span>نقطة</span></div>
+      <div class="vc-cvv"><small>CVV</small><div class="vc-cvv-box ${isNew?'empty':''}" id="vc-cvv-dots">${isNew?'• • •':'• • •'}</div></div>
+      ${isNew ? '' : `<div class="vc-back-bal"><small>الرصيد الحالي</small><b>${bal}</b><span>نقطة</span></div>`}
     </div></div></div>`;
+}
+/* إنشاء الفيزا من الصفر: اسم على البطاقة + رقم سري من 3 أرقام على ظهرها (البطاقة بتنقلب أول ما يدخل الرقم) */
+function renderVisaCreatePage(){
+  const pid = state.pid;
+  const me = PARTICIPANTS.find(x=>x.id===pid) || {};
+  const existingHolder = (VISA_CARDS[pid]||{}).holder || '';
+  const legacy = hasVisa(pid);
+  const draft = { holder: existingHolder || me.name || '' };
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">${legacy?'أكمل إنشاء فيزتك':'أنشئ فيزتك'}</div></div>
+    ${visaCardHtml(pid, draft, true)}
+    <div class="vp-hint" style="text-align:center;margin:8px 0 14px;">${legacy?'كارتك موجود، ناقص تحط رقمك السري عشان تقدر تودع وتسحب':'اكتب اسمك ورقمك السري وهتشوف بطاقتك بتتكوّن'}</div>
+    <div class="vp-panel">
+      <label class="vp-label" for="visa-new-name">الاسم على البطاقة</label>
+      <input id="visa-new-name" class="field" maxlength="22" autocomplete="off" placeholder="الاسم بالكامل" value="${escapeHtml(draft.holder)}" data-vc-live="name" />
+      <label class="vp-label" for="visa-new-pin">الرقم السري — 3 أرقام على ظهر البطاقة</label>
+      <input id="visa-new-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="new-password" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
+      <label class="vp-label" for="visa-new-pin2">تأكيد الرقم السري</label>
+      <input id="visa-new-pin2" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="new-password" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
+      <div class="vp-hint" style="margin-top:10px;">الرقم ده هتحتاجه في كل عملية إيداع أو سحب أو تجديد، احفظه كويس. ولو نسيته كلّم المنظمين يعيدوا تعيينه.<br>البطاقة صالحة لمدة ${visaValidDays()} يوم من لحظة الإنشاء، وبعدها بتحتاج تجديد.</div>
+      <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-create">${legacy?'حفظ الرقم السري 🔐':'إنشاء الفيزا 💳'}</button>
+    </div>`;
+}
+async function doVisaCreate(){
+  if(window.__visaCreating) return;
+  const pid = state.pid;
+  const nameEl = document.getElementById('visa-new-name');
+  const p1 = document.getElementById('visa-new-pin'), p2 = document.getElementById('visa-new-pin2');
+  const holder = (nameEl ? nameEl.value : '').trim();
+  const pin = cleanPin(p1 ? p1.value : ''), pin2 = cleanPin(p2 ? p2.value : '');
+  if(holder.length<2){ visaMsg('warn','الاسم غير مكتمل','اكتب الاسم الذي سيظهر على البطاقة (حرفان على الأقل).',{onClose:()=>{ if(nameEl) nameEl.focus(); }}); return; }
+  if(!/^\d{3}$/.test(pin)){ visaMsg('warn','الرقم السري غير مكتمل','الرقم السري يجب أن يتكوّن من 3 أرقام بالضبط.',{onClose:()=>{ if(p1) p1.focus(); }}); return; }
+  if(pin!==pin2){ visaMsg('error','الرقمان غير متطابقين','أعد كتابة تأكيد الرقم السري بنفس الرقم الذي اخترته.',{onClose:()=>{ if(p2){ p2.value=''; p2.focus(); } }}); return; }
+  window.__visaCreating = true;
+  try{
+    const hash = await visaPinHash(pid, pin);
+    const cur = VISA_CARDS[pid] || {};
+    const now = Date.now();
+    const expires = cur.expires || (now + visaValidDays()*VISA_DAY_MS);
+    const ok = await updateVisaCard(pid, { holder, pin:hash, theme: cur.theme || defaultCardTheme(pid), created: cur.created || now, expires });
+    if(!ok){ visaMsg('error','تعذّر إنشاء الفيزا','حدثت مشكلة في الاتصال بالسيرفر، يرجى المحاولة مرة أخرى.'); return; }
+    state.visaDraft = null; state.visaTab = 'deposit';
+    render();
+    visaMsg('success','تم إنشاء فيزتك بنجاح','بطاقتك جاهزة للاستخدام. احتفظ برقمك السري، ستحتاجه في كل إيداع وسحب وتجديد.',
+      { rows:[['صالحة حتى', fmtVisaDate(expires)], ['مدة الصلاحية', arDays(visaValidDays())]] });
+  } finally { window.__visaCreating = false; }
 }
 function renderVisaPage(){
   const pid = state.pid;
+  if(!visaCreated(pid)) return renderVisaCreatePage();
   const bal = WALLET[pid]||0, total = participantTotal(pid), min = visaMin();
-  const tab = state.visaTab==='withdraw' ? 'withdraw' : 'deposit';
+  const tab = state.visaTab==='withdraw' ? 'withdraw' : (state.visaTab==='transfer' ? 'transfer' : 'deposit');
   const cur = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, state.visaDraft||{});
   const pct = Math.min(100, Math.round(bal/min*100));
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
   const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
-    const isOwned = ownedThemes.indexOf(k)>-1;
+    const isOwned = ownsCardTheme(pid, k);
     return `<button type="button" class="vp-sw ${cur.theme===k?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
     + (customCardImageFor(pid) ? `<button type="button" class="vp-sw ${cur.theme==='custom'?'on':''}" data-action="visa-theme" data-k="custom" aria-label="مخصص" style="background-image:url('${customCardImageFor(pid)}');background-size:cover;background-position:center;">${cur.theme==='custom'?'':''}</button>` : '');
-  return `
-    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزتي</div></div>
-    ${visaCardHtml(pid, state.visaDraft)}
-    <div class="vp-hint" style="text-align:center;margin:8px 0 14px;">اضغط على البطاقة لقلبها</div>
+  const expired = visaExpired(pid), expTs = visaExpiresAt(pid), daysLeft = visaDaysLeft(pid);
+  const fee = visaRenewFee();
+  const tabsHtml = `<div class="vp-tabs">
+        <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit">إيداع</button>
+        <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw">سحب</button>
+        <button type="button" class="${tab==='transfer'?'on':''}" data-action="visa-tab" data-t="transfer">تحويل</button>
+      </div>`;
+  const tChips = [25,50,100,bal].filter((v,i,a)=>v>0 && a.indexOf(v)===i)
+    .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${v===bal?'الكل':v}</button>`).join('');
+  const transferPanel = `
+    <div class="vp-panel">
+      <div class="vp-stats">
+        <div><small>رصيد الفيزا</small><b>${bal}</b></div>
+        <div><small>نقاط الفقرات</small><b>${total}</b></div>
+      </div>
+      ${tabsHtml}
+      <label class="vp-label" for="visa-to">رقم بطاقة المستلم — الرقم الكبير على وجه البطاقة</label>
+      <input id="visa-to" class="field vp-cardno" type="text" inputmode="tel" maxlength="19" autocomplete="off" placeholder="0000 0000 0000 0000" data-vc-live="cardno" />
+      <label class="vp-label" for="visa-amt">المبلغ</label>
+      <input id="visa-amt" class="field" type="number" inputmode="numeric" min="1" placeholder="عدد النقاط المراد تحويلها" />
+      <div class="vp-chips">${tChips}</div>
+      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
+      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
+      <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-transfer">تحويل الآن</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-copy-number">📋 نسخ رقم بطاقتي</button>
+      <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة.</div>
+    </div>`;
+  const opsPanel = `
     <div class="vp-panel">
       <div class="vp-stats">
         <div><small>رصيد الفيزا</small><b>${bal}</b></div>
         <div><small>نقاط الفقرات</small><b>${total}</b></div>
       </div>
       ${bal<=0 ? `<div class="vp-empty">الفيزا فارغة، أودع نقاطًا من نقاط الفقرات عشان تقدر تلعب وتدخل الغرف.</div>` : ''}
-      <div class="vp-tabs">
-        <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit">إيداع</button>
-        <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw">سحب</button>
-      </div>
+      ${tabsHtml}
       <input id="visa-amt" class="field" type="number" inputmode="numeric" min="1" placeholder="${tab==='deposit'?'عدد النقاط المراد إيداعها':'عدد النقاط المراد سحبها'}" />
       <div class="vp-chips">${chips}</div>
       ${tab==='withdraw' ? `<div class="vp-prog"><i style="width:${pct}%"></i></div>
         <div class="vp-hint">${bal>=min ? 'السحب متاح، والنقاط بتتضاف لنقاط الفقرات' : `السحب بيتفتح عند ${min} نقطة (فاضل ${min-bal})`}</div>` :
         `<div class="vp-hint">النقاط بتتخصم من نقاط الفقرات وتتضاف لرصيد الفيزا</div>`}
+      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
+      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="${tab==='deposit'?'visa-deposit':'visa-withdraw'}">${tab==='deposit'?'إيداع في الفيزا':'سحب لنقاط الفقرات'}</button>
-    </div>
+    </div>`;
+  const canW = bal>=fee, canP = total>=fee;
+  const renewPanel = `
+    <div class="vp-panel vp-renew">
+      <div class="vp-renew-head">
+        <div class="vp-renew-ico">⏳</div>
+        <div>
+          <div class="vp-title" style="margin:0 0 2px;">انتهت صلاحية فيزتك</div>
+          <div class="vp-hint">انتهت بتاريخ ${expTs?fmtVisaDate(expTs):'—'}. جدّدها لتعود للعمل ${visaValidDays()} يومًا من لحظة التجديد.</div>
+        </div>
+      </div>
+      <div class="vp-stats">
+        <div><small>رصيد الفيزا</small><b>${bal}</b></div>
+        <div><small>نقاط الفقرات</small><b>${total}</b></div>
+      </div>
+      <div class="vp-fee-row"><span>رسوم التجديد</span><b>${fee} نقطة</b></div>
+      <label class="vp-label" for="visa-pin">الرقم السري (CVV) — اللي على ظهر البطاقة</label>
+      <input id="visa-pin" class="field vp-pin" type="password" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="•••" data-vc-live="pin" data-vc-flip="1" />
+      <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-renew" data-src="wallet" ${canW?'':'disabled'}>💳 تجديد من رصيد الفيزا</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-renew" data-src="points" ${canP?'':'disabled'}>🏅 تجديد من نقاط الفقرات</button>
+      ${(!canW && !canP) ? `<div class="vp-empty" style="margin:12px 0 0;">رصيدك لا يكفي لرسوم التجديد (${fee} نقطة)، اجمع نقاطًا من الفقرات ثم جدّد.</div>` : ''}
+    </div>`;
+  const validHint = expired
+    ? `<span style="color:var(--danger);font-weight:800;">منتهية الصلاحية</span> · اضغط على البطاقة لقلبها`
+    : `صالحة حتى ${expTs?fmtVisaDate(expTs):'—'}${daysLeft!==null?` · باقي ${arDays(daysLeft)}`:''} · اضغط على البطاقة لقلبها`;
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزتي</div></div>
+    ${visaCardHtml(pid, state.visaDraft)}
+    <div class="vp-hint" style="text-align:center;margin:8px 0 14px;">${validHint}</div>
+    ${expired ? renewPanel : (tab==='transfer' ? transferPanel : opsPanel)}
     <div class="vp-panel">
       <div class="vp-title">صمّم فيزتك</div>
       <div class="vp-sws">${swatches}</div>
@@ -3656,25 +3965,153 @@ async function visaRefresh(){
   [WALLET, VISA_CARDS, BONUS, OWNED_CARD_THEMES, CUSTOM_CARD_REQUESTS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus(), loadOwnedCardThemes(), loadCustomCardRequests()]);
   render();
 }
+async function visaCheckPin(pid){
+  const pinEl = document.getElementById('visa-pin');
+  const pin = cleanPin(pinEl ? pinEl.value : '');
+  if(!/^\d{3}$/.test(pin)){
+    visaMsg('warn','الرقم السري مطلوب','اكتب الرقم السري (3 أرقام) الموجود على ظهر البطاقة لإتمام العملية.',{onClose:()=>{ if(pinEl) pinEl.focus(); }});
+    return false;
+  }
+  if(!(await verifyVisaPin(pid, pin))){
+    visaMsg('error','الرقم السري غير صحيح','تأكد من الرقم السري وحاول مرة أخرى.',{onClose:()=>{ if(pinEl){ pinEl.value=''; pinEl.focus(); } }});
+    return false;
+  }
+  return true;
+}
 async function doVisaMove(kind){
   const pid = state.pid, amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
-  if(amt<=0){ showToast('اكتب عدد النقاط الأول', true); return; }
+  if(visaExpired(pid)){ showExpiredDialog(); return; }
+  if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد '+(kind==='deposit'?'إيداعها':'سحبها')+'.'); return; }
+  if(!(await visaCheckPin(pid))) return;
   [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
   const bal = WALLET[pid]||0;
+  let title, text;
   if(kind==='deposit'){
-    if(amt>participantTotal(pid)){ showToast('نقاط الفقرات لا تكفي لهذا الإيداع', true); return; }
+    if(amt>participantTotal(pid)){ visaMsg('warn','نقاط الفقرات لا تكفي','رصيد نقاط الفقرات لديك أقل من المبلغ المراد إيداعه.',{rows:[['نقاطك المتاحة', participantTotal(pid)+' نقطة']]}); return; }
     BONUS[pid] = (BONUS[pid]||0) - amt; WALLET[pid] = bal + amt;
-    showToast(`تم إيداع ${amt} نقطة في الفيزا 💳`);
+    title = 'تم الإيداع بنجاح'; text = `تم إيداع ${amt} نقطة في فيزتك.`;
   } else {
     const min = visaMin();
-    if(bal<min){ showToast(`السحب متاح عند وصول رصيد الفيزا إلى ${min} نقطة`, true); return; }
-    if(amt<min){ showToast(`أقل قيمة للسحب ${min} نقطة`, true); return; }
-    if(amt>bal){ showToast('المبلغ أكبر من رصيد الفيزا', true); return; }
+    if(bal<min){ visaMsg('warn','السحب غير متاح بعد',`يُفتح السحب عندما يصل رصيد الفيزا إلى ${min} نقطة.`,{rows:[['رصيدك الحالي', bal+' نقطة'],['المتبقي', (min-bal)+' نقطة']]}); return; }
+    if(amt<min){ visaMsg('warn','المبلغ أقل من الحد الأدنى',`أقل قيمة للسحب ${min} نقطة.`); return; }
+    if(amt>bal){ visaMsg('warn','المبلغ أكبر من الرصيد','المبلغ المطلوب أكبر من رصيد الفيزا الحالي.',{rows:[['رصيد الفيزا', bal+' نقطة']]}); return; }
     WALLET[pid] = bal - amt; BONUS[pid] = (BONUS[pid]||0) + amt;
-    showToast(`تم سحب ${amt} نقطة لنقاط الفقرات ✅`);
+    title = 'تم السحب بنجاح'; text = `تم سحب ${amt} نقطة وإضافتها إلى نقاط الفقرات.`;
   }
   await saveWallet(WALLET); await saveBonus(BONUS);
   vibrate([15,10,25]); render();
+  visaMsg('success', title, text, { rows:[['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
+}
+/* ---------- تحويل نقاط بين المشاركين عن طريق رقم الفيزا ---------- */
+function visaLookupByNumber(digits){
+  const p = PARTICIPANTS.find(x=>visaNumber(x.id).replace(/\s/g,'')===digits);
+  return p ? p.id : null;
+}
+/* المحفظة كلها في مفتاح واحد، فالخصم من المرسل والإضافة للمستلم بيتموا في transaction واحدة (يا الاتنين يا ولا واحد) */
+async function transferWallet(from, to, amt){
+  let blocked = false;
+  const apply = (curStr)=>{
+    let o = {};
+    try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+    if(!o || typeof o!=='object') o = {};
+    if(curStr!==null && (Number(o[from])||0) < amt){ blocked = true; return; }
+    o[from] = (Number(o[from])||0) - amt;
+    o[to] = (Number(o[to])||0) + amt;
+    return JSON.stringify(o);
+  };
+  let res = null;
+  if(window.storage && window.storage.update){
+    res = await window.storage.update('glavera-visa-wallet', apply, true);
+  } else {
+    const cur = await window.storage.get('glavera-visa-wallet', true);
+    res = await window.storage.set('glavera-visa-wallet', apply(cur ? cur.value : null), true);
+  }
+  if(res) return 'ok';
+  return blocked ? 'short' : 'fail';
+}
+async function doVisaTransfer(){
+  const pid = state.pid;
+  if(visaExpired(pid)){ showExpiredDialog(); return; }
+  const toEl = document.getElementById('visa-to');
+  const digits = String(normalizeDigits(toEl ? toEl.value : '')||'').replace(/\D/g,'');
+  const amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
+  if(digits.length!==16){ visaMsg('warn','رقم البطاقة غير مكتمل','اكتب رقم بطاقة المستلم كاملًا (16 رقم) كما يظهر على وجه بطاقته.',{onClose:()=>{ if(toEl) toEl.focus(); }}); return; }
+  if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد تحويلها.'); return; }
+  if(!(await visaCheckPin(pid))) return;
+  const [w, fresh] = await Promise.all([loadWallet(), loadVisaCards()]);
+  WALLET = w; if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh;
+  const to = visaLookupByNumber(digits);
+  if(!to || !visaCreated(to)){ visaMsg('error','رقم البطاقة غير صحيح','لم نعثر على فيزا صالحة بهذا الرقم، تأكد من الرقم وحاول مرة أخرى.',{onClose:()=>{ if(toEl) toEl.focus(); }}); return; }
+  if(to===pid){ visaMsg('warn','لا يمكن التحويل لنفس البطاقة','هذا رقم بطاقتك أنت، اكتب رقم بطاقة المستلم.'); return; }
+  if(visaExpired(to)){ visaMsg('warn','بطاقة المستلم منتهية','لا يمكن التحويل إلى هذه البطاقة لأن صلاحيتها انتهت، اطلب من صاحبها تجديدها أولًا.'); return; }
+  const bal = WALLET[pid]||0;
+  if(amt>bal){ visaMsg('warn','رصيد الفيزا غير كافٍ','رصيدك الحالي أقل من المبلغ المراد تحويله.',{rows:[['رصيدك الحالي', bal+' نقطة'],['المبلغ المطلوب', amt+' نقطة']]}); return; }
+  const rp = PARTICIPANTS.find(x=>x.id===to) || {};
+  const rName = escapeHtml((VISA_CARDS[to]||{}).holder || rp.name || '—');
+  visaMsg('info','تأكيد التحويل','راجع بيانات المستلم جيدًا قبل التأكيد، فلا يمكن استرجاع التحويل بعد إتمامه.',{
+    rows:[['المستلم', rName], ['رقم البطاقة', '•••• '+digits.slice(-4)], ['المبلغ', amt+' نقطة']],
+    primary:{label:'تأكيد التحويل', onClick:()=>executeVisaTransfer(pid, to, amt, rName)},
+    secondary:{label:'إلغاء'}
+  });
+}
+async function executeVisaTransfer(from, to, amt, rName){
+  if(window.__visaTransferring) return;
+  window.__visaTransferring = true;
+  try{
+    const r = await transferWallet(from, to, amt);
+    if(r==='short'){ visaMsg('warn','رصيد الفيزا غير كافٍ','تغيّر رصيدك أثناء العملية، لم يتم تحويل أي نقاط.'); return; }
+    if(r!=='ok'){ visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة في الاتصال بالسيرفر ولم يتم خصم أي نقاط. حاول مرة أخرى.'); return; }
+    WALLET = await loadWallet();
+    const me = PARTICIPANTS.find(x=>x.id===from) || {};
+    const senderName = (VISA_CARDS[from]||{}).holder || me.name || '';
+    pushNotification(from, `📤 تم تحويل ${amt} نقطة إلى ${(VISA_CARDS[to]||{}).holder || (PARTICIPANTS.find(x=>x.id===to)||{}).name || ''}`, '📤');
+    pushNotification(to, `📥 وصلك ${amt} نقطة في فيزتك من ${senderName}`, '📥');
+    vibrate([15,10,25]); render();
+    visaMsg('success','تم التحويل بنجاح',`تم تحويل ${amt} نقطة إلى ${rName}.`,{ rows:[['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[from]||0)+' نقطة']] });
+  } finally { window.__visaTransferring = false; }
+}
+async function copyMyVisaNumber(btn){
+  const num = visaNumber(state.pid);
+  let ok = false;
+  try{ await navigator.clipboard.writeText(num); ok = true; }catch(e){
+    try{ const ta = document.createElement('textarea'); ta.value = num; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); }catch(e2){}
+  }
+  if(btn){ const old = btn.textContent; btn.textContent = ok ? '✓ تم نسخ الرقم' : num; setTimeout(()=>{ btn.textContent = old; }, 2200); }
+}
+/* تجديد الفيزا بعد انتهاء الصلاحية: رسوم ثابتة (100 افتراضيًا) من رصيد الفيزا أو من نقاط الفقرات */
+async function doVisaRenew(src){
+  if(window.__visaRenewing) return;
+  const pid = state.pid, fee = visaRenewFee();
+  if(!visaExpired(pid)){ render(); return; }
+  if(!(await visaCheckPin(pid))) return;
+  window.__visaRenewing = true;
+  try{
+    [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
+    const fromWallet = src==='wallet';
+    if(fromWallet ? (WALLET[pid]||0) < fee : participantTotal(pid) < fee){
+      visaMsg('warn','الرصيد غير كافٍ','رصيدك لا يغطي رسوم التجديد.',{ rows:[[fromWallet?'رصيد الفيزا':'نقاط الفقرات', (fromWallet?(WALLET[pid]||0):participantTotal(pid))+' نقطة'],['رسوم التجديد', fee+' نقطة']] });
+      return;
+    }
+    const key = fromWallet ? 'glavera-visa-wallet' : 'glavera-bonus';
+    const charged = await adjustSharedNumber(key, pid, -fee, fromWallet ? 0 : undefined);
+    if(charged!=='ok'){
+      visaMsg('error', charged==='short' ? 'الرصيد غير كافٍ' : 'تعذّر إتمام التجديد', charged==='short' ? 'تغيّر رصيدك أثناء العملية، حدّث الصفحة وحاول مرة أخرى.' : 'حدثت مشكلة في الاتصال بالسيرفر ولم يتم خصم أي نقاط. حاول مرة أخرى.');
+      return;
+    }
+    const now = Date.now(), expires = now + visaValidDays()*VISA_DAY_MS;
+    const cur = VISA_CARDS[pid] || {};
+    const ok = await updateVisaCard(pid, { expires, renewedAt: now, renewCount: (cur.renewCount||0)+1 });
+    if(!ok){
+      await adjustSharedNumber(key, pid, fee); /* رجّع النقاط لو التجديد نفسه فشل */
+      visaMsg('error','تعذّر إتمام التجديد','حدثت مشكلة في الاتصال بالسيرفر، وتمت إعادة النقاط إلى رصيدك. حاول مرة أخرى.');
+      return;
+    }
+    [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
+    pushNotification(pid, `✅ تم تجديد فيزتك حتى ${fmtVisaDate(expires)}`, '✅');
+    vibrate([15,10,25]); render();
+    visaMsg('success','تم تجديد الفيزا','فيزتك تعمل الآن ويمكنك استخدامها في الإيداع والسحب والألعاب.',
+      { rows:[['المدفوع', fee+' نقطة'], ['صالحة حتى', fmtVisaDate(expires)]] });
+  } finally { window.__visaRenewing = false; }
 }
 /* نقاط صندوق الهدايا اليومي برضو منفصلة عن مجموع النقاط لنفس السبب */
 async function loadGiftPoints(){
@@ -6689,13 +7126,12 @@ function renderGamesHub(){
       <span class="gh-title">مشاهدة المعركة</span>
       <span class="gh-sub">اتفرج على أصحابك وهما بيلعبوا لايڤ</span>
     </button>`;
-  const hasOwnCard = hasVisa(state.pid);
-  const visaTile = hasOwnCard ? `
+  const visaTile = `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#2EC5C0,#6C3FD0); --i:4" data-action="open-visa">
       <span class="gh-ico">💳</span>
       <span class="gh-title">فيزتي</span>
-      <span class="gh-sub">كارتك الخاص، اشحن رصيدك واسحب أرباحك</span>
-    </button>` : '';
+      <span class="gh-sub">${!visaCreated(state.pid) ? 'أنشئ فيزتك الأول عشان تلعب وتدخل الغرف' : (visaExpired(state.pid) ? '⏳ انتهت صلاحيتها — جدّدها الآن' : 'كارتك الخاص، اشحن رصيدك واسحب أرباحك')}</span>
+    </button>`;
   const stickerStoreTile = `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#FF9AD5,#845EC2); --i:3" data-action="open-sticker-store">
       <span class="gh-ico">🛍️</span>
@@ -6785,7 +7221,7 @@ function renderShopCardTab(){
     const price = cardTierPrice(tier);
     const items = groups[tier].map(k=>{
       const t = VISA_THEMES[k];
-      const isOwned = owned.indexOf(k)>-1;
+      const isOwned = k==='aurora' || owned.indexOf(k)>-1;
       return `<div class="card-store-item ${isOwned?'owned':''}">
         <div class="card-store-swatch" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></div>
         <div class="card-store-name">${t.name}</div>
@@ -6803,6 +7239,7 @@ function renderShopCardTab(){
   `;
 }
 async function doBuyCardTheme(themeKey, price){
+  if(!requireVisaValid()) return;
   price = Math.max(0, Number(price)||0);
   if(!VISA_THEMES[themeKey]) return;
   WALLET = await loadWallet();
@@ -6817,7 +7254,7 @@ async function doBuyCardTheme(themeKey, price){
   OWNED_CARD_THEMES[state.pid] = owned;
   await saveWallet(WALLET);
   await saveOwnedCardThemes(OWNED_CARD_THEMES);
-  showToast(isFirstCard ? '🎉 اتفتحت لك خانة "فيزتي" في الألعاب — روح صمّم كارتك!' : '✅ اتشترى تصميم الكارد بنجاح');
+  showToast('✅ اتشترى تصميم الكارد — اختاره من صفحة فيزتي');
   render();
 }
 /* ---- تاب المخصص: طلب تصميم كارد خاص من الأدمن ---- */
@@ -6872,6 +7309,7 @@ function attachShopCustomInputs(){
   }
 }
 async function doSubmitCustomCard(price){
+  if(!requireVisaValid()) return;
   price = Math.max(0, Number(price)||0);
   const photo = state.customCardDraftPhoto;
   if(!photo){ showToast('اختار صورة الأول', true); return; }
@@ -10250,6 +10688,7 @@ async function showRoomFeeModal(kind, onPaid){
   document.getElementById('fee-close-btn').addEventListener('click', closeRoomFeeModal);
   document.getElementById('fee-back-btn').addEventListener('click', closeRoomFeeModal);
   document.getElementById('fee-pay-btn').addEventListener('click', async ()=>{
+    if(visaExpired(state.pid)){ closeRoomFeeModal(); showExpiredDialog(); return; }
     WALLET = await loadWallet();
     const curBal = WALLET[state.pid]||0;
     if(curBal < fee){ visaShort(fee, curBal); return; }
@@ -13580,6 +14019,7 @@ function renderAdminParticipantDetail(p){
         <button type="button" class="btn btn-primary" style="flex:1;" data-action="save-participant" data-pid="${p.id}">حفظ</button>
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-edit-participant">إلغاء</button>
       </div>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;" data-action="admin-reset-visa-pin" data-pid="${p.id}">🔑 إعادة تعيين الرقم السري للفيزا</button>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="delete-participant" data-pid="${p.id}">🗑️ حذف المشارك نهائيًا</button>
       ${renderParticipantPrivatePhotosBlock(p.id)}
       ${attendanceBlock}
@@ -15101,6 +15541,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-restore-points'){ confirmRestorePoints(); }
   else if(action==='admin-reset-all-visas'){ confirmResetAllVisas(); }
   else if(action==='admin-restore-visas'){ confirmRestoreVisas(); }
+  else if(action==='admin-reset-visa-pin'){ confirmAdminResetVisaPin(el.dataset.pid); }
   else if(action==='admin-bulk-points'){ doAdminBulkAddPoints(parseInt(el.dataset.sign,10)); }
   else if(action==='admin-game-points'){ confirmAdminGamePoints(parseInt(el.dataset.sign,10)); }
   else if(action==='cancel-edit-participant'){ state.editingParticipantId = null; render(); }
@@ -15227,20 +15668,21 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-save-dish-name'){ doAdminSaveDishName(el.dataset.cid, el.dataset.did); }
   else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
-  else if(action==='open-visa'){
-    if(!(OWNED_CARD_THEMES[state.pid]||[]).length){ showToast('لازم تشتري تصميم كارت الأول من Shop 🛍️ (تاب كارد)', true); return; }
-    state.friendTile = null; state.visaDraft = null; state.visaTab = 'deposit'; go('visa'); visaRefresh();
-  }
+  else if(action==='open-visa'){ openVisaPage(); }
   else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
   else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
   else if(action==='visa-theme'){ const h=document.getElementById('visa-holder'); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:h?h.value:''}); render(); }
-  else if(action==='visa-theme-locked'){ showToast('التصميم ده لسه مش عندك — اشتريه من Shop 🛍️ (تاب كارد)', true); }
+  else if(action==='visa-theme-locked'){ visaMsg('info','التصميم غير مملوك','هذا التصميم غير متاح لك بعد، يمكنك شراؤه من المتجر (Shop) ← تاب كارد.'); }
+  else if(action==='visa-create'){ doVisaCreate(); }
+  else if(action==='visa-renew'){ doVisaRenew(el.dataset.src); }
+  else if(action==='visa-transfer'){ doVisaTransfer(); }
+  else if(action==='visa-copy-number'){ copyMyVisaNumber(el); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){
-    const h=document.getElementById('visa-holder'); const d=Object.assign({theme:'aurora'}, VISA_CARDS[state.pid]||{}, state.visaDraft||{}, {holder:(h?h.value:'').trim()});
-    loadVisaCards().then(async all=>{ all[state.pid]=d; VISA_CARDS=all; await saveVisaCards(all); state.visaDraft=null; showToast('تم حفظ تصميم الفيزا 💳'); render(); });
+    const h=document.getElementById('visa-holder'); const cc=Object.assign({theme:defaultCardTheme(state.pid)}, VISA_CARDS[state.pid]||{}, state.visaDraft||{});
+    updateVisaCard(state.pid, {theme:cc.theme, holder:(h?h.value:'').trim()}).then(ok=>{ if(!ok){ visaMsg('error','تعذّر حفظ التصميم','حدثت مشكلة في الاتصال، حاول مرة أخرى.'); return; } state.visaDraft=null; render(); visaMsg('success','تم حفظ التصميم','تم تحديث تصميم فيزتك والاسم المكتوب عليها.'); });
   }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
@@ -15408,7 +15850,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='memory-reset'){ initMemoryGame(); render(); }
   else if(action==='rps-pick'){ doRpsPick(el.dataset.choice); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
-  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); } }
+  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); }); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
   else if(action==='radial-tap'){
     if(suppressNextRadialClick){ suppressNextRadialClick = false; }
@@ -15444,6 +15886,36 @@ document.addEventListener('change', (e)=>{
   }
   if(e.target.dataset && e.target.dataset.action==='move-participant-team' && e.target.value){
     doMoveParticipantTeam(e.target.dataset.pid, e.target.value);
+  }
+});
+/* الفيزا: الأرقام بس، وتحديث البطاقة لحظيًا وهو بيكتب (من غير ما نعيد رسم الصفحة) */
+document.addEventListener('input', (e)=>{
+  const t = e.target;
+  if(!t || !t.dataset || !t.dataset.vcLive) return;
+  if(t.dataset.vcLive==='name'){
+    const el = document.querySelector('.vc-holder-live');
+    if(el) el.textContent = t.value.trim() || 'FULL NAME';
+  } else if(t.dataset.vcLive==='cardno'){
+    const d = String(normalizeDigits(t.value)||'').replace(/\D/g,'').slice(0,16);
+    const f = d.replace(/(\d{4})(?=\d)/g,'$1 ');
+    if(t.value!==f) t.value = f;
+  } else if(t.dataset.vcLive==='pin'){
+    const v = cleanPin(t.value);
+    if(t.value!==v) t.value = v;
+    const box = document.getElementById('vc-cvv-dots');
+    if(box){ box.textContent = v ? v.split('').map(()=>'•').join(' ') : '• • •'; box.classList.toggle('empty', !v); }
+  }
+});
+document.addEventListener('focusin', (e)=>{
+  const t = e.target;
+  if(t && t.dataset && t.dataset.vcFlip){ const v = document.getElementById('vc-inner'); if(v) v.classList.add('flip'); }
+});
+document.addEventListener('focusout', (e)=>{
+  const t = e.target;
+  if(t && t.dataset && t.dataset.vcFlip){
+    const next = e.relatedTarget;
+    if(next && next.dataset && next.dataset.vcFlip) return; /* لسه بينتقل لخانة رقم سري تانية */
+    const v = document.getElementById('vc-inner'); if(v) v.classList.remove('flip');
   }
 });
 document.addEventListener('input', (e)=>{
@@ -17091,6 +17563,22 @@ function renderAdminVisaResetCard(){
       ${status}
     </div>`;
 }
+function confirmAdminResetVisaPin(pid){
+  const p = PARTICIPANTS.find(x=>x.id===pid);
+  if(!p) return;
+  showConfirmDialog(`إعادة تعيين الرقم السري لـ ${escapeHtml(p.name)}؟`, ()=>doAdminResetVisaPin(pid), {
+    icon:'🔑', confirmLabel:'إعادة التعيين',
+    sub:'هيتمسح رقمه السري الحالي وهيكتب رقم جديد من صفحة فيزتي. رصيد الفيزا وتصميم الكارت بيفضلوا زي ما هما.'
+  });
+}
+async function doAdminResetVisaPin(pid){
+  VISA_CARDS = await loadVisaCards();
+  if(!visaPinOf(pid)){ showToast('المشارك ده معندوش رقم سري متسجل', true); return; }
+  const ok = await updateVisaCard(pid, { pin:null });
+  if(!ok){ showToast('تعذر الحفظ على السيرفر — حاول تاني', true); return; }
+  pushNotification(pid, '🔑 المنظمين أعادوا تعيين الرقم السري لفيزتك — اكتب رقم جديد من صفحة فيزتي', '🔑');
+  showToast('✅ تمت إعادة تعيين الرقم السري');
+}
 async function doMoveParticipantTeam(pid, newTeamId){
   PARTICIPANT_OVERRIDES[pid] = Object.assign({}, PARTICIPANT_OVERRIDES[pid], {teamId:newTeamId});
   showToast('تم نقل المشارك للفريق الجديد');
@@ -18718,7 +19206,7 @@ async function refreshAllData(){
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
    CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS,
-   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS] = await Promise.all([
+   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, VISA_CARDS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
@@ -18726,7 +19214,7 @@ async function refreshAllData(){
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
     loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers(),
-    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests()
+    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadVisaCards()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
@@ -18847,6 +19335,7 @@ function startLivePolling(){
   setInterval(async ()=>{
     if(document.hidden) return;
     if(state.pid) checkDeviceSessionKicked();
+    if(state.pid) checkVisaExpiry();
     checkUpcomingSessionAlerts();
     checkDailyMessage();
     checkConfTimeAlerts();
