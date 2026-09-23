@@ -2193,6 +2193,23 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     display:flex; align-items:center; justify-content:center; border:2px solid var(--surface);}
   .pl-badge.pl-dot{width:18px; padding:0; border-radius:50%; box-shadow:inset 0 -2px 3px rgba(0,0,0,.25);}
   .pl-badge.pl-x{background:#E5484D; color:#fff;}
+  .pl-avatar.xl{width:92px; height:92px; font-size:30px; margin:0 auto 4px; box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--border), 0 10px 26px rgba(0,0,0,.4);}
+  .pl-avatar.xl.pl-ai{font-size:46px;}
+  .pl-avatar.pl-crying{filter:saturate(.7) brightness(.9);}
+  .pl-avatar.pl-crying::after{content:''; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 78%, rgba(70,130,220,.32), transparent 62%); pointer-events:none;}
+  .pl-tear{position:absolute; top:28%; width:5px; height:15px; z-index:2;
+    border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+    background:linear-gradient(180deg, rgba(150,205,255,.95), rgba(55,135,230,.9));
+    box-shadow:0 0 5px rgba(90,170,255,.75); opacity:0; animation:tearFall 1.9s ease-in infinite;}
+  .pl-tear-l{left:32%; animation-delay:0s;}
+  .pl-tear-r{left:60%; animation-delay:.65s;}
+  @keyframes tearFall{
+    0%{opacity:0; transform:translateY(0) scaleY(.6);}
+    12%{opacity:1; transform:translateY(2px) scaleY(1);}
+    72%{opacity:.9; transform:translateY(230%) scaleY(1.15);}
+    100%{opacity:0; transform:translateY(280%) scaleY(1.3);}
+  }
   .xo-score-pill.has-av{padding-top:10px; gap:6px; align-items:center;}
   .xo-score-pill.has-av span{line-height:1.2;}
 
@@ -6585,7 +6602,7 @@ function renderXoGame(){
       </div>
       <div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز ضد الجهاز تاخد <b>${reward}</b> نقطة</div>
       <div class="match-result-card ${iWon?'win':'lose'}">
-        <div class="match-result-ico">${iWon?'🏆':'😭'}</div>
+        <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
         <div class="match-result-title">${iWon?'مبروك! كسبت المعركة':'خسرت المعركة'}</div>
         <div class="match-result-sub">${iWon?'أنت':'الجهاز'} وصل ${need} فوز وحسم المعركة</div>
         ${iWon
@@ -7162,7 +7179,7 @@ function renderConnect4Game(){
       </div>
       <div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز ضد الجهاز تاخد <b>${reward}</b> نقطة</div>
       <div class="match-result-card ${iWon?'win':'lose'}">
-        <div class="match-result-ico">${iWon?'🏆':'😭'}</div>
+        <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
         <div class="match-result-title">${iWon?'مبروك! كسبت المعركة':'خسرت المعركة'}</div>
         <div class="match-result-sub">${iWon?'أنت':'الجهاز'} وصل ${need} فوز وحسم المعركة</div>
         ${iWon
@@ -9130,21 +9147,26 @@ function renderUnoGame(){
 // يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
 function gameAvatar(pid, badgeText, size, dotColorId){
   const p = PARTICIPANTS.find(x=>x.id===pid);
+  const crying = badgeText==='😭';
   let badge = '';
   if(dotColorId) badge = `<i class="pl-badge pl-dot" style="background:${c4Grad(dotColorId)}"></i>`;
-  else if(badgeText) badge = `<i class="pl-badge ${badgeText==='✖'?'pl-x':''}">${badgeText}</i>`;
-  if(!p) return `<div class="pl-avatar pl-ai ${size||''}">👤${badge}</div>`;
+  else if(badgeText && !crying) badge = `<i class="pl-badge ${badgeText==='✖'?'pl-x':''}">${badgeText}</i>`;
+  const tears = crying ? `<span class="pl-tear pl-tear-l"></span><span class="pl-tear pl-tear-r"></span>` : '';
+  const cryCls = crying ? ' pl-crying' : '';
+  if(!p) return `<div class="pl-avatar pl-ai ${size||''}${cryCls}">👤${badge}${tears}</div>`;
   const t = teamOf(p.teamId);
   const bg = p.photo
     ? `background-image:url('${p.photo}');background-size:cover;background-position:center;`
     : `background:${t?t.color:'var(--gold)'};`;
-  return `<div class="pl-avatar ${size||''}" style="${bg}" title="${escapeHtml(p.name)}">${p.photo?'':escapeHtml(initials(p.name))}${badge}</div>`;
+  return `<div class="pl-avatar ${size||''}${cryCls}" style="${bg}" title="${escapeHtml(p.name)}">${p.photo?'':escapeHtml(initials(p.name))}${badge}${tears}</div>`;
 }
 function gameAiAvatar(badgeText, size, dotColorId){
+  const crying = badgeText==='😭';
   let badge = '';
   if(dotColorId) badge = `<i class="pl-badge pl-dot" style="background:${c4Grad(dotColorId)}"></i>`;
-  else if(badgeText) badge = `<i class="pl-badge">${badgeText}</i>`;
-  return `<div class="pl-avatar pl-ai ${size||''}">🤖${badge}</div>`;
+  else if(badgeText && !crying) badge = `<i class="pl-badge">${badgeText}</i>`;
+  const tears = crying ? `<span class="pl-tear pl-tear-l"></span><span class="pl-tear pl-tear-r"></span>` : '';
+  return `<div class="pl-avatar pl-ai ${size||''}${crying?' pl-crying':''}">🤖${badge}${tears}</div>`;
 }
 function scorePill(avatarHtml, score, cls, active){
   return `<div class="xo-score-pill has-av ${cls||''}${active?' turn':''}">${avatarHtml}<b>${score}</b></div>`;
@@ -10090,7 +10112,7 @@ function renderRoomXo(){
       </div>
       ${feeBanner}
       <div class="match-result-card ${iWon?'win':'lose'}">
-        <div class="match-result-ico">${iWon?'🏆':'😭'}</div>
+        <div class="match-result-ico">${iWon?'🏆':gameAvatar(myId,'😭','xl')}</div>
         <div class="match-result-title">${iWon?'مبروك! كسبت المعركة':'خسرت المعركة'}</div>
         <div class="match-result-sub">${escapeHtml(winnerName||'')} كسب ${need} أجيمات وحسم المعركة</div>
         ${iWon
