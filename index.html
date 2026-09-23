@@ -3570,14 +3570,18 @@ function visaNumber(pid){
 }
 function visaMin(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.visaMinWithdraw) || 600; }
 function visaShort(fee, bal){
-  showToast(bal<=0 ? 'الفيزا فارغة 💳 يرجى شحنها من صفحة فيزا الألعاب' : `رصيد الفيزا لا يكفي (${bal} من ${fee}) — يرجى شحن الفيزا`, true);
+  showToast(bal<=0 ? 'الفيزا فارغة 💳 يرجى شحنها من صفحة فيزتي' : `رصيد الفيزا لا يكفي (${bal} من ${fee}) — يرجى شحن الفيزا`, true);
 }
 function customCardImageFor(pid){
   const done = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.pid===pid && r.status==='received' && r.resultImage);
   return done.length ? done[done.length-1].resultImage : null;
 }
+function defaultCardTheme(pid){
+  const owned = OWNED_CARD_THEMES[pid] || [];
+  return owned.length ? owned[0] : 'aurora';
+}
 function visaCardHtml(pid, draft){
-  const c = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, draft||{});
+  const c = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, draft||{});
   const customImg = c.theme==='custom' ? customCardImageFor(pid) : null;
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
   const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
@@ -3602,17 +3606,17 @@ function renderVisaPage(){
   const pid = state.pid;
   const bal = WALLET[pid]||0, total = participantTotal(pid), min = visaMin();
   const tab = state.visaTab==='withdraw' ? 'withdraw' : 'deposit';
-  const cur = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, state.visaDraft||{});
+  const cur = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, state.visaDraft||{});
   const pct = Math.min(100, Math.round(bal/min*100));
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
   const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
-    const isOwned = k==='aurora' || ownedThemes.indexOf(k)>-1;
+    const isOwned = ownedThemes.indexOf(k)>-1;
     return `<button type="button" class="vp-sw ${cur.theme===k?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
     + (customCardImageFor(pid) ? `<button type="button" class="vp-sw ${cur.theme==='custom'?'on':''}" data-action="visa-theme" data-k="custom" aria-label="مخصص" style="background-image:url('${customCardImageFor(pid)}');background-size:cover;background-position:center;">${cur.theme==='custom'?'':''}</button>` : '');
   return `
-    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزا الألعاب</div></div>
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزتي</div></div>
     ${visaCardHtml(pid, state.visaDraft)}
     <div class="vp-hint" style="text-align:center;margin:8px 0 14px;">اضغط على البطاقة لقلبها</div>
     <div class="vp-panel">
@@ -6664,12 +6668,13 @@ function renderGamesHub(){
       <span class="gh-title">مشاهدة المعركة</span>
       <span class="gh-sub">اتفرج على أصحابك وهما بيلعبوا لايڤ</span>
     </button>`;
-  const visaTile = `
+  const hasOwnCard = (OWNED_CARD_THEMES[state.pid]||[]).length>0;
+  const visaTile = hasOwnCard ? `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#2EC5C0,#6C3FD0); --i:4" data-action="open-visa">
       <span class="gh-ico">💳</span>
-      <span class="gh-title">فيزا الألعاب</span>
-      <span class="gh-sub">اشحن رصيدك واسحب أرباحك</span>
-    </button>`;
+      <span class="gh-title">فيزتي</span>
+      <span class="gh-sub">كارتك الخاص، اشحن رصيدك واسحب أرباحك</span>
+    </button>` : '';
   const stickerStoreTile = `
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#FF9AD5,#845EC2); --i:3" data-action="open-sticker-store">
       <span class="gh-ico">🛍️</span>
@@ -6757,7 +6762,7 @@ function renderShopCardTab(){
     const price = cardTierPrice(tier);
     const items = groups[tier].map(k=>{
       const t = VISA_THEMES[k];
-      const isOwned = k==='aurora' || owned.indexOf(k)>-1; // aurora هي التصميم الافتراضي المجاني
+      const isOwned = owned.indexOf(k)>-1;
       return `<div class="card-store-item ${isOwned?'owned':''}">
         <div class="card-store-swatch" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></div>
         <div class="card-store-name">${t.name}</div>
@@ -6771,7 +6776,7 @@ function renderShopCardTab(){
   return `
     ${renderGroup('simple','🎨 تصاميم بسيطة')}
     ${renderGroup('vip','👑 تصاميم VIP')}
-    <div class="hint" style="margin-top:12px;text-align:center;">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزا الألعاب</div>
+    <div class="hint" style="margin-top:12px;text-align:center;">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزتي</div>
   `;
 }
 async function doBuyCardTheme(themeKey, price){
@@ -6783,12 +6788,13 @@ async function doBuyCardTheme(themeKey, price){
   OWNED_CARD_THEMES = await loadOwnedCardThemes();
   const owned = OWNED_CARD_THEMES[state.pid] || [];
   if(owned.indexOf(themeKey)>-1){ render(); return; }
+  const isFirstCard = owned.length===0;
   BONUS[state.pid] = bal - price;
   owned.push(themeKey);
   OWNED_CARD_THEMES[state.pid] = owned;
   await saveBonus(BONUS);
   await saveOwnedCardThemes(OWNED_CARD_THEMES);
-  showToast('✅ اتشترى تصميم الكارد بنجاح');
+  showToast(isFirstCard ? '🎉 اتفتحت لك خانة "فيزتي" في الألعاب — روح صمّم كارتك!' : '✅ اتشترى تصميم الكارد بنجاح');
   render();
 }
 /* ---- تاب المخصص: طلب تصميم كارد خاص من الأدمن ---- */
@@ -15182,7 +15188,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-save-dish-name'){ doAdminSaveDishName(el.dataset.cid, el.dataset.did); }
   else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
-  else if(action==='open-visa'){ state.friendTile = null; state.visaDraft = null; state.visaTab = 'deposit'; go('visa'); visaRefresh(); }
+  else if(action==='open-visa'){
+    if(!(OWNED_CARD_THEMES[state.pid]||[]).length){ showToast('لازم تشتري تصميم كارت الأول من Shop 🛍️ (تاب كارد)', true); return; }
+    state.friendTile = null; state.visaDraft = null; state.visaTab = 'deposit'; go('visa'); visaRefresh();
+  }
   else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
   else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
@@ -15360,7 +15369,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='memory-reset'){ initMemoryGame(); render(); }
   else if(action==='rps-pick'){ doRpsPick(el.dataset.choice); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
-  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); } }
+  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
   else if(action==='radial-tap'){
     if(suppressNextRadialClick){ suppressNextRadialClick = false; }
