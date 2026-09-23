@@ -1194,6 +1194,20 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-sws{display:flex; gap:12px; margin-bottom:12px;}
   .vp-sw{width:36px; height:36px; border-radius:50%; border:2px solid transparent;}
   .vp-sw.on{border-color:var(--text); box-shadow:0 0 0 3px var(--bg-2) inset;}
+  .vc-front.vc-img{background:var(--img) center/cover no-repeat, var(--base);}
+  .vc-front.vc-img::before,.vc-front.vc-img::after{display:none;}
+  .vc-img .vc-top,.vc-img .vc-mid{display:none;}
+  .vc-img .vc-num{position:absolute; left:7%; top:54%; font-size:17px;}
+  .vc-img .vc-bot{position:absolute; left:7%; right:36%; bottom:12px; flex-direction:column-reverse; align-items:flex-start; gap:5px; text-shadow:0 1px 3px rgba(0,0,0,.55);}
+  .vc-img .vc-bot b{font-size:12.5px; max-width:100%;}
+  .vc-img.vc-dk{color:#1b1530;} .vc-img.vc-dk .vc-num,.vc-img.vc-dk .vc-bot{text-shadow:none;}
+  .vc-back.vc-imgb{background:linear-gradient(135deg,var(--base),#050510);}
+  .vp-designs-btn{margin-bottom:12px;}
+  .vd-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .vd-item{padding:0; border-radius:14px; overflow:hidden; border:2px solid transparent; aspect-ratio:1.586; background:var(--bg-2);}
+  .vd-item img{width:100%; height:100%; object-fit:cover; display:block;}
+  .vd-item.on{border-color:var(--gold-2);}
+  .vd-item:focus-visible{outline:2px solid var(--gold-2); outline-offset:2px;}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -3543,6 +3557,8 @@ const VISA_THEMES = {
   emerald:{name:'زمردي', base:'#06241a', a:'#2ecc91', b:'#c9f7e2', c:'#0f7a55'},
   rose:{name:'وردي', base:'#3a0f24', a:'#ff5e8a', b:'#ffc4d6', c:'#a12b6b'}
 };
+/* تصاميم جاهزة للكارت (الصور في مجلد cards/) */
+const VISA_DESIGNS = [{"id": "d01", "name": "الأسد", "c": "#0f0c08", "dk": 0}, {"id": "d02", "name": "موجة ذهبية", "c": "#0f0d0a", "dk": 0}, {"id": "d03", "name": "قمة الجبل", "c": "#191818", "dk": 0}, {"id": "d04", "name": "جبال الغروب", "c": "#2d3037", "dk": 0}, {"id": "d05", "name": "جبال زرقاء", "c": "#162533", "dk": 0}, {"id": "d06", "name": "رخام أسود", "c": "#12110e", "dk": 0}, {"id": "d07", "name": "خط ذهبي", "c": "#110f0f", "dk": 0}, {"id": "d08", "name": "موجة المحيط", "c": "#0b1f2f", "dk": 0}, {"id": "d09", "name": "مياه زرقاء", "c": "#092537", "dk": 0}, {"id": "d10", "name": "هندسي ذهبي", "c": "#0c0b08", "dk": 0}, {"id": "d11", "name": "الفهد", "c": "#0a0907", "dk": 0}, {"id": "d12", "name": "الأرض", "c": "#13161d", "dk": 0}, {"id": "d13", "name": "فراشة وأوراق", "c": "#0f0b06", "dk": 0}, {"id": "d14", "name": "فراشة ذهبية", "c": "#0c0907", "dk": 0}, {"id": "d15", "name": "موجة بنفسجية", "c": "#130e3d", "dk": 0}, {"id": "d16", "name": "كثبان", "c": "#27150e", "dk": 0}, {"id": "d17", "name": "كربون أحمر", "c": "#0d0b0b", "dk": 0}, {"id": "d18", "name": "التنين", "c": "#0e0904", "dk": 0}, {"id": "d19", "name": "رخام بنفسجي", "c": "#70646c", "dk": 1}, {"id": "d20", "name": "رخام أبيض", "c": "#6f6a67", "dk": 1}, {"id": "d21", "name": "حمم", "c": "#0f0706", "dk": 0}, {"id": "d22", "name": "موجة فضية", "c": "#0b0a09", "dk": 0}, {"id": "d23", "name": "أوراق خضراء", "c": "#0b130c", "dk": 0}, {"id": "d24", "name": "سلحفاة", "c": "#072736", "dk": 0}, {"id": "d25", "name": "مجرة", "c": "#130f15", "dk": 0}, {"id": "d26", "name": "موجة زرقاء", "c": "#080b0f", "dk": 0}, {"id": "d27", "name": "مدينة الغروب", "c": "#3b2e32", "dk": 0}, {"id": "d28", "name": "شفق قطبي", "c": "#091d29", "dk": 0}, {"id": "d29", "name": "كوكب ذهبي", "c": "#0e0b07", "dk": 0}, {"id": "d30", "name": "زهر الكرز", "c": "#77464c", "dk": 1}, {"id": "d31", "name": "رخام أزرق", "c": "#0a0d10", "dk": 0}, {"id": "d32", "name": "بوصلة", "c": "#0b0805", "dk": 0}, {"id": "d33", "name": "جبال ذهبية", "c": "#090807", "dk": 0}];
 function visaNumber(pid){
   let h = 2166136261; const t = String(pid);
   for(let i=0;i<t.length;i++){ h ^= t.charCodeAt(i); h = Math.imul(h,16777619)>>>0; }
@@ -3556,16 +3572,20 @@ function visaShort(fee, bal){
 function visaCardHtml(pid, draft){
   const c = Object.assign({theme:'aurora', holder:''}, VISA_CARDS[pid]||{}, draft||{});
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
+  const dz = c.design ? VISA_DESIGNS.find(x=>x.id===c.design) : null;
+  const fCls = dz ? ' vc-img'+(dz.dk?' vc-dk':'') : '', bCls = dz ? ' vc-imgb' : '';
+  const fSty = dz ? `--base:${dz.c};--img:url(cards/${dz.id}.webp)` : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
+  const bSty = dz ? `--base:${dz.c}` : `--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}`;
   const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
   const bal = WALLET[pid]||0;
   return `<div class="vc-scene" data-action="visa-flip"><div class="vc-inner" id="vc-inner">
-    <div class="vc-face vc-front" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+    <div class="vc-face vc-front${fCls}" style="${fSty}">
       <div class="vc-top"><span class="vc-brand">Glafera</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num">${visaNumber(pid)}</div>
       <div class="vc-bot"><div><small>حامل البطاقة</small><b dir="auto">${escapeHtml(nm)}</b></div><div><small>الصلاحية</small><b>12/30</b></div></div>
     </div>
-    <div class="vc-face vc-back" style="--base:${th.base};--a:${th.a};--b:${th.b};--c:${th.c}">
+    <div class="vc-face vc-back${bCls}" style="${bSty}">
       <div class="vc-strip"></div>
       <div class="vc-back-bal"><small>الرصيد الحالي</small><b>${bal}</b><span>نقطة</span></div>
     </div></div></div>`;
@@ -3579,7 +3599,7 @@ function renderVisaPage(){
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
-    return `<button type="button" class="vp-sw ${cur.theme===k?'on':''}" data-action="visa-theme" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></button>`; }).join('');
+    return `<button type="button" class="vp-sw ${cur.theme===k&&!cur.design?'on':''}" data-action="visa-theme" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></button>`; }).join('');
   return `
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">فيزا الألعاب</div></div>
     ${visaCardHtml(pid, state.visaDraft)}
@@ -3604,9 +3624,27 @@ function renderVisaPage(){
     <div class="vp-panel">
       <div class="vp-title">صمّم فيزتك</div>
       <div class="vp-sws">${swatches}</div>
+      <button type="button" class="btn btn-ghost vp-designs-btn" data-action="visa-designs">🎨 تصميم الكارت</button>
       <input id="visa-holder" class="field" maxlength="22" placeholder="الاسم على البطاقة" value="${escapeHtml(cur.holder||'')}" />
       <button type="button" class="btn btn-ghost" style="margin-top:10px;" data-action="visa-save-design">حفظ التصميم</button>
     </div>`;
+}
+function openVisaDesigns(){
+  const old = document.getElementById('visa-designs'); if(old) old.remove();
+  const cur = Object.assign({}, VISA_CARDS[state.pid]||{}, state.visaDraft||{});
+  const o = document.createElement('div'); o.id = 'visa-designs'; o.className = 'notif-overlay';
+  o.innerHTML = `<div class="notif-panel"><div class="notif-panel-handle"></div>
+    <div class="notif-panel-head"><div class="notif-panel-title">تصميم الكارت</div><button type="button" class="icon-btn" data-vd-close aria-label="إغلاق">✕</button></div>
+    <div class="vd-grid">${VISA_DESIGNS.map(d=>`<button type="button" class="vd-item ${cur.design===d.id?'on':''}" data-vd="${d.id}" aria-label="${d.name}"><img src="cards/${d.id}.webp" alt="${d.name}" loading="lazy"></button>`).join('')}</div></div>`;
+  document.body.appendChild(o);
+  o.addEventListener('click', e=>{
+    if(e.target===o || e.target.closest('[data-vd-close]')){ o.remove(); return; }
+    const b = e.target.closest('[data-vd]'); if(!b) return;
+    const h = document.getElementById('visa-holder');
+    state.visaDraft = Object.assign({}, state.visaDraft||{}, {design:b.dataset.vd, holder:h?h.value:''});
+    o.remove(); render(); vibrate([10]);
+    setTimeout(()=>{ const c=document.querySelector('.vc-scene'); if(c) c.scrollIntoView({behavior:'smooth',block:'center'}); }, 60);
+  });
 }
 async function visaRefresh(){
   [WALLET, VISA_CARDS, BONUS] = await Promise.all([loadWallet(), loadVisaCards(), loadBonus()]);
@@ -14977,7 +15015,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
   else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
-  else if(action==='visa-theme'){ const h=document.getElementById('visa-holder'); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:h?h.value:''}); render(); }
+  else if(action==='visa-theme'){ const h=document.getElementById('visa-holder'); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, design:null, holder:h?h.value:''}); render(); }
+  else if(action==='visa-designs'){ openVisaDesigns(); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){
