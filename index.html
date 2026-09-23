@@ -6599,7 +6599,7 @@ function renderXoGame(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
-    <button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="xo-reset">🔄 جولة جديدة</button>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="xo-reset">Next</button>
   `;
 }
 
@@ -7184,7 +7184,7 @@ function renderConnect4Game(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="c4-board">${cellsHtml}</div>
-    <button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="c4-reset">🔄 جولة جديدة</button>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="c4-reset">Next</button>
   `;
 }
 
@@ -7636,7 +7636,7 @@ function renderDominoGame(){
     <div class="domino-result">
       <div class="dr-title">${statusText}</div>
       ${g.blocked ? `<div class="dr-sub">نقطك: ${g.ptsR} • نقط ${oppName}: ${g.ptsY} (الأقل هو اللي بيكسب)</div>` : '<div class="dr-sub">عايز تلعب تاني؟</div>'}
-      <button type="button" class="btn btn-outline" data-action="domino-reset">🔄 جولة جديدة</button>
+      <button type="button" class="btn btn-primary" style="letter-spacing:1px;text-transform:uppercase;" data-action="domino-reset">Next</button>
     </div>` : '';
   const passHtml = g.mustPass ? `<button type="button" class="btn btn-primary" style="width:100%;margin:12px 0 0;" data-action="domino-pass">⏭️ عدّي الدور</button>` : '';
   return `
@@ -8066,7 +8066,7 @@ function ludoResultHtml(L, ctx){
     return `<div class="lr-row${i===0?' first':''}" style="--pc:${pal.solid}"><span class="lr-medal">${medals[i]}</span><span class="lr-dot"></span><span class="lr-name">${escapeHtml(s.name)}</span><span class="lr-home">🏠 ${x.home}/4</span></div>`;
   }).join('');
   const btn = ctx.canNew
-    ? `<button type="button" class="btn btn-outline" data-action="ludo-again">🔄 جولة جديدة</button>` + (ctx.mode==='local' ? `<button type="button" class="btn btn-outline" style="margin-top:8px;" data-action="ludo-setup">⚙️ تغيير اللاعبين</button>` : '')
+    ? `<button type="button" class="btn btn-primary" style="letter-spacing:1px;text-transform:uppercase;" data-action="ludo-again">Next</button>` + (ctx.mode==='local' ? `<button type="button" class="btn btn-outline" style="margin-top:8px;" data-action="ludo-setup">⚙️ تغيير اللاعبين</button>` : '')
     : `<div class="dr-sub" style="margin:6px 0 0;">⏳ في انتظار صاحب الغرفة يبدأ جولة جديدة</div>`;
   const w = L.seats[L.winner];
   return `
@@ -9085,7 +9085,7 @@ function unoWinHtml(g, myKey, prefix, nextAction){
         <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
         <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
         <div class="uno-win-sub">${others}</div>
-        <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="${nextAction}">🔄 جولة جديدة</button>
+        <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;letter-spacing:1px;text-transform:uppercase;" data-action="${nextAction}">Next</button>
       </div>
     </div>
   `;
@@ -10092,7 +10092,7 @@ function renderRoomXo(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="xo-board">${cellHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-xo-next">🔄 الجولة اللي جاية</button>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-xo-next">Next</button>` : ''}
   `;
 }
 function renderRoomRps(){
@@ -10139,7 +10139,7 @@ function renderRoomRps(){
     <div class="rps-choices">
       ${['rock','paper','scissors'].map(c=>`<button type="button" class="rps-btn" data-action="room-rps-pick" data-choice="${c}" ${myPick?'disabled':''}>${RPS_ICONS[c]}<span>${RPS_LABELS[c]}</span></button>`).join('')}
     </div>
-    ${bothPicked ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-rps-next">🔄 جولة جديدة</button>` : ''}
+    ${bothPicked ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-rps-next">Next</button>` : ''}
   `;
 }
 function renderRoomDomino(){
@@ -10198,7 +10198,7 @@ function renderRoomDomino(){
     ${pendingButtons}
     <div class="domino-hand-label">قطعك:</div>
     <div class="domino-hand">${handHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-domino-next">🔄 جولة جديدة</button>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-domino-next">Next</button>` : ''}
   `;
 }
 
@@ -10331,7 +10331,7 @@ function renderRoomC4(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="c4-board">${cellsHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-c4-next">🔄 جولة جديدة</button>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-c4-next">Next</button>` : ''}
   `;
 }
 
@@ -10424,7 +10424,7 @@ function renderRoomMemory(){
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="memory-grid">${cellsHtml}</div>
-    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-memory-next">🔄 جولة جديدة</button>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-memory-next">Next</button>` : ''}
   `;
 }
 
@@ -10497,7 +10497,7 @@ function renderRoomNumGuess(){
     <div class="xo-status">${statusText}</div>
     <div class="numguess-keypad">${keys}</div>
     ${historyHtml ? `<div class="memory-stats-row" style="margin-top:12px;flex-wrap:wrap;">${historyHtml}</div>` : ''}
-    ${room.winner ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="room-num-next">🔄 جولة جديدة</button>` : ''}
+    ${room.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:12px;letter-spacing:1px;text-transform:uppercase;" data-action="room-num-next">Next</button>` : ''}
   `;
 }
 
@@ -10559,7 +10559,7 @@ function renderRoomMath(){
     <div class="rps-choices">
       ${room.problem.options.map(o=>`<button type="button" class="rps-btn" data-action="room-math-pick" data-val="${o}" ${iLocked?'disabled':''}>${o}</button>`).join('')}
     </div>`}
-    ${room.finished ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:16px;" data-action="room-math-next">🔄 جولة جديدة</button>` : ''}
+    ${room.finished ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;letter-spacing:1px;text-transform:uppercase;" data-action="room-math-next">Next</button>` : ''}
   `;
 }
 
