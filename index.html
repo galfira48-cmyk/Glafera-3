@@ -2839,17 +2839,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .xo-score-pill.has-av span{line-height:1.2;}
 
   /* ---------- connect four: color picker ---------- */
-  .c4-picker{margin:0 0 14px; text-align:center;}
-  .c4-picker-label{font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:9px;}
-  .c4-swatches{display:flex; flex-wrap:wrap; gap:11px; justify-content:center;}
-  .c4-swatch{position:relative; width:42px; height:42px; border-radius:50%; border:none; padding:0; background:transparent; color:#fff; font-weight:900; font-size:17px;
-    display:flex; align-items:center; justify-content:center;}
-  .c4-sw-fill{position:absolute; inset:0; border-radius:50%; box-shadow:inset 0 -3px 4px rgba(0,0,0,.28);}
-  .c4-swatch.sel .c4-sw-fill{box-shadow:0 0 0 3px var(--gold), inset 0 -3px 4px rgba(0,0,0,.28);}
+  .c4-picker{margin:0 0 16px; text-align:center; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px 12px 16px; box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .c4-picker-label{font-size:13px; font-weight:800; color:var(--text); margin-bottom:13px; display:flex; align-items:center; justify-content:center; gap:7px; letter-spacing:.2px;}
+  .c4-picker-ico{font-size:14px; line-height:1;}
+  .c4-swatches{display:flex; flex-wrap:wrap; gap:16px; justify-content:center;}
+  .c4-swatch-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .c4-swatch{position:relative; width:46px; height:46px; border-radius:50%; border:none; padding:0; background:transparent; color:#fff; font-weight:900; font-size:17px;
+    display:flex; align-items:center; justify-content:center; transition:transform .15s ease;}
+  .c4-sw-fill{position:absolute; inset:0; border-radius:50%; box-shadow:inset 0 -3px 4px rgba(0,0,0,.35), 0 2px 5px rgba(0,0,0,.2);}
+  .c4-swatch.sel{transform:translateY(-2px);}
+  .c4-swatch.sel .c4-sw-fill{box-shadow:0 0 0 3px var(--gold), 0 0 12px rgba(244,183,64,.55), inset 0 -3px 4px rgba(0,0,0,.35);}
   .c4-swatch.taken{cursor:default;}
   .c4-swatch.taken .c4-sw-fill{opacity:.35; filter:saturate(.5);}
   .c4-swatch .c4-sw-mark{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.5);}
   .c4-swatch:not(:disabled):active{transform:scale(.9);}
+  .c4-sw-name{font-size:10px; font-weight:700; color:var(--text-muted);}
+  .c4-swatch.sel ~ .c4-sw-name, .c4-swatch-wrap:has(.c4-swatch.sel) .c4-sw-name{color:var(--gold-2); font-weight:800;}
   .c4-vs-row{display:flex; align-items:center; justify-content:center; gap:22px; margin:6px 0 14px;}
 
   /* ---------- VS intro (when both players are in the room) ---------- */
@@ -11590,14 +11595,10 @@ function nextProBtn(action, extraStyle){
 
 /* ---- Connect Four colors (each player picks their own disc color) ---- */
 const C4_COLORS = [
-  {id:'red',    name:'أحمر',    a:'#FF7A59', b:'#D6473A'},
-  {id:'yellow', name:'أصفر',    a:'#FFDE94', b:'#F4B740'},
-  {id:'blue',   name:'أزرق',    a:'#7CC0FF', b:'#2F7BEA'},
-  {id:'green',  name:'أخضر',    a:'#8FF0BC', b:'#2FB672'},
-  {id:'purple', name:'بنفسجي',  a:'#C7A6FF', b:'#7F56D9'},
-  {id:'pink',   name:'وردي',    a:'#FFA6D0', b:'#E5478F'},
-  {id:'orange', name:'برتقالي', a:'#FFC08A', b:'#F2761E'},
-  {id:'teal',   name:'تركواز',  a:'#8CF0E4', b:'#16B3A4'},
+  {id:'red',    name:'أحمر غامق',  a:'#C0392B', b:'#6E1D14'},
+  {id:'blue',   name:'أزرق غامق',  a:'#2E6DB4', b:'#0F3A66'},
+  {id:'yellow', name:'أصفر غامق',  a:'#D4A017', b:'#8A6508'},
+  {id:'green',  name:'أخضر غامق',  a:'#2E9E5B', b:'#125130'},
 ];
 function c4Color(id){ return C4_COLORS.find(c=>c.id===id) || C4_COLORS[0]; }
 function c4Grad(id){ const c=c4Color(id); return `linear-gradient(145deg,${c.a},${c.b})`; }
@@ -11610,9 +11611,9 @@ function c4PickerHtml(label, myColor, takenColor, takenById, action, extraAttrs)
     const mark = taken
       ? `<span class="c4-sw-mark">${takenById ? gameAvatar(takenById,'✖','xs') : '✖'}</span>`
       : (sel ? '<span class="c4-sw-mark">✓</span>' : '');
-    return `<button type="button" class="c4-swatch ${sel?'sel':''} ${taken?'taken':''}" title="${c.name}" data-action="${action}" data-color="${c.id}" ${extraAttrs||''} ${taken?'disabled':''}><span class="c4-sw-fill" style="background:${c4Grad(c.id)}"></span>${mark}</button>`;
+    return `<div class="c4-swatch-wrap"><button type="button" class="c4-swatch ${sel?'sel':''} ${taken?'taken':''}" title="${c.name}" data-action="${action}" data-color="${c.id}" ${extraAttrs||''} ${taken?'disabled':''}><span class="c4-sw-fill" style="background:${c4Grad(c.id)}"></span>${mark}</button><span class="c4-sw-name">${c.name}</span></div>`;
   }).join('');
-  return `<div class="c4-picker"><div class="c4-picker-label">${label}</div><div class="c4-swatches">${sw}</div></div>`;
+  return `<div class="c4-picker"><div class="c4-picker-label"><span class="c4-picker-ico">🎨</span><span>${label}</span></div><div class="c4-swatches">${sw}</div></div>`;
 }
 
 /* ============================= GAMES: ROOMS (LIVE MULTIPLAYER) ============================= */
