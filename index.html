@@ -20718,6 +20718,41 @@ function attachSessionCodeBoxes(){
       const idx = parseInt(box.dataset.idx,10);
       if(e.key==='Backspace' && !box.value && idx>0){ group[idx-1].focus(); }
     });
+    box.addEventListener('paste', (e)=>{
+      e.preventDefault();
+      const group = document.querySelectorAll(`.session-code-box[data-group="${box.dataset.group}"]`);
+      const idx = parseInt(box.dataset.idx,10);
+      const text = ((e.clipboardData || window.clipboardData || {}).getData) ? (e.clipboardData || window.clipboardData).getData('text') : '';
+      const chars = String(text||'').replace(/[^a-zA-Z0-9*#@%+=]/g,'').toUpperCase().split('');
+      if(!chars.length) return;
+      let i = idx;
+      chars.forEach(c=>{
+        if(i>=group.length) return;
+        const b = group[i];
+        b.value = c;
+        b.classList.add('filled');
+        const visual = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
+        if(visual){ visual.textContent = c; visual.classList.remove('show'); void visual.offsetWidth; visual.classList.add('show'); }
+        i++;
+      });
+      const lastIdx = Math.min(idx + chars.length, group.length) - 1;
+      if(group[lastIdx]) group[lastIdx].focus();
+      const allFilled = Array.from(group).every(b=>b.value);
+      if(allFilled){
+        const code = Array.from(group).map(b=>b.value).join('');
+        tryCheckin(code).then(ok=>{
+          if(!ok){
+            group.forEach(b=>{
+              b.value = '';
+              b.classList.remove('filled');
+              const v = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
+              if(v){ v.textContent=''; v.classList.remove('show'); }
+            });
+            group[0].focus();
+          }
+        });
+      }
+    });
   });
 }
 function attachOtpBoxes(){
@@ -20755,6 +20790,28 @@ function attachOtpBoxes(){
     box.addEventListener('keydown', (e)=>{
       if(e.key==='Backspace' && !box.value && idx>0){ boxes[idx-1].focus(); }
       else if(e.key==='Enter'){ doLogin(); }
+    });
+    /* لصق الكود كامل دفعة واحدة (كوبي/لصق أو اقتراح لوحة المفاتيح) بدل ما ياكل أول رقم بس ويتجاهل الباقي */
+    box.addEventListener('paste', (e)=>{
+      e.preventDefault();
+      const text = ((e.clipboardData || window.clipboardData || {}).getData) ? (e.clipboardData || window.clipboardData).getData('text') : '';
+      const digits = String(text||'').replace(/[^0-9]/g,'').split('');
+      if(!digits.length) return;
+      let i = idx;
+      digits.forEach(d=>{
+        if(i>=boxes.length) return;
+        const b = boxes[i];
+        b.value = d;
+        b.classList.add('filled');
+        const visual = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
+        if(visual){ visual.textContent = d; visual.classList.remove('show'); void visual.offsetWidth; visual.classList.add('show'); }
+        i++;
+      });
+      syncOtpHidden();
+      const lastIdx = Math.min(idx + digits.length, boxes.length) - 1;
+      if(boxes[lastIdx]) boxes[lastIdx].focus();
+      const allFilled = Array.from(boxes).every(b=>b.value);
+      if(allFilled){ setTimeout(autoSubmitOtpLogin, 220); }
     });
   });
   updateOtpProgress();
@@ -20837,6 +20894,22 @@ function attachAdminOtpBoxes(){
     box.addEventListener('keydown', (e)=>{
       if(e.key==='Backspace' && !box.value && idx>0){ boxes[idx-1].focus(); }
       else if(e.key==='Enter'){ doAdminUnlock(); }
+    });
+    box.addEventListener('paste', (e)=>{
+      e.preventDefault();
+      const text = ((e.clipboardData || window.clipboardData || {}).getData) ? (e.clipboardData || window.clipboardData).getData('text') : '';
+      const digits = String(text||'').replace(/[^0-9]/g,'').split('');
+      if(!digits.length) return;
+      let i = idx;
+      digits.forEach(d=>{
+        if(i>=boxes.length) return;
+        boxes[i].value = d;
+        boxes[i].classList.add('filled');
+        i++;
+      });
+      syncAdminOtpHidden();
+      const lastIdx = Math.min(idx + digits.length, boxes.length) - 1;
+      if(boxes[lastIdx]) boxes[lastIdx].focus();
     });
   });
   updateAdminOtpProgress();
