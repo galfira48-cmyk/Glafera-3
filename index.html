@@ -1271,6 +1271,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vmsg-card::after{content:''; position:absolute; top:-70px; left:50%; width:240px; height:160px; transform:translateX(-50%); pointer-events:none;
     background:radial-gradient(closest-side,color-mix(in srgb,var(--ta) 30%,transparent),transparent);}
   .vmsg-success{--ta:#3ddc97; --tb:#12a36a;} .vmsg-error{--ta:#ff6b6b; --tb:#c93a3a;} .vmsg-warn{--ta:#f7c948; --tb:#d98a12;} .vmsg-info{--ta:#4fd6d0; --tb:#5b6cf0;}
+  .vmsg-shop{--ta:var(--gold,#f4b740); --tb:var(--gold-2,#caa23a);}
+  .vmsg-shop .vmsg-title{background:linear-gradient(180deg,#fffaf0 0%,#f4dc9c 42%,#b98a33 56%,#f8e6ae 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; letter-spacing:.3px;}
+  .vmsg-shop .vmsg-btn.primary{box-shadow:0 10px 24px -6px color-mix(in srgb,var(--gold) 65%,transparent), inset 0 1px 0 rgba(255,255,255,.4);}
   .vmsg-ico{position:relative; z-index:1; width:70px; height:70px; margin:0 auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(145deg,var(--ta),var(--tb)); box-shadow:0 12px 30px -6px color-mix(in srgb,var(--tb) 70%,transparent);}
   .vmsg-ico::after{content:''; position:absolute; inset:-7px; border-radius:50%; border:1.5px solid color-mix(in srgb,var(--ta) 60%,transparent); animation:vmsgRing 1.9s ease-out infinite;}
@@ -3934,6 +3937,11 @@ function openVisaPage(){
   if(state.view!=='visa') go('visa');
   visaRefresh();
 }
+function openCardShop(){
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.remove());
+  state.friendTile = null; state.shopTab = 'card'; state.customCardDraftPhoto = null;
+  go('sticker-store');
+}
 function visaShort(fee, bal){
   visaMsg('warn', bal<=0 ? 'رصيد الفيزا فارغ' : 'رصيد الفيزا غير كافٍ',
     bal<=0 ? 'يرجى شحن الفيزا من صفحة «فيزتي» للتمكن من اللعب ودخول الغرف.' : 'رصيدك الحالي لا يغطي هذه العملية، يرجى شحن الفيزا أولًا.',
@@ -3964,7 +3972,8 @@ const VMSG_ICONS = {
   error:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M7 7l10 10M17 7L7 17"/></svg>',
   warn:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M12 6.5v7"/><circle cx="12" cy="17.6" r=".6" fill="#fff"/></svg>',
   info:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path class="vmsg-draw" d="M12 11v6"/><circle cx="12" cy="7.4" r=".6" fill="#fff"/></svg>',
-  locked:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="5.25" y="10.75" width="13.5" height="9.5" rx="2.6"/><path d="M8 10.75V7.6a4 4 0 018 0v3.15"/><circle cx="12" cy="15" r="1.15" fill="#fff" stroke="none"/></svg>'
+  locked:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="5.25" y="10.75" width="13.5" height="9.5" rx="2.6"/><path d="M8 10.75V7.6a4 4 0 018 0v3.15"/><circle cx="12" cy="15" r="1.15" fill="#fff" stroke="none"/></svg>',
+  shop:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 8.2h11l-.9 11.3a1.6 1.6 0 01-1.6 1.5H9a1.6 1.6 0 01-1.6-1.5L6.5 8.2z"/><path d="M9 8.2V6.7a3 3 0 016 0v1.5"/><circle cx="9.2" cy="11.4" r=".55" fill="#fff" stroke="none"/><circle cx="14.8" cy="11.4" r=".55" fill="#fff" stroke="none"/></svg>'
 };
 function visaMsg(kind, title, text, opts){
   opts = opts || {};
@@ -4184,8 +4193,8 @@ async function verifyVisaPin(pid, pin){
 }
 function requireVisaForRooms(){
   if(!hasVisa(state.pid)){
-    visaMsg('info', 'أنشئ فيزتك أولًا', 'تحتاج إلى فيزا الألعاب لدخول الغرف واللعب. إنشاؤها يستغرق لحظات.',
-      { primary:{label:'إنشاء الفيزا', onClick:openVisaPage}, secondary:{label:'لاحقًا'} });
+    visaMsg('shop', 'محتاج فيزا الألعاب', 'من غير فيزا مش هتقدر تدخل الغرف ولا تلعب. اشتري تصميم فيزتك دلوقتي من المتجر وابدأ في ثواني.',
+      { icon:'shop', primary:{label:'🛍️ اشتري فيزا', onClick:openCardShop}, secondary:{label:'لاحقًا'} });
     return false;
   }
   return requireVisaValid();
@@ -15082,7 +15091,7 @@ function render(){
   if(state.view==='admin' && !state.adminUnlocked){ attachAdminOtpBoxes(); }
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
-  if(state.view==='admin' && state.adminTab==='stickers'){ attachStickerAdminInputs(); }
+  if(state.view==='admin' && (state.adminTab==='stickers' || state.adminTab==='cardshop')){ attachStickerAdminInputs(); }
   if(state.view==='admin' && state.adminTab==='participants' && state.editingParticipantId){ attachParticipantPhotoInputs(); }
   if(state.view==='admin' && state.editingSessionId){
     const info = SESSION_INFO[state.editingSessionId] || {};
