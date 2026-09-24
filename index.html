@@ -3117,7 +3117,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-back{flex-shrink:0;}
   .bil-side-panel{flex-shrink:0; width:clamp(66px,20vw,98px); display:flex; flex-direction:column; align-items:center; gap:7px; overflow-y:auto; -webkit-overflow-scrolling:touch; -ms-overflow-style:none; scrollbar-width:none; padding:2px 1px 6px;}
   .bil-side-panel::-webkit-scrollbar{display:none;}
-  .bil-vs-row{display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; width:100%;}
+  .bil-vs-row{display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; width:100%; padding:8px 4px 10px; border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); border:1px solid rgba(255,255,255,.06);}
   .bil-side{width:100%; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; padding:7px 3px 6px; border-radius:14px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); color:#fff; font-family:Tajawal,Arial; font-size:10.5px; border:1.5px solid rgba(255,255,255,.07); transition:.25s; box-shadow:0 2px 6px rgba(0,0,0,.18); position:relative;}
   .bil-side.on{border-color:#F4B740; background:linear-gradient(180deg,rgba(244,183,64,.22),rgba(244,183,64,.05)); box-shadow:0 0 18px rgba(244,183,64,.32); transform:translateY(-1px);}
   .bil-side b{font-size:11px; margin-top:1px;}
@@ -3128,6 +3128,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-side.on .bil-avatar{border-color:#F4B740; box-shadow:0 0 0 3px rgba(244,183,64,.22), 0 3px 10px rgba(0,0,0,.4); animation:bilAvatarPulse 1.6s infinite;}
   .bil-side[data-p="B"] .bil-avatar{background:radial-gradient(circle at 32% 28%,#5a2f3c,#26141c 72%);}
   .bil-avatar-badge{position:absolute; bottom:-3px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; background:#141425; border:1.5px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:9px; line-height:1;}
+  .bil-avatar span{display:flex; align-items:center; justify-content:center; width:100%; height:100%;}
+  .bil-avatar svg{width:56%; height:56%; color:#F4B740; filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));}
+  .bil-side[data-p="B"] .bil-avatar svg{color:#FF9B85;}
   @keyframes bilAvatarPulse{0%,100%{box-shadow:0 0 0 3px rgba(244,183,64,.22),0 3px 10px rgba(0,0,0,.4);} 50%{box-shadow:0 0 0 6px rgba(244,183,64,.08),0 3px 10px rgba(0,0,0,.4);}}
   .bil-vs-badge{flex-shrink:0; transform:rotate(-6deg); font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:10.5px; letter-spacing:.5px; color:#3d2410;
     background:linear-gradient(160deg,#FFE9A8,#F4B740 55%,#C4841A); padding:3px 9px; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.25) inset; z-index:2;}
@@ -9481,6 +9484,11 @@ function bilResetGame(){
 }
 function bilGroupIcon(type){ return type==='solid' ? '⬤' : (type==='stripe' ? '🎯' : '❔'); }
 function bilGroupLabel(type){ return type==='solid' ? 'مصمتة' : (type==='stripe' ? 'مخططة' : 'لسه مش محدد'); }
+function bilAvatarIcon(kind){
+  return kind==='bot'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="10" rx="3"/><circle cx="9.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 9V6"/><circle cx="12" cy="4.3" r="1.15"/><path d="M3 12.5h2M19 12.5h2"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.4 7-6.4s7 2.8 7 6.4"/></svg>';
+}
 function bilBallTrackHtml(){
   const g = state.billiards; if(!g) return '';
   let out = '';
@@ -9516,7 +9524,7 @@ function bilRenderShell(){
         <button class="icon-btn bil-back" data-action="billiards-close">${ICO.back}</button>
         <div class="bil-vs-row">
           <div class="bil-side ${g.turn==='B'?'on':''}" data-p="B">
-            <div class="bil-avatar"><span>${g.mode==='ai'?'🤖':'🧑'}</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.B)}</span></div>
+            <div class="bil-avatar"><span>${bilAvatarIcon(g.mode==='ai'?'bot':'human')}</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.B)}</span></div>
             <b>${g.mode==='ai'?'الجهاز':'اللاعب 2'}</b><small>${gB}</small>
           </div>
           <div class="bil-vs-badge">VS</div>
@@ -9528,7 +9536,7 @@ function bilRenderShell(){
             <span id="bil-clock-num">${g.shotClock}</span>
           </div>
           <div class="bil-side ${g.turn==='A'?'on':''}" data-p="A">
-            <div class="bil-avatar"><span>🧑</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.A)}</span></div>
+            <div class="bil-avatar"><span>${bilAvatarIcon('human')}</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.A)}</span></div>
             <b>أنت</b><small>${gA}</small>
           </div>
         </div>
@@ -9570,6 +9578,15 @@ function bilFitCanvas(){
   canvas.style.height = dispH+'px';
   box.style.width = dispW+'px';
   box.style.height = dispH+'px';
+  /* render at real device pixel density — without this the canvas was rasterized at a fixed
+     400x800 backing store and stretched up by CSS, which is what was blurring/flattening the
+     ball shading and highlights */
+  const dpr = Math.min(window.devicePixelRatio||1, 3);
+  const bw = Math.max(1, Math.round(dispW*dpr)), bh = Math.max(1, Math.round(dispH*dpr));
+  if(canvas.width!==bw || canvas.height!==bh){
+    canvas.width = bw; canvas.height = bh;
+    bilDraw();
+  }
 }
 function bilOnResize(){ if(document.getElementById('bil-overlay')) bilFitCanvas(); }
 function bilMountCanvas(){
@@ -9918,8 +9935,10 @@ function bilDrawBall(ctx, b){
 }
 function bilBuildTableCache(){
   const {W,H,RAIL} = BIL;
-  const cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+  const CACHE_SCALE = 2; /* build the felt/wood texture at 2x so it stays sharp once magnified onto a high-density canvas */
+  const cv = document.createElement('canvas'); cv.width=W*CACHE_SCALE; cv.height=H*CACHE_SCALE;
   const ctx = cv.getContext('2d');
+  ctx.scale(CACHE_SCALE, CACHE_SCALE);
   /* wood rail */
   const railGrad = ctx.createLinearGradient(0,0,W,H);
   railGrad.addColorStop(0,'#7a5028'); railGrad.addColorStop(0.5,'#5c3a1c'); railGrad.addColorStop(1,'#3d2410');
@@ -9993,9 +10012,13 @@ function bilDraw(){
   if(!BIL_CTX) return;
   const ctx = BIL_CTX, {W,H} = BIL;
   const g = state.billiards;
+  /* map the fixed 400x800 logical game coordinates onto the canvas's real (device-pixel-dense)
+     backing store so every draw call below renders crisp instead of blurry upscaled pixels */
+  const scaleX = (BIL_CANVAS.width||W)/W, scaleY = (BIL_CANVAS.height||H)/H;
+  ctx.setTransform(scaleX,0,0,scaleY,0,0);
   ctx.clearRect(0,0,W,H);
   if(!BIL_TABLE_CACHE) BIL_TABLE_CACHE = bilBuildTableCache();
-  ctx.drawImage(BIL_TABLE_CACHE,0,0);
+  ctx.drawImage(BIL_TABLE_CACHE,0,0,W,H);
   if(g){
     if(BIL_AIM && BIL_AIM.active && bilHumanCanShoot()){
       const cue = g.balls.find(b=>b.id==='cue');
@@ -12436,6 +12459,9 @@ async function applyLeaveRoomPenalty(code){
       if(room.game==='ludo'){
         const seats = (room.ludo && room.ludo.seats) || (room.players||[]).map(p=>({pid:p.id, left:false}));
         recipients = seats.filter(s=> s.pid && s.pid!==state.pid && !s.left).map(s=>s.pid);
+      } else if(room.game==='uno'){
+        // غرفة يونو ممكن يكون فيها لغاية 4 لاعبين مش مجرد host/guest، فلازم نوزع على كل الباقيين النشطين
+        recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
       } else {
         recipients = [room.hostId, room.guestId].filter(id=> id && id!==state.pid);
       }
@@ -12516,6 +12542,7 @@ async function leaveGameRoom(){
           if(G.players.length<2){
             delete GAME_ROOMS[code];
           } else {
+            if(myIdx < G.turnIdx) G.turnIdx--;
             if(G.turnIdx>=G.players.length) G.turnIdx = 0;
             G.unoPending = null;
             G.log = '🚪 ' + myName + ' خرج من اللعبة';
