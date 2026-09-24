@@ -2844,18 +2844,74 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .c4-picker-ico{font-size:14px; line-height:1;}
   .c4-swatches{display:flex; flex-wrap:wrap; gap:16px; justify-content:center;}
   .c4-swatch-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
-  .c4-swatch{position:relative; width:46px; height:46px; border-radius:50%; border:none; padding:0; background:transparent; color:#fff; font-weight:900; font-size:17px;
-    display:flex; align-items:center; justify-content:center; transition:transform .15s ease;}
-  .c4-sw-fill{position:absolute; inset:0; border-radius:50%; box-shadow:inset 0 -3px 4px rgba(0,0,0,.35), 0 2px 5px rgba(0,0,0,.2);}
-  .c4-swatch.sel{transform:translateY(-2px);}
-  .c4-swatch.sel .c4-sw-fill{box-shadow:0 0 0 3px var(--gold), 0 0 12px rgba(244,183,64,.55), inset 0 -3px 4px rgba(0,0,0,.35);}
+  .c4-swatch{position:relative; width:56px; height:56px; border:none; padding:0; background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .18s cubic-bezier(.34,1.56,.64,1);}
+  .c4-sw-img{width:100%; height:100%; display:block; object-fit:contain; pointer-events:none; filter:drop-shadow(0 3px 5px rgba(0,0,0,.4)); transition:filter .18s ease, opacity .18s ease;}
+  .c4-swatch.sel{transform:translateY(-3px) scale(1.1);}
+  .c4-swatch.sel .c4-sw-img{filter:drop-shadow(0 0 9px rgba(244,183,64,.9)) drop-shadow(0 3px 5px rgba(0,0,0,.4));}
   .c4-swatch.taken{cursor:default;}
-  .c4-swatch.taken .c4-sw-fill{opacity:.35; filter:saturate(.5);}
-  .c4-swatch .c4-sw-mark{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .c4-swatch.taken .c4-sw-img{opacity:.35; filter:grayscale(.6);}
+  .c4-swatch .c4-sw-mark{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:20px; text-shadow:0 1px 4px rgba(0,0,0,.7);}
   .c4-swatch:not(:disabled):active{transform:scale(.9);}
   .c4-sw-name{font-size:10px; font-weight:700; color:var(--text-muted);}
   .c4-swatch.sel ~ .c4-sw-name, .c4-swatch-wrap:has(.c4-swatch.sel) .c4-sw-name{color:var(--gold-2); font-weight:800;}
   .c4-vs-row{display:flex; align-items:center; justify-content:center; gap:22px; margin:6px 0 14px;}
+
+  /* ---------- connect four: color dialog ---------- */
+  .c4dlg{position:fixed; inset:0; z-index:10002; display:flex; align-items:center; justify-content:center; padding:18px; direction:rtl;
+    background:radial-gradient(circle at 50% 40%, rgba(47,33,112,.78), rgba(7,5,26,.94)); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+    animation:c4dFade .3s ease both;}
+  .c4dlg.out{animation:c4dFadeOut .32s ease forwards;}
+  .c4dlg-card{position:relative; width:min(92vw,360px); padding:20px 18px 16px; text-align:center; border-radius:26px;
+    background:linear-gradient(180deg,#2b2270 0%,#171244 100%); border:1px solid rgba(244,183,64,.38);
+    box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,222,148,.08) inset, 0 1px 0 rgba(255,255,255,.18) inset; overflow:hidden;
+    animation:c4dCard .55s cubic-bezier(.2,1.25,.35,1) both;}
+  .c4dlg.out .c4dlg-card{animation:c4dCardOut .3s ease-in forwards;}
+  .c4dlg-card::before{content:''; position:absolute; top:0; bottom:0; left:0; width:60%; pointer-events:none;
+    background:linear-gradient(105deg, transparent 30%, rgba(255,222,148,.16) 50%, transparent 70%); transform:translateX(-130%); animation:c4dSheen 1.1s ease .5s both;}
+  .c4dlg-logo{display:block; height:58px; width:auto; max-width:70%; margin:0 auto 8px; object-fit:contain; filter:drop-shadow(0 6px 12px rgba(244,183,64,.35)); animation:c4dLogo .6s cubic-bezier(.2,1.5,.4,1) .15s both;}
+  .c4dlg-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; color:#fff; margin:0 0 4px; animation:c4dRise .45s ease .25s both;}
+  .c4dlg-sub{font-family:'Cairo',sans-serif; font-weight:600; font-size:13px; color:var(--text-muted); margin:0 0 16px; animation:c4dRise .45s ease .32s both;}
+  .c4dlg-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 8px; justify-items:center; perspective:700px;}
+  .c4dlg-btn{--glow:#fff; position:relative; width:100%; max-width:132px; padding:4px 0 0; border:none; background:transparent; cursor:pointer; color:#fff; font-family:'Cairo',sans-serif;
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation; display:flex; flex-direction:column; align-items:center; gap:2px;
+    animation:c4dCoin .7s cubic-bezier(.2,1.35,.35,1) calc(.3s + var(--i)*.09s) both;}
+  .c4dlg-btn img{width:100%; aspect-ratio:1; display:block; object-fit:contain; pointer-events:none; filter:drop-shadow(0 8px 10px rgba(0,0,0,.5));
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1), filter .22s ease;}
+  .c4dlg-btn .n{font-weight:800; font-size:13px; opacity:.85; transition:opacity .2s ease, color .2s ease;}
+  @media (hover:hover){
+    .c4dlg-btn:not(:disabled):hover img{transform:translateY(-4px) scale(1.07); filter:drop-shadow(0 0 16px var(--glow)) drop-shadow(0 10px 10px rgba(0,0,0,.5));}
+    .c4dlg-btn:not(:disabled):hover .n{opacity:1; color:var(--glow);}
+  }
+  .c4dlg-btn:not(:disabled):active img{transform:scale(.92); transition-duration:.08s;}
+  .c4dlg-btn:focus-visible{outline:none;}
+  .c4dlg-btn:focus-visible img{filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 14px var(--glow));}
+  .c4dlg-btn.cur img{filter:drop-shadow(0 0 12px rgba(244,183,64,.9)) drop-shadow(0 8px 10px rgba(0,0,0,.5));}
+  .c4dlg-btn.cur .n::after{content:' ✓'; color:var(--gold);}
+  .c4dlg-btn:disabled{cursor:default;}
+  .c4dlg-btn:disabled img{opacity:.3; filter:grayscale(.7);}
+  .c4dlg-btn:disabled .n{opacity:.5;}
+  .c4dlg-btn .tk{position:absolute; top:34%; left:0; right:0; display:flex; justify-content:center; font-weight:900; font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.7);}
+  .c4dlg-btn.picked{z-index:3; animation:c4dPick .6s cubic-bezier(.2,1.4,.4,1) forwards;}
+  .c4dlg-btn.picked img{filter:drop-shadow(0 0 22px var(--glow)) drop-shadow(0 10px 12px rgba(0,0,0,.5));}
+  .c4dlg-btn.picked::after{content:''; position:absolute; left:50%; top:46%; width:78%; aspect-ratio:1; margin:-39% 0 0 -39%; border-radius:50%; border:3px solid var(--glow); opacity:0; animation:c4dRing .7s ease-out forwards;}
+  .c4dlg-grid.chosen .c4dlg-btn:not(.picked){animation:c4dAway .4s ease forwards; pointer-events:none;}
+  .c4dlg-spark{position:absolute; left:50%; top:46%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:var(--glow); box-shadow:0 0 8px var(--glow); opacity:0; pointer-events:none; animation:c4dSpark .7s ease-out forwards;}
+  .c4dlg-skip{margin-top:12px; background:none; border:none; color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:700; font-size:13px; padding:8px 14px; cursor:pointer; animation:c4dRise .45s ease .8s both;}
+  @keyframes c4dFade{from{opacity:0;} to{opacity:1;}}
+  @keyframes c4dFadeOut{to{opacity:0;}}
+  @keyframes c4dCard{from{opacity:0; transform:translateY(34px) scale(.84);} to{opacity:1; transform:none;}}
+  @keyframes c4dCardOut{to{opacity:0; transform:translateY(10px) scale(.94);}}
+  @keyframes c4dSheen{to{transform:translateX(320%);}}
+  @keyframes c4dLogo{from{opacity:0; transform:scale(.5) rotate(-6deg);} to{opacity:1; transform:none;}}
+  @keyframes c4dRise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;}}
+  @keyframes c4dCoin{0%{opacity:0; transform:translateY(-46px) rotateX(88deg) scale(.5);} 60%{opacity:1;} 100%{opacity:1; transform:none;}}
+  @keyframes c4dPick{0%{transform:scale(1);} 35%{transform:scale(.9);} 100%{transform:scale(1.22) translateY(-4px);}}
+  @keyframes c4dRing{0%{opacity:.9; transform:scale(.7);} 100%{opacity:0; transform:scale(2.3);}}
+  @keyframes c4dAway{to{opacity:0; transform:scale(.7) translateY(10px); filter:blur(3px);}}
+  @keyframes c4dSpark{0%{opacity:1; transform:translate(0,0) scale(1);} 100%{opacity:0; transform:translate(var(--x),var(--y)) scale(.2);}}
+  @media (prefers-reduced-motion:reduce){
+    .c4dlg, .c4dlg *, .c4dlg::before, .c4dlg-card::before{animation-duration:.01s !important; animation-delay:0s !important;}
+  }
 
   /* ---------- VS intro (when both players are in the room) ---------- */
   .vs-overlay{position:fixed; inset:0; z-index:10001; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px;
@@ -9166,7 +9222,7 @@ function renderConnect4Game(){
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="c4-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
     ${g.mode==='ai' ? `<div class="xo-stakes-banner">🎯 أول ما توصل <b>${(GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloC4WinsNeeded)||4}</b> فوز تاخد <b>${(GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloC4Reward)||0}</b> نقطة</div>` : ''}
-    ${c4PickerHtml(g.mode==='ai' ? 'اختار لون قطعتك' : 'لون اللاعب 1', g.colorR, g.colorY, null, 'c4-color', 'data-slot="R"')}
+    ${c4PickerHtml(g.mode==='ai' ? 'اختار لون قطعتك' : 'لون اللاعب 1', g.colorR, g.mode==='ai' ? null : g.colorY, null, 'c4-color', 'data-slot="R"')}
     ${g.mode==='2p' ? c4PickerHtml('لون اللاعب 2', g.colorY, g.colorR, null, 'c4-color', 'data-slot="Y"') : ''}
     <div class="xo-score-row">
       ${scorePill(gameAvatar(state.pid,'',null,g.colorR), g.scoreR)}
@@ -11595,11 +11651,12 @@ function nextProBtn(action, extraStyle){
 
 /* ---- Connect Four colors (each player picks their own disc color) ---- */
 const C4_COLORS = [
-  {id:'red',    name:'أحمر غامق',  a:'#C0392B', b:'#6E1D14'},
-  {id:'blue',   name:'أزرق غامق',  a:'#2E6DB4', b:'#0F3A66'},
-  {id:'yellow', name:'أصفر غامق',  a:'#D4A017', b:'#8A6508'},
-  {id:'green',  name:'أخضر غامق',  a:'#2E9E5B', b:'#125130'},
+  {id:'red',    name:'أحمر',  a:'#E8202A', b:'#8C0A10', glow:'#FF4B45'},
+  {id:'blue',   name:'أزرق',  a:'#2F7BFF', b:'#0A3AA8', glow:'#4D93FF'},
+  {id:'yellow', name:'أصفر',  a:'#FFD21F', b:'#C48A00', glow:'#FFE04D'},
+  {id:'green',  name:'أخضر',  a:'#22C534', b:'#0A6A16', glow:'#3BEA52'},
 ];
+function c4BtnImg(id){ return 'c4-btn-'+id+'.webp'; }
 function c4Color(id){ return C4_COLORS.find(c=>c.id===id) || C4_COLORS[0]; }
 function c4Grad(id){ const c=c4Color(id); return `linear-gradient(145deg,${c.a},${c.b})`; }
 function c4Dot(id){ return `<span class="c4-dot" style="background:${c4Grad(id)}"></span>`; }
@@ -11611,9 +11668,110 @@ function c4PickerHtml(label, myColor, takenColor, takenById, action, extraAttrs)
     const mark = taken
       ? `<span class="c4-sw-mark">${takenById ? gameAvatar(takenById,'✖','xs') : '✖'}</span>`
       : (sel ? '<span class="c4-sw-mark">✓</span>' : '');
-    return `<div class="c4-swatch-wrap"><button type="button" class="c4-swatch ${sel?'sel':''} ${taken?'taken':''}" title="${c.name}" data-action="${action}" data-color="${c.id}" ${extraAttrs||''} ${taken?'disabled':''}><span class="c4-sw-fill" style="background:${c4Grad(c.id)}"></span>${mark}</button><span class="c4-sw-name">${c.name}</span></div>`;
+    return `<div class="c4-swatch-wrap"><button type="button" class="c4-swatch ${sel?'sel':''} ${taken?'taken':''}" title="${c.name}" data-action="${action}" data-color="${c.id}" ${extraAttrs||''} ${taken?'disabled':''}><img class="c4-sw-img" src="${c4BtnImg(c.id)}" alt="" draggable="false" />${mark}</button><span class="c4-sw-name">${c.name}</span></div>`;
   }).join('');
   return `<div class="c4-picker"><div class="c4-picker-label"><span class="c4-picker-ico">🎨</span><span>${label}</span></div><div class="c4-swatches">${sw}</div></div>`;
+}
+
+
+/* ---- Connect Four: centered color-choice dialog (gold buttons) ---- */
+function c4CloseColorDialog(instant){
+  const o = document.getElementById('c4dlg'); if(!o) return;
+  if(instant){ o.remove(); return; }
+  o.classList.add('out'); setTimeout(()=>{ if(o.parentNode) o.remove(); }, 320);
+}
+function c4DlgSetTaken(takenColor, takenById){
+  const o = document.getElementById('c4dlg'); if(!o || o.dataset.locked) return;
+  o.querySelectorAll('.c4dlg-btn').forEach(b=>{
+    const isTaken = !!takenColor && b.dataset.color===takenColor && !b.classList.contains('cur');
+    b.disabled = isTaken;
+    let tk = b.querySelector('.tk');
+    if(isTaken && !tk){ tk = document.createElement('span'); tk.className='tk'; tk.innerHTML = takenById ? gameAvatar(takenById,'✖','xs') : '✖'; b.appendChild(tk); }
+    if(!isTaken && tk) tk.remove();
+  });
+}
+function c4OpenColorDialog(o){
+  o = o || {};
+  c4CloseColorDialog(true);
+  const ov = document.createElement('div');
+  ov.id = 'c4dlg'; ov.className = 'c4dlg';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label', o.title||'اختار لون قطعتك');
+  const btns = C4_COLORS.map((c,i)=>{
+    const cur = o.mine===c.id;
+    return `<button type="button" class="c4dlg-btn ${cur?'cur':''}" style="--i:${i}; --glow:${c.glow}" data-color="${c.id}" aria-label="${c.name}">
+      <img src="${c4BtnImg(c.id)}" alt="" draggable="false" /><span class="n">${c.name}</span></button>`;
+  }).join('');
+  ov.innerHTML = `<div class="c4dlg-card">
+      <img class="c4dlg-logo" src="connect4-logo.png" alt="" draggable="false" />
+      <div class="c4dlg-title">${o.title||'اختار لون قطعتك'}</div>
+      <div class="c4dlg-sub">${o.sub||'دوس على الزرار اللي عايز تلعب بيه'}</div>
+      <div class="c4dlg-grid">${btns}</div>
+      ${o.dismissible===false ? '' : '<button type="button" class="c4dlg-skip">لاحقًا</button>'}
+    </div>`;
+  document.body.appendChild(ov);
+  c4DlgSetTaken(o.taken, o.takenById);
+  const grid = ov.querySelector('.c4dlg-grid');
+  const dismiss = ()=>{ if(ov.dataset.locked) return; c4CloseColorDialog(); if(o.onDismiss) o.onDismiss(); };
+  grid.addEventListener('click', (e)=>{
+    const b = e.target.closest('.c4dlg-btn'); if(!b || b.disabled || ov.dataset.locked) return;
+    ov.dataset.locked = '1';
+    grid.classList.add('chosen'); b.classList.add('picked');
+    for(let k=0;k<12;k++){
+      const sp = document.createElement('i'); sp.className='c4dlg-spark';
+      const ang = (Math.PI*2*k/12) + Math.random()*.4, d = 62 + Math.random()*34;
+      sp.style.setProperty('--x', Math.cos(ang)*d+'px'); sp.style.setProperty('--y', Math.sin(ang)*d+'px');
+      sp.style.animationDelay = (Math.random()*.08)+'s'; b.appendChild(sp);
+    }
+    try{ SND.click(); }catch(_){}
+    try{ vibrate([14]); }catch(_){}
+    const cid = b.dataset.color;
+    setTimeout(()=>{ c4CloseColorDialog(); if(o.onPick) o.onPick(cid); }, 620);
+  });
+  const sk = ov.querySelector('.c4dlg-skip'); if(sk) sk.addEventListener('click', dismiss);
+  if(o.dismissible!==false) ov.addEventListener('click', (e)=>{ if(e.target===ov) dismiss(); });
+  ov.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && o.dismissible!==false) dismiss(); });
+  const first = ov.querySelector('.c4dlg-btn:not(:disabled)'); if(first) setTimeout(()=>{ try{ first.focus({preventScroll:true}); }catch(_){} }, 700);
+}
+/* solo / two players on one phone */
+function c4SetColor(slot, cid){
+  const g = state.connect4; if(!g) return;
+  const other = slot==='R' ? 'Y' : 'R';
+  if(g.mode==='ai'){
+    g.colorR = cid;
+    if(g.colorY===g.colorR) g.colorY = (C4_COLORS.find(c=>c.id!==g.colorR)||C4_COLORS[0]).id;
+  } else if(g['color'+other]!==cid){
+    g['color'+slot] = cid;
+  }
+}
+function c4SoloPick(slot, delay){
+  setTimeout(()=>{
+    const g = state.connect4;
+    if(!g || state.view!=='game-connect4' || document.getElementById('c4dlg')) return;
+    const two = g.mode==='2p';
+    c4OpenColorDialog({
+      title: !two ? 'اختار لون قطعتك' : (slot==='R' ? 'لون اللاعب 1' : 'لون اللاعب 2'),
+      sub: two ? 'اللون اللي اتاخد مش هيظهر تاني' : 'الجهاز هياخد لون تاني',
+      mine: g['color'+slot],
+      taken: two ? g[slot==='R' ? 'colorY' : 'colorR'] : null,
+      onPick: (cid)=>{ c4SetColor(slot, cid); render(); if(two && slot==='R') c4SoloPick('Y', 250); }
+    });
+  }, delay==null ? 400 : delay);
+}
+/* online room: opens for whoever hasn't picked a color yet, and greys out the color the opponent took */
+function c4RoomDialogSync(room, myColor, oppColor, oppId){
+  const key = state.roomCode+':'+(room.round||0);
+  if(document.getElementById('c4dlg')){ c4DlgSetTaken(oppColor, oppId); return; }
+  if((!myColor || myColor===oppColor) && state._c4DlgOff!==key){
+    setTimeout(()=>{
+      if(document.getElementById('c4dlg') || state.view!=='room-connect4') return;
+      c4OpenColorDialog({
+        title:'اختار لون قطعتك', sub: oppColor ? 'صاحبك اختار لونه، اختار لون تاني' : 'كل واحد بيختار لون قطعته',
+        mine: myColor, taken: oppColor, takenById: oppId,
+        onPick: (cid)=>{ doRoomC4Color(cid); },
+        onDismiss: ()=>{ state._c4DlgOff = key; }
+      });
+    }, 350);
+  }
 }
 
 /* ============================= GAMES: ROOMS (LIVE MULTIPLAYER) ============================= */
@@ -12813,7 +12971,7 @@ function renderRoomC4(){
       </div>
       <div class="xo-status">${msg}</div>
       ${c4PickerHtml('لونك', myColor, oppColor, me.oppId, 'room-c4-color')}
-    `;
+    ` + (c4RoomDialogSync(room, myColor, oppColor, me.oppId), '');
   }
   const mySlot = me.isHost ? 'R' : 'Y';
   const colorOfSlot = sl => sl==='R' ? room.hostColor : room.guestColor;
@@ -15530,6 +15688,7 @@ function renderAdminAlertsTab(){
 
 /* ============================= MASTER RENDER ============================= */
 function render(){
+  { const _d = document.getElementById('c4dlg'); if(_d && !/connect4/.test(state.view||'')) _d.remove(); }
   const extraForSaver = state.pid ? myExtra(state.pid) : null;
   document.body.classList.toggle('data-saver', !!(extraForSaver && extraForSaver.dataSaver));
   document.documentElement.dataset.palette = (extraForSaver && extraForSaver.palette) ? extraForSaver.palette : 'gold';
@@ -16968,7 +17127,7 @@ document.addEventListener('click', (e)=>{
     const gid = el.dataset.game;
     if(gid==='billiards'){ openBilliardsGame(); return; }
     if(gid==='xo') initXoGame();
-    else if(gid==='connect4') initConnect4Game();
+    else if(gid==='connect4'){ initConnect4Game(); c4SoloPick('R', 450); }
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
     else if(gid==='ludo') initLudoGame();
     else if(gid==='memory') initMemoryGame();
@@ -17129,21 +17288,10 @@ document.addEventListener('click', (e)=>{
       state.connect4.matchOver = false; state.connect4.matchWinner = null;
     }
     render();
+    if(m==='2p') c4SoloPick('Y', 250);
   }
   else if(action==='c4-color'){
-    const g4 = state.connect4;
-    if(g4){
-      const slot = el.dataset.slot, cid = el.dataset.color;
-      const otherSlot = slot==='R' ? 'Y' : 'R';
-      if(g4['color'+otherSlot]!==cid){
-        g4['color'+slot] = cid;
-      }
-      // ضد الجهاز: لو اللاعب اختار نفس لون الجهاز، الجهاز ياخد أول لون تاني
-      if(g4.mode==='ai' && g4.colorR===g4.colorY){
-        g4.colorY = (C4_COLORS.find(c=>c.id!==g4.colorR)||C4_COLORS[0]).id;
-      }
-      SND.click();
-    }
+    if(state.connect4){ c4SetColor(el.dataset.slot, el.dataset.color); SND.click(); }
     render();
   }
   else if(action==='c4-reset'){
