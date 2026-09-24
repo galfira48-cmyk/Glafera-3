@@ -708,6 +708,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     display:flex; align-items:center; justify-content:center; }
   .id-photo-fallback{ font-family:'Cairo',sans-serif; font-weight:800; font-size:30px; color:#fff; }
   /* ---------- participant chip (top bar) + personal profile page ---------- */
+  html, body{ overscroll-behavior-y:none; } /* no pull-down-to-refresh */
   .tb-me{ display:flex; align-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .15s ease; }
   .tb-me:active{ transform:scale(.93); }
   .tb-av, .me-av{ border-radius:50%; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; flex:0 0 auto; }
@@ -6546,7 +6547,6 @@ function renderMePage(){
   const tRank = rankedTeams().findIndex(t=>t.id===team.id)+1;
   const flat = flatSessions();
   const attended = flat.filter(f=>CHECKINS[p.id+'__'+f.session.id]).length;
-  const badgesN = computeBadges(p.id).length + computeSecretBadges(p.id).length;
   const tierName = ['','برونزية','فضية','ذهبية'][tier];
   const nextAt = tier===1 ? 50 : (tier===2 ? 100 : null);
   const pct = nextAt ? Math.min(100, Math.round(((total-(tier===1?0:50))/50)*100)) : 100;
@@ -6578,7 +6578,6 @@ function renderMePage(){
       <div class="me-bar"><i style="width:${pct}%"></i></div>
     </div>
     <div class="me-links">
-      ${link('🏅','badges','أوسمتك',badgesN)}
       ${link('🎯','quests','التحديات')}
       ${link('📿','timeline','رحلتك',attended+' / '+flat.length+' فقرة')}
       ${link('👥','team','فريقي')}
