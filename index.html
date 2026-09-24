@@ -20572,6 +20572,7 @@ function autoSubmitOtpLogin(){
   const code = input.value.trim().toUpperCase();
   if(!code) return;
   const p = PARTICIPANTS.find(x=>x.id===code);
+  if(!p && !__loginDataReady){ loginWaitAndRetry(autoSubmitOtpLogin); return; }
   if(!p){
     showToast('كود الدخول غير صحيح', true);
     const boxes = document.querySelectorAll('.otp-box');
@@ -20673,6 +20674,7 @@ function doLogin(){
 }
 function doLoginWithCode(code){
   const p = PARTICIPANTS.find(x=>x.id===code.trim().toUpperCase());
+  if(!p && !__loginDataReady){ loginWaitAndRetry(()=>doLoginWithCode(code)); return; }
   if(!p){ showToast('كود الدخول غير صحيح', true); return; }
   const extra = myExtra(p.id);
   document.documentElement.dataset.theme = extra.mode==='light' ? 'light' : 'dark';
@@ -21105,16 +21107,36 @@ window.addEventListener('popstate', function(){
 });
 
 /* ============================= INIT ============================= */
+/* الأكواد بتاعة المشاركين المضافين من الأدمن كانت بتتعرف بس بعد ما يخلص تحميل كل بيانات التطبيق (ممكن ياخد لحد 10 ثواني)،
+   فلو حد كتب كوده بدري كان يطلعله "كود الدخول غير صحيح". دلوقتي بنحمّلهم الأول لوحدهم وبسرعة، ولو لسه ما خلصوش بنستنى بدل ما نرفض الكود. */
+let __loginDataReady = false, __loginDataResolve;
+const __loginDataPromise = new Promise(r=>{ __loginDataResolve = r; });
+function __markLoginDataReady(){ __loginDataReady = true; __loginDataResolve(); }
+async function preloadLoginData(){
+  try{
+    const [cp, ct] = await Promise.all([loadCustomParticipants(), loadCustomTeams()]);
+    (ct||[]).forEach(t=>{ if(!TEAMS.some(x=>x.id===t.id)) TEAMS.push({id:t.id, name:t.name, color:t.color}); });
+    (cp||[]).forEach(c=>{ if(!PARTICIPANTS.some(x=>x.id===c.id)) PARTICIPANTS.push({id:c.id, name:c.name, teamId:c.teamId}); });
+  }catch(e){ console.error('preloadLoginData failed', e); }
+}
+function loginWaitAndRetry(retry){
+  if(window.__loginRetryPending) return;
+  window.__loginRetryPending = true;
+  showToast('ثواني بنحمّل بيانات المشاركين... ⏳');
+  __loginDataPromise.then(()=>{ window.__loginRetryPending = false; retry(); });
+}
 (async function init(){
   initLuxuryParticles();
   armBackTrap();
   render(); // اعرض الفتيلة فورًا قبل تحميل البيانات من السيرفر
+  Promise.race([preloadLoginData(), new Promise(r=>setTimeout(r,6000))]).then(__markLoginDataReady);
   try{
     await Promise.race([
       refreshAllData(),
       new Promise((resolve)=> setTimeout(resolve, 10000))
     ]);
   }catch(e){ console.error('refreshAllData failed, continuing with local data', e); }
+  __markLoginDataReady();
   render();
   startLivePolling();
   try{ ensureVisaTxListener(); }catch(e){}
