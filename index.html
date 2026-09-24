@@ -745,6 +745,31 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .me-link .ico{ width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; background:rgba(244,183,64,.12); flex:0 0 auto; }
   .me-link .t{ flex:1; } .me-link .cnt{ color:var(--gold-2); font-size:12.5px; } .me-link svg{ color:var(--text-muted); }
   .me-logout{ width:100%; margin-bottom:8px; }
+  /* ---------- home: games entry card ---------- */
+  .home-games{ position:relative; display:block; width:100%; margin:16px 0 4px; padding:16px 16px 14px; border-radius:26px; overflow:hidden; text-align:right; cursor:pointer; color:var(--text);
+    font-family:'Cairo',sans-serif; -webkit-tap-highlight-color:transparent; isolation:isolate;
+    background:linear-gradient(145deg, rgba(244,183,64,.20), rgba(132,94,194,.22) 55%, rgba(255,255,255,.04));
+    border:1px solid rgba(244,183,64,.42); box-shadow:0 14px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.18);
+    transition:transform .18s ease; animation:meRise .5s cubic-bezier(.2,1,.3,1) both; }
+  .home-games:active{ transform:scale(.98); }
+  .home-games::before{ content:''; position:absolute; top:0; bottom:0; left:0; width:55%; z-index:-1; pointer-events:none;
+    background:linear-gradient(105deg, transparent 30%, rgba(255,222,148,.20) 50%, transparent 70%); transform:translateX(-140%); animation:hgSheen 4.5s ease-in-out 1s infinite; }
+  @keyframes hgSheen{ 0%{ transform:translateX(-140%);} 45%,100%{ transform:translateX(260%);} }
+  .hg-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .hg-title{ font-weight:900; font-size:20px; line-height:1.2; display:flex; align-items:center; gap:8px; }
+  .hg-title .ico{ width:38px; height:38px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:21px; background:linear-gradient(145deg,var(--gold-2),var(--gold)); box-shadow:0 6px 14px rgba(244,183,64,.35); }
+  .hg-live{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:999px; font-size:11.5px; font-weight:800; background:rgba(255,94,126,.16); border:1px solid rgba(255,94,126,.5); color:#ff8fa6; }
+  .hg-live i{ width:7px; height:7px; border-radius:50%; background:#ff4d6d; box-shadow:0 0 8px #ff4d6d; animation:hgPulse 1.4s ease-in-out infinite; }
+  @keyframes hgPulse{ 50%{ opacity:.35; transform:scale(.7);} }
+  .hg-sub{ margin:6px 0 12px; font-size:12.5px; color:var(--text-muted); font-weight:600; }
+  .hg-logos{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:18px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); }
+  .hg-logos img{ flex:1 1 0; min-width:0; height:46px; object-fit:contain; filter:drop-shadow(0 5px 8px rgba(0,0,0,.45)); pointer-events:none; }
+  .hg-more{ flex:0 0 auto; padding:6px 10px; border-radius:12px; font-size:12px; font-weight:900; color:var(--gold-2); background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.35); }
+  .hg-cta{ margin-top:12px; display:flex; align-items:center; justify-content:center; gap:6px; padding:11px; border-radius:16px; font-weight:900; font-size:14.5px; color:#1a1633;
+    background:linear-gradient(90deg, var(--gold-2), var(--gold)); box-shadow:0 8px 18px rgba(244,183,64,.32); }
+  .hg-cta svg{ width:16px; height:16px; }
+  .home-games.is-locked{ filter:saturate(.6); }
+  .home-games.is-locked .hg-cta{ background:rgba(255,255,255,.14); color:var(--text-muted); box-shadow:none; }
   @keyframes meRise{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
   .id-info{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; gap:13px; min-width:0;
     direction:ltr; align-items:flex-start; text-align:left; }
@@ -6587,6 +6612,23 @@ function renderMePage(){
     <button type="button" class="btn btn-ghost me-logout" data-action="logout">${ICO.logout} تسجيل الخروج</button>
   `;
 }
+function homeGamesCardHtml(){
+  const locked = !!(CONF_SETTINGS && CONF_SETTINGS.gamesLocked && state.pid!==GAMES_LOCK_REVIEWER_ID);
+  let live = 0; try{ live = liveRoomsList().length; }catch(e){}
+  const logos = GAMES_CATALOG.filter(g=>g.logo).slice(0,4).map(g=>`<img src="${g.logo}" alt="${escapeHtml(g.title)}" draggable="false">`).join('');
+  const more = GAMES_CATALOG.length - 4;
+  return `
+    <button type="button" class="home-games ${locked?'is-locked':''}" data-action="tile-nav" data-page="games" aria-label="الألعاب">
+      <div class="hg-top">
+        <div class="hg-title"><span class="ico">🎮</span><span>الألعاب</span></div>
+        ${locked ? '<span class="hg-live" style="background:rgba(255,255,255,.08);border-color:var(--border);color:var(--text-muted);">🔒 مقفولة مؤقتًا</span>'
+                 : (live ? `<span class="hg-live"><i></i>${live} لايف الآن</span>` : '')}
+      </div>
+      <div class="hg-sub">العب ضد الجهاز أو تحدَّ صحابك في غرفة مباشرة واكسب نقط</div>
+      <div class="hg-logos">${logos}${more>0?`<span class="hg-more">+${more}</span>`:''}</div>
+      <div class="hg-cta">ادخل عالم الألعاب ${ICO.chev}</div>
+    </button>`;
+}
 function renderProfile(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const team = teamOf(p.teamId);
@@ -6632,6 +6674,8 @@ function renderProfile(){
       </div>
     </div>
     <div class="hint" style="margin-top:-6px;">اضغط مطولاً على الميدالية لعرض بطاقة الإنجاز</div>
+
+    ${homeGamesCardHtml()}
 
     <div class="section-title">${tr('conf_capabilities_title')} <span class="sub">${tr('conf_capabilities_sub')}</span></div>
     <div class="radial-launcher">
