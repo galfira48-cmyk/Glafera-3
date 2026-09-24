@@ -923,6 +923,34 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes tapRippleAnim{ to{ transform:scale(2.6); opacity:0; } }
 
 
+
+  /* ---------- admin: unified page header, sibling nav, item cards, empty states ---------- */
+  .admin-page-head{ display:flex; align-items:center; gap:12px; padding:18px 0 10px; }
+  .admin-page-head .icon-btn{ transform:scaleX(-1); flex:0 0 auto; }
+  .admin-page-ico{ flex:0 0 auto; width:42px; height:42px; border-radius:var(--a-r-sm); display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden;
+    box-shadow:0 6px 16px -8px rgba(0,0,0,.6); }
+  .admin-page-titles{ min-width:0; }
+  .admin-page-titles .back-title{ font-size:17px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .admin-page-sub{ font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4; }
+  .admin-crumb{ color:var(--gold-2); font-weight:700; }
+  .admin-siblings{ margin-top:2px; }
+  .admin-tab .admin-tab-badge{ display:inline-block; min-width:16px; padding:0 5px; margin-inline-start:6px; border-radius:var(--a-r-pill); background:var(--danger); color:#fff; font-size:10px; line-height:16px; }
+  .admin-item-card{ background:var(--a-card-bg); border:1px solid var(--border); border-inline-start:3px solid var(--border); border-radius:var(--a-r-md);
+    padding:var(--a-pad); margin-bottom:var(--a-gap); box-shadow:var(--a-shadow-tile); }
+  .admin-item-card.is-pending{ border-inline-start-color:var(--gold-2); }
+  .admin-item-card.is-done{ border-inline-start-color:var(--good); opacity:.72; }
+  .admin-item-card.is-danger{ border-inline-start-color:var(--danger); }
+  .admin-item-head{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px; font-size:11px; color:var(--text-muted); }
+  .admin-item-who{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--text); }
+  .admin-item-time{ margin-inline-start:auto; }
+  .admin-item-text{ font-size:13.5px; margin-top:8px; line-height:1.75; word-break:break-word; }
+  .admin-item-actions{ display:flex; gap:var(--a-gap-sm); margin-top:12px; }
+  .admin-item-actions .btn{ flex:1; padding:9px; font-size:12px; margin:0; }
+  .admin-empty{ text-align:center; padding:44px 16px; color:var(--text-muted); }
+  .admin-empty-ico{ font-size:38px; margin-bottom:10px; opacity:.9; }
+  .admin-empty-title{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--text); }
+  .admin-empty-hint{ font-size:11.5px; margin-top:4px; }
+
   /* ---------- admin: organized hub (groups, search, status strip) ---------- */
   .admin-hub-search{ margin-bottom:var(--a-pad); }
   .admin-hub-group{ margin-bottom:var(--a-pad); }
@@ -14261,7 +14289,7 @@ function renderAdminAuditTab(){
   }).sort((a,b)=>b.ts-a.ts);
 
   if(entries.length===0){
-    return `<div class="empty-note">لسه محدش سجل حضوره</div>`;
+    return adminEmptyState('🕓','لسه محدش سجل حضوره','هتظهر هنا كل تسجيلات الحضور أول ما تبدأ');
   }
   const rows = entries.map(e=>{
     const d = new Date(e.ts);
@@ -14542,25 +14570,25 @@ const ADMIN_HUB_GROUPS = [
   {id:'system', icon:'⚙️', title:'النظام'},
 ];
 const ADMIN_HUB_ITEMS = [
-  {group:'live',   tab:'sessions',    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
-  {group:'live',   tab:'pulse',       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {group:'live',   tab:'alerts',      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
-  {group:'live',   tab:'questions',   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
-  {group:'live',   tab:'reports',     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
-  {group:'people', tab:'participants',icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {group:'people', tab:'teams',       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
-  {group:'people', tab:'logistics',   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
-  {group:'people', tab:'audit',       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
-  {group:'people', tab:'opinions',    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
-  {group:'points', tab:'pointcodes',  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
-  {group:'points', tab:'rankings',    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
-  {group:'points', tab:'chefs',       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
-  {group:'points', tab:'analytics',   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {group:'content',tab:'gallery',     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
-  {group:'content',tab:'stickers',    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
-  {group:'content',tab:'cardshop',    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
-  {group:'system', tab:'settings',    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
-  {group:'system', tab:'trash',       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
+  {group:'live',   tab:'sessions', desc:"أيام المؤتمر والفقرات: تعديل، قفل وفتح",    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+  {group:'live',   tab:'pulse', desc:"عدّاد الحضور اللحظي لعرضه على شاشة القاعة",       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'live',   tab:'alerts', desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين",      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
+  {group:'live',   tab:'questions', desc:"أسئلة المشاركين للمتحدثين",   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
+  {group:'live',   tab:'reports', desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
+  {group:'people', tab:'participants', desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
+  {group:'people', tab:'teams', desc:"إدارة الفرق وأعضائها",       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {group:'people', tab:'logistics', desc:"الغرف والمواصلات واستلام الكيت",   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
+  {group:'people', tab:'audit', desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
+  {group:'people', tab:'opinions', desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
+  {group:'points', tab:'pointcodes', desc:"توليد ومتابعة أكواد النقاط",  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
+  {group:'points', tab:'rankings', desc:"ترتيب الأفراد والفرق",    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {group:'points', tab:'chefs', desc:"تقييمات الوجبات والشيفات",       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
+  {group:'points', tab:'analytics', desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'content',tab:'gallery', desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
+  {group:'content',tab:'stickers', desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {group:'content',tab:'cardshop', desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+  {group:'system', tab:'settings', desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
+  {group:'system', tab:'trash', desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
@@ -14600,6 +14628,33 @@ function renderAdminHub(){
     ${groups}
     <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
   `;
+}
+function adminEmptyState(icon, title, hint){
+  return `<div class="admin-empty"><div class="admin-empty-ico">${icon}</div><div class="admin-empty-title">${title}</div>${hint?`<div class="admin-empty-hint">${hint}</div>`:''}</div>`;
+}
+function adminInDetailView(){
+  const t = state.adminTab;
+  return (t==='sessions' && (state.editingSessionId || state.adminDayId))
+    || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
+    || (t==='chefs' && state.editingChefId)
+    || (t==='opinions' && state.viewingOpinionId)
+    || (t==='teams' && (state.editingTeamId || state.addingTeam));
+}
+function adminPendingBadge(tab){
+  if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
+  if(tab==='reports') return REPORTS.filter(r=>!r.resolved).length;
+  if(tab==='cardshop') return (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
+  return 0;
+}
+function renderAdminSiblingNav(){
+  const cur = ADMIN_HUB_ITEMS.find(it=>it.tab===state.adminTab);
+  if(!cur) return '';
+  const sibs = ADMIN_HUB_ITEMS.filter(it=>it.group===cur.group);
+  if(sibs.length<2) return '';
+  return `<div class="admin-tabs admin-siblings">${sibs.map(it=>{
+    const b = adminPendingBadge(it.tab);
+    return `<button type="button" class="admin-tab ${it.tab===cur.tab?'active':''}" data-action="admin-hub-tile" data-tab="${it.tab}">${it.label}${b?`<span class="admin-tab-badge">${b}</span>`:''}</button>`;
+  }).join('')}</div>`;
 }
 function renderAdmin(){
   if(!state.adminUnlocked) return renderAdminLock();
@@ -14649,33 +14704,62 @@ function renderAdmin(){
       if(o) pageTitle = o.name;
     }
   }
+  const inDetail = !!adminInDetailView();
+  const grp = hubItem ? ADMIN_HUB_GROUPS.find(g=>g.id===hubItem.group) : null;
+  const subtitle = inDetail
+    ? `<span class="admin-crumb">${escapeHtml(hubItem?hubItem.label:'')}</span> ‹ تفاصيل`
+    : escapeHtml(hubItem&&hubItem.desc ? hubItem.desc : (grp?grp.title:''));
   return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="admin-hub-back">${ICO.back}</button>
-      <div class="back-title">${escapeHtml(pageTitle)}</div>
+    <div class="admin-page-head">
+      <button class="icon-btn" data-action="admin-up" aria-label="رجوع">${ICO.back}</button>
+      ${hubItem?`<span class="admin-page-ico" style="background:${hubItem.color}">${hubItem.icon}</span>`:''}
+      <div class="admin-page-titles">
+        <div class="back-title">${escapeHtml(pageTitle)}</div>
+        <div class="admin-page-sub">${subtitle}</div>
+      </div>
     </div>
+    ${inDetail ? '' : renderAdminSiblingNav()}
     ${body}
   `;
 }
 function renderAdminQuestionsTab(){
-  const qs = QUESTIONS.slice().sort((a,b)=>b.ts-a.ts);
-  if(!qs.length) return `<div class="empty-note">✋ لسه معملش حد يسأل سؤال</div>`;
-  return qs.map(q=>`<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.sessionName||'')} — ${escapeHtml(q.name)} — ${timeAgoAr(q.ts)}</div>
-    <div style="font-size:13.5px;margin-top:6px;line-height:1.6;">${escapeHtml(q.text)}</div>
-    <button type="button" class="btn ${q.answered?'btn-ghost':'btn-primary'}" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-mark-question-answered" data-id="${q.id}">${q.answered?'✔️ تم الرد':'وضع علامة "تم الرد"'}</button>
-  </div>`).join('');
+  if(!QUESTIONS.length) return adminEmptyState('✋','لسه محدش سأل سؤال','هتظهر هنا أسئلة المشاركين أول ما توصل');
+  const pending = QUESTIONS.filter(q=>!q.answered).length;
+  const done = QUESTIONS.length - pending;
+  const f = state.adminQFilter || (pending ? 'new' : 'all');
+  let qs = QUESTIONS.slice().sort((a,b)=> (a.answered===b.answered) ? b.ts-a.ts : (a.answered?1:-1));
+  if(f==='new') qs = qs.filter(q=>!q.answered);
+  else if(f==='done') qs = qs.filter(q=>q.answered);
+  const chip = (id,lab,n)=>`<button type="button" class="admin-tab ${f===id?'active':''}" data-action="admin-q-filter" data-f="${id}">${lab} (${n})</button>`;
+  const cards = qs.length ? qs.map(q=>`<div class="admin-item-card ${q.answered?'is-done':'is-pending'}" data-search="${escapeHtml(((q.name||'')+' '+(q.text||'')+' '+(q.sessionName||'')).toLowerCase())}">
+    <div class="admin-item-head">
+      <span class="admin-item-who">${escapeHtml(q.name)}</span>
+      ${q.sessionName?`<span class="admin-meta-chip">${escapeHtml(q.sessionName)}</span>`:''}
+      <span class="admin-item-time">${timeAgoAr(q.ts)}</span>
+    </div>
+    <div class="admin-item-text">${escapeHtml(q.text)}</div>
+    <div class="admin-item-actions">
+      <button type="button" class="btn ${q.answered?'btn-ghost':'btn-primary'}" data-action="admin-mark-question-answered" data-id="${q.id}">${q.answered?'↩️ إرجاع لجديد':'✔️ تم الرد'}</button>
+    </div>
+  </div>`).join('') : adminEmptyState('🎉','مفيش أسئلة في القسم ده','');
+  const search = QUESTIONS.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".admin-item-card" placeholder="🔍 دور في الأسئلة..." style="margin-bottom:10px;" />` : '';
+  return `<div class="admin-tabs">${chip('all','الكل',QUESTIONS.length)}${chip('new','جديدة',pending)}${chip('done','تم الرد',done)}</div>${search}${cards}`;
 }
 function renderAdminReportsTab(){
   const rs = REPORTS.slice().sort((a,b)=>b.ts-a.ts);
-  if(!rs.length) return `<div class="empty-note">🛠️ مفيش بلاغات مشاكل حاليًا</div>`;
+  if(!rs.length) return adminEmptyState('🛠️','مفيش بلاغات حاليًا','لما حد يبلّغ عن مشكلة هتظهر هنا');
   const search = rs.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".report-row" placeholder="🔍 دور بالاسم أو محتوى البلاغ..." style="margin-bottom:10px;" />` : '';
-  const rows = rs.map(r=>`<div class="card report-row" style="margin-bottom:10px;" data-search="${escapeHtml((r.name+' '+r.text).toLowerCase())}">
-    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(r.name)} — ${timeAgoAr(r.ts)}</div>
-    <div style="font-size:13.5px;margin-top:6px;line-height:1.6;">${escapeHtml(r.text)}</div>
-    <button type="button" class="btn btn-ghost" style="margin-top:10px;padding:9px;font-size:12px;" data-action="admin-delete-report" data-id="${r.id}">✕ حذف البلاغ</button>
+  const rows = rs.map(r=>`<div class="admin-item-card is-danger report-row" data-search="${escapeHtml(((r.name||'')+' '+(r.text||'')).toLowerCase())}">
+    <div class="admin-item-head">
+      <span class="admin-item-who">${escapeHtml(r.name)}</span>
+      <span class="admin-item-time">${timeAgoAr(r.ts)}</span>
+    </div>
+    <div class="admin-item-text">${escapeHtml(r.text)}</div>
+    <div class="admin-item-actions">
+      <button type="button" class="btn btn-ghost" data-action="admin-delete-report" data-id="${r.id}">✕ حذف البلاغ</button>
+    </div>
   </div>`).join('');
-  return search + rows;
+  return `<div class="hint" style="margin-bottom:10px;">${rs.length} بلاغ — الأحدث أولًا</div>${search}${rows}`;
 }
 function renderAdminOpinionsTab(){
   if(state.viewingOpinionId){
@@ -14734,19 +14818,24 @@ function renderAdminOpinionsTab(){
   return summary + search + rows;
 }
 function renderAdminTrashTab(){
-  if(!TRASH.length) return `<div class="empty-note">🗑️ سلة المهملات فاضية</div>`;
+  if(!TRASH.length) return adminEmptyState('🗑️','سلة المهملات فاضية','أي حاجة بتتحذف بتفضل هنا لحد ما تسترجعها أو تحذفها نهائيًا');
   const items = TRASH.slice().sort((a,b)=>b.deletedAt-a.deletedAt);
-  const rows = items.map(t=>`<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(TRASH_TYPE_LABELS[t.type]||t.type)} — اتحذف ${timeAgoAr(t.deletedAt)}</div>
-    <div style="font-size:13.5px;margin-top:6px;line-height:1.6;">${escapeHtml((t.label||'').slice(0,140))}</div>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button type="button" class="btn btn-primary" style="flex:1;padding:9px;font-size:12px;margin:0;" data-action="restore-trash-item" data-id="${t.id}">↩️ استرجاع</button>
-      <button type="button" class="btn btn-ghost" style="flex:1;padding:9px;font-size:12px;margin:0;color:var(--danger);" data-action="perma-delete-trash-item" data-id="${t.id}">🗑️ حذف نهائي</button>
+  const rows = items.map(t=>`<div class="admin-item-card">
+    <div class="admin-item-head">
+      <span class="admin-meta-chip">${escapeHtml(TRASH_TYPE_LABELS[t.type]||t.type)}</span>
+      <span class="admin-item-time">اتحذف ${timeAgoAr(t.deletedAt)}</span>
+    </div>
+    <div class="admin-item-text">${escapeHtml((t.label||'').slice(0,140))}</div>
+    <div class="admin-item-actions">
+      <button type="button" class="btn btn-primary" data-action="restore-trash-item" data-id="${t.id}">↩️ استرجاع</button>
+      <button type="button" class="btn btn-ghost" style="color:var(--danger);" data-action="perma-delete-trash-item" data-id="${t.id}">🗑️ حذف نهائي</button>
     </div>
   </div>`).join('');
   return `
-    <button type="button" class="btn btn-ghost trash-empty-btn" style="width:100%;color:var(--danger);" data-action="empty-trash">🗑️ إفراغ السلة نهائيًا (${items.length})</button>
+    <div class="hint" style="margin-bottom:10px;">${items.length} عنصر محذوف</div>
     ${rows}
+    <div class="admin-section-title"><span>⚠️</span><span>منطقة الخطر</span></div>
+    <button type="button" class="btn btn-ghost trash-empty-btn admin-danger-zone" style="width:100%;color:var(--danger);" data-action="empty-trash">🗑️ إفراغ السلة نهائيًا (${items.length})</button>
   `;
 }
 
@@ -16426,7 +16515,21 @@ document.addEventListener('click', (e)=>{
   else if(action==='reset-demo'){ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }
   else if(action==='submit-admin-pass'){ doAdminUnlock(); }
   else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; state.viewingOpinionId = null; render(); }
-  else if(action==='admin-hub-tile'){ state.editingChefId = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); }
+  else if(action==='admin-up'){
+    const t = state.adminTab;
+    if(t==='sessions' && state.editingSessionId){ state.editingSessionId = null; }
+    else if(t==='sessions' && state.adminDayId){ state.adminDayId = null; }
+    else if(t==='participants' && state.addingParticipant){ state.addingParticipant = false; }
+    else if(t==='participants' && state.editingParticipantId){ state.editingParticipantId = null; }
+    else if(t==='chefs' && state.editingChefId){ state.editingChefId = null; }
+    else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
+    else if(t==='teams' && state.editingTeamId){ state.editingTeamId = null; }
+    else if(t==='teams' && state.addingTeam){ state.addingTeam = false; }
+    else { state.adminHub = true; state.adminDayId = null; state.editingChefId = null; state.viewingOpinionId = null; }
+    render(); try{ window.scrollTo(0,0); }catch(e){}
+  }
+  else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
+  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.editingTeamId = null; state.addingTeam = false; state.editingChefId = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.editingChefId = null; state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
