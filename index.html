@@ -3112,26 +3112,43 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#171449,#0c0a24); overflow-y:auto; -webkit-overflow-scrolling:touch;}
   .bil-shell{max-width:520px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
   .bil-topbar{padding:4px 2px 2px;}
-  .bil-back{margin-bottom:6px;}
+  .bil-topbar .icon-btn.bil-back{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(6px); color:#fff; transition:.15s;}
+  .bil-topbar .icon-btn.bil-back:active{transform:scaleX(-1) scale(.9);}
+  .bil-back{margin-bottom:8px;}
   .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
-  .bil-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 4px; border-radius:14px; background:rgba(255,255,255,.06); color:#fff; font-family:Tajawal,Arial; font-size:11.5px; border:1.5px solid transparent; transition:.2s;}
-  .bil-side.on{border-color:#F4B740; background:rgba(244,183,64,.16);}
+  .bil-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:8px 4px; border-radius:14px; background:rgba(255,255,255,.05); color:#fff; font-family:Tajawal,Arial; font-size:11.5px; border:1.5px solid rgba(255,255,255,.06); transition:.25s; box-shadow:0 2px 6px rgba(0,0,0,.15);}
+  .bil-side.on{border-color:#F4B740; background:rgba(244,183,64,.16); box-shadow:0 0 16px rgba(244,183,64,.28); transform:translateY(-1px);}
   .bil-side b{font-size:12.5px;}
   .bil-side small{opacity:.75; font-size:10.5px;}
-  .bil-side-ico{font-size:15px;}
-  .bil-clock{width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#F4B740,#B5790F); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,.35); flex-shrink:0;}
-  .bil-clock span{color:#1a1220; font-weight:900; font-size:17px; font-family:Tajawal,Arial;}
-  .bil-clock.danger{background:radial-gradient(circle at 35% 30%,#FF6B5B,#B5230F); animation:bilPulse .6s infinite;}
-  @keyframes bilPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  .bil-side-ico{font-size:16px;}
+  .bil-clock{position:relative; width:46px; height:46px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .bil-clock-ring{position:absolute; inset:0; transform:rotate(-90deg);}
+  .bil-clock-ring circle{fill:none; stroke-width:3.5;}
+  .bil-clock-track{stroke:rgba(255,255,255,.12);}
+  .bil-clock-prog{stroke:#F4B740; stroke-linecap:round; transition:stroke-dashoffset .3s linear, stroke .2s;}
+  .bil-clock span{position:relative; color:#fff; font-weight:900; font-size:16px; font-family:Tajawal,Arial;}
+  .bil-clock.danger .bil-clock-prog{stroke:#FF6B5B;}
+  .bil-clock.danger span{animation:bilPulse .6s infinite;}
+  @keyframes bilPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
   .bil-mode-switch{margin-top:10px;}
+  .bil-mode-switch .gms-btn{transition:.15s;}
+  .bil-mode-switch .gms-btn:active{transform:scale(.96);}
   .bil-groups-row{display:flex; gap:10px; margin:10px 0 6px;}
-  .bil-status{text-align:center; color:#fff; font-family:Tajawal,Arial; font-weight:700; font-size:13.5px; margin:8px 0 8px; min-height:18px;}
+  .bil-status{text-align:center; color:#fff; font-family:Tajawal,Arial; font-weight:700; font-size:13px; margin:10px auto 8px; min-height:18px; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:7px 16px; border-radius:999px; max-width:92%;}
+  .bil-status-wrap{display:flex; justify-content:center;}
+  .bil-status-your-turn{background:rgba(95,224,164,.14); color:#8ff0c0; border:1px solid rgba(95,224,164,.32);}
+  .bil-status-p2-turn{background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.14);}
+  .bil-status-ai-thinking{background:rgba(244,183,64,.14); color:#F4B740; border:1px solid rgba(244,183,64,.3); animation:bilStatusPulse 1.3s infinite;}
+  .bil-status-won{background:rgba(244,183,64,.18); color:#F4B740; border:1px solid rgba(244,183,64,.4); box-shadow:0 0 14px rgba(244,183,64,.2);}
+  @keyframes bilStatusPulse{0%,100%{opacity:1;}50%{opacity:.6;}}
   .bil-table-wrap{position:relative; flex:1; min-height:0; width:100%; margin:0 auto; padding:4px 6px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
   .bil-canvas-box{position:relative; line-height:0;}
-  .bil-canvas-box canvas{display:block; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.5); touch-action:none;}
-  .bil-power-wrap{position:absolute; top:5%; bottom:5%; left:7px; width:9px; background:rgba(0,0,0,.4); border-radius:5px; overflow:hidden; display:flex; align-items:flex-end; z-index:2;}
-  .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740,#E2382A); transition:height .05s linear;}
-  .bil-hint{text-align:center; color:rgba(255,255,255,.55); font-family:Tajawal,Arial; font-size:11px; margin-top:10px;}
+  .bil-canvas-box canvas{display:block; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset; touch-action:none;}
+  .bil-power-wrap{position:absolute; top:5%; bottom:5%; left:7px; width:10px; background:rgba(0,0,0,.4); border-radius:6px; overflow:hidden; display:flex; align-items:flex-end; z-index:2; box-shadow:inset 0 0 4px rgba(0,0,0,.5);}
+  .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740,#E2382A); transition:height .05s linear; border-radius:6px; box-shadow:0 0 8px rgba(244,183,64,.5);}
+  .bil-hint{text-align:center; color:rgba(255,255,255,.5); font-family:Tajawal,Arial; font-size:11px; margin-top:10px; letter-spacing:.2px;}
+  .bil-reset-btn{width:100%; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; transition:.15s;}
+  .bil-reset-btn:active{transform:scale(.97);}
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
   .xo-cell{aspect-ratio:1/1; border-radius:18px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); font-family:'Cairo',sans-serif; font-weight:900; font-size:34px;
@@ -9351,8 +9368,14 @@ function bilStartClock(){
 function bilUpdateClockUI(){
   const g = state.billiards; if(!g) return;
   const wrap = document.getElementById('bil-clock'); const num = document.getElementById('bil-clock-num');
+  const ring = document.getElementById('bil-clock-ring');
   if(num) num.textContent = Math.max(0, g.shotClock);
   if(wrap) wrap.classList.toggle('danger', g.shotClock<=5);
+  if(ring){
+    const c = 2*Math.PI*19;
+    const frac = Math.max(0, Math.min(1, g.shotClock/BIL.SHOT_SECONDS));
+    ring.style.strokeDashoffset = (c*(1-frac))+'';
+  }
 }
 function bilAutoRandomShot(){
   const g = state.billiards;
@@ -9411,21 +9434,31 @@ function bilRenderShell(){
   if(!g) return;
   const shell = document.getElementById('bil-shell');
   if(!shell) return;
-  let statusText;
+  let statusText, statusClass;
   if(g.winner){
     statusText = g.winner==='A' ? '🏆 فزت! برافو عليك' : (g.mode==='ai' ? '🤖 فاز الجهاز، حظ أوفر المرة الجاية' : '🏆 فاز اللاعب الثاني');
+    statusClass = 'won';
   } else if(g.mode==='ai' && g.turn==='B'){
     statusText = '🤖 الجهاز بيسدد...';
+    statusClass = 'ai-thinking';
   } else {
     statusText = g.turn==='A' ? 'دورك: اسحب من الكرة البيضاء وسيبها 🎱' : 'دور اللاعب الثاني 🎱';
+    statusClass = g.turn==='A' ? 'your-turn' : 'p2-turn';
   }
   const gA = bilGroupLabel(g.groups.A), gB = bilGroupLabel(g.groups.B);
+  const clockC = 2*Math.PI*19;
   shell.innerHTML = `
     <div class="bil-topbar">
       <button class="icon-btn bil-back" data-action="billiards-close">${ICO.back}</button>
       <div class="bil-vs-row">
         <div class="bil-side ${g.turn==='A'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.A)}</span><b>أنت</b><small>${gA}</small></div>
-        <div class="bil-clock" id="bil-clock"><span id="bil-clock-num">${g.shotClock}</span></div>
+        <div class="bil-clock" id="bil-clock">
+          <svg class="bil-clock-ring" viewBox="0 0 44 44">
+            <circle class="bil-clock-track" cx="22" cy="22" r="19"/>
+            <circle class="bil-clock-prog" id="bil-clock-ring" cx="22" cy="22" r="19" style="stroke-dasharray:${clockC};stroke-dashoffset:0;"/>
+          </svg>
+          <span id="bil-clock-num">${g.shotClock}</span>
+        </div>
         <div class="bil-side ${g.turn==='B'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.B)}</span><b>${g.mode==='ai'?'الجهاز':'اللاعب 2'}</b><small>${gB}</small></div>
       </div>
     </div>
@@ -9433,7 +9466,7 @@ function bilRenderShell(){
       <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="billiards-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="billiards-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
-    <div class="bil-status">${statusText}</div>
+    <div class="bil-status-wrap"><div class="bil-status bil-status-${statusClass}">${statusText}</div></div>
     <div class="bil-table-wrap" id="bil-table-wrap">
       <div class="bil-canvas-box" id="bil-canvas-box">
         <div class="bil-power-wrap" id="bil-power-wrap" style="display:none;"><div class="bil-power-bar" id="bil-power-bar"></div></div>
@@ -9441,9 +9474,10 @@ function bilRenderShell(){
       </div>
     </div>
     <div class="bil-hint">${g.winner ? '' : 'اسحب من الكرة البيضاء بعكس اتجاه الضربة، وسيب إصبعك عشان تضرب 🎯'}</div>
-    ${g.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="billiards-reset">🔄 لعبة جديدة</button>` : ''}
+    ${g.winner ? `<button type="button" class="btn btn-primary bil-reset-btn" data-action="billiards-reset">🔄 لعبة جديدة</button>` : ''}
   `;
   bilMountCanvas();
+  bilUpdateClockUI();
 }
 function bilFitCanvas(){
   const wrap = document.getElementById('bil-table-wrap');
