@@ -1436,6 +1436,20 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-history-link{position:relative; background:linear-gradient(120deg,rgba(244,183,64,.12),transparent 70%),var(--bg-2); border-color:color-mix(in srgb,var(--gold) 26%,var(--border)); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); padding:13px; letter-spacing:.2px;}
   .vp-history-link::after{content:'‹'; position:absolute; inset-inline-end:16px; top:50%; transform:translateY(-52%); color:var(--gold-2); font-size:20px; font-weight:900;}
   .vp-history-link:active{transform:scale(.99);}
+  /* ===== Brand plain & official; numbers closer ===== */
+  .vc-brand{background:none !important; -webkit-background-clip:border-box !important; background-clip:border-box !important; -webkit-text-fill-color:#fff !important; color:#fff !important; filter:none !important;
+    font-family:'Cinzel','Playfair Display',serif !important; font-weight:600 !important; font-size:19px !important; letter-spacing:3.5px !important; text-shadow:0 1px 2px rgba(0,0,0,.4) !important;}
+  .vc-expired .vc-brand{filter:none;}
+  .vc-num{justify-content:flex-start !important; gap:15px;}
+  /* ===== Cleaner balance tile + pro tab icons ===== */
+  .vp-tab-ico{width:17px; height:17px; vertical-align:-3px; margin-inline-end:7px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .vp-pro{background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 93%,#fff 7%),var(--surface)) !important; border-color:rgba(255,255,255,.09) !important;}
+  .vp-pro .vp-stats.single div{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02)) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;}
+  .vp-pro .vp-stats.single .vp-stat-ico{background:rgba(244,183,64,.1) !important; border:1px solid rgba(244,183,64,.32); color:var(--gold-2); box-shadow:none !important;}
+  .vp-stat-ico svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  .vp-pro .vp-stats.single small{color:var(--text-muted); font-weight:600;}
+  .vp-pro .vp-stats.single b{text-shadow:none !important; color:var(--text) !important; font-size:30px; letter-spacing:.5px;}
+  .vp-pro .vp-tabs button.on{box-shadow:0 6px 14px -8px rgba(244,183,64,.55), inset 0 1px 0 rgba(255,255,255,.5) !important;}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} .vc-face::after{animation:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -4243,7 +4257,7 @@ async function doVisaSaveDesign(){
 }
 function visaStatsHtml(bal, total){
   return `<div class="vp-stats single">
-    <div><span class="vp-stat-ico">💳</span><small>رصيد الفيزا</small><b data-vc-count="wallet" data-to="${bal}">${bal}</b></div>
+    <div><span class="vp-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg></span><small>رصيد الفيزا</small><b data-vc-count="wallet" data-to="${bal}">${bal}</b></div>
   </div>`;
 }
 function renderVisaPage(){
@@ -4264,9 +4278,9 @@ function renderVisaPage(){
   const expired = visaExpired(pid), expTs = visaExpiresAt(pid), daysLeft = visaDaysLeft(pid);
   const fee = visaRenewFee();
   const tabsHtml = `<div class="vp-tabs">
-        <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit">📥 إيداع</button>
-        <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw">📤 سحب</button>
-        <button type="button" class="${tab==='transfer'?'on':''}" data-action="visa-tab" data-t="transfer">🔁 تحويل</button>
+        <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>إيداع</button>
+        <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M4 20h16"/></svg>سحب</button>
+        <button type="button" class="${tab==='transfer'?'on':''}" data-action="visa-tab" data-t="transfer"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg>تحويل</button>
       </div>`;
   const tChips = [25,50,100,bal].filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${v===bal?'الكل':v}</button>`).join('');
