@@ -3110,7 +3110,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .xo-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; margin-bottom:12px;
     min-height:20px; color:var(--text);}
   .bil-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#171449,#0c0a24); overflow-y:auto; -webkit-overflow-scrolling:touch;}
-  .bil-shell{max-width:520px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
+  .bil-shell{max-width:960px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
   .bil-topbar{padding:4px 2px 2px;}
   .bil-topbar .icon-btn.bil-back{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(6px); color:#fff; transition:.15s;}
   .bil-topbar .icon-btn.bil-back:active{transform:scaleX(-1) scale(.9);}
@@ -3149,6 +3149,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-hint{text-align:center; color:rgba(255,255,255,.5); font-family:Tajawal,Arial; font-size:11px; margin-top:10px; letter-spacing:.2px;}
   .bil-reset-btn{width:100%; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; transition:.15s;}
   .bil-reset-btn:active{transform:scale(.97);}
+  @media (orientation:landscape) and (max-height:520px){
+    .bil-shell{padding-top:calc(4px + env(safe-area-inset-top,0px)); padding-bottom:calc(4px + env(safe-area-inset-bottom,0px));}
+    .bil-topbar{padding:2px 2px 0;}
+    .bil-back{margin-bottom:3px;}
+    .bil-side{padding:4px 4px; gap:0;}
+    .bil-side b{font-size:11px;}
+    .bil-side small{font-size:9.5px;}
+    .bil-side-ico{font-size:13px;}
+    .bil-clock{width:36px; height:36px;}
+    .bil-clock span{font-size:13px;}
+    .bil-mode-switch{margin-top:4px;}
+    .bil-mode-switch .gms-btn{padding:6px; font-size:11px;}
+    .bil-status{margin:4px auto; padding:4px 12px; font-size:11.5px; min-height:0;}
+    .bil-hint{display:none;}
+    .bil-table-wrap{padding:2px 4px;}
+  }
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
   .xo-cell{aspect-ratio:1/1; border-radius:18px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); font-family:'Cairo',sans-serif; font-weight:900; font-size:34px;
@@ -9298,37 +9314,37 @@ function renderConnect4Game(){
 
 
 /* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
-const BIL = { W:400, H:800, RAIL:28, R:14, POCKET_R:24, FRICTION:0.988, MIN_V:0.06, MAX_PULL:188, MAX_POWER:29, SHOT_SECONDS:20 };
+const BIL = { W:800, H:400, RAIL:28, R:14, POCKET_R:24, FRICTION:0.988, MIN_V:0.06, MAX_PULL:188, MAX_POWER:29, SHOT_SECONDS:20 };
 const BIL_COLORS = {1:'#F5C518',2:'#1E5FD9',3:'#E2231A',4:'#7A3AA0',5:'#F2791D',6:'#178A45',7:'#7A1F1F',8:'#141414'};
 function bilBallColor(num){ return BIL_COLORS[ num>8 ? num-8 : num ] || '#ccc'; }
 
 function bilPockets(){
-  /* portrait table: the long rails are the left/right sides, so the two side pockets sit at mid-height */
+  /* landscape table: the long rails are top/bottom, so the two side pockets sit at mid-width */
   const {W,H,RAIL} = BIL;
-  return [ {x:RAIL,y:RAIL}, {x:RAIL,y:H/2}, {x:RAIL,y:H-RAIL}, {x:W-RAIL,y:RAIL}, {x:W-RAIL,y:H/2}, {x:W-RAIL,y:H-RAIL} ];
+  return [ {x:RAIL,y:RAIL}, {x:W/2,y:RAIL}, {x:W-RAIL,y:RAIL}, {x:RAIL,y:H-RAIL}, {x:W/2,y:H-RAIL}, {x:W-RAIL,y:H-RAIL} ];
 }
 function bilDiamonds(){
   const {W,H,RAIL} = BIL;
   const pts = [];
   const longSpots = [0.2,0.35,0.5,0.65,0.8];
-  longSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
+  longSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
   const shortSpots = [0.33,0.66];
-  shortSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
+  shortSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
   return pts;
 }
 function bilRack(){
-  /* portrait table: triangle apex near the bottom (facing the breaking cue ball), base toward the top */
+  /* landscape table: triangle apex faces left (toward the breaking cue ball), base toward the right rail */
   const ROWS = [[1],[9,2],[10,8,3],[4,11,5,12],[13,6,14,7,15]];
   const {W,H,RAIL,R} = BIL;
-  const apexY = RAIL + (H-2*RAIL)*0.66, cx = W/2, dr = R*1.01, colGap = R*1.732*1.03;
+  const apexX = RAIL + (W-2*RAIL)*0.66, cy = H/2, dr = R*1.01, colGap = R*1.732*1.03;
   const out = [];
   ROWS.forEach((row,ri)=>{
-    const n = row.length, rowY = apexY - ri*colGap, startX = cx - (n-1)*dr;
-    row.forEach((num,ci)=> out.push({num, x:startX+ci*2*dr, y:rowY}));
+    const n = row.length, rowX = apexX + ri*colGap, startY = cy - (n-1)*dr;
+    row.forEach((num,ci)=> out.push({num, x:rowX, y:startY+ci*2*dr}));
   });
   return out;
 }
-function bilCueSpot(){ return {x: BIL.W/2, y: BIL.RAIL + (BIL.H-2*BIL.RAIL)*0.86}; }
+function bilCueSpot(){ return {x: BIL.RAIL + (BIL.W-2*BIL.RAIL)*0.14, y: BIL.H/2}; }
 function initBilliardsGame(){
   const prevMode = state.billiards ? state.billiards.mode : 'ai';
   const prevScore = state.billiards ? {a:state.billiards.scoreA, b:state.billiards.scoreB} : {a:0,b:0};
@@ -9402,7 +9418,16 @@ function openBilliardsGame(){
   bilStartClock();
   window.addEventListener('resize', bilOnResize);
   window.addEventListener('orientationchange', bilOnResize);
+  bilLockLandscape();
   SND.click();
+}
+function bilLockLandscape(){
+  try{
+    if(screen.orientation && screen.orientation.lock){ screen.orientation.lock('landscape').catch(()=>{}); }
+  }catch(e){}
+}
+function bilUnlockOrientation(){
+  try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 }
 function closeBilliardsGame(){
   bilClearClock();
@@ -9411,6 +9436,7 @@ function closeBilliardsGame(){
   BIL_CTX = null; BIL_CANVAS = null; BIL_AIM = null; BIL_FX = [];
   window.removeEventListener('resize', bilOnResize);
   window.removeEventListener('orientationchange', bilOnResize);
+  bilUnlockOrientation();
   const overlay = document.getElementById('bil-overlay');
   if(overlay) overlay.remove();
   SND.back();
