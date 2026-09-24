@@ -3110,7 +3110,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .xo-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; margin-bottom:12px;
     min-height:20px; color:var(--text);}
   .bil-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#171449,#0c0a24); overflow-y:auto; -webkit-overflow-scrolling:touch;}
-  .bil-shell{max-width:520px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); min-height:100%; min-height:100dvh; display:flex; flex-direction:column; box-sizing:border-box;}
+  .bil-shell{max-width:520px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
   .bil-topbar{padding:4px 2px 2px;}
   .bil-back{margin-bottom:6px;}
   .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
@@ -3126,7 +3126,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-mode-switch{margin-top:10px;}
   .bil-groups-row{display:flex; gap:10px; margin:10px 0 6px;}
   .bil-status{text-align:center; color:#fff; font-family:Tajawal,Arial; font-weight:700; font-size:13.5px; margin:8px 0 8px; min-height:18px;}
-  .bil-table-wrap{position:relative; flex:1; min-height:0; width:100%; margin:0 auto; padding:4px 6px; display:flex; align-items:center; justify-content:center;}
+  .bil-table-wrap{position:relative; flex:1; min-height:0; width:100%; margin:0 auto; padding:4px 6px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
   .bil-canvas-box{position:relative; line-height:0;}
   .bil-canvas-box canvas{display:block; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.5); touch-action:none;}
   .bil-power-wrap{position:absolute; top:5%; bottom:5%; left:7px; width:9px; background:rgba(0,0,0,.4); border-radius:5px; overflow:hidden; display:flex; align-items:flex-end; z-index:2;}
@@ -9282,8 +9282,9 @@ function renderConnect4Game(){
 
 /* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
 const BIL = { W:400, H:800, RAIL:28, R:14, POCKET_R:24, FRICTION:0.988, MIN_V:0.06, MAX_PULL:188, MAX_POWER:29, SHOT_SECONDS:20 };
-const BIL_COLORS = {1:'#F3C23D',2:'#2C6FEA',3:'#E2382A',4:'#7B3FA0',5:'#EE7A1E',6:'#1E8A4C',7:'#7A2E2E',8:'#161616'};
+const BIL_COLORS = {1:'#F5C518',2:'#1E5FD9',3:'#E2231A',4:'#7A3AA0',5:'#F2791D',6:'#178A45',7:'#7A1F1F',8:'#141414'};
 function bilBallColor(num){ return BIL_COLORS[ num>8 ? num-8 : num ] || '#ccc'; }
+
 function bilPockets(){
   /* portrait table: the long rails are the left/right sides, so the two side pockets sit at mid-height */
   const {W,H,RAIL} = BIL;
@@ -9315,6 +9316,7 @@ function initBilliardsGame(){
   const prevMode = state.billiards ? state.billiards.mode : 'ai';
   const prevScore = state.billiards ? {a:state.billiards.scoreA, b:state.billiards.scoreB} : {a:0,b:0};
   bilClearClock();
+  BIL_FX = [];
   const spot = bilCueSpot();
   const balls = [{id:'cue', num:0, type:'cue', x:spot.x, y:spot.y, vx:0, vy:0, in:false}];
   bilRack().forEach(p=> balls.push({ id:'b'+p.num, num:p.num, type: p.num===8?'eight':(p.num<=7?'solid':'stripe'), x:p.x, y:p.y, vx:0, vy:0, in:false }));
@@ -9362,6 +9364,8 @@ function bilAutoRandomShot(){
 /* ---------- overlay shell ---------- */
 let BIL_CTX = null, BIL_CANVAS = null;
 let BIL_AIM = null;
+let BIL_FX = [];
+let BIL_TABLE_CACHE = null;
 function openBilliardsGame(){
   initBilliardsGame();
   const old = document.getElementById('bil-overlay');
@@ -9381,7 +9385,7 @@ function closeBilliardsGame(){
   bilClearClock();
   const g = state.billiards;
   if(g && g._raf){ cancelAnimationFrame(g._raf); g._raf = null; }
-  BIL_CTX = null; BIL_CANVAS = null; BIL_AIM = null;
+  BIL_CTX = null; BIL_CANVAS = null; BIL_AIM = null; BIL_FX = [];
   window.removeEventListener('resize', bilOnResize);
   window.removeEventListener('orientationchange', bilOnResize);
   const overlay = document.getElementById('bil-overlay');
@@ -9469,6 +9473,7 @@ function bilMountCanvas(){
   BIL_CANVAS.onpointerup = bilPointerUp;
   BIL_CANVAS.onpointercancel = bilPointerUp;
   bilFitCanvas();
+  requestAnimationFrame(bilFitCanvas);
   bilDraw();
 }
 function bilCanvasPoint(e){
@@ -9525,14 +9530,20 @@ function bilFireShot(dx,dy,power){
   cue.vx = (dx/len)*power; cue.vy = (dy/len)*power;
   g.moving = true;
   g._shot = { firstContact:null, potted:[] };
-  luxTone(180,.05,'sine',.05,{cutoff:900,wet:.1});
+  const pw = Math.min(1, power/BIL.MAX_POWER);
+  luxTone(150-pw*40, .05+pw*.03, 'sine', .04+pw*.07, {cutoff:700+pw*700, wet:.1});
   bilAnimate();
 }
 function bilPot(b, shot){
   b.in = true; b.vx = 0; b.vy = 0;
   shot.potted.push({num:b.num, type:b.type});
-  luxTone(1200,.09,'sine',.05,{chorus:true,wet:.2});
+  luxTone(200,.07,'sine',.04,{cutoff:500,wet:.15});
+  setTimeout(()=>luxTone(1250,.1,'sine',.045,{chorus:true,wet:.22}), 55);
   vibrate([12]);
+  bilSpawnPotBurst(b);
+}
+function bilSpawnPotBurst(b){
+  BIL_FX.push({x:b.x, y:b.y, t:0, kind:'pot'});
 }
 function bilStep(){
   const g = state.billiards;
@@ -9544,9 +9555,13 @@ function bilStep(){
     const sp = Math.hypot(b.vx,b.vy);
     if(sp < MIN_V){ b.vx=0; b.vy=0; continue; }
     moving = true;
+    b.trail = b.trail || [];
+    b.trail.push({x:b.x,y:b.y});
+    if(b.trail.length>5) b.trail.shift();
     b.x += b.vx; b.y += b.vy;
     b.vx *= FRICTION; b.vy *= FRICTION;
   }
+  for(const b of balls){ if(Math.hypot(b.vx,b.vy) < MIN_V) b.trail = null; }
   const pockets = bilPockets();
   for(const b of balls){
     if(b.in) continue;
@@ -9556,10 +9571,15 @@ function bilStep(){
   }
   for(const b of balls){
     if(b.in) continue;
-    if(b.x-R < RAIL){ b.x = RAIL+R; b.vx = -b.vx*0.9; }
-    if(b.x+R > W-RAIL){ b.x = W-RAIL-R; b.vx = -b.vx*0.9; }
-    if(b.y-R < RAIL){ b.y = RAIL+R; b.vy = -b.vy*0.9; }
-    if(b.y+R > H-RAIL){ b.y = H-RAIL-R; b.vy = -b.vy*0.9; }
+    let hit = false, sp = Math.hypot(b.vx,b.vy);
+    if(b.x-R < RAIL){ b.x = RAIL+R; b.vx = -b.vx*0.9; hit=true; }
+    if(b.x+R > W-RAIL){ b.x = W-RAIL-R; b.vx = -b.vx*0.9; hit=true; }
+    if(b.y-R < RAIL){ b.y = RAIL+R; b.vy = -b.vy*0.9; hit=true; }
+    if(b.y+R > H-RAIL){ b.y = H-RAIL-R; b.vy = -b.vy*0.9; hit=true; }
+    if(hit && sp > 0.7){
+      const inten = Math.min(1, sp/8);
+      luxTone(340+inten*80, .045, 'triangle', .02+inten*.05, {cutoff:1600+inten*1200, wet:.12});
+    }
   }
   const live = g.balls.filter(b=>!b.in);
   for(let i=0;i<live.length;i++){
@@ -9575,18 +9595,26 @@ function bilStep(){
         const va = a.vx*nx+a.vy*ny, vb = b.vx*nx+b.vy*ny, diff = vb-va;
         a.vx += diff*nx; a.vy += diff*ny;
         b.vx -= diff*nx; b.vy -= diff*ny;
-        luxTone(700,.05,'triangle',.03,{cutoff:2500,wet:.1});
+        const inten = Math.min(1, Math.abs(diff)/9);
+        luxTone(650+inten*220,.045+inten*.02,'triangle',.02+inten*.05,{cutoff:2200+inten*1500,wet:.1});
       }
     }
   }
   return moving;
 }
+function bilAdvanceFX(){
+  for(let i=BIL_FX.length-1;i>=0;i--){
+    BIL_FX[i].t += 1;
+    if(BIL_FX[i].t > 18) BIL_FX.splice(i,1);
+  }
+}
 function bilAnimate(){
   const g = state.billiards;
   if(!g) return;
   const moving = bilStep();
+  bilAdvanceFX();
   bilDraw();
-  if(moving){ g._raf = requestAnimationFrame(bilAnimate); }
+  if(moving || BIL_FX.length>0){ g._raf = requestAnimationFrame(bilAnimate); }
   else { g.moving = false; g._raf = null; bilResolveShot(); }
 }
 function bilResolveShot(){
@@ -9690,31 +9718,175 @@ function bilBotChooseShot(){
 }
 
 /* ---------- rendering ---------- */
+function bilDrawBall(ctx, b){
+  const R = BIL.R, x=b.x, y=b.y;
+  /* soft contact shadow */
+  ctx.save();
+  const shGrad = ctx.createRadialGradient(x,y+R*0.85,0, x,y+R*0.85,R*1.05);
+  shGrad.addColorStop(0,'rgba(0,0,0,.4)'); shGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath(); ctx.ellipse(x,y+R*0.85,R*1.0,R*0.36,0,0,Math.PI*2);
+  ctx.fillStyle = shGrad; ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.clip();
+
+  /* base color */
+  if(b.type==='stripe'){
+    ctx.fillStyle='#f7f5ef'; ctx.fillRect(x-R,y-R,R*2,R*2);
+    const bandH = R*0.9;
+    ctx.fillStyle = bilBallColor(b.num);
+    ctx.fillRect(x-R, y-bandH/2, R*2, bandH);
+    ctx.fillStyle='rgba(0,0,0,.12)';
+    ctx.fillRect(x-R, y-bandH/2, R*2, R*0.05);
+    ctx.fillRect(x-R, y+bandH/2-R*0.05, R*2, R*0.05);
+  } else if(b.type==='eight'){
+    ctx.fillStyle='#151515'; ctx.fillRect(x-R,y-R,R*2,R*2);
+  } else if(b.type==='cue'){
+    ctx.fillStyle='#f7f5ef'; ctx.fillRect(x-R,y-R,R*2,R*2);
+  } else {
+    ctx.fillStyle = bilBallColor(b.num); ctx.fillRect(x-R,y-R,R*2,R*2);
+  }
+
+  /* spherical shading — darkens toward the rim for a real 3D feel */
+  const shade = ctx.createRadialGradient(x-R*0.28,y-R*0.32,R*0.15, x,y,R*1.08);
+  shade.addColorStop(0,'rgba(255,255,255,0)');
+  shade.addColorStop(0.6,'rgba(255,255,255,0)');
+  shade.addColorStop(0.86,'rgba(0,0,0,.16)');
+  shade.addColorStop(1,'rgba(0,0,0,.58)');
+  ctx.fillStyle = shade; ctx.globalCompositeOperation='multiply';
+  ctx.fillRect(x-R,y-R,R*2,R*2);
+  ctx.globalCompositeOperation='source-over';
+
+  /* number disc — embossed sticker look */
+  if(b.type!=='cue'){
+    const nr = R*0.44;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=nr*0.35; ctx.shadowOffsetY=nr*0.12;
+    ctx.beginPath(); ctx.arc(x,y,nr,0,Math.PI*2);
+    ctx.fillStyle='#f8f6ee'; ctx.fill();
+    ctx.restore();
+    ctx.lineWidth=0.7; ctx.strokeStyle='rgba(0,0,0,.18)';
+    ctx.beginPath(); ctx.arc(x,y,nr,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle='#161616';
+    ctx.font='700 '+(R*0.5)+'px Tajawal, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(b.num), x, y+R*0.02);
+  }
+
+  /* soft felt bounce-light reflecting up into the lower face of the ball */
+  const bounce = ctx.createRadialGradient(x+R*0.18,y+R*0.55,0, x+R*0.18,y+R*0.55,R*0.95);
+  bounce.addColorStop(0,'rgba(90,210,150,.16)'); bounce.addColorStop(1,'rgba(90,210,150,0)');
+  ctx.fillStyle = bounce; ctx.globalCompositeOperation='lighter';
+  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+
+  /* glossy highlight */
+  const hl = ctx.createRadialGradient(x-R*0.38,y-R*0.42,0, x-R*0.38,y-R*0.42,R*0.8);
+  hl.addColorStop(0,'rgba(255,255,255,.85)');
+  hl.addColorStop(0.4,'rgba(255,255,255,.22)');
+  hl.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = hl; ctx.globalCompositeOperation='lighter';
+  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+
+  /* crisp specular spot */
+  ctx.beginPath();
+  ctx.ellipse(x-R*0.4,y-R*0.46,R*0.17,R*0.1,-0.5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.92)'; ctx.fill();
+
+  /* thin rim light on the far side — separates the ball from the felt */
+  ctx.beginPath();
+  ctx.arc(x,y,R*0.96, Math.PI*0.1, Math.PI*0.75);
+  ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.lineWidth=R*0.07; ctx.lineCap='round';
+  ctx.stroke();
+
+  ctx.restore();
+
+  /* rim edge for crispness against the felt */
+  ctx.beginPath(); ctx.arc(x,y,R,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=0.9; ctx.stroke();
+}
+function bilBuildTableCache(){
+  const {W,H,RAIL} = BIL;
+  const cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+  const ctx = cv.getContext('2d');
+  /* wood rail */
+  const railGrad = ctx.createLinearGradient(0,0,W,H);
+  railGrad.addColorStop(0,'#7a5028'); railGrad.addColorStop(0.5,'#5c3a1c'); railGrad.addColorStop(1,'#3d2410');
+  ctx.fillStyle = railGrad; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.globalAlpha = 0.08;
+  for(let i=0;i<24;i++){
+    const gx = (i*41)%W;
+    ctx.strokeStyle = i%2===0 ? '#000' : '#fff'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(gx,0); ctx.bezierCurveTo(gx+8,H*0.3,gx-8,H*0.7,gx,H); ctx.stroke();
+  }
+  ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2; ctx.strokeRect(3,3,W-6,H-6);
+  /* rubber cushion band */
+  const ci = 8;
+  ctx.fillStyle = '#0b3d24';
+  ctx.fillRect(RAIL-ci,RAIL-ci,W-2*(RAIL-ci),H-2*(RAIL-ci));
+  /* felt */
+  const feltGrad = ctx.createRadialGradient(W/2,H/2,20,W/2,H/2,W*0.6);
+  feltGrad.addColorStop(0,'#1f9058'); feltGrad.addColorStop(0.7,'#157a46'); feltGrad.addColorStop(1,'#0a4a2c');
+  ctx.fillStyle = feltGrad; ctx.fillRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
+  const vign = ctx.createRadialGradient(W/2,H/2,H*0.28,W/2,H/2,H*0.62);
+  vign.addColorStop(0,'rgba(0,0,0,0)'); vign.addColorStop(1,'rgba(0,0,0,.28)');
+  ctx.fillStyle = vign; ctx.fillRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
+  ctx.save(); ctx.globalAlpha=0.05; ctx.strokeStyle='#fff'; ctx.lineWidth=1;
+  for(let i=0;i<40;i++){ const yy = RAIL + (i/40)*(H-2*RAIL); ctx.beginPath(); ctx.moveTo(RAIL,yy); ctx.lineTo(W-RAIL,yy); ctx.stroke(); }
+  ctx.restore();
+  ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=2; ctx.strokeRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
+  /* diamonds */
+  bilDiamonds().forEach(p=>{
+    const dg = ctx.createRadialGradient(p.x-0.6,p.y-0.6,0.3,p.x,p.y,2.6);
+    dg.addColorStop(0,'rgba(255,255,255,.9)'); dg.addColorStop(1,'rgba(255,255,255,.35)');
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.6,0,Math.PI*2); ctx.fillStyle=dg; ctx.fill();
+  });
+  /* pockets — deep leather look */
+  bilPockets().forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R+3,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
+    const pg = ctx.createRadialGradient(p.x,p.y,BIL.POCKET_R*0.15,p.x,p.y,BIL.POCKET_R);
+    pg.addColorStop(0,'#000'); pg.addColorStop(0.7,'#070707'); pg.addColorStop(1,'#2a1a0c');
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
+    ctx.strokeStyle='rgba(130,90,45,.55)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R-1,Math.PI*1.1,Math.PI*1.6);
+    ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=1.5; ctx.stroke();
+  });
+  return cv;
+}
+function bilDrawTrail(ctx,b){
+  if(!b.trail) return;
+  const n = b.trail.length;
+  b.trail.forEach((p,i)=>{
+    const a = (i+1)/(n+1) * 0.14;
+    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.R*0.88,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,'+a+')'; ctx.fill();
+  });
+}
+function bilDrawFX(ctx){
+  BIL_FX.forEach(fx=>{
+    const p = fx.t/18, r = 6+p*22;
+    ctx.beginPath(); ctx.arc(fx.x,fx.y,r,0,Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,222,150,'+(0.55*(1-p))+')';
+    ctx.lineWidth = 2.2*(1-p)+0.4; ctx.stroke();
+    for(let i=0;i<5;i++){
+      const ang = (i/5)*Math.PI*2 + p*2;
+      const sx = fx.x+Math.cos(ang)*r*0.8, sy = fx.y+Math.sin(ang)*r*0.8;
+      ctx.beginPath(); ctx.arc(sx,sy,1.6*(1-p),0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+(0.7*(1-p))+')'; ctx.fill();
+    }
+  });
+}
 function bilDraw(){
   if(!BIL_CTX) return;
-  const ctx = BIL_CTX, {W,H,RAIL} = BIL;
+  const ctx = BIL_CTX, {W,H} = BIL;
   const g = state.billiards;
   ctx.clearRect(0,0,W,H);
-  const railGrad = ctx.createLinearGradient(0,0,W,H);
-  railGrad.addColorStop(0,'#6b4322'); railGrad.addColorStop(1,'#452a14');
-  ctx.fillStyle = railGrad;
-  ctx.fillRect(0,0,W,H);
-  const feltGrad = ctx.createRadialGradient(W/2,H/2,20,W/2,H/2,W*0.55);
-  feltGrad.addColorStop(0,'#1c8a52'); feltGrad.addColorStop(1,'#0d5c36');
-  ctx.fillStyle = feltGrad;
-  ctx.fillRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
-  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth=2;
-  ctx.strokeRect(RAIL,RAIL,W-RAIL*2,H-RAIL*2);
-  bilDiamonds().forEach(p=>{
-    ctx.beginPath(); ctx.arc(p.x,p.y,2.4,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fill();
-  });
-  bilPockets().forEach(p=>{
-    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R,0,Math.PI*2);
-    ctx.fillStyle = '#0a0a0a'; ctx.fill();
-    ctx.beginPath(); ctx.arc(p.x,p.y,BIL.POCKET_R,0,Math.PI*2);
-    ctx.strokeStyle='rgba(255,255,255,.15)'; ctx.lineWidth=2; ctx.stroke();
-  });
+  if(!BIL_TABLE_CACHE) BIL_TABLE_CACHE = bilBuildTableCache();
+  ctx.drawImage(BIL_TABLE_CACHE,0,0);
   if(g){
     if(BIL_AIM && BIL_AIM.active && bilHumanCanShoot()){
       const cue = g.balls.find(b=>b.id==='cue');
@@ -9730,49 +9902,49 @@ function bilDraw(){
         if(Math.hypot(px-b.x,py-b.y) < BIL.R*2){ if(t<travel){ travel=t; hitBall=true; } }
       }
       const tX = cue.x+ux*travel, tY = cue.y+uy*travel;
+      ctx.save();
       ctx.beginPath(); ctx.moveTo(cue.x,cue.y); ctx.lineTo(tX,tY);
-      ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1.6; ctx.setLineDash([6,6]);
-      ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=4; ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1.6; ctx.setLineDash([6,6]);
+      ctx.stroke(); ctx.setLineDash([]); ctx.restore();
       if(hitBall){
         ctx.beginPath(); ctx.arc(tX,tY,BIL.R,0,Math.PI*2);
         ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=1.4; ctx.setLineDash([3,3]);
         ctx.stroke(); ctx.setLineDash([]);
       }
       const pull = Math.min(BIL.MAX_PULL, len);
-      const stickBackX = cue.x - ux*(BIL.R+16+pull), stickBackY = cue.y - uy*(BIL.R+16+pull);
-      const stickFrontX = cue.x - ux*(BIL.R+6), stickFrontY = cue.y - uy*(BIL.R+6);
-      ctx.beginPath(); ctx.moveTo(stickBackX,stickBackY); ctx.lineTo(stickFrontX,stickFrontY);
-      ctx.strokeStyle='#c99a5c'; ctx.lineWidth=5.5; ctx.lineCap='round'; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(stickFrontX,stickFrontY); ctx.lineTo(stickFrontX-ux*10,stickFrontY-uy*10);
-      ctx.strokeStyle='#2b2b2b'; ctx.lineWidth=5.5; ctx.lineCap='round'; ctx.stroke();
+      const buttX = cue.x - ux*(BIL.R+16+pull), buttY = cue.y - uy*(BIL.R+16+pull);
+      const tipX = cue.x - ux*(BIL.R+6), tipY = cue.y - uy*(BIL.R+6);
+      const perpX=-uy, perpY=ux, ferruleLen=7;
+      const shaftEndX = tipX - ux*ferruleLen, shaftEndY = tipY - uy*ferruleLen;
+      const gripEndX = buttX + ux*18, gripEndY = buttY + uy*18;
+      const quad=(x1,y1,w1,x2,y2,w2,fill)=>{
+        ctx.beginPath();
+        ctx.moveTo(x1+perpX*w1,y1+perpY*w1); ctx.lineTo(x2+perpX*w2,y2+perpY*w2);
+        ctx.lineTo(x2-perpX*w2,y2-perpY*w2); ctx.lineTo(x1-perpX*w1,y1-perpY*w1);
+        ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
+      };
+      const shaftGrad = ctx.createLinearGradient(buttX,buttY,shaftEndX,shaftEndY);
+      shaftGrad.addColorStop(0,'#33200f'); shaftGrad.addColorStop(0.15,'#6b4423');
+      shaftGrad.addColorStop(0.6,'#c9975c'); shaftGrad.addColorStop(1,'#eccb96');
+      quad(buttX,buttY,4.4, shaftEndX,shaftEndY,2.0, shaftGrad);
+      ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=0.5; ctx.stroke();
+      quad(buttX,buttY,4.5, gripEndX,gripEndY,4.0, 'rgba(20,20,20,.85)');
+      quad(shaftEndX,shaftEndY,2.0, tipX,tipY,1.8, '#f3ecd9');
+      const tipCapX = tipX-ux*1.4, tipCapY = tipY-uy*1.4;
+      ctx.beginPath(); ctx.arc(tipCapX,tipCapY,2.1,0,Math.PI*2);
+      ctx.fillStyle='#3f7a93'; ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=0.4; ctx.stroke();
     }
     g.balls.forEach(b=>{
       if(b.in) return;
-      ctx.save();
-      ctx.beginPath(); ctx.ellipse(b.x,b.y+BIL.R*0.75,BIL.R*0.85,BIL.R*0.35,0,0,Math.PI*2);
-      ctx.fillStyle='rgba(0,0,0,.28)'; ctx.fill();
-      ctx.restore();
-      const grad = ctx.createRadialGradient(b.x-BIL.R*0.35,b.y-BIL.R*0.35,1,b.x,b.y,BIL.R);
-      if(b.type==='cue'){ grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#d9d9d2'); }
-      else if(b.type==='stripe'){ grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#eeeeee'); }
-      else { const c = bilBallColor(b.num); grad.addColorStop(0, c); grad.addColorStop(1, c); }
-      ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
-      if(b.type==='stripe'){
-        ctx.save();
-        ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2); ctx.clip();
-        ctx.fillStyle = bilBallColor(b.num);
-        ctx.fillRect(b.x-BIL.R, b.y-BIL.R*0.42, BIL.R*2, BIL.R*0.84);
-        ctx.restore();
-      }
-      if(b.type!=='cue'){
-        ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R*0.42,0,Math.PI*2);
-        ctx.fillStyle='#fff'; ctx.fill();
-        ctx.fillStyle='#111'; ctx.font='bold '+(BIL.R*0.5)+'px Tajawal, Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(String(b.num), b.x, b.y+0.5);
-      }
-      ctx.beginPath(); ctx.arc(b.x,b.y,BIL.R,0,Math.PI*2);
-      ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=0.8; ctx.stroke();
+      bilDrawTrail(ctx,b);
     });
+    g.balls.forEach(b=>{
+      if(b.in) return;
+      bilDrawBall(ctx, b);
+    });
+    bilDrawFX(ctx);
   }
 }
 /* ============================= GAMES: DOMINO ============================= */
