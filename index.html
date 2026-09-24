@@ -1378,7 +1378,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
 
-  /* ---------- فيزا الألعاب ---------- */
+  /* ---------- فيزا Games ---------- */
   .vc-scene{perspective:1100px; width:100%; max-width:340px; margin:6px auto 0; cursor:pointer;}
   .vc-inner{position:relative; width:100%; aspect-ratio:1.586; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.3,.7,.2,1);}
   .vc-inner.flip{transform:rotateY(180deg);}
@@ -3110,7 +3110,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .xo-status{text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; margin-bottom:12px;
     min-height:20px; color:var(--text);}
   .bil-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#171449,#0c0a24); overflow-y:auto; -webkit-overflow-scrolling:touch;}
-  .bil-shell{max-width:720px; margin:0 auto; padding:12px 10px 24px;}
+  .bil-shell{max-width:520px; margin:0 auto; padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)); min-height:100%; min-height:100dvh; display:flex; flex-direction:column; box-sizing:border-box;}
   .bil-topbar{padding:4px 2px 2px;}
   .bil-back{margin-bottom:6px;}
   .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
@@ -3126,9 +3126,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-mode-switch{margin-top:10px;}
   .bil-groups-row{display:flex; gap:10px; margin:10px 0 6px;}
   .bil-status{text-align:center; color:#fff; font-family:Tajawal,Arial; font-weight:700; font-size:13.5px; margin:8px 0 8px; min-height:18px;}
-  .bil-table-wrap{position:relative; width:100%; margin:0 auto; padding:0 16px;}
-  .bil-table-wrap canvas{width:100%; height:auto; display:block; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.45); touch-action:none;}
-  .bil-power-wrap{position:absolute; top:8%; bottom:8%; left:0; width:11px; background:rgba(0,0,0,.35); border-radius:6px; overflow:hidden; display:flex; align-items:flex-end;}
+  .bil-table-wrap{position:relative; flex:1; min-height:0; width:100%; margin:0 auto; padding:4px 6px; display:flex; align-items:center; justify-content:center;}
+  .bil-canvas-box{position:relative; line-height:0;}
+  .bil-canvas-box canvas{display:block; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.5); touch-action:none;}
+  .bil-power-wrap{position:absolute; top:5%; bottom:5%; left:7px; width:9px; background:rgba(0,0,0,.4); border-radius:5px; overflow:hidden; display:flex; align-items:flex-end; z-index:2;}
   .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740,#E2382A); transition:height .05s linear;}
   .bil-hint{text-align:center; color:rgba(255,255,255,.55); font-family:Tajawal,Arial; font-size:11px; margin-top:10px;}
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
@@ -3700,7 +3701,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     font-size:30px; background:var(--g); box-shadow:0 10px 22px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.45);}
   .gh-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; line-height:1.3;}
   .gh-sub{font-size:11.5px; line-height:1.45; color:var(--text-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  /* علامة ! الصغيرة على كروت الألعاب */
+  /* علامة ! الصغيرة على كروت Games */
   .gh-info{position:absolute; top:10px; inset-inline-end:10px; z-index:2; width:24px; height:24px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text);
     background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
@@ -4193,7 +4194,7 @@ async function loadBonus(){
 async function saveBonus(obj){
   try{ await window.storage.set('glavera-bonus', JSON.stringify(obj), true); }catch(e){}
 }
-/* ============================= VISA (فيزا الألعاب) ============================= */
+/* ============================= VISA (فيزا Games) ============================= */
 let WALLET = {}, VISA_CARDS = {};
 async function loadWallet(){ try{ const r = await window.storage.get('glavera-visa-wallet', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; } }
 async function saveWallet(o){ try{ await window.storage.set('glavera-visa-wallet', JSON.stringify(o), true); }catch(e){} }
@@ -4357,7 +4358,7 @@ function visaMsg(kind, title, text, opts){
 function showExpiredDialog(){
   const pid = state.pid, exp = visaExpiresAt(pid);
   visaMsg('warn', 'انتهت صلاحية الفيزا',
-    'لا يمكن استخدام الفيزا حاليًا في الإيداع أو السحب أو الألعاب. يرجى تجديد الفيزا للمتابعة.',
+    'لا يمكن استخدام الفيزا حاليًا في الإيداع أو السحب أو Games. يرجى تجديد الفيزا للمتابعة.',
     { rows:[['انتهت بتاريخ', exp?fmtVisaDate(exp):'—'], ['رسوم التجديد', visaRenewFee()+' نقطة']],
       primary:{label:'تجديد الفيزا', onClick:openVisaPage}, secondary:{label:'لاحقًا'} });
 }
@@ -4531,7 +4532,7 @@ async function verifyVisaPin(pid, pin){
 }
 function requireVisaForRooms(){
   if(!hasVisa(state.pid)){
-    visaMsg('shop', 'محتاج فيزا الألعاب', 'من غير فيزا مش هتقدر تدخل الغرف ولا تلعب. اشتري تصميم فيزتك دلوقتي من المتجر وابدأ في ثواني.',
+    visaMsg('shop', 'محتاج فيزا Games', 'من غير فيزا مش هتقدر تدخل الغرف ولا تلعب. اشتري تصميم فيزتك دلوقتي من المتجر وابدأ في ثواني.',
       { icon:'shop', primary:{label:'🛍️ اشتري فيزا', onClick:openCardShop}, secondary:{label:'لاحقًا'} });
     return false;
   }
@@ -4708,7 +4709,7 @@ function renderVisaPage(){
       <div class="vp-chips">${chips}</div>
       ${tab==='withdraw' ? `<div class="vp-prog"><i style="width:${pct}%"></i></div>
         <div class="vp-hint">${bal>=min ? 'السحب متاح دلوقتي' : `السحب بيتفتح عند ${min} نقطة (فاضل ${min-bal})`}</div>` :
-        `<div class="vp-hint">النقاط بتتضاف لرصيد فيزتك فورًا وتقدر تستخدمها في الألعاب والـ Shop</div>`}
+        `<div class="vp-hint">النقاط بتتضاف لرصيد فيزتك فورًا وتقدر تستخدمها في Games والـ Shop</div>`}
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="${tab==='deposit'?'visa-deposit':'visa-withdraw'}">${tab==='deposit'?'إيداع في الفيزا':'سحب من الفيزا'}</button>
     </div>`;
   const canW = bal>=fee, canP = total>=fee;
@@ -4876,7 +4877,7 @@ function vtxShowReceipt(id){
 }
 function vtxLabelForFilters(){
   const P = {all:'كل الوقت', today:'اليوم', week:'آخر 7 أيام', month:'آخر 30 يوم'};
-  const F = {all:'كل العمليات', in:'الوارد فقط', out:'الصادر فقط', transfer:'التحويلات', game:'الألعاب', shop:'المشتريات', wallet:'إيداع وسحب', admin:'المنظمين'};
+  const F = {all:'كل العمليات', in:'الوارد فقط', out:'الصادر فقط', transfer:'التحويلات', game:'Games', shop:'المشتريات', wallet:'إيداع وسحب', admin:'المنظمين'};
   return (F[state.vtxFilter||'all']||'') + ' — ' + (P[state.vtxPeriod||'all']||'');
 }
 function vtxDownloadCsv(){
@@ -5128,7 +5129,7 @@ async function executeVisaRenew(pid, src, fee){
     await logVisaTx([{ pid, type:'renew', amount:fee, balAfter: fromWallet ? (WALLET[pid]||0) : participantTotal(pid), note: fromWallet?'من رصيد الفيزا':'من نقاط الفقرات' }]);
     pushNotification(pid, `✅ تم تجديد فيزتك حتى ${fmtVisaDate(expires)}`, '✅');
     vibrate([15,10,25]); render();
-    visaMsg('success','تم تجديد الفيزا','فيزتك تعمل الآن ويمكنك استخدامها في الإيداع والسحب والألعاب.',
+    visaMsg('success','تم تجديد الفيزا','فيزتك تعمل الآن ويمكنك استخدامها في الإيداع والسحب وGames.',
       { rows:[['المدفوع', fee+' نقطة'], ['صالحة حتى', fmtVisaDate(expires)]] });
   } finally { window.__visaRenewing = false; }
 }
@@ -5161,7 +5162,7 @@ async function loadConfSettings(){
 async function saveConfSettings(obj){
   try{ await window.storage.set('glavera-conf-settings', JSON.stringify(obj), true); }catch(e){}
 }
-/* نقاط الألعاب: كام نقطة تتحسب للمركز الأول/التاني/التالت (لودو) وكام نقطة تتخصم من اللاعب اللي يخرج/ينسحب */
+/* نقاط Games: كام نقطة تتحسب للمركز الأول/التاني/التالت (لودو) وكام نقطة تتخصم من اللاعب اللي يخرج/ينسحب */
 async function loadGamePointsSettings(){
   const fallback = {first:100, second:50, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25,
     soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
@@ -5519,7 +5520,7 @@ async function saveStickerImage(stickerId, dataUrl, attempt){
 async function deleteStickerImage(stickerId){
   try{ await window.storage.delete('glavera-sticker-img-'+stickerId, true); }catch(e){}
 }
-/* ---- متجر الكروت (تصاميم فيزا الألعاب) وطلبات الكروت المخصصة — جزء من متجر Shop ---- */
+/* ---- متجر الكروت (تصاميم فيزا Games) وطلبات الكروت المخصصة — جزء من متجر Shop ---- */
 let OWNED_CARD_THEMES = {}; // {pid:[themeKey,...]}
 let SHOP_PRICES = { simple:20, vip:60, custom:150 };
 const CARD_THEME_TIER = { aurora:'simple', emerald:'simple', rose:'simple', gold:'vip', midnight:'vip' };
@@ -5796,7 +5797,7 @@ const TRANSLATIONS = {
     nav_certificate:'الشهادة', nav_certificate_sub:'حمّل شهادة مشاركتك',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
     nav_gallery:'معرض الصور', nav_gallery_sub:'أجمل لحظات المؤتمر',
-    nav_games:'الألعاب', nav_games_sub:'العب وأنت مستني الفقرة الجاية 🎮',
+    nav_games:'Games', nav_games_sub:'العب وأنت مستني الفقرة الجاية 🎮',
     nav_chefs:'تقييم الشيف', nav_chefs_sub:'شيفات المؤتمر وأكلاتهم بالنجوم ⭐',
     gallery_title:'معرض صور المؤتمر', gallery_sub:'مرّر أو اسحب لاستعراض الصور',
     gallery_hint:'اسحب يمين أو شمال، أو دوس على الصورة اللي في النص عشان تفتح الألبوم',
@@ -6252,10 +6253,10 @@ function showDeviceKickedOverlay(){
   });
 }
 
-const GAMES_LOCK_REVIEWER_ID = '6666'; /* المشارك المسموح له بدخول الألعاب وهي مقفولة عشان يراجع التعديل */
+const GAMES_LOCK_REVIEWER_ID = '6666'; /* المشارك المسموح له بدخول Games وهي مقفولة عشان يراجع التعديل */
 function go(view, extra={}){
   if(view==='games' && CONF_SETTINGS.gamesLocked && state.pid!==GAMES_LOCK_REVIEWER_ID){
-    showToast('خانة الألعاب مقفولة مؤقتًا لحد ما نخلص تعديل، هترجع تفتح قريب 🔧', true);
+    showToast('خانة Games مقفولة مؤقتًا لحد ما نخلص تعديل، هترجع تفتح قريب 🔧', true);
     return;
   }
   state.history.push({view:state.view, dayId:state.dayId, sessionId:state.sessionId, lbTab:state.lbTab});
@@ -6624,15 +6625,15 @@ function homeGamesCardHtml(){
   const logos = GAMES_CATALOG.filter(g=>g.logo).slice(0,4).map(g=>`<img src="${g.logo}" alt="${escapeHtml(g.title)}" draggable="false">`).join('');
   const more = GAMES_CATALOG.length - 4;
   return `
-    <button type="button" class="home-games ${locked?'is-locked':''}" data-action="tile-nav" data-page="games" aria-label="الألعاب">
+    <button type="button" class="home-games ${locked?'is-locked':''}" data-action="tile-nav" data-page="games" aria-label="Games">
       <div class="hg-top">
-        <div class="hg-title"><img class="hg-logo" src="${GAMES_LOGO}" alt="" draggable="false"><span>الألعاب</span></div>
+        <div class="hg-title"><img class="hg-logo" src="${GAMES_LOGO}" alt="" draggable="false"><span>Games</span></div>
         ${locked ? '<span class="hg-live" style="background:rgba(255,255,255,.08);border-color:var(--border);color:var(--text-muted);">🔒 مقفولة مؤقتًا</span>'
                  : (live ? `<span class="hg-live"><i></i>${live} لايف الآن</span>` : '')}
       </div>
       <div class="hg-sub">العب ضد الجهاز أو تحدَّ صحابك في غرفة مباشرة واكسب نقط</div>
       <div class="hg-logos">${logos}${more>0?`<span class="hg-more">+${more}</span>`:''}</div>
-      <div class="hg-cta">ادخل عالم الألعاب ${ICO.chev}</div>
+      <div class="hg-cta">ادخل عالم Games ${ICO.chev}</div>
     </button>`;
 }
 function renderProfile(){
@@ -8146,7 +8147,7 @@ function renderGamesHub(){
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">الألعاب</div>
+      <div class="back-title">Games</div>
     </div>
     <div class="opinion-hero">
       <img class="gh-hero-logo" src="${GAMES_LOGO}" alt="" draggable="false">
@@ -8216,7 +8217,7 @@ async function doBuySticker(id, price){
   showToast('✅ اتشترى الاستيكر بنجاح');
   render();
 }
-/* ---- تاب الكارد: تصاميم بطاقة فيزا الألعاب — بسيطة و VIP ---- */
+/* ---- تاب الكارد: تصاميم بطاقة فيزا Games — بسيطة و VIP ---- */
 function cardTierPrice(tier){ return (SHOP_PRICES && SHOP_PRICES[tier]) || (tier==='vip'?60:20); }
 function renderShopCardTab(){
   const owned = OWNED_CARD_THEMES[state.pid] || [];
@@ -9280,35 +9281,36 @@ function renderConnect4Game(){
 
 
 /* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
-const BIL = { W:640, H:320, RAIL:22, R:11, POCKET_R:19, FRICTION:0.988, MIN_V:0.05, MAX_PULL:150, MAX_POWER:23, SHOT_SECONDS:20 };
+const BIL = { W:400, H:800, RAIL:28, R:14, POCKET_R:24, FRICTION:0.988, MIN_V:0.06, MAX_PULL:188, MAX_POWER:29, SHOT_SECONDS:20 };
 const BIL_COLORS = {1:'#F3C23D',2:'#2C6FEA',3:'#E2382A',4:'#7B3FA0',5:'#EE7A1E',6:'#1E8A4C',7:'#7A2E2E',8:'#161616'};
 function bilBallColor(num){ return BIL_COLORS[ num>8 ? num-8 : num ] || '#ccc'; }
 function bilPockets(){
+  /* portrait table: the long rails are the left/right sides, so the two side pockets sit at mid-height */
   const {W,H,RAIL} = BIL;
-  return [ {x:RAIL,y:RAIL}, {x:W/2,y:RAIL}, {x:W-RAIL,y:RAIL}, {x:RAIL,y:H-RAIL}, {x:W/2,y:H-RAIL}, {x:W-RAIL,y:H-RAIL} ];
+  return [ {x:RAIL,y:RAIL}, {x:RAIL,y:H/2}, {x:RAIL,y:H-RAIL}, {x:W-RAIL,y:RAIL}, {x:W-RAIL,y:H/2}, {x:W-RAIL,y:H-RAIL} ];
 }
 function bilDiamonds(){
   const {W,H,RAIL} = BIL;
   const pts = [];
   const longSpots = [0.2,0.35,0.5,0.65,0.8];
-  longSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
+  longSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
   const shortSpots = [0.33,0.66];
-  shortSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
+  shortSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
   return pts;
 }
 function bilRack(){
-  /* triangle apex on the left, opening toward the right — cue ball breaks from the left side */
+  /* portrait table: triangle apex near the bottom (facing the breaking cue ball), base toward the top */
   const ROWS = [[1],[9,2],[10,8,3],[4,11,5,12],[13,6,14,7,15]];
   const {W,H,RAIL,R} = BIL;
-  const apexX = RAIL + (W-2*RAIL)*0.66, cy = H/2, dr = R*1.01, colGap = R*1.732*1.03;
+  const apexY = RAIL + (H-2*RAIL)*0.66, cx = W/2, dr = R*1.01, colGap = R*1.732*1.03;
   const out = [];
   ROWS.forEach((row,ri)=>{
-    const n = row.length, colX = apexX + ri*colGap, startY = cy - (n-1)*dr;
-    row.forEach((num,ci)=> out.push({num, x:colX, y:startY+ci*2*dr}));
+    const n = row.length, rowY = apexY - ri*colGap, startX = cx - (n-1)*dr;
+    row.forEach((num,ci)=> out.push({num, x:startX+ci*2*dr, y:rowY}));
   });
   return out;
 }
-function bilCueSpot(){ return {x: BIL.RAIL + (BIL.W-2*BIL.RAIL)*0.22, y: BIL.H/2}; }
+function bilCueSpot(){ return {x: BIL.W/2, y: BIL.RAIL + (BIL.H-2*BIL.RAIL)*0.86}; }
 function initBilliardsGame(){
   const prevMode = state.billiards ? state.billiards.mode : 'ai';
   const prevScore = state.billiards ? {a:state.billiards.scoreA, b:state.billiards.scoreB} : {a:0,b:0};
@@ -9371,6 +9373,8 @@ function openBilliardsGame(){
   document.body.appendChild(overlay);
   bilRenderShell();
   bilStartClock();
+  window.addEventListener('resize', bilOnResize);
+  window.addEventListener('orientationchange', bilOnResize);
   SND.click();
 }
 function closeBilliardsGame(){
@@ -9378,6 +9382,8 @@ function closeBilliardsGame(){
   const g = state.billiards;
   if(g && g._raf){ cancelAnimationFrame(g._raf); g._raf = null; }
   BIL_CTX = null; BIL_CANVAS = null; BIL_AIM = null;
+  window.removeEventListener('resize', bilOnResize);
+  window.removeEventListener('orientationchange', bilOnResize);
   const overlay = document.getElementById('bil-overlay');
   if(overlay) overlay.remove();
   SND.back();
@@ -9424,15 +9430,35 @@ function bilRenderShell(){
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="billiards-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
     <div class="bil-status">${statusText}</div>
-    <div class="bil-table-wrap">
-      <div class="bil-power-wrap" id="bil-power-wrap" style="display:none;"><div class="bil-power-bar" id="bil-power-bar"></div></div>
-      <canvas id="bil-canvas" width="${BIL.W}" height="${BIL.H}"></canvas>
+    <div class="bil-table-wrap" id="bil-table-wrap">
+      <div class="bil-canvas-box" id="bil-canvas-box">
+        <div class="bil-power-wrap" id="bil-power-wrap" style="display:none;"><div class="bil-power-bar" id="bil-power-bar"></div></div>
+        <canvas id="bil-canvas" width="${BIL.W}" height="${BIL.H}"></canvas>
+      </div>
     </div>
     <div class="bil-hint">${g.winner ? '' : 'اسحب من الكرة البيضاء بعكس اتجاه الضربة، وسيب إصبعك عشان تضرب 🎯'}</div>
     ${g.winner ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="billiards-reset">🔄 لعبة جديدة</button>` : ''}
   `;
   bilMountCanvas();
 }
+function bilFitCanvas(){
+  const wrap = document.getElementById('bil-table-wrap');
+  const box = document.getElementById('bil-canvas-box');
+  const canvas = document.getElementById('bil-canvas');
+  if(!wrap || !box || !canvas) return;
+  const availW = Math.max(60, wrap.clientWidth - 4);
+  const availH = Math.max(60, wrap.clientHeight);
+  if(availW<=0 || availH<=0) return;
+  const ratio = BIL.W/BIL.H;
+  let dispW = availW, dispH = dispW/ratio;
+  if(dispH > availH){ dispH = availH; dispW = dispH*ratio; }
+  dispW = Math.floor(dispW); dispH = Math.floor(dispH);
+  canvas.style.width = dispW+'px';
+  canvas.style.height = dispH+'px';
+  box.style.width = dispW+'px';
+  box.style.height = dispH+'px';
+}
+function bilOnResize(){ if(document.getElementById('bil-overlay')) bilFitCanvas(); }
 function bilMountCanvas(){
   BIL_CANVAS = document.getElementById('bil-canvas');
   if(!BIL_CANVAS) return;
@@ -9442,6 +9468,7 @@ function bilMountCanvas(){
   BIL_CANVAS.onpointermove = bilPointerMove;
   BIL_CANVAS.onpointerup = bilPointerUp;
   BIL_CANVAS.onpointercancel = bilPointerUp;
+  bilFitCanvas();
   bilDraw();
 }
 function bilCanvasPoint(e){
@@ -14799,8 +14826,8 @@ function renderAdminSettingsTab(){
     </div>
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 قفل خانة الألعاب</div>
-        <div class="hint" style="margin:2px 0 0;">هتتقفل خانة الألعاب لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID} (للمراجعة)، وترجع تفتح لما تدوس تاني</div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 قفل خانة Games</div>
+        <div class="hint" style="margin:2px 0 0;">هتتقفل خانة Games لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID} (للمراجعة)، وترجع تفتح لما تدوس تاني</div>
       </div>
       <button type="button" class="switch ${CONF_SETTINGS.gamesLocked?'on':''}" data-action="toggle-games-locked"></button>
     </div>
@@ -18833,15 +18860,15 @@ async function doAdminBulkAddPoints(sign){
     render();
   } finally { _pointsOpBusy = false; }
 }
-/* ============================= ADMIN: نقاط الألعاب (رصيد الفيزا) لجميع المشاركين ============================= */
-/* بتضيف/تخصم نفس العدد من رصيد فيزا الألعاب لكل المشاركين (الأساسيين والمضافين). التعديل بيتم كـ transaction على Firebase
+/* ============================= ADMIN: نقاط Games (رصيد الفيزا) لجميع المشاركين ============================= */
+/* بتضيف/تخصم نفس العدد من رصيد فيزا Games لكل المشاركين (الأساسيين والمضافين). التعديل بيتم كـ transaction على Firebase
    عشان لو حد لعب أو دفع رسوم غرفة في نفس اللحظة رصيده ما يتلخبطش. */
 let _gamePointsBusy = false;
 function renderAdminGamePointsCard(){
   return `
     <div class="card" style="margin-bottom:14px;border-color:rgba(63,220,201,.4);">
       <div class="admin-session-name" style="margin-bottom:10px;">🎮 إضافة نقاط ألعاب لجميع المشاركين</div>
-      <div class="hint" style="margin-bottom:2px;">دي بتضيف في رصيد فيزا الألعاب (اللي بيدفعوا منه رسوم الغرف واللعب) لكل مشارك مسجّل (${PARTICIPANTS.length}) مرة واحدة.</div>
+      <div class="hint" style="margin-bottom:2px;">دي بتضيف في رصيد فيزا Games (اللي بيدفعوا منه رسوم الغرف واللعب) لكل مشارك مسجّل (${PARTICIPANTS.length}) مرة واحدة.</div>
       <div class="point-stepper">
         <button type="button" class="ps-btn ps-minus" data-action="admin-game-points" data-sign="-1">−</button>
         <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="game-points-input" value="200" />
@@ -18859,14 +18886,14 @@ function confirmAdminGamePoints(sign){
   const val = magnitude * (sign||1);
   showConfirmDialog(val>0 ? `إضافة ${magnitude} نقطة ألعاب لكل المشاركين؟` : `خصم ${magnitude} نقطة ألعاب من كل المشاركين؟`, ()=>doAdminGamePoints(val), {
     icon: val>0 ? '🎮' : '⚠️', confirmLabel: val>0 ? 'إضافة للجميع' : 'خصم من الجميع',
-    sub: `هيتم ${val>0?'إضافة':'خصم'} ${magnitude} نقطة ${val>0?'إلى':'من'} رصيد فيزا الألعاب لـ ${PARTICIPANTS.length} مشارك. اضغط مرة واحدة بس عشان متتكررش.`
+    sub: `هيتم ${val>0?'إضافة':'خصم'} ${magnitude} نقطة ${val>0?'إلى':'من'} رصيد فيزا Games لـ ${PARTICIPANTS.length} مشارك. اضغط مرة واحدة بس عشان متتكررش.`
   });
 }
 async function doAdminGamePoints(val){
   if(_gamePointsBusy) return;
   _gamePointsBusy = true;
   try{
-    showToast('⏳ جاري تحديث نقاط الألعاب لجميع المشاركين...');
+    showToast('⏳ جاري تحديث نقاط Games لجميع المشاركين...');
     const ids = PARTICIPANTS.map(p=>p.id);
     const apply = (curStr)=>{
       let o = {};
@@ -18913,7 +18940,7 @@ function renderAdminPointsResetCard(){
       ${status}
     </div>`;
 }
-/* ============================= ADMIN: تصفير / استرجاع فيزا الألعاب لجميع المشاركين ============================= */
+/* ============================= ADMIN: تصفير / استرجاع فيزا Games لجميع المشاركين ============================= */
 /* التصفير بياخد نسخة كاملة من (رصيد الفيزا + تصاميم الكروت المملوكة + تصميم كل كارت) ويحفظها في مفتاح منفصل على
    Firebase وبعدين يصفّر البيانات الحية، فيرجع الكل زي ما لسه مشتراش فيزا. الاسترجاع بيرجّع النسخة دي (بيستبدل أي
    حاجة اتجمعت بعد التصفير، لأن الفيزا مش بتتجمع زي النقاط) وبعدها بيمسح النسخة عشان محدش يرجّعها مرتين. */
@@ -18962,7 +18989,7 @@ function confirmResetAllVisas(){
   if(_visaOpBusy) return;
   showConfirmDialog('تصفير فيزا جميع المشاركين؟', ()=>doResetAllVisas(), {
     icon:'⚠️', confirmLabel:'تصفير الكل',
-    sub:'هيتم مسح رصيد الفيزا وكل الكروت المشتراة من كل المشاركين، وهيبقوا لازم يشتروا فيزا جديدة من نقاط الألعاب. النسخة بتتحفظ وتقدر ترجّعها بزر "استرجاع الفيزا".'
+    sub:'هيتم مسح رصيد الفيزا وكل الكروت المشتراة من كل المشاركين، وهيبقوا لازم يشتروا فيزا جديدة من نقاط Games. النسخة بتتحفظ وتقدر ترجّعها بزر "استرجاع الفيزا".'
   });
 }
 function confirmRestoreVisas(){
@@ -19041,8 +19068,8 @@ function renderAdminVisaResetCard(){
     : `<div class="hint" style="margin:8px 0 0;">مفيش فيزا متصفرة محفوظة دلوقتي</div>`;
   return `
     <div class="card" style="margin-bottom:14px;border-color:rgba(214,71,58,.35);">
-      <div class="admin-session-name" style="margin-bottom:10px;">💳 تصفير فيزا الألعاب لجميع المشاركين</div>
-      <div class="hint" style="margin-bottom:8px;">هيتم مسح رصيد الفيزا وكل كروت الفيزا المشتراة، وهيبقى لازم كل واحد يشتري فيزا جديدة من نقاط الألعاب.</div>
+      <div class="admin-session-name" style="margin-bottom:10px;">💳 تصفير فيزا Games لجميع المشاركين</div>
+      <div class="hint" style="margin-bottom:8px;">هيتم مسح رصيد الفيزا وكل كروت الفيزا المشتراة، وهيبقى لازم كل واحد يشتري فيزا جديدة من نقاط Games.</div>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn btn-outline" style="flex:1;padding:10px 6px;font-size:12px;color:var(--danger);" data-action="admin-reset-all-visas">🔄 تصفير كل الفيزا</button>
         <button type="button" class="btn btn-outline" style="flex:1;padding:10px 6px;font-size:12px;${b?'':'opacity:.4;'}" data-action="admin-restore-visas" ${b?'':'disabled'}>↩️ استرجاع الفيزا</button>
@@ -20227,7 +20254,7 @@ async function doToggleStickerStore(){
 async function doToggleGamesLocked(){
   CONF_SETTINGS.gamesLocked = !CONF_SETTINGS.gamesLocked;
   await saveConfSettings(CONF_SETTINGS);
-  showToast(CONF_SETTINGS.gamesLocked ? `🔒 اتقفلت خانة الألعاب لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID}` : '✅ اتفتحت خانة الألعاب للجميع');
+  showToast(CONF_SETTINGS.gamesLocked ? `🔒 اتقفلت خانة Games لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID}` : '✅ اتفتحت خانة Games للجميع');
   render();
 }
 async function doSaveConfDates(){
