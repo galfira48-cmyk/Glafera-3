@@ -924,6 +924,16 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
 
 
+
+  /* ---------- XO logo ---------- */
+  .game-logo-img{ display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+  .gh-ico.has-logo{ width:100%; min-width:0; max-width:120px; height:62px; background:none; box-shadow:none; border-radius:0; justify-content:center; align-self:center; }
+  .watch-ico.has-logo{ padding:5px; box-sizing:border-box; }
+  .vs-game .vg-ico .game-logo-img{ width:auto; height:34px; }
+  .xo-logo-hero{ display:flex; justify-content:center; margin:0 0 12px; }
+  .xo-logo-hero img{ height:84px; width:auto; max-width:70%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 8px 16px rgba(244,183,64,.32)); animation:xoLogoIn .55s cubic-bezier(.22,.9,.32,1) both; }
+  @keyframes xoLogoIn{ from{ opacity:0; transform:translateY(-8px) scale(.92); } to{ opacity:1; transform:none; } }
+
   /* ---------- admin: unified page header, sibling nav, item cards, empty states ---------- */
   .admin-page-head{ display:flex; align-items:center; gap:12px; padding:18px 0 10px; }
   .admin-page-head .icon-btn{ transform:scaleX(-1); flex:0 0 auto; }
@@ -956,7 +966,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-subtabs{ display:flex; gap:4px; padding:4px; margin-bottom:var(--a-pad); background:var(--bg-2); border:1px solid var(--border);
     border-radius:var(--a-r-pill); overflow-x:auto; scrollbar-width:none; }
   .admin-subtabs::-webkit-scrollbar{ display:none; }
-  .admin-subtabs .admin-tab{ flex:1 1 0; white-space:nowrap; text-align:center; background:transparent; border-color:transparent; padding:8px 12px; margin:0; }
+  .admin-subtabs .admin-tab{ flex:1 0 auto; white-space:nowrap; text-align:center; background:transparent; border-color:transparent; padding:8px 12px; margin:0; }
   .admin-subtabs .admin-tab:not(.active){ color:var(--text-muted); }
   .admin-hero{ display:flex; align-items:center; gap:12px; background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-lg);
     padding:var(--a-pad); margin-bottom:var(--a-pad); box-shadow:var(--a-shadow-tile); }
@@ -988,6 +998,79 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-progress-inline{ height:6px; border-radius:4px; background:var(--bg-2); overflow:hidden; margin-top:8px; }
   .admin-progress-inline > div{ height:100%; background:linear-gradient(90deg,var(--teal),var(--good)); }
   .admin-row-line{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
+
+  /* ---------- admin: info (!) popovers replacing long explanatory text ---------- */
+  .admin-info-btn{ position:relative; display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; margin-inline-start:8px; flex:0 0 auto;
+    border-radius:50%; border:1.5px solid var(--gold-2); background:rgba(244,183,64,.12); color:var(--gold-2); font-family:'Cairo',sans-serif; font-weight:900; font-size:11.5px;
+    line-height:1; cursor:pointer; vertical-align:middle; user-select:none; -webkit-tap-highlight-color:transparent; transition:transform .15s ease, background .15s ease, color .15s ease; }
+  .admin-info-btn::before{ content:''; position:absolute; inset:-9px; }
+  .admin-info-btn:active{ transform:scale(.88); }
+  .admin-info-btn.open{ background:var(--gold-2); color:#2a1d00; box-shadow:0 0 0 3px rgba(244,183,64,.22); }
+  .admin-info-pill{ width:auto; height:auto; border-radius:var(--a-r-pill); padding:3px 11px 3px 9px; margin:0 0 6px; gap:5px; font-size:11px; font-weight:800; }
+  .admin-info-row{ display:flex; margin:0; }
+  .hint.admin-info-pop, .admin-info-pop{ display:none; margin:8px 0 10px!important; padding:10px 12px; text-align:start!important; font-size:12px; line-height:1.75; color:var(--text);
+    background:linear-gradient(135deg,rgba(244,183,64,.12),rgba(244,183,64,.05)); border:1px solid rgba(244,183,64,.28); border-inline-start:3px solid var(--gold-2);
+    border-radius:var(--a-r-sm); animation:adminInfoIn .18s ease; }
+  .admin-info-pop.open{ display:block; }
+  .admin-collapse-head + .admin-info-pop{ margin-top:-4px!important; }
+  @keyframes adminInfoIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+
+
+  /* =============== admin visual refresh (scoped to #app.is-admin) =============== */
+  /* -- hub: horizontal cards, group accent, description line -- */
+  #app.is-admin .admin-hub-group-title{ color:var(--g,var(--gold)); font-size:13px; }
+  #app.is-admin .admin-hub-group-title .ahg-count{ background:var(--bg-2); border:1px solid var(--border); border-radius:var(--a-r-pill); padding:0 8px; line-height:18px; color:var(--text-muted); }
+  #app.is-admin .admin-hub-grid{ gap:10px; }
+  #app.is-admin .admin-hub-tile{ flex-direction:row; align-items:center; justify-content:flex-start; gap:11px; padding:11px 12px; min-height:66px; text-align:start;
+    border-radius:var(--a-r-lg); border-inline-start:3px solid var(--g,var(--gold)); overflow:hidden; }
+  #app.is-admin .admin-hub-tile:active{ transform:scale(.97); }
+  #app.is-admin .admin-hub-ico{ width:42px; height:42px; flex:0 0 auto; font-size:20px; border-radius:var(--a-r-sm); }
+  #app.is-admin .admin-hub-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+  #app.is-admin .admin-hub-lab{ font-size:12.5px; line-height:1.3; }
+  #app.is-admin .admin-hub-desc{ font-size:10px; line-height:1.4; font-weight:500; color:var(--text-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  #app.is-admin .admin-hub-badge{ position:static; flex:0 0 auto; margin-inline-start:auto; align-self:flex-start; }
+  #app.is-admin .admin-hub-grid > .admin-hub-tile:last-child:nth-child(odd){ grid-column:1 / -1; }
+  #app.is-admin .admin-search-input{ text-align:start; letter-spacing:0; font-size:14px; padding:11px 16px; border-radius:var(--a-r-pill); }
+
+  /* -- page header -- */
+  #app.is-admin .admin-page-head{ padding:16px 0 12px; margin-bottom:12px; border-bottom:1px solid var(--border); }
+  #app.is-admin .admin-page-ico{ width:46px; height:46px; border-radius:var(--a-r-md); font-size:22px; box-shadow:var(--a-shadow-ico); }
+  #app.is-admin .admin-page-titles .back-title{ font-size:18px; }
+
+  /* -- cards & headings -- */
+  #app.is-admin .card{ background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-lg); padding:var(--a-pad) 16px; margin-bottom:var(--a-gap); box-shadow:var(--a-shadow-tile); }
+  #app.is-admin .section-title, #app.is-admin .admin-day-title{ font-size:13px; color:var(--gold); margin:20px 2px 10px; padding-bottom:0; }
+  #app.is-admin .settings-row{ padding:12px 2px; }
+  #app.is-admin .card > .settings-row:last-child{ border-bottom:none; }
+
+  /* -- forms: label above field, one consistent field style -- */
+  #app.is-admin label:not([class]){ display:block; margin:12px 2px 6px; font-size:11.5px; font-weight:700; color:var(--text-muted); letter-spacing:.2px; }
+  #app.is-admin label:not([class]):first-child{ margin-top:0; }
+  #app.is-admin :is(.card,.admin-glass-box,.admin-edit-form,.admin-collapse-body) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]):not(.ps-input):not(.admin-sticker-price-input), textarea, select){
+    width:100%; box-sizing:border-box; background:var(--bg-2); border:1.5px solid var(--border); border-radius:var(--a-r-md); padding:12px 14px;
+    color:var(--text); font-size:16px; font-family:inherit; outline:none; text-align:start; letter-spacing:0; transition:border-color .15s ease, box-shadow .15s ease; }
+  #app.is-admin :is(.card,.admin-glass-box,.admin-edit-form,.admin-collapse-body) :is(input,textarea,select):focus{ border-color:var(--gold-2); box-shadow:var(--a-focus-ring); }
+  #app.is-admin :is(.card,.admin-glass-box,.admin-edit-form) :is(input[inputmode="numeric"],input[type=password],input[type=number]){ text-align:center; letter-spacing:.5px; }
+  #app.is-admin :is(.card,.admin-glass-box,.admin-edit-form) textarea{ min-height:84px; resize:vertical; line-height:1.7; }
+  #app.is-admin :is(.card,.admin-glass-box,.admin-edit-form) input[type=file]{ width:100%; box-sizing:border-box; padding:9px 10px; border:1.5px dashed var(--border); border-radius:var(--a-r-md); background:transparent; font-size:12px; color:var(--text-muted); }
+  #app.is-admin .admin-edit-row{ display:flex; gap:10px; }
+  #app.is-admin .admin-edit-row > div{ min-width:0; }
+
+  /* -- buttons -- */
+  #app.is-admin .btn{ padding:12px 14px; font-size:13.5px; line-height:1.3; border-radius:var(--a-r-md); }
+  #app.is-admin .btn-primary{ box-shadow:0 8px 18px -8px rgba(244,183,64,.5); }
+
+  /* -- participants: compact one-per-row list -- */
+  #app.is-admin .admin-participant-grid{ grid-template-columns:1fr; gap:8px; }
+  #app.is-admin .admin-participant-tile{ display:grid; grid-template-columns:44px auto 1fr auto; grid-template-rows:auto auto; column-gap:11px; row-gap:3px;
+    align-items:center; text-align:start; padding:10px 12px; border-radius:var(--a-r-md); }
+  #app.is-admin .admin-participant-tile .avatar{ grid-column:1; grid-row:1 / span 2; }
+  #app.is-admin .admin-participant-tile .pt-name{ grid-column:2 / span 2; grid-row:1; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #app.is-admin .admin-participant-tile .pt-code{ grid-column:2; grid-row:2; font-size:10.5px; color:var(--text-muted); }
+  #app.is-admin .admin-participant-tile .pt-team-chip{ grid-column:3; grid-row:2; justify-self:start; }
+  #app.is-admin .admin-participant-tile .pt-points{ grid-column:4; grid-row:1; justify-self:end; font-size:16px; line-height:1.1; }
+  #app.is-admin .admin-participant-tile .pt-points-lab{ grid-column:4; grid-row:2; justify-self:end; font-size:9.5px; }
 
   /* ---------- admin: organized hub (groups, search, status strip) ---------- */
   .admin-hub-search{ margin-bottom:var(--a-pad); }
@@ -7924,7 +8007,7 @@ function showGameWinModal(pts, title){
 
 /* ============================= GAMES: HUB ============================= */
 const GAMES_CATALOG = [
-  {id:'xo', icon:'⭕', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {id:'xo', icon:'⭕', logo:'xo-logo.png', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'connect4', icon:'🔴', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
   {id:'domino', icon:'🁫', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'},
   {id:'ludo', icon:'🎲', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#FFB347,#EE4B4B)'},
@@ -7941,10 +8024,11 @@ const GH_SOLO_SUB = {
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم'
 };
+function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
 function ghGameTile(g, sub, action, i){
   return `
     <button type="button" class="gh-tile" style="--g:${g.color}; --i:${i}" data-action="${action}" data-game="${g.id}">
-      <span class="gh-ico">${g.icon}</span>
+      <span class="gh-ico${g.logo?' has-logo':''}">${gameIconHtml(g)}</span>
       <span class="gh-title">${g.title}</span>
       <span class="gh-sub">${sub}</span>
     </button>`;
@@ -8278,7 +8362,7 @@ function renderWatchRooms(){
     return `
       <button type="button" class="watch-card" data-action="watch-room" data-code="${room.code}" data-game="${room.game}">
         <span class="watch-live-dot" aria-hidden="true"></span>
-        <span class="watch-ico" style="background:${g.color}">${g.icon}</span>
+        <span class="watch-ico${g.logo?' has-logo':''}" style="background:${g.color}">${gameIconHtml(g)}</span>
         <span class="watch-info">
           <span class="watch-title">${g.title}</span>
           <span class="watch-names">${escapeHtml(watchRoomNames(room))}</span>
@@ -8453,6 +8537,7 @@ function renderXoGame(){
         <button class="icon-btn" data-action="back">${ICO.back}</button>
         <div class="back-title">إكس أو</div>
       </div>
+      <div class="xo-logo-hero"><img src="xo-logo.png" alt="XO" draggable="false"></div>
       <div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز ضد الجهاز تاخد <b>${reward}</b> نقطة</div>
       <div class="match-result-card ${iWon?'win':'lose'}">
         <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
@@ -8487,6 +8572,7 @@ function renderXoGame(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">إكس أو</div>
     </div>
+    <div class="xo-logo-hero"><img src="xo-logo.png" alt="XO" draggable="false"></div>
     <div class="game-mode-switch">
       <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="xo-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="xo-mode" data-mode="2p">👥 لاعبين اتنين</button>
@@ -13046,7 +13132,7 @@ function roomMaybeIntro(){
       <div class="vs-mid"><span class="vs-shock"></span><span class="vs-shock b"></span><span class="vs-badge">VS</span></div>
       <div class="vs-p right me"><span class="vs-glow"></span><span class="vs-ring"></span>${vsPhotoHtml(state.pid)}</div>
     </div>
-    <div class="vs-game"><span class="vg-ico">${g.icon}</span><span>${g.title}</span></div>
+    <div class="vs-game"><span class="vg-ico">${gameIconHtml(g)}</span><span>${g.title}</span></div>
     <div class="vs-go">اضغط للبدء</div>`;
   let closed = false;
   const close = ()=>{ if(closed) return; closed = true; ov.classList.add('out'); setTimeout(()=>{ if(ov.parentNode) ov.parentNode.removeChild(ov); }, 450); };
@@ -14699,32 +14785,32 @@ function renderAdminPointCodesTab(){
 }
 
 const ADMIN_HUB_GROUPS = [
-  {id:'live', icon:'🔴', title:'التشغيل المباشر'},
-  {id:'people', icon:'👥', title:'المشاركون والفرق'},
-  {id:'points', icon:'🏆', title:'النقاط والتقييم'},
-  {id:'content', icon:'🎨', title:'المحتوى والمتجر'},
-  {id:'system', icon:'⚙️', title:'النظام'},
+  {id:'live', icon:'🔴', title:'التشغيل المباشر', accent:'var(--coral)'},
+  {id:'people', icon:'👥', title:'المشاركون والفرق', accent:'var(--teal)'},
+  {id:'points', icon:'🏆', title:'النقاط والتقييم', accent:'var(--gold)'},
+  {id:'content', icon:'🎨', title:'المحتوى والمتجر', accent:'var(--violet)'},
+  {id:'system', icon:'⚙️', title:'النظام', accent:'var(--text-muted)'},
 ];
 const ADMIN_HUB_ITEMS = [
-  {group:'live',   tab:'sessions', desc:"أيام المؤتمر والفقرات: تعديل، قفل وفتح",    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
-  {group:'live',   tab:'pulse', desc:"عدّاد الحضور اللحظي لعرضه على شاشة القاعة",       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {group:'live',   tab:'alerts', desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين",      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
-  {group:'live',   tab:'questions', desc:"أسئلة المشاركين للمتحدثين",   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
-  {group:'live',   tab:'reports', desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
-  {group:'people', tab:'participants', desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {group:'people', tab:'teams', desc:"إدارة الفرق وأعضائها",       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
-  {group:'people', tab:'logistics', desc:"الغرف والمواصلات واستلام الكيت",   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
-  {group:'people', tab:'audit', desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
-  {group:'people', tab:'opinions', desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
-  {group:'points', tab:'pointcodes', desc:"توليد ومتابعة أكواد النقاط",  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
-  {group:'points', tab:'rankings', desc:"ترتيب الأفراد والفرق",    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
-  {group:'points', tab:'chefs', desc:"تقييمات الوجبات والشيفات",       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
-  {group:'points', tab:'analytics', desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {group:'content',tab:'gallery', desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
-  {group:'content',tab:'stickers', desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
-  {group:'content',tab:'cardshop', desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
-  {group:'system', tab:'settings', desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
-  {group:'system', tab:'trash', desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
+  {group:'live',   tab:'sessions', short:"أيام المؤتمر وفقراته", desc:"أيام المؤتمر والفقرات: تعديل، قفل وفتح",    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+  {group:'live',   tab:'pulse', short:"عدّاد لشاشة القاعة", desc:"عدّاد الحضور اللحظي لعرضه على شاشة القاعة",       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'live',   tab:'alerts', short:"تنبيهات فورية ومجدولة", desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين",      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
+  {group:'live',   tab:'questions', short:"أسئلة للمتحدثين", desc:"أسئلة المشاركين للمتحدثين",   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
+  {group:'live',   tab:'reports', short:"مشاكل من المشاركين", desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
+  {group:'people', tab:'participants', short:"الأسماء والنقاط والأكواد", desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
+  {group:'people', tab:'teams', short:"الفرق وأعضاؤها", desc:"إدارة الفرق وأعضائها",       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {group:'people', tab:'logistics', short:"الغرف والمواصلات والكيت", desc:"الغرف والمواصلات واستلام الكيت",   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
+  {group:'people', tab:'audit', short:"تسجيلات الحضور", desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
+  {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
+  {group:'points', tab:'pointcodes', short:"توليد ومتابعة الأكواد", desc:"توليد ومتابعة أكواد النقاط",  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
+  {group:'points', tab:'rankings', short:"ترتيب الأفراد والفرق", desc:"ترتيب الأفراد والفرق",    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {group:'points', tab:'chefs', short:"تقييمات الوجبات", desc:"تقييمات الوجبات والشيفات",       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
+  {group:'points', tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
+  {group:'content',tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {group:'content',tab:'cardshop', short:"ثيمات وطلبات الكروت", desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+  {group:'system', tab:'settings', short:"التوقيت والهوية والأمان", desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
+  {group:'system', tab:'trash', short:"استرجاع أو حذف نهائي", desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
@@ -14733,16 +14819,16 @@ function renderAdminHub(){
   const badgeOf = tab => tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
   const tileHtml = it=>{
     const badge = badgeOf(it.tab);
-    return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml(it.label.toLowerCase())}">
-      ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
+    return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml((it.label+' '+(it.desc||'')).toLowerCase())}">
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
-      <span class="admin-hub-lab">${it.label}</span>
+      <span class="admin-hub-txt"><span class="admin-hub-lab">${it.label}</span>${(it.short||it.desc)?`<span class="admin-hub-desc">${it.short||it.desc}</span>`:''}</span>
+      ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
     </button>`;
   };
   const groups = ADMIN_HUB_GROUPS.map(g=>{
     const items = ADMIN_HUB_ITEMS.filter(it=>it.group===g.id);
     if(!items.length) return '';
-    return `<section class="admin-hub-group">
+    return `<section class="admin-hub-group" style="--g:${g.accent}">
       <div class="admin-hub-group-title"><span>${g.icon}</span><span>${g.title}</span><span class="ahg-count">${items.length}</span></div>
       <div class="admin-hub-grid">${items.map(tileHtml).join('')}</div>
     </section>`;
@@ -14954,7 +15040,7 @@ function renderAdminOpinionsTab(){
     {id:'neg', label:'⚠️ فيها سلبيات ('+negCount+')'},
     {id:'sug', label:'💡 اقتراحات ('+sugCount+')'},
   ], f);
-  const favLine = topFav.length ? `<div class="hint" style="margin:0 2px 10px;">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : '';
+  const favLine = topFav.length ? `<div class="hint" data-keep="1" style="margin:0 2px 10px;">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : '';
   const search = os.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".op-admin-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" />` : '';
   const flags = o => `${(o.positives||'').trim()?'✅':''}${(o.negatives||'').trim()?'⚠️':''}${(o.suggestions||'').trim()?'💡':''}`;
   const rows = list.map(o=>`
@@ -15511,6 +15597,7 @@ function render(){
     if(state.roomSpectate) html = spectateBannerHtml(_rm) + html;
   }
   app.innerHTML = html;
+  app.classList.toggle('is-admin', state.view==='admin');
   if(state.view!=='game-domino') dominoSyncYardLayer('');
   updateTeamTint();
   /* الأنيميشن ده (فيد + حركة خفيفة) لازم يشتغل بس لما فعلاً بنتنقل بين شاشات (go/goBack) —
@@ -18676,7 +18763,7 @@ function renderAdminBulkPointsCard(){
         <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="bulk-points-input" placeholder="0" />
         <button type="button" class="ps-btn ps-plus" data-action="admin-bulk-points" data-sign="1">+</button>
       </div>
-      <div class="hint" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
+      <div class="hint" data-keep="1" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
     </div>`;
 }
 async function doAdminBulkAddPoints(sign){
@@ -18714,7 +18801,7 @@ function renderAdminGamePointsCard(){
         <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="game-points-input" value="200" />
         <button type="button" class="ps-btn ps-plus" data-action="admin-game-points" data-sign="1">+</button>
       </div>
-      <div class="hint" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
+      <div class="hint" data-keep="1" style="margin-top:8px;text-align:center;">➖ خصم من الجميع &nbsp;·&nbsp; ➕ إضافة للجميع</div>
     </div>`;
 }
 function confirmAdminGamePoints(sign){
@@ -18768,7 +18855,7 @@ function renderAdminPointsResetCard(){
   let when = '';
   if(b && b.ts){ try{ when = new Date(b.ts).toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'}); }catch(e){ when = new Date(b.ts).toLocaleString(); } }
   const status = b
-    ? `<div class="hint" style="margin:8px 0 0;">💾 نسخة محفوظة (${when}) — ${b.participants||0} مشارك، مجموع ${b.total||0} نقطة</div>`
+    ? `<div class="hint" data-keep="1" style="margin:8px 0 0;">💾 نسخة محفوظة (${when}) — ${b.participants||0} مشارك، مجموع ${b.total||0} نقطة</div>`
     : `<div class="hint" style="margin:8px 0 0;">مفيش نقاط متصفرة محفوظة دلوقتي</div>`;
   return `
     <div class="card" style="margin-bottom:14px;border-color:rgba(214,71,58,.35);">
@@ -18904,7 +18991,7 @@ function renderAdminVisaResetCard(){
   let when = '';
   if(b && b.ts){ try{ when = new Date(b.ts).toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'}); }catch(e){ when = new Date(b.ts).toLocaleString(); } }
   const status = b
-    ? `<div class="hint" style="margin:8px 0 0;">💾 نسخة محفوظة (${when}) — ${b.participants||0} مشارك، رصيد فيزا ${b.total||0} نقطة</div>`
+    ? `<div class="hint" data-keep="1" style="margin:8px 0 0;">💾 نسخة محفوظة (${when}) — ${b.participants||0} مشارك، رصيد فيزا ${b.total||0} نقطة</div>`
     : `<div class="hint" style="margin:8px 0 0;">مفيش فيزا متصفرة محفوظة دلوقتي</div>`;
   return `
     <div class="card" style="margin-bottom:14px;border-color:rgba(214,71,58,.35);">
@@ -20969,6 +21056,95 @@ window.addEventListener('popstate', function(){
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
   }
+})();
+
+/* ============================= ADMIN: شرح الخانات داخل علامة (!) ============================= */
+(function adminInfoBubbles(){
+  let uid = 0, queued = false;
+  const TITLE_CLS = ['admin-glass-title','admin-session-name','admin-day-title','admin-section-title','section-title','admin-hero-name','admin-day-name'];
+  const STOP_SEL = '.card, .admin-glass-box, .admin-item-card, .admin-stat-strip, .admin-tabs, .admin-subtabs, .admin-collapse-head';
+  function isTitle(el){
+    if(!el || el.nodeType!==1) return false;
+    if(el.classList.contains('hint') || el.classList.contains('admin-info-pop')) return false;
+    if(TITLE_CLS.some(c=>el.classList.contains(c))) return true;
+    if(el.tagName==='LABEL' || el.tagName==='INPUT' || el.tagName==='BUTTON' || el.tagName==='SELECT' || el.tagName==='TEXTAREA') return false;
+    const st = el.getAttribute('style') || '';
+    if(/font-weight:\s*(800|700)/.test(st) && !el.querySelector('button,input,select,textarea') && (el.textContent||'').trim().length < 90) return true;
+    return false;
+  }
+  function makeBtn(id, pill){
+    const b = document.createElement('span');
+    b.className = 'admin-info-btn' + (pill?' admin-info-pill':'');
+    b.setAttribute('role','button'); b.setAttribute('tabindex','0'); b.setAttribute('aria-label','شرح'); b.setAttribute('aria-expanded','false');
+    b.dataset.info = id; b.textContent = pill ? '! شرح' : '!';
+    return b;
+  }
+  function shouldConvert(h){
+    if(h.dataset.infoDone || h.hasAttribute('data-keep')) return false;
+    const t = (h.textContent||'').trim();
+    if(t.length < 30) return false;
+    if(/^(💾|مفيش|لسه|📈)/.test(t)) return false;
+    if(h.querySelector('b,strong')) return false;
+    const st = h.getAttribute('style') || '';
+    if(/danger|#d6473a/i.test(st)) return false;
+    return true;
+  }
+  function convertHint(h){
+    const id = 'aip-' + (++uid);
+    h.dataset.infoDone = '1'; h.id = id; h.classList.add('admin-info-pop');
+    let title = null, el = h.previousElementSibling, steps = 0;
+    while(el && steps < 4){
+      if(el.dataset && el.dataset.infoDone){ el = el.previousElementSibling; steps++; continue; }
+      if(isTitle(el)){ title = el; break; }
+      if(el.matches && el.matches(STOP_SEL)) break;
+      el = el.previousElementSibling; steps++;
+    }
+    if(title && !title.querySelector('.admin-info-btn')){
+      title.appendChild(makeBtn(id,false));
+    } else {
+      const row = document.createElement('div'); row.className = 'admin-info-row';
+      row.appendChild(makeBtn(id,true));
+      h.parentNode.insertBefore(row, h);
+    }
+  }
+  function convertCollapseSub(sub){
+    const head = sub.closest('.admin-collapse-head');
+    if(!head || sub.dataset.infoDone) return;
+    const t = (sub.textContent||'').trim(); if(!t) return;
+    sub.dataset.infoDone = '1';
+    const id = 'aip-' + (++uid);
+    const pop = document.createElement('div'); pop.className = 'admin-info-pop'; pop.id = id; pop.textContent = t;
+    head.insertAdjacentElement('afterend', pop);
+    const titleEl = sub.previousElementSibling;
+    if(titleEl) titleEl.appendChild(makeBtn(id,false));
+    sub.style.display = 'none';
+  }
+  function run(){
+    queued = false;
+    const head = document.querySelector('.admin-page-head');
+    if(!head || !head.parentElement) return;
+    const root = head.parentElement;
+    root.querySelectorAll('.hint:not([data-info-done])').forEach(h=>{ if(shouldConvert(h)) convertHint(h); });
+    root.querySelectorAll('.ach-sub:not([data-info-done])').forEach(convertCollapseSub);
+  }
+  function schedule(){ if(queued) return; queued = true; (window.requestAnimationFrame||setTimeout)(run); }
+  new MutationObserver(schedule).observe(document.documentElement, {childList:true, subtree:true});
+  function toggle(btn){
+    const pop = document.getElementById(btn.dataset.info); if(!pop) return;
+    const open = !pop.classList.contains('open');
+    pop.classList.toggle('open', open); btn.classList.toggle('open', open); btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  document.addEventListener('click', function(e){
+    const t = e.target; if(!t || !t.closest) return;
+    const btn = t.closest('.admin-info-btn');
+    if(btn){ e.preventDefault(); e.stopPropagation(); toggle(btn); return; }
+    const pop = t.closest('.admin-info-pop.open');
+    if(pop){ e.stopPropagation(); pop.classList.remove('open'); const b = document.querySelector('.admin-info-btn[data-info="'+pop.id+'"]'); if(b){ b.classList.remove('open'); b.setAttribute('aria-expanded','false'); } }
+  }, true);
+  document.addEventListener('keydown', function(e){
+    if((e.key==='Enter' || e.key===' ') && e.target && e.target.classList && e.target.classList.contains('admin-info-btn')){ e.preventDefault(); toggle(e.target); }
+  });
+  schedule();
 })();
 </script>
 </body>

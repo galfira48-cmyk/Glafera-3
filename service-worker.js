@@ -1,5 +1,5 @@
-const CACHE_NAME = 'glavera3-v21';
-const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
+const CACHE_NAME = 'glavera3-v24';
+const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './xo-logo.png', './music.mp3'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
