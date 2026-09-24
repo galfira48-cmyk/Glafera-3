@@ -928,6 +928,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ---------- XO logo ---------- */
   .game-logo-img{ display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
   .gh-ico.has-logo{ width:100%; min-width:0; max-width:120px; height:62px; background:none; box-shadow:none; border-radius:0; justify-content:center; align-self:center; }
+  .gh-tile[data-game="domino"] .gh-ico.has-logo{ height:104px; max-width:140px; margin:-4px 0 -2px; }
+  .gh-tile[data-game="ludo"] .gh-ico.has-logo{ height:104px; max-width:140px; margin:-4px 0 -2px; }
+  .gh-tile[data-game="connect4"] .gh-ico.has-logo{ height:96px; max-width:130px; margin:-2px 0; }
   .watch-ico.has-logo{ padding:5px; box-sizing:border-box; }
   .vs-game .vg-ico .game-logo-img{ width:auto; height:34px; }
   .xo-logo-hero{ display:flex; justify-content:center; margin:0 0 12px; }
@@ -8072,7 +8075,7 @@ const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', logo:'xo-logo.png', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'connect4', icon:'🔴', logo:'connect4-logo.png', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
   {id:'domino', icon:'🁫', logo:'domino-logo.png', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
-  {id:'ludo', icon:'🎲', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#FFB347,#EE4B4B)'},
+  {id:'ludo', icon:'🎲', logo:'ludo-logo.png', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
@@ -10673,7 +10676,7 @@ function renderLudoGame(){
       <div class="back-title">لودو</div>
       ${G.stage==='play' ? `<button class="icon-btn" style="transform:none;margin-inline-start:auto;" data-action="ludo-setup" aria-label="اللاعبين">⚙️</button>` : ''}
     </div>`;
-  if(G.stage==='setup') return head + renderLudoSetup(G);
+  if(G.stage==='setup') return head + `<div class="xo-logo-hero domino-logo-hero"><img src="ludo-logo.png" alt="لودو" draggable="false"></div>` + renderLudoSetup(G);
   return head + ludoPlayHtml(G.L, ludoLocalCtx(G));
 }
 function ludoColorPickerHtml(c){
