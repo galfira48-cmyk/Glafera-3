@@ -1237,18 +1237,27 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-renew .btn[disabled]{opacity:.45; cursor:not-allowed;}
   .vp-history-link{display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin:0 0 14px; padding:11px; border-radius:14px; background:var(--bg-2); border:1px solid var(--border); color:var(--text); font-family:'Cairo',sans-serif; font-weight:800; font-size:13px;}
   .vtx-list{display:flex; flex-direction:column; gap:10px;}
-  .vtx-item{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px 14px;}
-  .vtx-ico{flex:0 0 auto; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; background:var(--bg-2);}
+  .vtx-item{display:flex; align-items:flex-start; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px 14px;}
+  .vtx-ico{flex:0 0 auto; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; background:var(--bg-2); margin-top:1px;}
   .vtx-ico.pos{background:color-mix(in srgb,var(--good) 18%,transparent);}
   .vtx-ico.neg{background:color-mix(in srgb,var(--danger) 14%,transparent);}
-  .vtx-mid{flex:1; min-width:0;}
-  .vtx-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--text);}
-  .vtx-sub{font-size:11.5px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .vtx-amt{flex:0 0 auto; text-align:left; direction:ltr;}
+  .vtx-mid{flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;}
+  .vtx-row1{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .vtx-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .vtx-cat{flex:0 0 auto; font-size:9.5px; font-weight:800; font-family:'Cairo',sans-serif; padding:3px 8px; border-radius:999px; background:var(--bg-2); color:var(--text-muted); border:1px solid var(--border); white-space:nowrap;}
+  .vtx-cat.cat-transfer{color:#7AA2FF; background:color-mix(in srgb,#7AA2FF 16%,transparent); border-color:color-mix(in srgb,#7AA2FF 30%,transparent);}
+  .vtx-cat.cat-game{color:#B98CFF; background:color-mix(in srgb,#B98CFF 16%,transparent); border-color:color-mix(in srgb,#B98CFF 30%,transparent);}
+  .vtx-cat.cat-shop{color:var(--gold-2); background:color-mix(in srgb,var(--gold-2) 16%,transparent); border-color:color-mix(in srgb,var(--gold-2) 30%,transparent);}
+  .vtx-cat.cat-wallet{color:var(--good); background:color-mix(in srgb,var(--good) 16%,transparent); border-color:color-mix(in srgb,var(--good) 30%,transparent);}
+  .vtx-cat.cat-admin{color:#FF9A6B; background:color-mix(in srgb,#FF9A6B 16%,transparent); border-color:color-mix(in srgb,#FF9A6B 30%,transparent);}
+  .vtx-note{font-size:11.5px; color:var(--text-muted); line-height:1.5; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;}
+  .vtx-row3{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:1px;}
+  .vtx-time{font-size:10.5px; color:var(--text-muted); opacity:.85;}
+  .vtx-amt{flex:0 0 auto; text-align:left; direction:ltr; padding-top:1px;}
   .vtx-amt b{font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; display:block;}
   .vtx-amt b.pos{color:var(--good);}
   .vtx-amt b.neg{color:var(--danger);}
-  .vtx-amt small{display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px;}
+  .vtx-amt small{display:block; font-size:10px; color:var(--text-muted); margin-top:3px; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:2px 6px;}
   .vtx-empty{text-align:center; padding:50px 20px; color:var(--text-muted); font-size:13px; line-height:1.9;}
   /* ---------- رسالة الفيزا في منتصف الشاشة ---------- */
   .vmsg-overlay{background:rgba(5,6,18,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); z-index:300; padding:24px; animation:vmsgFade .22s ease both;}
@@ -1359,7 +1368,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vst-day{font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:var(--text-muted); margin:14px 4px 8px;}
   button.vtx-item{width:100%; text-align:right; font:inherit; color:inherit; cursor:pointer; transition:transform .15s ease, border-color .2s ease;}
   button.vtx-item:active{transform:scale(.985); border-color:var(--gold);}
-  .vtx-ref{font-size:10px; color:var(--text-muted); opacity:.75; margin-top:1px; direction:ltr; text-align:right;}
+  .vtx-ref{font-size:9.5px; color:var(--text-muted); opacity:.7; direction:ltr; font-family:monospace,'Cairo',sans-serif; letter-spacing:.2px;}
   /* ---------- إشعارات العمليات اللحظية ---------- */
   #vtx-banners{position:fixed; left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 8px); z-index:95; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; padding:0 12px;}
   .vtx-banner{pointer-events:auto; width:100%; max-width:420px; display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:18px; color:var(--text); background:color-mix(in srgb,var(--surface) 92%,#000); border:1px solid var(--border); border-inline-start:4px solid var(--good); box-shadow:0 14px 34px -10px rgba(0,0,0,.65); backdrop-filter:blur(10px); transform:translateY(-130%); opacity:0; transition:transform .5s cubic-bezier(.2,.9,.25,1.1), opacity .35s ease; cursor:pointer;}
@@ -4363,6 +4372,7 @@ function vtxFiltered(pid){
     return m.cat===f;
   });
 }
+const VTX_CAT_LABELS = {transfer:'تحويلات', game:'ألعاب', shop:'مشتريات', wallet:'إيداع وسحب', admin:'المنظمين', other:'أخرى'};
 function vtxRef(tx){ return 'GF-'+String(tx.id||'').slice(-8).toUpperCase(); }
 function vtxTime(ts){ try{ return new Date(ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
 function vtxDate(ts){ try{ return new Date(ts).toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return ''; } }
@@ -4411,13 +4421,19 @@ function renderVisaHistoryPage(){
     rows += `<button type="button" class="vtx-item" data-action="vtx-open" data-id="${escapeHtml(tx.id||'')}">
       <div class="vtx-ico ${pos?'pos':'neg'}">${meta.ico}</div>
       <div class="vtx-mid">
-        <div class="vtx-title">${meta.label}</div>
-        <div class="vtx-sub">${tx.note ? escapeHtml(tx.note)+' · ' : ''}${vtxTime(tx.ts)}</div>
-        <div class="vtx-ref">${vtxRef(tx)}</div>
+        <div class="vtx-row1">
+          <span class="vtx-title">${meta.label}</span>
+          <span class="vtx-cat cat-${meta.cat||'other'}">${VTX_CAT_LABELS[meta.cat]||VTX_CAT_LABELS.other}</span>
+        </div>
+        ${tx.note ? `<div class="vtx-note">${escapeHtml(tx.note)}</div>` : ''}
+        <div class="vtx-row3">
+          <span class="vtx-time">🕓 ${vtxTime(tx.ts)}</span>
+          <span class="vtx-ref">${vtxRef(tx)}</span>
+        </div>
       </div>
       <div class="vtx-amt">
         <b class="${pos?'pos':'neg'}">${pos?'+':'−'}${tx.amount}</b>
-        <small>الرصيد: ${tx.balAfter}</small>
+        <small>الرصيد ${tx.balAfter}</small>
       </div>
     </button>`;
   });
