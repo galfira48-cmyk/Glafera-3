@@ -932,6 +932,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vs-game .vg-ico .game-logo-img{ width:auto; height:34px; }
   .xo-logo-hero{ display:flex; justify-content:center; margin:0 0 12px; }
   .xo-logo-hero img{ height:84px; width:auto; max-width:70%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 8px 16px rgba(244,183,64,.32)); animation:xoLogoIn .55s cubic-bezier(.22,.9,.32,1) both; }
+  .domino-logo-hero img{ height:96px; }
   @keyframes xoLogoIn{ from{ opacity:0; transform:translateY(-8px) scale(.92); } to{ opacity:1; transform:none; } }
 
   /* ---------- admin: unified page header, sibling nav, item cards, empty states ---------- */
@@ -8070,7 +8071,7 @@ function showGameWinModal(pts, title){
 const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', logo:'xo-logo.png', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'connect4', icon:'🔴', logo:'connect4-logo.png', title:'كونكت فور', sub:'وصّل 4 قطع في صف قبل خصمك', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
-  {id:'domino', icon:'🁫', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'},
+  {id:'domino', icon:'🁫', logo:'domino-logo.png', title:'دومينو', sub:'خلّص قطعك الأول ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'ludo', icon:'🎲', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#FFB347,#EE4B4B)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
@@ -10161,6 +10162,7 @@ function renderDominoGame(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">دومينو</div>
     </div>
+    <div class="xo-logo-hero domino-logo-hero"><img src="domino-logo.png" alt="دومينو" draggable="false"></div>
     <div class="game-mode-switch">
       <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="domino-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${g.mode==='2p'?'active':''}" data-action="domino-mode" data-mode="2p">👥 لاعبين اتنين</button>
