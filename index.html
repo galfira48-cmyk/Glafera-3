@@ -3160,8 +3160,16 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-table-wrap{position:relative; flex:1; min-height:0; width:100%; margin:0 auto; padding:4px 6px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
   .bil-canvas-box{position:relative; line-height:0;}
   .bil-canvas-box canvas{display:block; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset; touch-action:none;}
-  .bil-power-wrap{position:absolute; top:5%; bottom:5%; left:7px; width:10px; background:rgba(0,0,0,.4); border-radius:6px; overflow:hidden; display:flex; align-items:flex-end; z-index:2; box-shadow:inset 0 0 4px rgba(0,0,0,.5);}
-  .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740,#E2382A); transition:height .05s linear; border-radius:6px; box-shadow:0 0 8px rgba(244,183,64,.5);}
+  .bil-power-wrap{position:absolute; top:4%; bottom:4%; left:10px; width:18px; border-radius:9px; overflow:visible; z-index:2;
+    background:linear-gradient(180deg,#2a1a0c,#4a2f16 45%,#6b4423 100%); box-shadow:0 3px 10px rgba(0,0,0,.55), inset 1px 0 2px rgba(255,255,255,.12), inset -1px 0 3px rgba(0,0,0,.5), 0 0 0 1px rgba(244,183,64,.3);
+    display:flex; align-items:flex-end;}
+  .bil-power-wrap::before{content:''; position:absolute; top:-7px; left:50%; transform:translateX(-50%); width:12px; height:12px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#7fc4de,#3f7a93 70%); box-shadow:0 0 6px rgba(63,122,147,.8), 0 0 0 2px rgba(255,255,255,.12);}
+  .bil-power-wrap::after{content:''; position:absolute; inset:0; border-radius:9px; overflow:hidden; pointer-events:none;
+    background:repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 14px,rgba(0,0,0,.18) 14px 15px);}
+  .bil-power-bar{width:100%; height:0%; background:linear-gradient(0deg,#5FE0A4,#F4B740 55%,#E2382A); transition:height .05s linear; border-radius:0 0 9px 9px; box-shadow:0 0 10px rgba(244,183,64,.55);}
+  .bil-power-wrap.max .bil-power-bar{animation:bilPowerMax .35s infinite;}
+  @keyframes bilPowerMax{0%,100%{filter:brightness(1);}50%{filter:brightness(1.35);}}
   .bil-hint{text-align:center; color:rgba(255,255,255,.5); font-family:Tajawal,Arial; font-size:11px; margin-top:10px; letter-spacing:.2px;}
   .bil-reset-btn{width:100%; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; transition:.15s;}
   .bil-reset-btn:active{transform:scale(.97);}
@@ -9334,37 +9342,37 @@ function renderConnect4Game(){
 
 
 /* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
-const BIL = { W:800, H:400, RAIL:28, R:14, POCKET_R:24, FRICTION:0.988, MIN_V:0.06, MAX_PULL:188, MAX_POWER:29, SHOT_SECONDS:20 };
+const BIL = { W:400, H:800, RAIL:26, R:13.5, POCKET_R:23, FRICTION:0.988, MIN_V:0.06, MAX_PULL:200, MAX_POWER:29, SHOT_SECONDS:20 };
 const BIL_COLORS = {1:'#F5C518',2:'#1E5FD9',3:'#E2231A',4:'#7A3AA0',5:'#F2791D',6:'#178A45',7:'#7A1F1F',8:'#141414'};
 function bilBallColor(num){ return BIL_COLORS[ num>8 ? num-8 : num ] || '#ccc'; }
 
 function bilPockets(){
-  /* landscape table: the long rails are top/bottom, so the two side pockets sit at mid-width */
+  /* portrait table: the long rails are left/right, so the two side pockets sit at mid-height */
   const {W,H,RAIL} = BIL;
-  return [ {x:RAIL,y:RAIL}, {x:W/2,y:RAIL}, {x:W-RAIL,y:RAIL}, {x:RAIL,y:H-RAIL}, {x:W/2,y:H-RAIL}, {x:W-RAIL,y:H-RAIL} ];
+  return [ {x:RAIL,y:RAIL}, {x:W-RAIL,y:RAIL}, {x:RAIL,y:H/2}, {x:W-RAIL,y:H/2}, {x:RAIL,y:H-RAIL}, {x:W-RAIL,y:H-RAIL} ];
 }
 function bilDiamonds(){
   const {W,H,RAIL} = BIL;
   const pts = [];
   const longSpots = [0.2,0.35,0.5,0.65,0.8];
-  longSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
+  longSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
   const shortSpots = [0.33,0.66];
-  shortSpots.forEach(f=>{ pts.push({x:RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); pts.push({x:W-RAIL*0.55, y:RAIL+(H-2*RAIL)*f}); });
+  shortSpots.forEach(f=>{ pts.push({x:RAIL+(W-2*RAIL)*f, y:RAIL*0.55}); pts.push({x:RAIL+(W-2*RAIL)*f, y:H-RAIL*0.55}); });
   return pts;
 }
 function bilRack(){
-  /* landscape table: triangle apex faces left (toward the breaking cue ball), base toward the right rail */
+  /* portrait table: triangle apex faces up (toward the breaking cue ball at the bottom), base toward the top rail */
   const ROWS = [[1],[9,2],[10,8,3],[4,11,5,12],[13,6,14,7,15]];
   const {W,H,RAIL,R} = BIL;
-  const apexX = RAIL + (W-2*RAIL)*0.66, cy = H/2, dr = R*1.01, colGap = R*1.732*1.03;
+  const apexY = RAIL + (H-2*RAIL)*0.34, cx = W/2, dr = R*1.01, rowGap = R*1.732*1.03;
   const out = [];
   ROWS.forEach((row,ri)=>{
-    const n = row.length, rowX = apexX + ri*colGap, startY = cy - (n-1)*dr;
-    row.forEach((num,ci)=> out.push({num, x:rowX, y:startY+ci*2*dr}));
+    const n = row.length, rowY = apexY - ri*rowGap, startX = cx - (n-1)*dr;
+    row.forEach((num,ci)=> out.push({num, x:startX+ci*2*dr, y:rowY}));
   });
   return out;
 }
-function bilCueSpot(){ return {x: BIL.RAIL + (BIL.W-2*BIL.RAIL)*0.14, y: BIL.H/2}; }
+function bilCueSpot(){ return {x: BIL.W/2, y: BIL.RAIL + (BIL.H-2*BIL.RAIL)*0.82}; }
 function initBilliardsGame(){
   const prevMode = state.billiards ? state.billiards.mode : 'ai';
   const prevScore = state.billiards ? {a:state.billiards.scoreA, b:state.billiards.scoreB} : {a:0,b:0};
@@ -9438,14 +9446,9 @@ function openBilliardsGame(){
   bilStartClock();
   window.addEventListener('resize', bilOnResize);
   window.addEventListener('orientationchange', bilOnResize);
-  bilLockLandscape();
   SND.click();
 }
-function bilLockLandscape(){
-  try{
-    if(screen.orientation && screen.orientation.lock){ screen.orientation.lock('landscape').catch(()=>{}); }
-  }catch(e){}
-}
+function bilLockLandscape(){ /* table is now portrait — plays in the phone's natural orientation, no lock needed */ }
 function bilUnlockOrientation(){
   try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 }
@@ -9600,7 +9603,7 @@ function bilPointerMove(e){
   const cue = state.billiards.balls.find(b=>b.id==='cue');
   const pull = Math.min(BIL.MAX_PULL, Math.hypot(BIL_AIM.cx-cue.x, BIL_AIM.cy-cue.y));
   const pw = document.getElementById('bil-power-wrap'), pb = document.getElementById('bil-power-bar');
-  if(pw && pb){ pw.style.display='block'; pb.style.height = Math.round(pull/BIL.MAX_PULL*100)+'%'; }
+  if(pw && pb){ pw.style.display='flex'; const pct = pull/BIL.MAX_PULL; pb.style.height = Math.round(pct*100)+'%'; pw.classList.toggle('max', pct>=0.97); }
   bilDraw();
 }
 function bilPointerUp(e){
