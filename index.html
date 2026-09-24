@@ -3115,12 +3115,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-topbar .icon-btn.bil-back{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(6px); color:#fff; transition:.15s;}
   .bil-topbar .icon-btn.bil-back:active{transform:scaleX(-1) scale(.9);}
   .bil-back{margin-bottom:8px;}
-  .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
-  .bil-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:8px 4px; border-radius:14px; background:rgba(255,255,255,.05); color:#fff; font-family:Tajawal,Arial; font-size:11.5px; border:1.5px solid rgba(255,255,255,.06); transition:.25s; box-shadow:0 2px 6px rgba(0,0,0,.15);}
-  .bil-side.on{border-color:#F4B740; background:rgba(244,183,64,.16); box-shadow:0 0 16px rgba(244,183,64,.28); transform:translateY(-1px);}
-  .bil-side b{font-size:12.5px;}
-  .bil-side small{opacity:.75; font-size:10.5px;}
-  .bil-side-ico{font-size:16px;}
+  .bil-vs-row{display:flex; align-items:center; justify-content:space-between; gap:6px; position:relative;}
+  .bil-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px 7px; border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); color:#fff; font-family:Tajawal,Arial; font-size:11.5px; border:1.5px solid rgba(255,255,255,.07); transition:.25s; box-shadow:0 2px 6px rgba(0,0,0,.18); position:relative;}
+  .bil-side.on{border-color:#F4B740; background:linear-gradient(180deg,rgba(244,183,64,.22),rgba(244,183,64,.05)); box-shadow:0 0 18px rgba(244,183,64,.32); transform:translateY(-1px);}
+  .bil-side b{font-size:12.5px; margin-top:1px;}
+  .bil-side small{opacity:.75; font-size:10px;}
+  .bil-avatar{position:relative; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;
+    background:radial-gradient(circle at 32% 28%,#4a4270,#211d3c 72%); border:2px solid rgba(255,255,255,.18); box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 6px rgba(0,0,0,.35);}
+  .bil-side.on .bil-avatar{border-color:#F4B740; box-shadow:0 0 0 3px rgba(244,183,64,.22), 0 3px 10px rgba(0,0,0,.4); animation:bilAvatarPulse 1.6s infinite;}
+  .bil-side[data-p="B"] .bil-avatar{background:radial-gradient(circle at 32% 28%,#5a2f3c,#26141c 72%);}
+  .bil-avatar-badge{position:absolute; bottom:-3px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; background:#141425; border:1.5px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:9px; line-height:1;}
+  @keyframes bilAvatarPulse{0%,100%{box-shadow:0 0 0 3px rgba(244,183,64,.22),0 3px 10px rgba(0,0,0,.4);} 50%{box-shadow:0 0 0 6px rgba(244,183,64,.08),0 3px 10px rgba(0,0,0,.4);}}
+  .bil-vs-badge{position:absolute; top:-9px; left:50%; transform:translateX(-50%) rotate(-6deg); font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:10px; letter-spacing:.5px; color:#3d2410;
+    background:linear-gradient(160deg,#FFE9A8,#F4B740 55%,#C4841A); padding:2.5px 7px; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.25) inset; z-index:2;}
   .bil-clock{position:relative; width:46px; height:46px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .bil-clock-ring{position:absolute; inset:0; transform:rotate(-90deg);}
   .bil-clock-ring circle{fill:none; stroke-width:3.5;}
@@ -3129,6 +3136,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bil-clock span{position:relative; color:#fff; font-weight:900; font-size:16px; font-family:Tajawal,Arial;}
   .bil-clock.danger .bil-clock-prog{stroke:#FF6B5B;}
   .bil-clock.danger span{animation:bilPulse .6s infinite;}
+  .bil-balltrack{display:flex; align-items:center; justify-content:center; gap:4px; margin:8px auto 0; padding:5px 10px; max-width:100%; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none;
+    background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); border-radius:999px; box-shadow:inset 0 1px 3px rgba(0,0,0,.4);}
+  .bil-balltrack::-webkit-scrollbar{display:none;}
+  .bil-track-ball{position:relative; flex-shrink:0; width:15px; height:15px; border-radius:50%; background:var(--bc); box-shadow:0 1px 2px rgba(0,0,0,.5), inset -2px -2px 3px rgba(0,0,0,.35), inset 1.5px 1.5px 2px rgba(255,255,255,.55); transition:.3s;}
+  .bil-track-ball.stripe::after{content:''; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle,#fff 38%,transparent 40%), linear-gradient(0deg,transparent 32%,#fff 32%,#fff 68%,transparent 68%);}
+  .bil-track-ball.eight{box-shadow:0 1px 2px rgba(0,0,0,.5), inset -2px -2px 3px rgba(0,0,0,.5), inset 1.5px 1.5px 2px rgba(255,255,255,.35);}
+  .bil-track-ball.eight::after{content:''; position:absolute; inset:3px; border-radius:50%; background:#fff;}
+  .bil-track-ball.potted{opacity:.22; filter:grayscale(.7) saturate(.6); transform:scale(.82);}
+  .bil-track-ball.potted::before{content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; color:#5FE0A4; text-shadow:0 0 3px #000;}
   @keyframes bilPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
   .bil-mode-switch{margin-top:10px;}
   .bil-mode-switch .gms-btn{transition:.15s;}
@@ -3153,12 +3169,16 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .bil-shell{padding-top:calc(4px + env(safe-area-inset-top,0px)); padding-bottom:calc(4px + env(safe-area-inset-bottom,0px));}
     .bil-topbar{padding:2px 2px 0;}
     .bil-back{margin-bottom:3px;}
-    .bil-side{padding:4px 4px; gap:0;}
-    .bil-side b{font-size:11px;}
-    .bil-side small{font-size:9.5px;}
-    .bil-side-ico{font-size:13px;}
-    .bil-clock{width:36px; height:36px;}
-    .bil-clock span{font-size:13px;}
+    .bil-side{padding:3px 4px 4px; gap:0;}
+    .bil-side b{font-size:10px;}
+    .bil-side small{font-size:8.5px;}
+    .bil-avatar{width:26px; height:26px; font-size:13px;}
+    .bil-avatar-badge{width:12px; height:12px; font-size:7px;}
+    .bil-vs-badge{font-size:8px; padding:1.5px 5px; top:-6px;}
+    .bil-clock{width:32px; height:32px;}
+    .bil-clock span{font-size:12px;}
+    .bil-balltrack{margin-top:4px; padding:3px 8px;}
+    .bil-track-ball{width:11px; height:11px;}
     .bil-mode-switch{margin-top:4px;}
     .bil-mode-switch .gms-btn{padding:6px; font-size:11px;}
     .bil-status{margin:4px auto; padding:4px 12px; font-size:11.5px; min-height:0;}
@@ -9455,6 +9475,17 @@ function bilResetGame(){
 }
 function bilGroupIcon(type){ return type==='solid' ? '⬤' : (type==='stripe' ? '🎯' : '❔'); }
 function bilGroupLabel(type){ return type==='solid' ? 'مصمتة' : (type==='stripe' ? 'مخططة' : 'لسه مش محدد'); }
+function bilBallTrackHtml(){
+  const g = state.billiards; if(!g) return '';
+  let out = '';
+  for(let n=1;n<=15;n++){
+    const b = g.balls.find(x=>x.num===n);
+    const potted = b ? b.in : false;
+    const cls = (n>8?'stripe':'') + (n===8?'eight':'');
+    out += `<span class="bil-track-ball ${cls} ${potted?'potted':''}" style="--bc:${bilBallColor(n)}"></span>`;
+  }
+  return `<div class="bil-balltrack">${out}</div>`;
+}
 function bilRenderShell(){
   const g = state.billiards;
   if(!g) return;
@@ -9477,7 +9508,11 @@ function bilRenderShell(){
     <div class="bil-topbar">
       <button class="icon-btn bil-back" data-action="billiards-close">${ICO.back}</button>
       <div class="bil-vs-row">
-        <div class="bil-side ${g.turn==='A'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.A)}</span><b>أنت</b><small>${gA}</small></div>
+        <div class="bil-side ${g.turn==='A'?'on':''}" data-p="A">
+          <div class="bil-avatar"><span>🧑</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.A)}</span></div>
+          <b>أنت</b><small>${gA}</small>
+        </div>
+        <div class="bil-vs-badge">VS</div>
         <div class="bil-clock" id="bil-clock">
           <svg class="bil-clock-ring" viewBox="0 0 44 44">
             <circle class="bil-clock-track" cx="22" cy="22" r="19"/>
@@ -9485,8 +9520,12 @@ function bilRenderShell(){
           </svg>
           <span id="bil-clock-num">${g.shotClock}</span>
         </div>
-        <div class="bil-side ${g.turn==='B'?'on':''}"><span class="bil-side-ico">${bilGroupIcon(g.groups.B)}</span><b>${g.mode==='ai'?'الجهاز':'اللاعب 2'}</b><small>${gB}</small></div>
+        <div class="bil-side ${g.turn==='B'?'on':''}" data-p="B">
+          <div class="bil-avatar"><span>${g.mode==='ai'?'🤖':'🧑'}</span><span class="bil-avatar-badge">${bilGroupIcon(g.groups.B)}</span></div>
+          <b>${g.mode==='ai'?'الجهاز':'اللاعب 2'}</b><small>${gB}</small>
+        </div>
       </div>
+      ${bilBallTrackHtml()}
     </div>
     <div class="game-mode-switch bil-mode-switch">
       <button type="button" class="gms-btn ${g.mode==='ai'?'active':''}" data-action="billiards-mode" data-mode="ai">🤖 ضد الجهاز</button>
