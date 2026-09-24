@@ -4158,7 +4158,7 @@ function defaultCardTheme(pid){
 function visaCardHtml(pid, draft, isNew){
   const c = Object.assign({theme:defaultCardTheme(pid), holder:''}, VISA_CARDS[pid]||{}, draft||{});
   c.theme = effectiveCardTheme(pid, c.theme);
-  const customImg = c.theme==='custom' ? customCardImageFor(pid) : null;
+  const customImg = c.theme==='custom' ? customCardImageFor(pid) : cardThemeImg(c.theme);
   const th = VISA_THEMES[c.theme] || VISA_THEMES.aurora;
   const nm = c.holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || 'PLAYER';
   const bal = WALLET[pid]||0;
@@ -4173,7 +4173,7 @@ function visaCardHtml(pid, draft, isNew){
   const expTxt = expTs ? fmtVisaDate(expTs) : '--/--/--';
   const expired = !isNew && visaExpired(pid);
   const vcEnter = (Date.now() - (window.__vcSeenAt||0)) > 30000; window.__vcSeenAt = Date.now();
-  const vcVip = !customImg && CARD_THEME_TIER[c.theme]==='vip';
+  const vcVip = c.theme!=='custom' && cardThemeTier(c.theme)==='vip';
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
       <div class="vc-top"><span class="vc-brand">Glafira</span><span class="vc-tag">GAME CARD</span></div>
@@ -4280,9 +4280,13 @@ function renderVisaPage(){
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
-  const swatches = Object.keys(VISA_THEMES).map(k=>{ const t=VISA_THEMES[k];
+  const allThemeKeys = themeKeysForTier('simple').concat(themeKeysForTier('vip'));
+  const swatches = allThemeKeys.map(k=>{
+    const img = cardThemeImg(k);
+    const t = VISA_THEMES[k];
     const isOwned = ownsCardTheme(pid, k);
-    return `<button type="button" class="vp-sw ${(cur.theme===k && isOwned)?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${t.name}" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})">${isOwned?'':'🔒'}</button>`; }).join('')
+    const bg = img ? `background-image:url('${img}');background-size:cover;background-position:center;` : `background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})`;
+    return `<button type="button" class="vp-sw ${(cur.theme===k && isOwned)?'on':''} ${isOwned?'':'locked'}" data-action="${isOwned?'visa-theme':'visa-theme-locked'}" data-k="${k}" aria-label="${img?cardThemeName(k):t.name}" style="${bg}">${isOwned?'':'🔒'}</button>`; }).join('')
     + (customCardImageFor(pid) ? `<button type="button" class="vp-sw ${cur.theme==='custom'?'on':''}" data-action="visa-theme" data-k="custom" aria-label="مخصص" style="background-image:url('${customCardImageFor(pid)}');background-size:cover;background-position:center;">${cur.theme==='custom'?'':''}</button>` : '');
   const expired = visaExpired(pid), expTs = visaExpiresAt(pid), daysLeft = visaDaysLeft(pid);
   const fee = visaRenewFee();
@@ -5175,6 +5179,61 @@ async function preloadStickerImages(list){
       if(r && r.value) STICKER_IMG_CACHE[id] = r.value;
     }catch(e){}
   }));
+}
+/* ---- ثيمات كارت مرفوعة من الأدمن (صور حقيقية) — تنضم لتصاميم الفيزا الجاهزة في الـ Shop ---- */
+let CUSTOM_CARD_THEMES = []; // [{id, tier:'simple'|'vip', ts}]
+const CARD_THEME_IMG_CACHE = {};
+async function loadCustomCardThemes(){
+  try{ const r = await window.storage.get('glavera-card-themes-list', true); return r && r.value ? JSON.parse(r.value) : []; }
+  catch(e){ return []; }
+}
+async function saveCustomCardThemesWithRetry(arr, attempt){
+  attempt = attempt || 1;
+  try{ await window.storage.set('glavera-card-themes-list', JSON.stringify(arr), true); return true; }
+  catch(e){
+    console.error('saveCustomCardThemes failed (attempt '+attempt+'):', e);
+    if(attempt < 3){ await sleep(800*attempt); return saveCustomCardThemesWithRetry(arr, attempt+1); }
+    return false;
+  }
+}
+async function saveCardThemeImage(themeId, dataUrl, attempt){
+  attempt = attempt || 1;
+  try{
+    const r = await window.storage.set('glavera-cardtheme-img-'+themeId, dataUrl, true, 45000);
+    if(!r) throw new Error(_fbLastError||'save failed');
+    return true;
+  }catch(e){
+    console.error('saveCardThemeImage failed (attempt '+attempt+'):', e);
+    if(attempt < 3){ await sleep(900*attempt); return saveCardThemeImage(themeId, dataUrl, attempt+1); }
+    return false;
+  }
+}
+async function deleteCardThemeImage(themeId){
+  try{ await window.storage.delete('glavera-cardtheme-img-'+themeId, true); }catch(e){}
+}
+async function preloadCardThemeImages(list){
+  const ids = (list||[]).filter(t=>!CARD_THEME_IMG_CACHE[t.id]).map(t=>t.id);
+  if(!ids.length) return;
+  await Promise.all(ids.map(async id=>{
+    try{
+      const r = await window.storage.get('glavera-cardtheme-img-'+id, true);
+      if(r && r.value) CARD_THEME_IMG_CACHE[id] = r.value;
+    }catch(e){}
+  }));
+}
+/* التصميم ده مرفوع من الأدمن (صورة) ولا من الجاهزين (Gradient)؟ + إيه الفئة بتاعته */
+function cardThemeTier(key){
+  if(CARD_THEME_TIER[key]) return CARD_THEME_TIER[key];
+  const t = (CUSTOM_CARD_THEMES||[]).find(x=>x.id===key);
+  return t ? t.tier : 'simple';
+}
+function cardThemeImg(key){ return CARD_THEME_IMG_CACHE[key] || null; }
+function cardThemeName(key){ return (VISA_THEMES[key]||{}).name || 'تصميم مميز'; }
+/* كل مفاتيح تصاميم الفئة دي: الجاهزة (Gradient) + المرفوعة (صور) */
+function themeKeysForTier(tier){
+  const built = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
+  const uploaded = (CUSTOM_CARD_THEMES||[]).filter(t=>t.tier===tier).map(t=>t.id);
+  return built.concat(uploaded);
 }
 
 async function loadTrash(){
@@ -7843,22 +7902,23 @@ async function doBuySticker(id, price){
 function cardTierPrice(tier){ return (SHOP_PRICES && SHOP_PRICES[tier]) || (tier==='vip'?60:20); }
 function renderShopCardTab(){
   const owned = OWNED_CARD_THEMES[state.pid] || [];
-  const groups = { simple:[], vip:[] };
-  Object.keys(VISA_THEMES).forEach(k=>{ const tier = CARD_THEME_TIER[k]||'simple'; groups[tier].push(k); });
   const renderGroup = (tier, label)=>{
     const price = cardTierPrice(tier);
-    const items = groups[tier].map(k=>{
+    const items = themeKeysForTier(tier).map(k=>{
+      const img = cardThemeImg(k);
       const t = VISA_THEMES[k];
+      const name = img ? cardThemeName(k) : t.name;
       const isOwned = owned.indexOf(k)>-1;
+      const swatchStyle = img ? `background-image:url('${img}');background-size:cover;background-position:center;` : `background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})`;
       return `<div class="card-store-item ${isOwned?'owned':''}">
-        <div class="card-store-swatch" style="background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a})"></div>
-        <div class="card-store-name">${t.name}</div>
+        <div class="card-store-swatch" style="${swatchStyle}"></div>
+        <div class="card-store-name">${name}</div>
         ${isOwned
           ? `<div class="sticker-store-owned">✅ عندك</div>`
           : `<button type="button" class="sticker-store-buy" data-action="buy-card-theme" data-k="${k}" data-price="${price}">اشتري بـ ${price} 💳</button>`}
       </div>`;
     }).join('');
-    return `<div class="shop-tier-label">${label} — ${price} 🌟</div><div class="card-store-grid">${items}</div>`;
+    return `<div class="shop-tier-label">${label} — ${price} 🌟</div><div class="card-store-grid">${items || `<div class="empty-note">لسه مفيش تصاميم في الفئة دي</div>`}</div>`;
   };
   return `
     ${renderGroup('simple','🎨 تصاميم بسيطة')}
@@ -7869,7 +7929,6 @@ function renderShopCardTab(){
 async function doBuyCardTheme(themeKey, price){
   if(!requireVisaValid()) return;
   price = Math.max(0, Number(price)||0);
-  if(!VISA_THEMES[themeKey]) return;
   WALLET = await loadWallet();
   const bal = WALLET[state.pid]||0;
   if(bal < price){ showToast(`محتاج ${price-bal} نقطة كمان في الفيزا عشان تشتري التصميم ده`, true); return; }
@@ -7883,7 +7942,7 @@ async function doBuyCardTheme(themeKey, price){
   await saveWallet(WALLET);
   await saveOwnedCardThemes(OWNED_CARD_THEMES);
   try{ await updateVisaCard(state.pid, { editOpen:true }); }catch(e){}
-  vtxLogSafe([{ pid:state.pid, type:'shop_card', amount:price, balAfter:(WALLET[state.pid]||0), note:(VISA_THEMES[themeKey]||{}).name||'' }]);
+  vtxLogSafe([{ pid:state.pid, type:'shop_card', amount:price, balAfter:(WALLET[state.pid]||0), note:cardThemeName(themeKey) }]);
   showToast('✅ اتشترى تصميم الكارد — اختاره من صفحة فيزتي');
   render();
 }
@@ -16172,6 +16231,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='send-chat-sticker'){ doSendChatSticker(el.dataset.sticker); }
   else if(action==='send-chat-custom-sticker'){ doSendChatCustomSticker(el.dataset.id); }
   else if(action==='admin-delete-sticker'){ doAdminDeleteSticker(el.dataset.id); }
+  else if(action==='admin-delete-cardtheme'){ doAdminDeleteCardTheme(el.dataset.id); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
@@ -16338,11 +16398,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-sticker-store'){
     if(!CONF_SETTINGS.stickerStoreOpen){ showToast('الافتتاح قريب جدًا... انتظرونا 🛍️', true); return; }
     state.friendTile = null; state.shopTab = 'stickers'; state.customCardDraftPhoto = null; go('sticker-store');
-    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers(), loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadWallet()])
-      .then(([bonus, owned, stickers, ownedCards, prices, ccRequests, wallet])=>{
+    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers(), loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadWallet()])
+      .then(([bonus, owned, stickers, ownedCards, prices, ccRequests, cardThemes, wallet])=>{
         BONUS = bonus; OWNED_STICKERS = owned; CUSTOM_STICKERS = stickers;
-        OWNED_CARD_THEMES = ownedCards; SHOP_PRICES = prices; CUSTOM_CARD_REQUESTS = ccRequests; WALLET = wallet;
-        preloadStickerImages(CUSTOM_STICKERS).then(()=>render());
+        OWNED_CARD_THEMES = ownedCards; SHOP_PRICES = prices; CUSTOM_CARD_REQUESTS = ccRequests; CUSTOM_CARD_THEMES = cardThemes; WALLET = wallet;
+        Promise.all([preloadStickerImages(CUSTOM_STICKERS), preloadCardThemeImages(CUSTOM_CARD_THEMES)]).then(()=>render());
       });
   }
   else if(action==='shop-tab'){ state.shopTab = el.dataset.t; render(); if(el.dataset.t==='card'||el.dataset.t==='custom'){ loadWallet().then(w=>{ WALLET=w; render(); }); } }
@@ -17217,16 +17277,18 @@ function readPhotoFileToDataUrl(file, maxSize, quality){
   });
 }
 function renderAdminStickersTab(){
-  const sub = state.shopAdminTab==='prices' ? 'prices' : (state.shopAdminTab==='custom' ? 'custom' : 'stickers');
+  const sub = ['stickers','simple','vip','requests'].indexOf(state.shopAdminTab)>-1 ? state.shopAdminTab : 'stickers';
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const tabsHtml = `<div class="vp-tabs" style="margin-bottom:16px;">
     <button type="button" class="${sub==='stickers'?'on':''}" data-action="admin-shop-tab" data-t="stickers">استيكرات</button>
-    <button type="button" class="${sub==='prices'?'on':''}" data-action="admin-shop-tab" data-t="prices">أسعار الكروت</button>
-    <button type="button" class="${sub==='custom'?'on':''}" data-action="admin-shop-tab" data-t="custom">طلبات مخصصة${pendingCC?` (${pendingCC})`:''}</button>
+    <button type="button" class="${sub==='simple'?'on':''}" data-action="admin-shop-tab" data-t="simple">🎨 كروت عادية</button>
+    <button type="button" class="${sub==='vip'?'on':''}" data-action="admin-shop-tab" data-t="vip">👑 كروت VIP</button>
+    <button type="button" class="${sub==='requests'?'on':''}" data-action="admin-shop-tab" data-t="requests">طلبات المشاركين${pendingCC?` (${pendingCC})`:''}</button>
   </div>`;
   let body = '';
   if(sub==='stickers') body = renderAdminStickersSubTab();
-  else if(sub==='prices') body = renderAdminShopPricesSubTab();
+  else if(sub==='simple') body = renderAdminCardThemeSubTab('simple');
+  else if(sub==='vip') body = renderAdminCardThemeSubTab('vip');
   else body = renderAdminShopCustomSubTab();
   return tabsHtml + body;
 }
@@ -17261,23 +17323,50 @@ function renderAdminStickersSubTab(){
     ${items ? `<div class="admin-sticker-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات مرفوعة</div>`}
   `;
 }
-function renderAdminShopPricesSubTab(){
-  const p = Object.assign({simple:20,vip:60,custom:150}, SHOP_PRICES||{});
+function renderAdminCardThemeSubTab(tier){
+  const label = tier==='vip' ? '👑 كروت VIP' : '🎨 كروت عادية';
+  const price = cardTierPrice(tier);
+  const uploaded = (CUSTOM_CARD_THEMES||[]).filter(t=>t.tier===tier);
+  const built = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
+  const uploadedItems = uploaded.map(t=>{
+    const url = CARD_THEME_IMG_CACHE[t.id];
+    return `<div class="admin-sticker-item">
+      <div class="admin-sticker-thumb" style="aspect-ratio:1.58;">${url ? `<img src="${url}" alt="تصميم كارد" />` : '⏳'}</div>
+      <button type="button" class="admin-sticker-del" title="حذف" data-action="admin-delete-cardtheme" data-id="${t.id}">✕</button>
+    </div>`;
+  }).join('');
+  const builtItems = built.map(k=>{
+    const t = VISA_THEMES[k];
+    return `<div class="admin-sticker-item">
+      <div class="admin-sticker-thumb" style="aspect-ratio:1.58;background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a});">${t.name}</div>
+      <div class="hint" style="text-align:center;font-size:10px;">افتراضي</div>
+    </div>`;
+  }).join('');
   return `
-    <div class="card" style="margin-bottom:14px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:10px;">💳 أسعار تصاميم تاب الكارد وطلب الكارد المخصص</div>
-      <div class="hint" style="margin:0 0 6px;">تصاميم بسيطة (${p.simple} 🌟)</div>
-      <input type="number" min="0" class="field" style="margin-bottom:10px;" data-action-input="shop-price" data-k="simple" value="${p.simple}" />
-      <div class="hint" style="margin:0 0 6px;">تصاميم VIP (${p.vip} 🌟)</div>
-      <input type="number" min="0" class="field" style="margin-bottom:10px;" data-action-input="shop-price" data-k="vip" value="${p.vip}" />
-      <div class="hint" style="margin:0 0 6px;">طلب كارد مخصص (${p.custom} 🌟)</div>
-      <input type="number" min="0" class="field" data-action-input="shop-price" data-k="custom" value="${p.custom}" />
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:10px;">💳 سعر ${label} (${price} 🌟)</div>
+      <input type="number" min="0" class="field" style="margin-bottom:4px;" data-action-input="shop-price" data-k="${tier}" value="${price}" />
+      <div class="hint" style="margin:0 0 12px;">السعر ده هيتطبق على كل تصاميم الفئة دي في متجر المشاركين</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">📤 رفع تصاميم كارت جديدة (${label})</div>
+      <div class="hint" style="margin:0 0 10px;">اختار صور من الهاتف — هتتضاف لمتجر الكروت، والمشارك يقدر يشتريها بنقاطه وتظهر كتصميم فيزته</div>
+      <label class="btn btn-primary" style="display:inline-block;text-align:center;cursor:pointer;">
+        📤 اختيار صور كارت
+        <input type="file" accept="image/*" multiple id="cardtheme-admin-upload-${tier}" data-tier="${tier}" style="display:none;" />
+      </label>
     </div>
+    <div class="admin-day-title">تصاميم ${label} المرفوعة (${uploaded.length})</div>
+    ${uploadedItems ? `<div class="admin-sticker-grid">${uploadedItems}</div>` : `<div class="empty-note">لسه معملتش رفع تصاميم في الفئة دي</div>`}
+    ${built.length ? `<div class="admin-day-title" style="margin-top:16px;">تصاميم ${label} الافتراضية (${built.length})</div><div class="admin-sticker-grid">${builtItems}</div>` : ''}
   `;
 }
 function renderAdminShopCustomSubTab(){
+  const price = cardTierPrice('custom');
+  const priceBox = `<div class="card" style="margin-bottom:16px;">
+    <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:10px;">✨ سعر طلب كارد مخصص (${price} 🌟)</div>
+    <input type="number" min="0" class="field" data-action-input="shop-price" data-k="custom" value="${price}" />
+  </div>`;
   const list = (CUSTOM_CARD_REQUESTS||[]).slice().sort((a,b)=>b.ts-a.ts);
-  if(!list.length) return `<div class="empty-note">لسه مفيش طلبات كروت مخصصة</div>`;
+  if(!list.length) return priceBox + `<div class="empty-note">لسه مفيش طلبات كروت مخصصة</div>`;
   const items = list.map(r=>{
     const statusLabel = r.status==='pending' ? '⏳ مستني الأدمن' : (r.status==='ready' ? '✅ اترسل — مستني الاستلام' : '🎉 المشارك استلمه');
     return `<div class="admin-cc-item">
@@ -17296,7 +17385,7 @@ function renderAdminShopCustomSubTab(){
       </div>
     </div>`;
   }).join('');
-  return items;
+  return priceBox + items;
 }
 function attachStickerAdminInputs(){
   const inputEl = document.getElementById('sticker-admin-upload');
@@ -17325,6 +17414,15 @@ function attachStickerAdminInputs(){
       const k = el.dataset.k;
       const val = Math.max(0, parseInt(el.value,10)||0);
       doAdminSetShopPrice(k, val);
+    });
+  });
+  document.querySelectorAll('input[type="file"][id^="cardtheme-admin-upload-"]').forEach(inputEl=>{
+    if(inputEl.dataset.bound) return;
+    inputEl.dataset.bound = '1';
+    inputEl.addEventListener('change', ()=>{
+      const files = Array.from(inputEl.files || []);
+      const tier = inputEl.dataset.tier;
+      if(files.length) doAdminUploadCardThemes(files, tier, inputEl);
     });
   });
   document.querySelectorAll('[data-action-input="admin-cc-upload"]').forEach(el=>{
@@ -17391,6 +17489,33 @@ async function doAdminDeleteSticker(id){
   render();
   await deleteStickerImage(id);
   await saveCustomStickersWithRetry(CUSTOM_STICKERS);
+}
+async function doAdminUploadCardThemes(files, tier, inputEl){
+  showToast('جاري رفع تصاميم الكارت...');
+  let okCount = 0;
+  for(let i=0;i<files.length;i++){
+    const dataUrl = await readPhotoFileToDataUrl(files[i], 900, 0.88);
+    if(!dataUrl) continue;
+    const id = 'cth'+Date.now()+Math.random().toString(36).slice(2,6);
+    CARD_THEME_IMG_CACHE[id] = dataUrl;
+    const saved = await saveCardThemeImage(id, dataUrl);
+    if(saved){ CUSTOM_CARD_THEMES.push({id, tier, ts:Date.now()}); okCount++; render(); }
+  }
+  if(inputEl) inputEl.value = '';
+  if(okCount){
+    await saveCustomCardThemesWithRetry(CUSTOM_CARD_THEMES);
+    showToast(`✅ اتضاف ${okCount} تصميم بنجاح`);
+  } else {
+    showToast('⚠️ حصلت مشكلة في رفع الصور، جرب تاني', true);
+  }
+  render();
+}
+async function doAdminDeleteCardTheme(id){
+  CUSTOM_CARD_THEMES = CUSTOM_CARD_THEMES.filter(t=>t.id!==id);
+  delete CARD_THEME_IMG_CACHE[id];
+  render();
+  await deleteCardThemeImage(id);
+  await saveCustomCardThemesWithRetry(CUSTOM_CARD_THEMES);
 }
 
 
@@ -19856,7 +19981,7 @@ async function refreshAllData(){
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
    CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS,
-   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, VISA_CARDS] = await Promise.all([
+   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, VISA_CARDS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
@@ -19864,11 +19989,12 @@ async function refreshAllData(){
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
     loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers(),
-    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadVisaCards()
+    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadVisaCards()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
   await preloadStickerImages(CUSTOM_STICKERS);
+  await preloadCardThemeImages(CUSTOM_CARD_THEMES);
   CUSTOM_TEAMS.forEach(ct=>{
     if(!TEAMS.some(t=>t.id===ct.id)) TEAMS.push({id:ct.id, name:ct.name, color:ct.color});
   });
