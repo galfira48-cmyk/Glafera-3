@@ -1258,7 +1258,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vtx-amt b.pos{color:var(--good);}
   .vtx-amt b.neg{color:var(--danger);}
   .vtx-amt small{display:block; font-size:10px; color:var(--text-muted); margin-top:3px; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:2px 6px;}
-  .vtx-empty{text-align:center; padding:50px 20px; color:var(--text-muted); font-size:13px; line-height:1.9;}
+  .vtx-empty{text-align:center; padding:36px 24px; color:var(--text-muted); font-size:12.5px; line-height:1.8; background:var(--surface); border:1px dashed var(--border); border-radius:18px; margin-top:4px;}
+  .vtx-empty-ico{font-size:30px; display:block; margin-bottom:10px; opacity:.75;}
+  .vtx-empty b{display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--text); margin-bottom:4px;}
   /* ---------- رسالة الفيزا في منتصف الشاشة ---------- */
   .vmsg-overlay{background:rgba(5,6,18,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); z-index:300; padding:24px; animation:vmsgFade .22s ease both;}
   .vmsg-overlay.leaving{animation:vmsgFadeOut .18s ease forwards;}
@@ -1355,7 +1357,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vst-sums small{display:block; font-size:10.5px; color:var(--text-muted);}
   .vst-sums b{display:block; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; margin-top:2px; direction:ltr;}
   .vst-sums .in b{color:var(--good);} .vst-sums .out b{color:var(--danger);}
-  .vst-chips{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 8px; margin-bottom:4px; scrollbar-width:none;}
+  .vst-chips{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 8px; margin-bottom:4px; scrollbar-width:none; -webkit-mask-image:linear-gradient(to left,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%); mask-image:linear-gradient(to left,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);}
   .vst-chips::-webkit-scrollbar{display:none;}
   .vst-chip{flex:0 0 auto; padding:7px 14px; border-radius:999px; background:var(--bg-2); border:1px solid var(--border); color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; transition:background .2s ease,color .2s ease,transform .15s ease;}
   .vst-chip.on{background:linear-gradient(145deg,var(--gold),var(--gold-2)); color:#221900; border-color:transparent; box-shadow:0 4px 12px -4px rgba(244,183,64,.6);}
@@ -1459,6 +1461,43 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vp-pro .vp-stats.single small{color:var(--text-muted); font-weight:600;}
   .vp-pro .vp-stats.single b{text-shadow:none !important; color:var(--text) !important; font-size:30px; letter-spacing:.5px;}
   .vp-pro .vp-tabs button.on{box-shadow:0 6px 14px -8px rgba(244,183,64,.55), inset 0 1px 0 rgba(255,255,255,.5) !important;}
+
+  /* ===== Back face refined: signature strip, CVV & balance matched to front finish ===== */
+  .vc-strip{background:linear-gradient(180deg,rgba(0,0,0,.86),rgba(0,0,0,.72)); box-shadow:0 1px 0 rgba(255,255,255,.07), 0 3px 8px rgba(0,0,0,.4);}
+  .vc-sig-row{align-items:stretch;}
+  .vc-sig-panel{height:auto; border-radius:9px; background:linear-gradient(155deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.14); box-shadow:inset 0 1px 2px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.05);}
+  .vc-sig-panel::after{content:''; position:absolute; inset:0; background:repeating-linear-gradient(115deg,transparent 0 6px,rgba(255,255,255,.045) 6px 7px); pointer-events:none;}
+  .vc-sig-micro{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:0; white-space:nowrap; overflow:visible;
+    font-family:'Cinzel','Playfair Display',serif; font-weight:700; font-size:13px; letter-spacing:5px;
+    background:linear-gradient(180deg,#fffaf0 0%,#f4dc9c 42%,#b98a33 56%,#f8e6ae 100%); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; filter:drop-shadow(0 1px 1px rgba(0,0,0,.5)); opacity:.95;}
+  .vc-cvv{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;}
+  .vc-cvv small{text-align:center; font-family:'Montserrat','Cairo',sans-serif; font-weight:700; font-size:8.5px; letter-spacing:2.4px;
+    padding:2px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.26); background:rgba(255,255,255,.06);
+    backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); opacity:.9;}
+  .vc-cvv-box{display:flex; align-items:center; justify-content:center; min-width:64px; min-height:32px; padding:6px 16px;
+    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.22);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.4), inset 0 -1px 0 rgba(255,255,255,.06);}
+  .vc-cvv-num{font-family:'IBM Plex Mono','Courier New',monospace; font-weight:600; font-size:17px; letter-spacing:4px;
+    background:linear-gradient(180deg,#ffffff 0%,#f1e8d2 55%,#c9b98f 100%); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; filter:drop-shadow(0 1px 0 rgba(0,0,0,.55));}
+  .vc-cvv-box.empty .vc-cvv-num{background:none; -webkit-text-fill-color:rgba(255,255,255,.35); color:rgba(255,255,255,.35); filter:none; letter-spacing:6px;}
+  .vc-back-bal{display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px;
+    background:linear-gradient(155deg,rgba(255,255,255,.09),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 6px 14px -8px rgba(0,0,0,.5);}
+  .vc-bb-ico{flex:0 0 auto; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(145deg,var(--gold,#f4b740),var(--gold-2,#e0932a)); color:#221900; box-shadow:0 4px 10px -3px rgba(244,183,64,.55);}
+  .vc-bb-ico svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .vc-bb-mid{flex:1; min-width:0;}
+  .vc-back-bal small{display:block; margin-bottom:2px; font-family:'Montserrat','Cairo',sans-serif; font-weight:600; font-size:9.5px;
+    letter-spacing:1.2px; text-transform:uppercase; opacity:.75;}
+  .vc-bb-val{display:flex; align-items:baseline; gap:5px;}
+  .vc-back-bal b{font-family:'Montserrat','Cairo',sans-serif; font-weight:700; font-size:22px; letter-spacing:.3px;
+    background:linear-gradient(180deg,#fffaf0 0%,#f4dc9c 42%,#b98a33 56%,#f8e6ae 100%); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; filter:drop-shadow(0 1px 1px rgba(0,0,0,.4));}
+  .vc-back-bal span{font-size:10.5px; font-weight:600; opacity:.7;}
+  .vc-expired .vc-sig-micro,.vc-expired .vc-cvv-num,.vc-expired .vc-back-bal b{filter:grayscale(1);}
   @media (prefers-reduced-motion:reduce){ .vc-inner{transition:none;} .vc-face::after{animation:none;} }
 
   /* ---------- رسالة "الخصم غادر المعركة" ---------- */
@@ -4187,10 +4226,10 @@ function visaCardHtml(pid, draft, isNew){
     <div class="vc-face vc-back" style="${backStyle}"><i class="vc-glare"></i>
       <div class="vc-strip"></div>
       <div class="vc-sig-row">
-        <div class="vc-sig-panel"><span class="vc-sig-micro">GLAFIRA • GLAFIRA • GLAFIRA • GLAFIRA</span></div>
-        <div class="vc-cvv"><small>CVV</small><div class="vc-cvv-box ${isNew?'empty':''}" id="vc-cvv-dots">${isNew ? '• • •' : (visaPinPlainOf(pid) ? visaPinPlainOf(pid).split('').join(' ') : '• • •')}</div></div>
+        <div class="vc-sig-panel"><span class="vc-sig-micro">GLAFIRA</span></div>
+        <div class="vc-cvv"><small>CVV</small><div class="vc-cvv-box ${isNew?'empty':''}" id="vc-cvv-dots"><span class="vc-cvv-num">${isNew ? '• • •' : (visaPinPlainOf(pid) ? visaPinPlainOf(pid).split('').join(' ') : '• • •')}</span></div></div>
       </div>
-      ${isNew ? '' : `<div class="vc-back-bal"><small>الرصيد الحالي</small><b data-vc-count="walletBack" data-to="${bal}">${bal}</b><span>نقطة</span></div>`}
+      ${isNew ? '' : `<div class="vc-back-bal"><span class="vc-bb-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg></span><div class="vc-bb-mid"><small>الرصيد الحالي</small><div class="vc-bb-val"><b data-vc-count="walletBack" data-to="${bal}">${bal}</b><span>نقطة</span></div></div></div>`}
     </div></div></div></div>`;
 }
 /* إنشاء الفيزا من الصفر: اسم على البطاقة + رقم سري من 3 أرقام على ظهرها (البطاقة بتنقلب أول ما يدخل الرقم) */
@@ -4466,7 +4505,7 @@ function renderVisaHistoryPage(){
       <button type="button" data-action="vtx-copy">📋<br>نسخ الكشف</button>
     </div>
     ${notifRow}
-    ${list.length ? `<div class="vtx-list">${rows}</div>` : `<div class="vtx-empty">${all.length ? 'مفيش عمليات تطابق الفلتر ده.<br>جرّب تغيّر الفترة أو النوع.' : 'لسه معملتش أي عملية على فيزتك.<br>أي إيداع أو سحب أو تحويل أو شراء أو جائزة أو رسوم هيظهر هنا بالتفصيل.'}</div>`}
+    ${list.length ? `<div class="vtx-list">${rows}</div>` : `<div class="vtx-empty"><span class="vtx-empty-ico">${all.length?'🔍':'🧾'}</span>${all.length ? `<b>مفيش عمليات تطابق الفلتر ده</b>جرّب تغيّر الفترة أو النوع` : `<b>لسه معملتش أي عملية على فيزتك</b>أي إيداع أو سحب أو تحويل أو شراء أو جائزة أو رسوم هيظهر هنا بالتفصيل`}</div>`}
   `;
 }
 function vtxShowReceipt(id){
@@ -5229,9 +5268,19 @@ function cardThemeTier(key){
 }
 function cardThemeImg(key){ return CARD_THEME_IMG_CACHE[key] || null; }
 function cardThemeName(key){ return (VISA_THEMES[key]||{}).name || 'تصميم مميز'; }
-/* كل مفاتيح تصاميم الفئة دي: الجاهزة (Gradient) + المرفوعة (صور) */
+/* الثيمات الجاهزة اللي الأدمن حذفها (اتشالت من المتجر بس بتفضل شغالة لمين معاه الكارد ده أصلًا) */
+let HIDDEN_BUILTIN_THEMES = [];
+async function loadHiddenBuiltinThemes(){
+  try{ const r = await window.storage.get('glavera-hidden-builtin-themes', true); return r && r.value ? JSON.parse(r.value) : []; }
+  catch(e){ return []; }
+}
+async function saveHiddenBuiltinThemes(arr){
+  try{ await window.storage.set('glavera-hidden-builtin-themes', JSON.stringify(arr), true); return true; }
+  catch(e){ console.error('saveHiddenBuiltinThemes failed:', e); return false; }
+}
+/* كل مفاتيح تصاميم الفئة دي: الجاهزة (Gradient) اللي مش محذوفة + المرفوعة (صور) */
 function themeKeysForTier(tier){
-  const built = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
+  const built = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier && HIDDEN_BUILTIN_THEMES.indexOf(k)<0);
   const uploaded = (CUSTOM_CARD_THEMES||[]).filter(t=>t.tier===tier).map(t=>t.id);
   return built.concat(uploaded);
 }
@@ -14383,14 +14432,15 @@ const ADMIN_HUB_ITEMS = [
   {tab:'opinions',   icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {tab:'reports',    icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {tab:'trash',      icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
-  {tab:'stickers',   icon:'🎨', label:'Shop (المتجر)',        color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {tab:'stickers',   icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {tab:'cardshop',   icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const tiles = ADMIN_HUB_ITEMS.map(it=>{
-    const badge = it.tab==='questions'&&pendingQ ? pendingQ : (it.tab==='reports'&&pendingR ? pendingR : (it.tab==='trash'&&TRASH.length ? TRASH.length : (it.tab==='stickers'&&pendingCC ? pendingCC : 0)));
+    const badge = it.tab==='questions'&&pendingQ ? pendingQ : (it.tab==='reports'&&pendingR ? pendingR : (it.tab==='trash'&&TRASH.length ? TRASH.length : (it.tab==='cardshop'&&pendingCC ? pendingCC : 0)));
     return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}">
       ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
@@ -14428,6 +14478,7 @@ function renderAdmin(){
   else if(tab==='reports') body = renderAdminReportsTab();
   else if(tab==='trash') body = renderAdminTrashTab();
   else if(tab==='stickers') body = renderAdminStickersTab();
+  else if(tab==='cardshop') body = renderAdminCardShopTab();
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
   let pageTitle = hubItem ? hubItem.label : 'لوحة المنظمين';
   if(tab==='sessions'){
@@ -16232,6 +16283,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='send-chat-custom-sticker'){ doSendChatCustomSticker(el.dataset.id); }
   else if(action==='admin-delete-sticker'){ doAdminDeleteSticker(el.dataset.id); }
   else if(action==='admin-delete-cardtheme'){ doAdminDeleteCardTheme(el.dataset.id); }
+  else if(action==='admin-hide-builtin-theme'){ doAdminHideBuiltinTheme(el.dataset.k); }
+  else if(action==='admin-restore-builtin-theme'){ doAdminRestoreBuiltinTheme(el.dataset.k); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
@@ -16398,10 +16451,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-sticker-store'){
     if(!CONF_SETTINGS.stickerStoreOpen){ showToast('الافتتاح قريب جدًا... انتظرونا 🛍️', true); return; }
     state.friendTile = null; state.shopTab = 'stickers'; state.customCardDraftPhoto = null; go('sticker-store');
-    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers(), loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadWallet()])
-      .then(([bonus, owned, stickers, ownedCards, prices, ccRequests, cardThemes, wallet])=>{
+    Promise.all([loadBonus(), loadOwnedStickers(), loadCustomStickers(), loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadHiddenBuiltinThemes(), loadWallet()])
+      .then(([bonus, owned, stickers, ownedCards, prices, ccRequests, cardThemes, hiddenBuilt, wallet])=>{
         BONUS = bonus; OWNED_STICKERS = owned; CUSTOM_STICKERS = stickers;
-        OWNED_CARD_THEMES = ownedCards; SHOP_PRICES = prices; CUSTOM_CARD_REQUESTS = ccRequests; CUSTOM_CARD_THEMES = cardThemes; WALLET = wallet;
+        OWNED_CARD_THEMES = ownedCards; SHOP_PRICES = prices; CUSTOM_CARD_REQUESTS = ccRequests; CUSTOM_CARD_THEMES = cardThemes; HIDDEN_BUILTIN_THEMES = hiddenBuilt; WALLET = wallet;
         Promise.all([preloadStickerImages(CUSTOM_STICKERS), preloadCardThemeImages(CUSTOM_CARD_THEMES)]).then(()=>render());
       });
   }
@@ -17277,17 +17330,18 @@ function readPhotoFileToDataUrl(file, maxSize, quality){
   });
 }
 function renderAdminStickersTab(){
-  const sub = ['stickers','simple','vip','requests'].indexOf(state.shopAdminTab)>-1 ? state.shopAdminTab : 'stickers';
+  return renderAdminStickersSubTab();
+}
+function renderAdminCardShopTab(){
+  const sub = ['simple','vip','requests'].indexOf(state.shopAdminTab)>-1 ? state.shopAdminTab : 'simple';
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const tabsHtml = `<div class="vp-tabs" style="margin-bottom:16px;">
-    <button type="button" class="${sub==='stickers'?'on':''}" data-action="admin-shop-tab" data-t="stickers">استيكرات</button>
     <button type="button" class="${sub==='simple'?'on':''}" data-action="admin-shop-tab" data-t="simple">🎨 كروت عادية</button>
     <button type="button" class="${sub==='vip'?'on':''}" data-action="admin-shop-tab" data-t="vip">👑 كروت VIP</button>
     <button type="button" class="${sub==='requests'?'on':''}" data-action="admin-shop-tab" data-t="requests">طلبات المشاركين${pendingCC?` (${pendingCC})`:''}</button>
   </div>`;
   let body = '';
-  if(sub==='stickers') body = renderAdminStickersSubTab();
-  else if(sub==='simple') body = renderAdminCardThemeSubTab('simple');
+  if(sub==='simple') body = renderAdminCardThemeSubTab('simple');
   else if(sub==='vip') body = renderAdminCardThemeSubTab('vip');
   else body = renderAdminShopCustomSubTab();
   return tabsHtml + body;
@@ -17327,7 +17381,9 @@ function renderAdminCardThemeSubTab(tier){
   const label = tier==='vip' ? '👑 كروت VIP' : '🎨 كروت عادية';
   const price = cardTierPrice(tier);
   const uploaded = (CUSTOM_CARD_THEMES||[]).filter(t=>t.tier===tier);
-  const built = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
+  const builtAll = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
+  const built = builtAll.filter(k=>HIDDEN_BUILTIN_THEMES.indexOf(k)<0);
+  const hiddenBuilt = builtAll.filter(k=>HIDDEN_BUILTIN_THEMES.indexOf(k)>-1);
   const uploadedItems = uploaded.map(t=>{
     const url = CARD_THEME_IMG_CACHE[t.id];
     return `<div class="admin-sticker-item">
@@ -17339,7 +17395,14 @@ function renderAdminCardThemeSubTab(tier){
     const t = VISA_THEMES[k];
     return `<div class="admin-sticker-item">
       <div class="admin-sticker-thumb" style="aspect-ratio:1.58;background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a});">${t.name}</div>
-      <div class="hint" style="text-align:center;font-size:10px;">افتراضي</div>
+      <button type="button" class="admin-sticker-del" title="حذف" data-action="admin-hide-builtin-theme" data-k="${k}">✕</button>
+    </div>`;
+  }).join('');
+  const hiddenItems = hiddenBuilt.map(k=>{
+    const t = VISA_THEMES[k];
+    return `<div class="admin-sticker-item">
+      <div class="admin-sticker-thumb" style="aspect-ratio:1.58;background:conic-gradient(from 200deg,${t.a},${t.b},${t.c},${t.a});opacity:.5;">${t.name}</div>
+      <button type="button" class="admin-sticker-del" title="استرجاع" data-action="admin-restore-builtin-theme" data-k="${k}">↺</button>
     </div>`;
   }).join('');
   return `
@@ -17357,6 +17420,7 @@ function renderAdminCardThemeSubTab(tier){
     <div class="admin-day-title">تصاميم ${label} المرفوعة (${uploaded.length})</div>
     ${uploadedItems ? `<div class="admin-sticker-grid">${uploadedItems}</div>` : `<div class="empty-note">لسه معملتش رفع تصاميم في الفئة دي</div>`}
     ${built.length ? `<div class="admin-day-title" style="margin-top:16px;">تصاميم ${label} الافتراضية (${built.length})</div><div class="admin-sticker-grid">${builtItems}</div>` : ''}
+    ${hiddenBuilt.length ? `<div class="admin-day-title" style="margin-top:16px;">تصاميم افتراضية محذوفة (${hiddenBuilt.length})</div><div class="admin-sticker-grid">${hiddenItems}</div>` : ''}
   `;
 }
 function renderAdminShopCustomSubTab(){
@@ -17516,6 +17580,17 @@ async function doAdminDeleteCardTheme(id){
   render();
   await deleteCardThemeImage(id);
   await saveCustomCardThemesWithRetry(CUSTOM_CARD_THEMES);
+}
+async function doAdminHideBuiltinTheme(key){
+  if(HIDDEN_BUILTIN_THEMES.indexOf(key)>-1) return;
+  HIDDEN_BUILTIN_THEMES = HIDDEN_BUILTIN_THEMES.concat([key]);
+  render();
+  await saveHiddenBuiltinThemes(HIDDEN_BUILTIN_THEMES);
+}
+async function doAdminRestoreBuiltinTheme(key){
+  HIDDEN_BUILTIN_THEMES = HIDDEN_BUILTIN_THEMES.filter(k=>k!==key);
+  render();
+  await saveHiddenBuiltinThemes(HIDDEN_BUILTIN_THEMES);
 }
 
 
@@ -19981,7 +20056,7 @@ async function refreshAllData(){
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
    CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS,
-   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, VISA_CARDS] = await Promise.all([
+   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, HIDDEN_BUILTIN_THEMES, VISA_CARDS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
@@ -19989,7 +20064,7 @@ async function refreshAllData(){
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
     loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers(),
-    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadVisaCards()
+    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadHiddenBuiltinThemes(), loadVisaCards()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
