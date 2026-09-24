@@ -332,43 +332,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   
   
 
-  /* ---------- conference countdown widget (glass circular) ---------- */
-  .conf-cd-card{position:relative; background:linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:14px 12px 12px; margin:0 0 14px; text-align:center;
-    box-shadow:0 12px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.14); overflow:hidden;}
-  html[data-theme="light"] .conf-cd-card{background:linear-gradient(160deg, rgba(255,255,255,.55), rgba(255,255,255,.22));
-    border:1px solid rgba(30,24,10,.10); box-shadow:0 12px 24px rgba(120,100,50,.14), inset 0 1px 0 rgba(255,255,255,.5);}
-  .conf-cd-card::before{content:''; position:absolute; top:-40%; left:-20%; width:70%; height:140%;
-    background:radial-gradient(circle, rgba(244,183,64,.14), transparent 65%); pointer-events:none;}
-  .conf-cd-ring-wrap{position:relative; width:96px; height:96px; margin:0 auto 8px;}
-  .conf-cd-ring{width:96px; height:96px; transform:rotate(-90deg);}
-  .conf-cd-ring-track{fill:none; stroke:rgba(255,255,255,.12); stroke-width:8;}
-  html[data-theme="light"] .conf-cd-ring-track{stroke:rgba(30,24,10,.08);}
-  .conf-cd-ring-fill{fill:none; stroke:url(#confCdGrad); stroke-width:8; stroke-linecap:round;
-    transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1); filter:drop-shadow(0 0 5px rgba(244,183,64,.45));}
-  .conf-cd-ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border-radius:50%; background:rgba(255,255,255,.05); backdrop-filter:blur(6px); margin:9px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.1);}
-  html[data-theme="light"] .conf-cd-ring-center{background:rgba(255,255,255,.35);}
-  .conf-cd-pct{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:var(--text); font-variant-numeric:tabular-nums;
-    background:linear-gradient(95deg, var(--teal), var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent;}
-  .conf-cd-pct-lab{font-family:'Cairo',sans-serif; font-weight:700; font-size:8px; color:var(--text-muted); margin-top:1px;}
-  .conf-cd-phase{font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px; color:var(--gold); margin-bottom:9px; position:relative;}
-  .conf-cd-units{display:flex; justify-content:center; gap:7px; position:relative;}
-  .conf-cd-unit-glass{display:flex; flex-direction:column; align-items:center; justify-content:center;
-    width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.07); backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.16); box-shadow:0 5px 12px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.12);}
-  html[data-theme="light"] .conf-cd-unit-glass{background:rgba(255,255,255,.5); border:1px solid rgba(30,24,10,.08);
-    box-shadow:0 5px 10px rgba(120,100,50,.12), inset 0 1px 0 rgba(255,255,255,.6);}
-  .conf-cd-val{font-family:'Cairo',sans-serif; font-weight:900; font-size:12px; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.1;}
-  .conf-cd-lab{font-family:'Cairo',sans-serif; font-weight:600; font-size:7px; color:var(--text-muted); margin-top:1px;}
-  .conf-cd-share-btn{margin-top:11px; font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:var(--text);
-    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); border-radius:20px; padding:6px 16px;
-    cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  html[data-theme="light"] .conf-cd-share-btn{background:rgba(255,255,255,.55); border:1px solid rgba(30,24,10,.1);}
-  .conf-cd-share-btn:active{transform:scale(.96);}
-
   /* ---------- splash lamp trigger (drag to pull) ---------- */
   .splash-lamp-wrap{position:relative; margin-top:38px; display:flex; flex-direction:column; align-items:center;}
   .splash-lamp-shade{width:66px; height:38px; border-radius:38px 38px 5px 5px/38px 38px 5px 5px;
@@ -670,11 +633,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes numBreathe{ 0%,100%{ transform:scale(1); text-shadow:0 0 0 rgba(244,183,64,0);} 50%{ transform:scale(1.06); text-shadow:0 0 16px rgba(244,183,64,.55);} }
   .medal-label{position:relative; font-size:12.5px; color:var(--text-muted); margin-top:4px;}
 
-  .rank-row{display:flex; gap:10px; margin:16px 0 6px;}
-  .rank-card{flex:1; text-align:center; padding:14px 8px; cursor:pointer; position:relative;}
-  .rank-card .num{font-family:'Cairo',sans-serif; font-weight:800; font-size:20px; color:var(--teal);}
-  .rank-card .lab{font-size:11.5px; color:var(--text-muted); margin-top:3px;}
-  .rank-card .crown{position:absolute; top:2px; right:50%; transform:translateX(50%); font-size:14px; display:inline-block; animation:crownFloat 2.4s ease-in-out infinite;}
+  
+  
+  
+  
+  
 
   .section-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:16.5px; margin:22px 2px 12px; display:flex; align-items:center; justify-content:space-between; position:relative; padding-bottom:6px;}
   .section-title::after{ content:''; position:absolute; bottom:0; right:0; height:2px; width:30px; border-radius:2px;
@@ -5657,117 +5620,6 @@ function verseCardHtml(){
   </div>`;
 }
 
-/* ---------- conference countdown / progress widget ---------- */
-function confCountdownCalc(){
-  if(!CONF_SETTINGS || !CONF_SETTINGS.startAt || !CONF_SETTINGS.endAt) return null;
-  const start = new Date(CONF_SETTINGS.startAt).getTime();
-  const end = new Date(CONF_SETTINGS.endAt).getTime();
-  if(isNaN(start) || isNaN(end) || end<=start) return null;
-  const now = Date.now();
-  let phase, targetTime, pct;
-  if(now < start){
-    phase = 'before'; targetTime = start; pct = 0;
-  } else if(now >= end){
-    phase = 'after'; targetTime = end; pct = 100;
-  } else {
-    phase = 'during'; targetTime = end;
-    pct = Math.round(((now-start)/(end-start))*1000)/10;
-  }
-  let diff = Math.max(0, targetTime-now);
-  const days = Math.floor(diff/86400000); diff -= days*86400000;
-  const hours = Math.floor(diff/3600000); diff -= hours*3600000;
-  const mins = Math.floor(diff/60000); diff -= mins*60000;
-  const secs = Math.floor(diff/1000);
-  return {phase, pct, days, hours, mins, secs};
-}
-const CONF_CD_RADIUS = 68;
-const CONF_CD_CIRC = 2*Math.PI*CONF_CD_RADIUS;
-function confCdPhaseLabel(phase){
-  return phase==='before' ? tr('cd_before') : (phase==='during' ? tr('cd_during') : tr('cd_after'));
-}
-function confCountdownHtml(){
-  const c = confCountdownCalc();
-  if(!c) return '';
-  const offset = CONF_CD_CIRC * (1 - c.pct/100);
-  return `<div class="conf-cd-card" id="conf-count-widget">
-    <div class="conf-cd-ring-wrap">
-      <svg class="conf-cd-ring" viewBox="0 0 160 160">
-        <defs>
-          <linearGradient id="confCdGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="var(--teal)"/>
-            <stop offset="100%" stop-color="var(--gold)"/>
-          </linearGradient>
-        </defs>
-        <circle class="conf-cd-ring-track" cx="80" cy="80" r="${CONF_CD_RADIUS}"></circle>
-        <circle class="conf-cd-ring-fill" id="conf-cd-ring-fill" cx="80" cy="80" r="${CONF_CD_RADIUS}"
-          style="stroke-dasharray:${CONF_CD_CIRC};stroke-dashoffset:${offset};"></circle>
-      </svg>
-      <div class="conf-cd-ring-center">
-        <div class="conf-cd-pct" id="conf-cd-pct">${c.phase==='before'?'0%':(c.phase==='after'?'100%':c.pct+'%')}</div>
-        <div class="conf-cd-pct-lab">${c.phase==='during'?tr('cd_during_sub'):(c.phase==='before'?tr('cd_before_sub'):tr('cd_after_sub'))}</div>
-      </div>
-    </div>
-    <div class="conf-cd-phase" id="conf-cd-phase">${confCdPhaseLabel(c.phase)}</div>
-    ${c.phase==='after' ? '' : `
-    <div class="conf-cd-units" id="conf-cd-units">
-      <div class="conf-cd-unit-glass"><span class="conf-cd-val" id="conf-cd-days">${String(c.days)}</span><span class="conf-cd-lab">${tr('cd_days')}</span></div>
-      <div class="conf-cd-unit-glass"><span class="conf-cd-val" id="conf-cd-hours">${String(c.hours).padStart(2,'0')}</span><span class="conf-cd-lab">${tr('cd_hours')}</span></div>
-      <div class="conf-cd-unit-glass"><span class="conf-cd-val" id="conf-cd-mins">${String(c.mins).padStart(2,'0')}</span><span class="conf-cd-lab">${tr('cd_mins')}</span></div>
-      <div class="conf-cd-unit-glass"><span class="conf-cd-val" id="conf-cd-secs">${String(c.secs).padStart(2,'0')}</span><span class="conf-cd-lab">${tr('cd_secs')}</span></div>
-    </div>`}
-  </div>`;
-}
-function tickConfCountdown(){
-  const widget = document.getElementById('conf-count-widget');
-  if(!widget) return;
-  const c = confCountdownCalc();
-  if(!c) return;
-  const phaseEl = document.getElementById('conf-cd-phase');
-  const ringEl = document.getElementById('conf-cd-ring-fill');
-  const pctEl = document.getElementById('conf-cd-pct');
-  const dEl = document.getElementById('conf-cd-days');
-  const hEl = document.getElementById('conf-cd-hours');
-  const mEl = document.getElementById('conf-cd-mins');
-  const sEl = document.getElementById('conf-cd-secs');
-  if(phaseEl) phaseEl.textContent = confCdPhaseLabel(c.phase);
-  if(ringEl) ringEl.style.strokeDashoffset = String(CONF_CD_CIRC * (1 - c.pct/100));
-  if(pctEl) pctEl.textContent = (c.phase==='before'?'0%':(c.phase==='after'?'100%':c.pct+'%'));
-  if(c.phase==='after'){
-    const unitsEl = document.getElementById('conf-cd-units');
-    if(unitsEl) unitsEl.remove();
-    return;
-  }
-  if(dEl) dEl.textContent = String(c.days);
-  if(hEl) hEl.textContent = String(c.hours).padStart(2,'0');
-  if(mEl) mEl.textContent = String(c.mins).padStart(2,'0');
-  if(sEl) sEl.textContent = String(c.secs).padStart(2,'0');
-}
-async function shareConfCountdown(){
-  const widget = document.getElementById('conf-count-widget');
-  const btn = document.getElementById('conf-cd-share-btn');
-  if(!widget) return;
-  if(typeof html2canvas==='undefined'){ showToast('تعذّر تجهيز الصورة، جرّب تاني', true); return; }
-  if(btn) btn.style.visibility = 'hidden';
-  try{
-    const canvas = await html2canvas(widget, {
-      backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg') || '#0E0D2B',
-      scale: 2, useCORS: true
-    });
-    if(btn) btn.style.visibility = '';
-    canvas.toBlob(async (blob)=>{
-      if(!blob){ showToast('تعذّر تجهيز الصورة', true); return; }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'glavera3-countdown.png';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 4000);
-      showToast('اتحمّلت الصورة');
-    }, 'image/png');
-  }catch(e){
-    if(btn) btn.style.visibility = '';
-    showToast('حصل خطأ في تجهيز الصورة', true);
-  }
-}
 function checkConfTimeAlerts(){
   if(!state.pid || !CONF_SETTINGS || !CONF_SETTINGS.startAt || !CONF_SETTINGS.endAt) return;
   const start = new Date(CONF_SETTINGS.startAt).getTime();
@@ -5876,9 +5728,9 @@ const TRANSLATIONS = {
     save:'حفظ', cancel:'إلغاء', back:'رجوع', done:'تم', edit:'تعديل', delete:'حذف', add:'إضافة',
     conf_capabilities_title:'كل الإمكانات', conf_capabilities_sub:'اضغط على الزرار',
     lang_toggle_title:'English / عربي',
-    cd_before:'المؤتمر يبدأ خلال', cd_during:'متبقٍ على ختام المؤتمر', cd_after:'🎉 المؤتمر انتهى',
-    cd_during_sub:'من الوقت', cd_before_sub:'لسه ما بدأش', cd_after_sub:'اكتمل',
-    cd_days:'يوم', cd_hours:'ساعة', cd_mins:'دقيقة', cd_secs:'ثانية', cd_share:'📤 مشاركة',
+
+
+
     settings_title:'الإعدادات', settings_music:'موسيقى الخلفية', settings_music_toggle:'🎵 تشغيل موسيقى الخلفية',
     settings_volume:'مستوى الصوت', settings_data:'البيانات', settings_export_pdf:'تصدير رحلتي كـ PDF',
     settings_report:'الإبلاغ عن مشكلة', settings_report_hint:'واجهت مشكلة في التطبيق؟ اكتبها هنا وهنعملها معالجة بأسرع وقت',
@@ -5931,9 +5783,9 @@ const TRANSLATIONS = {
     save:'Save', cancel:'Cancel', back:'Back', done:'Done', edit:'Edit', delete:'Delete', add:'Add',
     conf_capabilities_title:'Everything Else', conf_capabilities_sub:'Tap the button',
     lang_toggle_title:'English / عربي',
-    cd_before:'Conference starts in', cd_during:'Remaining until closing', cd_after:'🎉 The conference has ended',
-    cd_during_sub:'of the time', cd_before_sub:"Hasn't started yet", cd_after_sub:'Complete',
-    cd_days:'Days', cd_hours:'Hours', cd_mins:'Mins', cd_secs:'Secs', cd_share:'📤 Share',
+
+
+
     settings_title:'Settings', settings_music:'Background Music', settings_music_toggle:'🎵 Play background music',
     settings_volume:'Volume', settings_data:'Data', settings_export_pdf:'Export my journey as PDF',
     settings_report:'Report an Issue', settings_report_hint:"Ran into an issue in the app? Describe it here and we'll handle it ASAP",
@@ -6634,10 +6486,6 @@ function renderProfile(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const team = teamOf(p.teamId);
   const total = participantTotal(p.id);
-  const ranked = rankedParticipants();
-  const myRank = ranked.findIndex(x=>x.id===p.id)+1;
-  const teams = rankedTeams();
-  const myTeamRank = teams.findIndex(t=>t.id===team.id)+1;
   const tier = medalTier(total);
   const streak = computeStreak(p.id);
   const title = computeTitle(p.id);
@@ -6686,21 +6534,6 @@ function renderProfile(){
       </div>
     </div>
     <div class="hint" style="margin-top:-6px;">اضغط مطولاً على الميدالية لعرض بطاقة الإنجاز</div>
-
-    <div class="rank-row">
-      <div class="card card-sm rank-card" data-action="open-leaderboard" data-tab="solo">
-        ${myRank===1?'<div class="crown">👑</div>':''}
-        <div class="num">#${myRank}</div>
-        <div class="lab">ترتيبك الفردي من ${ranked.length}</div>
-      </div>
-      <div class="card card-sm rank-card" data-action="open-leaderboard" data-tab="team">
-        ${myTeamRank===1?'<div class="crown">👑</div>':''}
-        <div class="num">#${myTeamRank}</div>
-        <div class="lab">ترتيب فريقك من ${teams.length}</div>
-      </div>
-    </div>
-
-    ${confCountdownHtml()}
 
     <div class="section-title">${tr('conf_capabilities_title')} <span class="sub">${tr('conf_capabilities_sub')}</span></div>
     <div class="radial-launcher">
@@ -14707,8 +14540,8 @@ function renderAdminSettingsTab(){
   return `
     <div class="admin-section-title"><span>📅</span><span>التوقيت وحالة المؤتمر</span></div>
     <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">توقيت المؤتمر (للعداد)</div>
-      <div class="hint" style="margin:2px 0 12px;">هيتحسب عليها العداد التنازلي وشريط تقدّم المؤتمر اللي بيظهر لكل مشارك</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">توقيت المؤتمر</div>
+      <div class="hint" style="margin:2px 0 12px;">بيتحسب عليها توقيت تنبيهات بداية المؤتمر ونهايته</div>
       <label>بداية المؤتمر</label>
       <input type="datetime-local" id="conf-start-date" value="${escapeHtml(startAt)}" />
       <label style="margin-top:10px;">نهاية المؤتمر</label>
@@ -15791,7 +15624,7 @@ function playPageTransition(app, dir){
 function staggerRevealChildren(app){
   const saver = state.pid ? myExtra(state.pid).dataSaver : false;
   if(saver) return;
-  const nodes = app.querySelectorAll('.card, .list-row, .id-card-glass, .wall-post, .wall-compose, .badge-item, .kpi-card, .lb-row, .member-card, .agenda-row, .rank-card, .nav-tile, .quest-card, .kit-item, .dock-icon');
+  const nodes = app.querySelectorAll('.card, .list-row, .id-card-glass, .wall-post, .wall-compose, .badge-item, .kpi-card, .lb-row, .member-card, .agenda-row, .nav-tile, .quest-card, .kit-item, .dock-icon');
   const max = 24;
   nodes.forEach((el,i)=>{
     if(i>=max) return;
@@ -16968,7 +16801,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='toggle-games-locked'){ doToggleGamesLocked(); }
   else if(action==='save-conf-dates'){ doSaveConfDates(); }
   else if(action==='save-name-font'){ doSaveNameFont(); }
-  else if(action==='share-conf-countdown'){ shareConfCountdown(); }
   else if(action==='export-participants-xlsx'){ exportParticipantsXlsx(); }
   else if(action==='save-conf-verse'){ doSaveConfVerse(); }
   else if(action==='save-admin-passcode'){ doSaveAdminPasscode(); }
@@ -20177,7 +20009,6 @@ async function doSaveConfDates(){
   await saveConfSettings(CONF_SETTINGS);
   showToast('تم حفظ توقيت المؤتمر');
   render();
-  tickConfCountdown();
 }
 async function doSaveNameFont(){
   const sizeEl = document.getElementById('name-font-size');
@@ -21105,7 +20936,6 @@ window.addEventListener('popstate', function(){
   startLivePolling();
   try{ ensureVisaTxListener(); }catch(e){}
   checkDailyMessage();
-  setInterval(tickConfCountdown, 1000);
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
   }
