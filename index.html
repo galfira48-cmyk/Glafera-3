@@ -951,6 +951,44 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-empty-title{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--text); }
   .admin-empty-hint{ font-size:11.5px; margin-top:4px; }
 
+
+  /* ---------- admin: level-3 organization (sub-tabs, hero, bars, podium) ---------- */
+  .admin-subtabs{ display:flex; gap:4px; padding:4px; margin-bottom:var(--a-pad); background:var(--bg-2); border:1px solid var(--border);
+    border-radius:var(--a-r-pill); overflow-x:auto; scrollbar-width:none; }
+  .admin-subtabs::-webkit-scrollbar{ display:none; }
+  .admin-subtabs .admin-tab{ flex:1 1 0; white-space:nowrap; text-align:center; background:transparent; border-color:transparent; padding:8px 12px; margin:0; }
+  .admin-subtabs .admin-tab:not(.active){ color:var(--text-muted); }
+  .admin-hero{ display:flex; align-items:center; gap:12px; background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-lg);
+    padding:var(--a-pad); margin-bottom:var(--a-pad); box-shadow:var(--a-shadow-tile); }
+  .admin-hero-body{ flex:1; min-width:0; }
+  .admin-hero-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; line-height:1.3; }
+  .admin-hero-meta{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .admin-bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .admin-bar-row .abr-name{ flex:0 0 38%; font-size:12px; line-height:1.4; }
+  .admin-bar-row .abr-track{ flex:1; height:10px; border-radius:6px; background:var(--bg-2); overflow:hidden; }
+  .admin-bar-row .abr-fill{ height:100%; border-radius:6px; background:linear-gradient(90deg,var(--teal),var(--good)); transition:width .5s ease; }
+  .admin-bar-row .abr-val{ flex:0 0 auto; min-width:44px; text-align:end; font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px; color:var(--gold-2); }
+  .admin-podium{ display:flex; align-items:flex-end; justify-content:center; gap:8px; margin-bottom:var(--a-pad); padding:var(--a-pad) 4px 0;
+    background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-lg); box-shadow:var(--a-shadow-tile); }
+  .ap-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+  .ap-col .ap-name{ font-size:11.5px; font-weight:700; text-align:center; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ap-col .ap-pts{ font-family:'Cairo',sans-serif; font-weight:900; font-size:14px; color:var(--gold-2); }
+  .ap-col .ap-bar{ width:100%; display:flex; align-items:center; justify-content:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:18px;
+    border-radius:10px 10px 0 0; color:#2a1d00; }
+  .ap-1 .ap-bar{ height:74px; background:linear-gradient(180deg,#FFE9B0,#F4B740); }
+  .ap-2 .ap-bar{ height:54px; background:linear-gradient(180deg,#EDEFF3,#B8C0CC); }
+  .ap-3 .ap-bar{ height:40px; background:linear-gradient(180deg,#E3A272,#C47A43); }
+  .admin-rank-row{ display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--border); font-size:12.5px; }
+  .admin-rank-row:last-child{ border-bottom:none; }
+  .admin-rank-row .arr-num{ flex:0 0 26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-2);
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; color:var(--text-muted); }
+  .admin-rank-row .arr-body{ flex:1; min-width:0; }
+  .admin-rank-row .arr-sub{ font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+  .admin-rank-row .arr-pts{ font-family:'Cairo',sans-serif; font-weight:800; color:var(--gold-2); }
+  .admin-progress-inline{ height:6px; border-radius:4px; background:var(--bg-2); overflow:hidden; margin-top:8px; }
+  .admin-progress-inline > div{ height:100%; background:linear-gradient(90deg,var(--teal),var(--good)); }
+  .admin-row-line{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
   /* ---------- admin: organized hub (groups, search, status strip) ---------- */
   .admin-hub-search{ margin-bottom:var(--a-pad); }
   .admin-hub-group{ margin-bottom:var(--a-pad); }
@@ -7647,7 +7685,7 @@ function renderAdminChefsTab(){
   const rows = CHEFS.map(c=>{
     const ph = CHEF_PHOTOS[c.id];
     const n = (c.dishes||[]).length;
-    return `<div class="card chef-admin-row">
+    return `<div class="card chef-admin-row" data-search="${escapeHtml((c.name||'').toLowerCase())}">
       <div class="avatar" style="${ph?`background-image:url('${ph}');`:'background:linear-gradient(145deg,#F6D365,#FDA085);'}">${ph?'':'👨‍🍳'}</div>
       <div class="chef-admin-info">
         <div class="chef-admin-name">${escapeHtml(c.name)}</div>
@@ -7656,19 +7694,25 @@ function renderAdminChefsTab(){
       <button type="button" class="btn btn-primary" style="padding:9px 12px;font-size:12px;" data-action="admin-edit-chef" data-id="${c.id}">إدارة</button>
     </div>`;
   }).join('');
-  return `
-    <div class="card">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;margin-bottom:8px;">➕ إضافة شيف جديد</div>
+  const dishTotal = CHEFS.reduce((a,c)=>a+(c.dishes||[]).length,0);
+  const withDishes = CHEFS.filter(c=>(c.dishes||[]).length);
+  const avgAll = withDishes.length ? Math.round(withDishes.reduce((a,c)=>a+chefAvg(c),0)/withDishes.length*10)/10 : 0;
+  const addBody = `
       <label>اسم الشيف</label>
       <input class="field" id="new-chef-name" placeholder="مثال: الشيف أحمد" />
       <label style="margin-top:10px;">صورة الشيف</label>
       <input type="file" accept="image/*" id="new-chef-photo" style="font-size:11px;" />
-      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-chef">إضافة الشيف</button>
-    </div>
-    <div class="section-title">الشيفات (${CHEFS.length})</div>
-    ${rows || `<div class="empty-note">👨‍🍳 لسه مفيش شيفات — ضيف أول شيف من فوق</div>`}
+      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-chef">إضافة الشيف</button>`;
+  return `
+    ${adminKpis([{num:CHEFS.length,lab:'شيف'},{num:dishTotal,lab:'أكلة'},{num:avgAll?avgAll+'/'+CHEF_MAX_STARS:'—',lab:'متوسط التقييم'}])}
+    ${adminSectionTitle('👨‍🍳','الشيفات ('+CHEFS.length+')')}
+    ${CHEFS.length>5 ? `<input type="text" class="field admin-search-input" data-filter-target=".chef-admin-row" placeholder="🔍 دور باسم الشيف..." style="margin-bottom:10px;" />` : ''}
+    ${rows || adminEmptyState('👨‍🍳','لسه مفيش شيفات','ضيف أول شيف من الأسفل')}
+    ${adminSectionTitle('🛠️','إدارة')}
+    ${adminCollapse('chef-add','➕','إضافة شيف جديد','الاسم والصورة', addBody, !CHEFS.length)}
   `;
 }
+
 function renderAdminChefEdit(c){
   ensureChefReviews(c.id);
   const ph = CHEF_PHOTOS[c.id];
@@ -7688,9 +7732,13 @@ function renderAdminChefEdit(c){
         <button type="button" class="btn btn-ghost" style="color:var(--danger);" data-action="admin-delete-dish" data-cid="${c.id}" data-did="${d.id}">✕ حذف</button>
       </div>
     </div>`).join('');
+  const chefSub = adminSubGet('chef:'+c.id,'dishes');
+  const dishN = (c.dishes||[]).length;
   return `
     <div class="op-admin-back-link" data-action="admin-chef-back">${ICO.back} رجوع لقائمة الشيفات</div>
-    <div class="card">
+    ${adminKpis([{num:dishN,lab:'أكلة'},{num:dishN?(Math.round(chefAvg(c)*10)/10)+'/'+CHEF_MAX_STARS:'—',lab:'المتوسط'}])}
+    ${adminSubTabs('chef:'+c.id, [{id:'dishes',label:'🍽️ الأكلات ('+dishN+')'},{id:'info',label:'⚙️ بيانات الشيف'}], chefSub)}
+    ${chefSub==='info' ? `<div class="card">
       <div style="display:flex;align-items:center;gap:12px;">
         <div class="avatar" style="width:56px;height:56px;${ph?`background-image:url('${ph}');background-size:cover;background-position:center;`:'background:linear-gradient(145deg,#F6D365,#FDA085);'}">${ph?'':'👨‍🍳'}</div>
         <div style="font-family:'Cairo',sans-serif;font-weight:800;">${escapeHtml(c.name)}</div>
@@ -7701,8 +7749,8 @@ function renderAdminChefEdit(c){
       <input type="file" accept="image/*" id="edit-chef-photo-${c.id}" style="font-size:11px;" />
       <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-save-chef" data-id="${c.id}">حفظ بيانات الشيف</button>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="admin-delete-chef" data-id="${c.id}">✕ حذف الشيف وكل أكلاته</button>
-    </div>
-    <div class="section-title">➕ إضافة أكلة</div>
+    </div>` : ''}
+    ${chefSub==='dishes' ? `${adminSectionTitle('➕','إضافة أكلة')}
     <div class="card">
       <label>اسم الأكلة</label>
       <input class="field" id="new-dish-name" placeholder="مثال: كشري" />
@@ -7712,8 +7760,8 @@ function renderAdminChefEdit(c){
       ${chefStarPickerHtml(newStars, 'new-dish-picker', 'chef-new-stars')}
       <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-dish" data-cid="${c.id}">إضافة الأكلة</button>
     </div>
-    <div class="section-title">الأكلات (${(c.dishes||[]).length})</div>
-    ${dishRows || `<div class="empty-note">🍽️ لسه مفيش أكلات للشيف ده</div>`}
+    ${adminSectionTitle('🍽️','الأكلات ('+dishN+')')}
+    ${dishRows || adminEmptyState('🍽️','لسه مفيش أكلات للشيف ده','ضيف أول أكلة من الأعلى')}` : ''}
   `;
 }
 async function chefPersist(msgOk){
@@ -14073,7 +14121,14 @@ function renderAdminSessionsTab(){
     </div>`;
   }).join('');
   return `
-    <div class="hint" style="margin-bottom:14px;">اضغط على أي يوم لعرض وتعديل فقراته</div>
+    ${adminKpis([
+      {num:DAYS.length, lab:'يوم'},
+      {num:DAYS.reduce((a,d)=>a+d.sessions.length,0), lab:'فقرة'},
+      {num:DAYS.reduce((a,d)=>a+d.sessions.filter(x=>x.locked).length,0)+DAYS.filter(d=>d.locked).length, lab:'مقفول', cls:'is-alert'},
+      {num:Object.keys(CHECKINS).length, lab:'تسجيل حضور'},
+    ])}
+    ${adminSectionTitle('📅','أيام المؤتمر')}
+    <div class="hint" style="margin-bottom:10px;">اضغط على أي يوم لعرض وتعديل فقراته، أو على القفل لغلقه</div>
     <div class="admin-day-grid">${tiles}</div>
   `;
 }
@@ -14094,8 +14149,8 @@ function renderAdminDayDetail(dayId){
   const dayUsed = dayCodes.filter(c=>POINT_CODES[c].used).length;
   const dayUsagePct = dayCodes.length ? Math.round((dayUsed/dayCodes.length)*100) : 0;
 
-  body += `
-    <div class="card" style="margin:14px 0;">
+  const toolsHtml = `
+    <div class="card" style="margin:0;">
       <div class="admin-session-name" style="margin-bottom:4px;">🎟️ توليد أكواد QR لكل فقرات هذا اليوم دفعة واحدة</div>
       <div class="hint" style="margin:0 0 10px;">العدد اللي تكتبه هيتولّد لكل قيمة من الحد الأدنى للأقصى، لكل فقرة على حدة. مثال: 0-10 وعدد 40 = 40 كود لكل قيمة (440 كود لكل فقرة).</div>
       ${dayCodes.length ? `<div class="hint" style="margin:0 0 10px;">📈 نسبة استخدام أكواد كل فقرات اليوم ده: <b>${dayUsagePct}%</b> (${dayUsed} من ${dayCodes.length})</div>` : ''}
@@ -14126,9 +14181,17 @@ function renderAdminDayDetail(dayId){
       <span class="session-tile-pct" data-progress-lab-session="${s.id}">${checkedIn}/${PARTICIPANTS.length} حضروا</span>
     </div>`;
   }).join('');
-  body += `<div class="admin-session-grid">${sessionTiles}</div>`;
+  const dayCheckins = day.sessions.reduce((a,s)=>a+checkinsForSession(s.id),0);
+  body += adminKpis([
+    {num:day.sessions.length, lab:'فقرة'},
+    {num:day.sessions.filter(s=>s.locked).length, lab:'مقفولة', cls:day.sessions.some(s=>s.locked)?'is-alert':''},
+    {num:dayCheckins, lab:'تسجيل حضور'},
+    {num:dayCodes.length?dayUsagePct+'%':'—', lab:'استخدام الأكواد'},
+  ]);
+  body += adminSectionTitle('🗓️','فقرات اليوم');
+  body += day.sessions.length ? `<div class="admin-session-grid">${sessionTiles}</div>` : adminEmptyState('🗓️','لا توجد فقرات في هذا اليوم','أضف أول فقرة من الأسفل');
 
-  body += `
+  const addHtml = `
     <div class="admin-add-session-card" style="margin-top:12px;">
       <div class="admin-session-name" style="margin-bottom:8px;">➕ إضافة فقرة جديدة لهذا اليوم</div>
       <input class="field" id="new-session-name-${day.id}" placeholder="اسم الفقرة" style="margin-bottom:8px;" />
@@ -14136,6 +14199,9 @@ function renderAdminDayDetail(dayId){
       <button type="button" class="btn btn-primary" style="margin-top:8px;width:100%;" data-action="admin-add-session" data-day="${day.id}">إضافة الفقرة</button>
     </div>
   `;
+  body += adminSectionTitle('🛠️','أدوات');
+  body += adminCollapse('day-add-'+day.id,'➕','إضافة فقرة جديدة','لهذا اليوم', addHtml);
+  body += adminCollapse('day-tools-'+day.id,'🎟️','أكواد QR لليوم','توليد وطباعة وحذف أكواد كل فقرات اليوم', toolsHtml);
   return body;
 }
 function renderAdminSessionDetail(sessionId){
@@ -14177,9 +14243,18 @@ function renderAdminSessionDetail(sessionId){
       </div>
       <button type="button" class="lock-chip ${session.locked?'locked':''}" data-action="admin-toggle-session-lock" data-session="${sessionId}">${lockIconSvg()} <span>${session.locked?'مقفولة':'مفتوحة'}</span></button>
     </div>
-    <div class="card">${renderAdminEditForm(session, info)}</div>
-
-    <div class="card" style="margin-top:12px;">
+    ${adminKpis([
+      {num:checkedIn, lab:'حضروا'},
+      {num:pct+'%', lab:'نسبة الحضور'},
+      {num:totalCodes, lab:'كود QR'},
+      {num:totalCodes?usagePct+'%':'—', lab:'استخدام الأكواد'},
+    ])}
+    ${adminSubTabs('session:'+sessionId, [{id:'settings',label:'⚙️ الإعدادات'},{id:'codes',label:'🎟️ الأكواد ('+totalCodes+')'}], adminSubGet('session:'+sessionId,'settings'))}
+    ${adminSubGet('session:'+sessionId,'settings')==='settings' ? `<div class="card">${renderAdminEditForm(session, info)}</div>
+    ${adminSectionTitle('⚠️','منطقة الخطر')}
+    <button type="button" class="btn btn-ghost admin-danger-zone" style="width:100%;color:var(--danger);" data-action="admin-delete-session" data-session="${sessionId}">🗑️ حذف الفقرة نهائيًا</button>` : ''}
+    ${adminSubGet('session:'+sessionId,'settings')==='codes' ? `
+    <div class="card">
       <div class="admin-session-name" style="margin-bottom:4px;">🎟️ أكواد QR الخاصة بهذه الفقرة</div>
       ${info.pointsEnabled===false ? `
       <div class="hint" style="color:var(--danger,#d6473a);">النقاط متوقفة في هذه الفقرة (من إعدادات الفقرة فوق) — فعّل النقاط الأول عشان تقدر تولّد أكواد</div>
@@ -14202,49 +14277,68 @@ function renderAdminSessionDetail(sessionId){
         <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-custom-session-qr" data-session="${sessionId}">توليد كود QR بهذا النص</button>
         <div id="custom-qr-holder-${sessionId}" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px;"></div>
       </div>
-    </div>
-
-    <button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;color:var(--danger);" data-action="admin-delete-session" data-session="${sessionId}">🗑️ حذف الفقرة نهائيًا</button>
+    </div>` : ''}
   `;
 }
 
 function renderAdminRankingsTab(){
   const solo = rankedParticipants();
   const teams = rankedTeams();
-  const soloRows = solo.map((p,i)=>{
-    const t = teamOf(p.teamId);
-    return `<div class="rank-mini-row"><div class="rank-mini-num">${i+1}</div><div style="flex:1;">${escapeHtml(p.name)}<div class="lb-sub">${t.name}</div></div><div class="lb-pts">${p.total} نقطة</div></div>`;
-  }).join('');
-  const teamRows = teams.map((t,i)=>`<div class="rank-mini-row"><div class="rank-mini-num">${i+1}</div><div style="flex:1;">${t.name}<div class="lb-sub">${t.count} أعضاء</div></div><div class="lb-pts">${t.total} نقطة</div></div>`).join('');
-
-  const maxTeam = Math.max(1,...teams.map(t=>t.total));
-  const barRows = teams.map(t=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
-    <div style="width:74px;font-size:11px;color:var(--text-muted);">${t.name}</div>
-    <div style="flex:1;background:var(--bg-2);border-radius:6px;overflow:hidden;height:14px;">
-      <div style="width:${(t.total/maxTeam)*100}%;height:100%;background:${t.color};"></div>
-    </div>
-    <div style="width:38px;text-align:end;font-size:11px;color:var(--gold);font-weight:800;">${t.total}</div>
-  </div>`).join('');
-
-  const hours = new Array(24).fill(0);
-  Object.values(CHECKINS).forEach(v=>{ hours[new Date(v.ts).getHours()]++; });
-  const maxHour = Math.max(1,...hours);
-  const heatBars = hours.map((c,h)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;">
-      <div style="width:100%;max-width:8px;height:${Math.max(2,(c/maxHour)*58)}px;background:${c>0?'var(--teal)':'var(--bg-2)'};border-radius:3px 3px 0 0;"></div>
-      ${h%4===0?`<div style="font-size:8px;color:var(--text-muted);">${h}</div>`:''}
+  const sub = adminSubGet('rankings','solo');
+  const totalPts = solo.reduce((a,p)=>a+p.total,0);
+  const kpis = adminKpis([
+    {num:solo[0]?escapeHtml(solo[0].name.split(' ')[0]):'—', lab:'المتصدر فرديًا'},
+    {num:teams[0]?escapeHtml(teams[0].name):'—', lab:'المتصدر جماعيًا'},
+    {num:totalPts, lab:'إجمالي النقاط'},
+    {num:solo.length?Math.round(totalPts/solo.length):0, lab:'متوسط الفرد'},
+  ]);
+  const tabs = adminSubTabs('rankings', [
+    {id:'solo', label:'🏅 الأفراد'},
+    {id:'teams', label:'👥 الفرق'},
+    {id:'charts', label:'📈 رسوم'},
+  ], sub);
+  const exportBtn = `<button class="btn btn-outline" data-action="export-results" style="margin-bottom:var(--a-pad);width:100%;">${ICO.download} تصدير النتائج (CSV)</button>`;
+  let body = '';
+  if(sub==='solo'){
+    const podCol = (p,i,cls)=> p ? `<div class="ap-col ${cls}"><div class="avatar" style="background:${teamOf(p.teamId).color};width:44px;height:44px;font-size:14px;">${initials(p.name)}</div><div class="ap-name">${escapeHtml(p.name)}</div><div class="ap-pts">${p.total}</div><div class="ap-bar">${i+1}</div></div>` : `<div class="ap-col"></div>`;
+    const podium = solo.length>=3 ? `<div class="admin-podium">${podCol(solo[1],1,'ap-2')}${podCol(solo[0],0,'ap-1')}${podCol(solo[2],2,'ap-3')}</div>` : '';
+    const LIMIT = 15;
+    const all = !!state.adminRankAll;
+    const rows = solo.map((p,i)=>`<div class="admin-rank-row admin-rank-item" data-search="${escapeHtml((p.name+' '+p.id+' '+teamOf(p.teamId).name).toLowerCase())}" ${(!all && i>=LIMIT)?'style="display:none;"':''}>
+      <div class="arr-num">${i+1}</div>
+      <div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">${escapeHtml(teamOf(p.teamId).name)} · #${escapeHtml(p.id)}</div></div>
+      <div class="arr-pts">${p.total}</div>
     </div>`).join('');
-
-  return `
-    <button class="btn btn-outline" data-action="export-results" style="margin-bottom:16px;">${ICO.download} تصدير النتائج (CSV)</button>
-    <div class="section-title" style="margin-top:0;">توزيع النقاط بين الفرق</div>
-    <div class="card">${barRows}</div>
-    <div class="section-title">ترتيب المشاركين</div>
-    <div class="card">${soloRows}</div>
-    <div class="section-title">ترتيب الفرق</div>
-    <div class="card">${teamRows}</div>
-    <div class="section-title">أوقات الذروة <span class="sub">تسجيل الحضور حسب الساعة</span></div>
-    <div class="card" style="display:flex;align-items:flex-end;gap:2px;height:96px;padding:14px 10px 6px;">${heatBars}</div>
-  `;
+    body = `${podium}
+      <input type="text" class="field admin-search-input" data-filter-target=".admin-rank-item" placeholder="🔍 دور على مشارك في الترتيب..." style="margin-bottom:10px;" />
+      <div class="card">${rows || adminEmptyState('🏅','لا يوجد مشاركون','')}</div>
+      ${solo.length>LIMIT ? `<button type="button" class="btn btn-ghost" style="width:100%;margin-top:10px;" data-action="admin-rank-all">${all?'عرض أقل ▲':`عرض كل المشاركين (${solo.length}) ▼`}</button>` : ''}`;
+  } else if(sub==='teams'){
+    const rows = teams.map((t,i)=>`<div class="admin-rank-row">
+      <div class="arr-num">${i+1}</div>
+      <div class="arr-body">${escapeHtml(t.name)}<div class="arr-sub">${t.count} أعضاء</div></div>
+      <div class="arr-pts">${t.total}</div>
+    </div>`).join('');
+    body = `<div class="card">${rows || adminEmptyState('👥','لا توجد فرق','')}</div>`;
+  } else {
+    const maxTeam = Math.max(1,...teams.map(t=>t.total));
+    const barRows = teams.map(t=>`<div class="admin-bar-row"><div class="abr-name">${escapeHtml(t.name)}</div><div class="abr-track"><div class="abr-fill" style="width:${(t.total/maxTeam)*100}%;background:${t.color};"></div></div><div class="abr-val">${t.total}</div></div>`).join('');
+    const hours = new Array(24).fill(0);
+    Object.values(CHECKINS).forEach(v=>{ hours[new Date(v.ts).getHours()]++; });
+    const maxHour = Math.max(1,...hours);
+    const peak = hours.indexOf(Math.max(...hours));
+    const heatBars = hours.map((c,h)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;">
+        <div style="width:100%;max-width:8px;height:${Math.max(2,(c/maxHour)*58)}px;background:${c>0?'var(--teal)':'var(--bg-2)'};border-radius:3px 3px 0 0;"></div>
+        ${h%4===0?`<div style="font-size:8px;color:var(--text-muted);">${h}</div>`:''}
+      </div>`).join('');
+    body = `
+      ${adminSectionTitle('📊','توزيع النقاط بين الفرق')}
+      <div class="card">${barRows}</div>
+      ${adminSectionTitle('⏱️','أوقات الذروة')}
+      <div class="hint" style="margin:0 2px 8px;">تسجيل الحضور حسب الساعة${Object.keys(CHECKINS).length?` — الذروة عند الساعة ${peak}:00`:''}</div>
+      <div class="card" style="display:flex;align-items:flex-end;gap:2px;height:96px;padding:14px 10px 6px;">${heatBars}</div>`;
+  }
+  return kpis + tabs + body + (sub==='solo' ? adminSectionTitle('📤','تصدير') + exportBtn : '');
 }
 
 function renderAdminPulseTab(){
@@ -14309,47 +14403,75 @@ function renderAdminAuditTab(){
 }
 
 function renderAdminAnalyticsTab(){
+  const sub = adminSubGet('analytics','overview');
   const totalPossible = PARTICIPANTS.length * flatSessions().length;
   const totalCheckins = Object.keys(CHECKINS).length;
   const participationRate = totalPossible ? Math.round((totalCheckins/totalPossible)*100) : 0;
   const avgPoints = PARTICIPANTS.length ? Math.round(PARTICIPANTS.reduce((s,p)=>s+participantTotal(p.id),0)/PARTICIPANTS.length) : 0;
   const activeCount = PARTICIPANTS.filter(p=>participantTotal(p.id)>0).length;
-
-  const typeTally = {};
-  DAYS.forEach(d=>d.sessions.forEach(s=>{ typeTally[s.type] = (typeTally[s.type]||0) + checkinsForSession(s.id); }));
-  const typeTotal = Object.values(typeTally).reduce((a,b)=>a+b,0) || 1;
-  let acc=0; const stops=[];
-  Object.entries(typeTally).forEach(([type,c])=>{ const pct=c/typeTotal*100; stops.push(`${TYPE_COLORS[type]||'#888'} ${acc}% ${acc+pct}%`); acc+=pct; });
-  const legend = Object.entries(typeTally).sort((a,b)=>b[1]-a[1]).map(([type,c])=>
-    `<div class="donut-legend-row"><span class="donut-dot" style="background:${TYPE_COLORS[type]||'#888'}"></span>${SESSION_TYPE_LABELS[type]||type} — ${c} تسجيل</div>`).join('');
-  const topType = Object.entries(typeTally).sort((a,b)=>b[1]-a[1])[0];
-
-  const streaks = PARTICIPANTS.map(p=>({p, streak: computeStreak(p.id).max})).sort((a,b)=>b.streak-a.streak).filter(x=>x.streak>0).slice(0,5);
-  const streakRows = streaks.length ? streaks.map(({p,streak})=>`<div class="streak-lead-row">🔥 <div style="flex:1;">${escapeHtml(p.name)}</div><span style="color:var(--gold);font-weight:800;">${streak} متتالية</span></div>`).join('')
-    : `<div class="empty-note">لا توجد بيانات كافية بعد</div>`;
-
-  const totalBadges = PARTICIPANTS.reduce((s,p)=>s+computeBadges(p.id).length+computeSecretBadges(p.id).length,0);
-  const avgRating = avgRatingOverall();
-
-  return `
-    <div class="kpi-grid">
-      <div class="card kpi-card"><div class="kpi-num">${participationRate}%</div><div class="kpi-lab">نسبة المشاركة الكلية</div></div>
-      <div class="card kpi-card"><div class="kpi-num">${avgPoints}</div><div class="kpi-lab">متوسط نقاط المشارك</div></div>
-      <div class="card kpi-card"><div class="kpi-num">${activeCount}/${PARTICIPANTS.length}</div><div class="kpi-lab">مشاركون نشطون</div></div>
-      <div class="card kpi-card"><div class="kpi-num">${totalBadges}</div><div class="kpi-lab">إجمالي الأوسمة الممنوحة</div></div>
-      <div class="card kpi-card"><div class="kpi-num">${avgRating?avgRating.toFixed(1)+' ★':'—'}</div><div class="kpi-lab">متوسط رضا الحضور عن الفقرات</div></div>
-    </div>
-    <div class="section-title">إقبال حسب نوع الفقرة</div>
-    <div class="card donut-wrap">
-      <div style="width:88px;height:88px;border-radius:50%;background:conic-gradient(${stops.join(',')||'#333 0 100%'});flex:0 0 auto;position:relative;">
-        <div style="position:absolute;inset:12px;border-radius:50%;background:var(--surface-2);"></div>
+  const tabs = adminSubTabs('analytics', [
+    {id:'overview', label:'📊 نظرة عامة'},
+    {id:'sessions', label:'🗓️ الفقرات'},
+    {id:'people', label:'👤 المشاركون'},
+  ], sub);
+  let body = '';
+  if(sub==='overview'){
+    const typeTally = {};
+    DAYS.forEach(d=>d.sessions.forEach(s=>{ typeTally[s.type] = (typeTally[s.type]||0) + checkinsForSession(s.id); }));
+    const typeTotal = Object.values(typeTally).reduce((a,b)=>a+b,0) || 1;
+    let acc=0; const stops=[];
+    Object.entries(typeTally).forEach(([type,c])=>{ const pct=c/typeTotal*100; stops.push(`${TYPE_COLORS[type]||'#888'} ${acc}% ${acc+pct}%`); acc+=pct; });
+    const legend = Object.entries(typeTally).sort((a,b)=>b[1]-a[1]).map(([type,c])=>
+      `<div class="donut-legend-row"><span class="donut-dot" style="background:${TYPE_COLORS[type]||'#888'}"></span>${SESSION_TYPE_LABELS[type]||type} — ${c} تسجيل</div>`).join('');
+    const topType = Object.entries(typeTally).sort((a,b)=>b[1]-a[1])[0];
+    const totalBadges = PARTICIPANTS.reduce((s,p)=>s+computeBadges(p.id).length+computeSecretBadges(p.id).length,0);
+    const avgRating = avgRatingOverall();
+    body = `
+      <div class="kpi-grid">
+        <div class="card kpi-card"><div class="kpi-num">${participationRate}%</div><div class="kpi-lab">نسبة المشاركة الكلية</div></div>
+        <div class="card kpi-card"><div class="kpi-num">${avgPoints}</div><div class="kpi-lab">متوسط نقاط المشارك</div></div>
+        <div class="card kpi-card"><div class="kpi-num">${activeCount}/${PARTICIPANTS.length}</div><div class="kpi-lab">مشاركون نشطون</div></div>
+        <div class="card kpi-card"><div class="kpi-num">${totalBadges}</div><div class="kpi-lab">إجمالي الأوسمة الممنوحة</div></div>
+        <div class="card kpi-card"><div class="kpi-num">${avgRating?avgRating.toFixed(1)+' ★':'—'}</div><div class="kpi-lab">متوسط رضا الحضور عن الفقرات</div></div>
       </div>
-      <div class="donut-legend">${legend || '<div class="hint">لا توجد بيانات بعد</div>'}</div>
-    </div>
-    ${topType ? `<div class="hint" style="margin:-4px 2px 4px;">أكثر نوع فقرات إقبالاً: <strong style="color:var(--gold);">${SESSION_TYPE_LABELS[topType[0]]||topType[0]}</strong></div>` : ''}
-    <div class="section-title">الأكثر التزامًا <span class="sub">أطول سلسلة حضور متتالية</span></div>
-    <div class="card">${streakRows}</div>
-  `;
+      ${adminSectionTitle('🍩','إقبال حسب نوع الفقرة')}
+      <div class="card donut-wrap">
+        <div style="width:88px;height:88px;border-radius:50%;background:conic-gradient(${stops.join(',')||'#333 0 100%'});flex:0 0 auto;position:relative;">
+          <div style="position:absolute;inset:12px;border-radius:50%;background:var(--surface-2);"></div>
+        </div>
+        <div class="donut-legend">${legend || '<div class="hint">لا توجد بيانات بعد</div>'}</div>
+      </div>
+      ${topType ? `<div class="hint" style="margin:-4px 2px 4px;">أكثر نوع فقرات إقبالاً: <strong style="color:var(--gold);">${SESSION_TYPE_LABELS[topType[0]]||topType[0]}</strong></div>` : ''}`;
+  } else if(sub==='sessions'){
+    const rowsByDay = DAYS.map(d=>{
+      const rows = d.sessions.map(s=>{
+        const n = checkinsForSession(s.id);
+        const pct = PARTICIPANTS.length ? Math.round(n/PARTICIPANTS.length*100) : 0;
+        const info = SESSION_INFO[s.id] || {};
+        return `<div class="admin-bar-row"><div class="abr-name">${escapeHtml(info.name||s.name)}</div><div class="abr-track"><div class="abr-fill" style="width:${pct}%"></div></div><div class="abr-val">${n} · ${pct}%</div></div>`;
+      }).join('');
+      return `${adminSectionTitle('📅', escapeHtml(d.label))}<div class="card">${rows || '<div class="hint">لا توجد فقرات</div>'}</div>`;
+    }).join('');
+    const best = flatSessions().map(s=>({s,n:checkinsForSession(s.id)})).sort((a,b)=>b.n-a.n)[0];
+    body = adminKpis([{num:flatSessions().length,lab:'فقرة'},{num:totalCheckins,lab:'تسجيل حضور'},{num:participationRate+'%',lab:'نسبة الحضور'},{num:best&&best.n?best.n:'—',lab:'أعلى حضور'}]) + rowsByDay;
+  } else {
+    const streaks = PARTICIPANTS.map(p=>({p, streak: computeStreak(p.id).max})).sort((a,b)=>b.streak-a.streak).filter(x=>x.streak>0).slice(0,5);
+    const streakRows = streaks.length ? streaks.map(({p,streak})=>`<div class="streak-lead-row">🔥 <div style="flex:1;">${escapeHtml(p.name)}</div><span style="color:var(--gold);font-weight:800;">${streak} متتالية</span></div>`).join('')
+      : `<div class="empty-note">لا توجد بيانات كافية بعد</div>`;
+    const inactive = PARTICIPANTS.filter(p=>participantTotal(p.id)===0);
+    const top = rankedParticipants().slice(0,5).map((p,i)=>`<div class="admin-rank-row"><div class="arr-num">${i+1}</div><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">${escapeHtml(teamOf(p.teamId).name)}</div></div><div class="arr-pts">${p.total}</div></div>`).join('');
+    const inactiveHtml = inactive.length ? inactive.slice(0,40).map(p=>`<div class="admin-rank-row admin-inactive-row" data-search="${escapeHtml((p.name+' '+p.id).toLowerCase())}"><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">#${escapeHtml(p.id)} · ${escapeHtml(teamOf(p.teamId).name)}</div></div></div>`).join('') + (inactive.length>40?`<div class="hint" style="text-align:center;padding-top:8px;">و ${inactive.length-40} آخرين</div>`:'') : '<div class="empty-note">كل المشاركين لديهم نقاط 🎉</div>';
+    body = `
+      ${adminKpis([{num:activeCount,lab:'نشطون'},{num:inactive.length,lab:'بلا نقاط',cls:inactive.length?'is-alert':'is-ok'},{num:avgPoints,lab:'متوسط النقاط'}])}
+      ${adminSectionTitle('🏅','الأعلى نقاطًا')}
+      <div class="card">${top || '<div class="empty-note">لا توجد بيانات</div>'}</div>
+      ${adminSectionTitle('🔥','الأكثر التزامًا (أطول سلسلة حضور)')}
+      <div class="card">${streakRows}</div>
+      ${adminSectionTitle('😴','مشاركون بلا نقاط بعد')}
+      ${inactive.length>6 ? `<input type="text" class="field admin-search-input" data-filter-target=".admin-inactive-row" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />` : ''}
+      <div class="card">${inactiveHtml}</div>`;
+  }
+  return tabs + body;
 }
 
 function renderAdminLogisticsTab(){
@@ -14525,27 +14647,28 @@ function renderAdminSettingsTab(){
 
 function renderAdminPointCodesTab(){
   const denominations = {};
+  let total=0, used=0;
   Object.values(POINT_CODES).forEach(pc=>{
     denominations[pc.value] = denominations[pc.value] || {total:0, used:0};
-    denominations[pc.value].total++;
-    if(pc.used) denominations[pc.value].used++;
+    denominations[pc.value].total++; total++;
+    if(pc.used){ denominations[pc.value].used++; used++; }
   });
   const denomKeys = Object.keys(denominations).map(Number).sort((a,b)=>a-b);
-  const denomRows = denomKeys.map(v=>{
-    const d = denominations[v];
-    return `<div class="admin-session">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div>
-          <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;">🪙 أكواد بقيمة ${v} نقطة</div>
-          <div class="hint" style="margin:2px 0 0;">${d.total} كود إجمالي · ${d.used} مستخدم · ${d.total-d.used} متبقي</div>
-        </div>
-        <button type="button" class="btn btn-outline" style="padding:8px 14px;font-size:12px;flex:0 0 auto;" data-action="print-point-codes" data-value="${v}">🖨️ طباعة</button>
-      </div>
-    </div>`;
-  }).join('') || `<div class="empty-note">لسه مفيش أكواد نقاط متولدة</div>`;
-
-  return `
-    <div class="card" style="margin-bottom:16px;">
+  const sub = adminSubGet('pointcodes','batches');
+  const kpis = adminKpis([
+    {num:total, lab:'إجمالي الأكواد'},
+    {num:used, lab:'مستخدمة'},
+    {num:total-used, lab:'متبقية', cls:(total>0 && total-used===0)?'is-alert':''},
+    {num:(total?Math.round(used/total*100):0)+'%', lab:'نسبة الاستخدام'},
+  ]);
+  const tabs = adminSubTabs('pointcodes', [
+    {id:'batches', label:'📦 الدفعات ('+denomKeys.length+')'},
+    {id:'gen', label:'➕ توليد جديد'},
+  ], sub);
+  let body = '';
+  if(sub==='gen'){
+    body = `
+    <div class="card">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎟️ توليد أكواد نقاط جديدة</div>
       <div class="hint" style="margin:0 0 10px;">كل كود يُستخدم مرة واحدة بس من أي مشارك، جوه أي فقرة يفتحها ويمسحه فيها</div>
       <div class="admin-edit-form" style="padding:0;">
@@ -14554,13 +14677,26 @@ function renderAdminPointCodesTab(){
           <div style="flex:1;"><label>الكمية</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="gen-code-qty" placeholder="مثال: 100" /></div>
         </div>
       </div>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="generate-point-codes">توليد الأكواد</button>
-    </div>
-    <div class="admin-day-title">دفعات الأكواد الحالية</div>
-    ${denomRows}
-  `;
+      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-point-codes">توليد الأكواد</button>
+    </div>`;
+  } else {
+    body = denomKeys.map(v=>{
+      const d = denominations[v];
+      const pct = d.total ? Math.round(d.used/d.total*100) : 0;
+      return `<div class="admin-item-card ${d.total-d.used===0?'is-done':'is-pending'}">
+        <div class="admin-row-line">
+          <div>
+            <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;">🪙 أكواد بقيمة ${v} نقطة</div>
+            <div class="hint" style="margin:2px 0 0;">${d.total} إجمالي · ${d.used} مستخدم · ${d.total-d.used} متبقي · ${pct}%</div>
+          </div>
+          <button type="button" class="btn btn-outline" style="padding:8px 14px;font-size:12px;flex:0 0 auto;" data-action="print-point-codes" data-value="${v}">🖨️ طباعة</button>
+        </div>
+        ${adminPctBar(pct)}
+      </div>`;
+    }).join('') || adminEmptyState('🎟️','لسه مفيش أكواد نقاط','ابدأ بتوليد أول دفعة من تبويب "توليد جديد"');
+  }
+  return kpis + tabs + body;
 }
-
 
 const ADMIN_HUB_GROUPS = [
   {id:'live', icon:'🔴', title:'التشغيل المباشر'},
@@ -14629,6 +14765,21 @@ function renderAdminHub(){
     <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
   `;
 }
+function adminSubGet(k, def){ return (state.adminSub && state.adminSub[k]) || def; }
+function adminSubTabs(k, items, cur){
+  return `<div class="admin-subtabs">${items.map(it=>`<button type="button" class="admin-tab ${it.id===cur?'active':''}" data-action="admin-sub" data-k="${k}" data-v="${it.id}">${it.label}${it.badge?`<span class="admin-tab-badge">${it.badge}</span>`:''}</button>`).join('')}</div>`;
+}
+function adminKpis(cells){
+  return `<div class="admin-stat-strip">${cells.map(c=>`<div class="admin-stat-cell ${c.cls||''}"><div class="admin-stat-num">${c.num}</div><div class="admin-stat-lab">${c.lab}</div></div>`).join('')}</div>`;
+}
+function adminSectionTitle(icon, title){
+  return `<div class="admin-section-title"><span>${icon}</span><span>${title}</span></div>`;
+}
+function adminCollapse(k, icon, title, sub, bodyHtml, defOpen){
+  const open = (state.adminOpen && (k in state.adminOpen)) ? state.adminOpen[k] : !!defOpen;
+  return `<button type="button" class="admin-collapse-head ${open?'open':''}" data-action="admin-collapse" data-k="${k}"><span>${icon}</span><span><span>${title}</span>${sub?`<span class="ach-sub">${sub}</span>`:''}</span><span class="ach-chev">▾</span></button>${open?`<div class="admin-collapse-body">${bodyHtml}</div>`:''}`;
+}
+function adminPctBar(pct){ return `<div class="admin-progress-inline"><div style="width:${Math.max(0,Math.min(100,pct))}%"></div></div>`; }
 function adminEmptyState(icon, title, hint){
   return `<div class="admin-empty"><div class="admin-empty-ico">${icon}</div><div class="admin-empty-title">${title}</div>${hint?`<div class="admin-empty-hint">${hint}</div>`:''}</div>`;
 }
@@ -14638,7 +14789,7 @@ function adminInDetailView(){
     || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
     || (t==='chefs' && state.editingChefId)
     || (t==='opinions' && state.viewingOpinionId)
-    || (t==='teams' && (state.editingTeamId || state.addingTeam));
+    || (t==='teams' && state.editingTeamId);
 }
 function adminPendingBadge(tab){
   if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
@@ -14782,8 +14933,7 @@ function renderAdminOpinionsTab(){
     }
   }
   const os = OPINIONS.slice().sort((a,b)=>b.ts-a.ts);
-  if(!os.length) return `<div class="empty-note">📝 لسه محدش بعت رأيه</div>`;
-  // ---- ملخص سريع: أكتر الفقرات المفضلة ذكرًا، وعدد الآراء اللي فيها كل بند ----
+  if(!os.length) return adminEmptyState('📝','لسه محدش بعت رأيه','آراء المشاركين هتظهر هنا');
   const favTally = {};
   let posCount=0, negCount=0, sugCount=0;
   os.forEach(o=>{
@@ -14794,28 +14944,29 @@ function renderAdminOpinionsTab(){
     if(fv) favTally[fv] = (favTally[fv]||0)+1;
   });
   const topFav = Object.entries(favTally).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const summary = `
-    <div class="card" style="margin-bottom:14px;">
-      <div class="admin-session-name" style="margin-bottom:10px;">📊 ملخص سريع</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <span class="admin-meta-chip">📝 ${os.length} رأي وصل</span>
-        <span class="admin-meta-chip">✅ ${posCount} كتبوا إيجابيات</span>
-        <span class="admin-meta-chip">⚠️ ${negCount} كتبوا سلبيات</span>
-        <span class="admin-meta-chip">💡 ${sugCount} كتبوا اقتراحات</span>
-      </div>
-      ${topFav.length ? `<div style="margin-top:10px;font-size:12px;color:var(--text-muted);">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : ''}
-    </div>`;
+  const f = adminSubGet('opinions','all');
+  let list = os;
+  if(f==='neg') list = os.filter(o=>(o.negatives||'').trim());
+  else if(f==='sug') list = os.filter(o=>(o.suggestions||'').trim());
+  const kpis = adminKpis([{num:os.length,lab:'رأي'},{num:posCount,lab:'إيجابيات'},{num:negCount,lab:'سلبيات',cls:negCount?'is-alert':''},{num:sugCount,lab:'اقتراحات'}]);
+  const tabs = adminSubTabs('opinions', [
+    {id:'all', label:'الكل ('+os.length+')'},
+    {id:'neg', label:'⚠️ فيها سلبيات ('+negCount+')'},
+    {id:'sug', label:'💡 اقتراحات ('+sugCount+')'},
+  ], f);
+  const favLine = topFav.length ? `<div class="hint" style="margin:0 2px 10px;">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : '';
   const search = os.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".op-admin-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" />` : '';
-  const rows = os.map(o=>`
+  const flags = o => `${(o.positives||'').trim()?'✅':''}${(o.negatives||'').trim()?'⚠️':''}${(o.suggestions||'').trim()?'💡':''}`;
+  const rows = list.map(o=>`
     <button type="button" class="op-admin-row" data-action="view-opinion" data-id="${o.id}" data-search="${escapeHtml((o.name||'').toLowerCase())}">
       <span class="op-admin-row-avatar">${escapeHtml((o.name||'?').trim().charAt(0))}</span>
       <span class="op-admin-row-body">
         <span class="op-admin-row-name">${escapeHtml(o.name||'مجهول')}</span>
-        <span class="op-admin-row-time">${timeAgoAr(o.ts)}</span>
+        <span class="op-admin-row-time">${timeAgoAr(o.ts)} ${flags(o)}</span>
       </span>
       <span class="op-admin-row-chev">${ICO.chev}</span>
     </button>`).join('');
-  return summary + search + rows;
+  return kpis + tabs + favLine + search + (rows || adminEmptyState('🎉','مفيش آراء في القسم ده',''));
 }
 function renderAdminTrashTab(){
   if(!TRASH.length) return adminEmptyState('🗑️','سلة المهملات فاضية','أي حاجة بتتحذف بتفضل هنا لحد ما تسترجعها أو تحذفها نهائيًا');
@@ -14873,10 +15024,12 @@ function renderAdminGalleryTab(){
     `;
   }).join('');
   return `
-    <div class="empty-note" style="text-align:right;margin-bottom:6px;">
+    ${adminKpis([{num:GALLERY_ALBUMS.length,lab:'خانة'},{num:GALLERY_ALBUMS.reduce((a,al)=>a+(al.photoIds||[]).length,0),lab:'صورة'}])}
+    ${adminSectionTitle('🖼️','خانات المعرض')}
+    <div class="hint" style="margin-bottom:12px;">
       من هنا بتضيف وبتشيل خانات معرض الصور، وبتضيف صور جوه كل خانة. دوس "إضافة صور" في أي خانة وارفع كذا صورة مرة واحدة. أول صورة بتتضاف بتبقى الغلاف تلقائي، لكن تقدر تدوس على ⭐ فوق أي صورة تانية عشان تخليها هي الغلاف بدالها. وعنوان الخانة اللي بتكتبه بيظهر للمشارك بشكل احترافي فوق صورة الغلاف لما يفتح الخانة.
     </div>
-    ${cards || '<div class="empty-note">لسه مفيش خانات — دوس "إضافة خانة جديدة" تحت عشان تبدأ</div>'}
+    ${cards || adminEmptyState('🖼️','لسه مفيش خانات','دوس "إضافة خانة جديدة" من الأسفل عشان تبدأ')}
     <button type="button" class="btn btn-primary" style="width:100%;margin-top:6px;" data-action="gallery-admin-add-slot">＋ إضافة خانة جديدة</button>
   `;
 }
@@ -14910,6 +15063,12 @@ function renderAdminParticipantsTab(){
     </div>` : '';
   return `
     ${justAddedCard}
+    ${adminKpis([
+      {num:PARTICIPANTS.length, lab:'مشارك'},
+      {num:TEAMS.length, lab:'فريق'},
+      {num:new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size, lab:'سجّلوا حضورًا'},
+      {num:PARTICIPANTS.reduce((a,p)=>a+participantTotal(p.id),0), lab:'إجمالي النقاط'},
+    ])}
     <button type="button" class="btn btn-primary" style="margin-bottom:12px;width:100%;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
     <button type="button" class="admin-collapse-head ${state.adminToolsOpen?'open':''}" data-action="toggle-admin-tools">
       <span>🧰</span>
@@ -14972,27 +15131,31 @@ function renderAdminParticipantDetail(p){
     </div>`);
   }));
   const attendanceBlock = `
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+    <div style="margin-top:0;">
       <div class="admin-session-name" style="margin-bottom:4px;">📋 الفقرات اللي حضرها (${attendedCount})</div>
       <div class="hint" style="margin:0 0 8px;">إلغاء الحضور بيمسح نقاط الفقرة دي بس من رصيد المشارك، وبيسيبه يقدر يمسح كود QR جديد لنفس الفقرة تاني</div>
       ${attendedRows.join('') || `<div class="hint">لسه معملش أي حضور</div>`}
     </div>
   `;
-  return `
+  const sub = adminSubGet('participant:'+p.id,'info');
+  const heroHtml = `
     <button type="button" class="admin-back-link" data-action="cancel-edit-participant">${ICO.back} كل المشاركين</button>
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+    <div class="admin-hero">
+      <div style="display:contents;">
         <div class="avatar" style="width:52px;height:52px;font-size:16px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
         <div>
           <div class="admin-session-name" style="font-size:15px;">${escapeHtml(p.name)}</div>
           <div style="font-size:11px;color:var(--text-muted);">#${escapeHtml(p.id)} — ${escapeHtml(team.name)}</div>
         </div>
       </div>
-      <div class="admin-stat-strip">
-        <div class="admin-stat-cell"><div class="admin-stat-num">${participantTotal(p.id)}</div><div class="admin-stat-lab">مجموع النقاط</div></div>
-        <div class="admin-stat-cell"><div class="admin-stat-num">#${myRank}</div><div class="admin-stat-lab">الترتيب الفردي</div></div>
-        <div class="admin-stat-cell"><div class="admin-stat-num">${attendedCount}</div><div class="admin-stat-lab">فقرات حضرها</div></div>
-      </div>
+      
+    </div>
+    ${adminKpis([{num:participantTotal(p.id),lab:'مجموع النقاط'},{num:'#'+myRank,lab:'الترتيب الفردي'},{num:attendedCount,lab:'فقرات حضرها'}])}
+    ${adminSubTabs('participant:'+p.id, [{id:'info',label:'👤 البيانات'},{id:'points',label:'🪙 النقاط والحضور'},{id:'photos',label:'📷 الصور'}], sub)}`;
+  let bodyHtml = '';
+  if(sub==='info'){
+    bodyHtml = `
+    <div class="card">
       <label>الاسم</label>
       <input class="field" id="edit-pname-${p.id}" value="${escapeHtml(p.name)}" />
       <label style="margin-top:10px;">كود الدخول</label>
@@ -15004,22 +15167,34 @@ function renderAdminParticipantDetail(p){
         <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
         <input type="file" accept="image/*" id="edit-pphoto-${p.id}" style="font-size:11px;flex:1;" />
       </div>
+      
+      <div class="admin-edit-actions" style="margin-top:14px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" data-action="save-participant" data-pid="${p.id}">حفظ</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-edit-participant">إلغاء</button>
+      </div>
+    </div>
+    ${adminSectionTitle('🔐','إجراءات حساسة')}
+    <div class="card admin-danger-zone">
+      <button type="button" class="btn btn-ghost" style="margin-top:0;width:100%;" data-action="admin-reset-visa-pin" data-pid="${p.id}">🔑 إعادة تعيين الرقم السري للفيزا</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="delete-participant" data-pid="${p.id}">🗑️ حذف المشارك نهائيًا</button>
+    </div>`;
+  } else if(sub==='points'){
+    bodyHtml = `
+    <div class="card">
       <label style="margin-top:10px;">إضافة / خصم نقاط بونص (الرصيد الحالي من البونص: ${bonusOf(p.id)})</label>
       <div class="point-stepper">
         <button type="button" class="ps-btn ps-minus" data-action="apply-participant-bonus" data-pid="${p.id}" data-sign="-1">−</button>
         <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="edit-pbonus-${p.id}" placeholder="0" />
         <button type="button" class="ps-btn ps-plus" data-action="apply-participant-bonus" data-pid="${p.id}" data-sign="1">+</button>
       </div>
-      <div class="admin-edit-actions" style="margin-top:14px;">
-        <button type="button" class="btn btn-primary" style="flex:1;" data-action="save-participant" data-pid="${p.id}">حفظ</button>
-        <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-edit-participant">إلغاء</button>
-      </div>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;" data-action="admin-reset-visa-pin" data-pid="${p.id}">🔑 إعادة تعيين الرقم السري للفيزا</button>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;color:var(--danger);" data-action="delete-participant" data-pid="${p.id}">🗑️ حذف المشارك نهائيًا</button>
-      ${renderParticipantPrivatePhotosBlock(p.id)}
-      ${attendanceBlock}
+      
     </div>
-  `;
+    ${adminSectionTitle('📋','سجل الحضور')}
+    <div class="card">${attendanceBlock}</div>`;
+  } else {
+    bodyHtml = `<div class="card">${renderParticipantPrivatePhotosBlock(p.id)}</div>`;
+  }
+  return heroHtml + bodyHtml;
 }
 function renderParticipantPrivatePhotosBlock(pid){
   const ids = PARTICIPANT_PHOTOS[pid] || [];
@@ -15032,7 +15207,7 @@ function renderParticipantPrivatePhotosBlock(pid){
   }).join('');
   const pendingN = pendingUploadsCountForParticipant(pid);
   return `
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+    <div style="margin-top:0;">
       <div class="admin-session-name" style="margin-bottom:4px;">📷 صور المشارك (Photo) — خاصة بيه بس</div>
       <div class="hint" style="margin:0 0 10px;">الصور دي هتظهر للمشارك ده بس في خانة "Photo" الخاصة بيه، ومش هتظهر لأي مشارك تاني ولا في المعرض العام</div>
       ${ids.length ? `<div class="pphoto-grid">${thumbs}</div>` : `<div class="empty-note" style="padding:10px 0;">لسه مفيش صور مرفوعة لهذا المشارك</div>`}
@@ -15050,10 +15225,16 @@ function renderAdminTeamsTab(){
   const isEditing = !!state.editingTeamId;
   if(isEditing){
     const t = TEAMS.find(x=>x.id===state.editingTeamId);
+    if(!t){ state.editingTeamId = null; return renderAdminTeamsTab(); }
     const members = PARTICIPANTS.filter(p=>p.teamId===t.id).slice().sort((a,b)=>participantTotal(b.id)-participantTotal(a.id));
     const otherTeams = TEAMS.filter(x=>x.id!==t.id);
+    const rt = rankedTeams();
+    const total = (rt.find(x=>x.id===t.id)||{}).total || 0;
+    const rank = rt.findIndex(x=>x.id===t.id)+1;
+    const leader = members.find(m=>m.id===t.leaderId);
+    const sub = adminSubGet('team:'+t.id,'info');
     const leaderOptions = `<option value="">— بدون قائد —</option>` + members.map(m=>`<option value="${m.id}" ${t.leaderId===m.id?'selected':''}>${escapeHtml(m.name)}</option>`).join('');
-    const membersHtml = members.map(m=>`<div class="admin-member-tile ${t.leaderId===m.id?'is-leader':''}">
+    const membersHtml = members.map(m=>`<div class="admin-member-tile ${t.leaderId===m.id?'is-leader':''}" data-search="${escapeHtml((m.name+' '+m.id).toLowerCase())}">
         ${t.leaderId===m.id?'<span class="amt-crown">👑</span>':''}
         <div class="avatar" style="background:${t.color};">${initials(m.name)}</div>
         <div class="amt-name">${escapeHtml(m.name)}</div>
@@ -15062,17 +15243,25 @@ function renderAdminTeamsTab(){
           <option value="">نقل لفريق آخر...</option>
           ${otherTeams.map(ot=>`<option value="${ot.id}">${escapeHtml(ot.name)}</option>`).join('')}
         </select>
-      </div>`).join('') || `<div class="empty-note">لا يوجد أعضاء في هذا الفريق</div>`;
-    return `
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="avatar" style="width:52px;height:52px;${t.logo?`background-image:url('${t.logo}');background-size:cover;background-position:center;`:`background:${t.color};`}">${t.logo?'':'👥'}</div>
-          <div style="flex:1;">
-            <div style="font-family:'Cairo',sans-serif;font-weight:800;">${escapeHtml(t.name)}</div>
-            <div style="font-size:11px;color:var(--text-muted);">${members.length} عضو — ${rankedTeams().find(x=>x.id===t.id).total} نقطة</div>
+      </div>`).join('');
+    const hero = `
+      <div class="admin-hero">
+        <div class="avatar" style="width:52px;height:52px;${t.logo?`background-image:url('${t.logo}');background-size:cover;background-position:center;`:`background:${t.color};`}">${t.logo?'':'👥'}</div>
+        <div class="admin-hero-body">
+          <div class="admin-hero-name">${escapeHtml(t.name)}</div>
+          <div class="admin-hero-meta">
+            <span class="admin-meta-chip">🏆 المركز #${rank}</span>
+            ${leader?`<span class="admin-meta-chip">👑 ${escapeHtml(leader.name)}</span>`:''}
           </div>
         </div>
-        <label style="margin-top:12px;">اسم الفريق</label>
+      </div>
+      ${adminKpis([{num:members.length,lab:'عضو'},{num:total,lab:'نقطة'},{num:TEAM_BONUS[t.id]||0,lab:'بونص الفريق'}])}
+      ${adminSubTabs('team:'+t.id, [{id:'info',label:'⚙️ البيانات'},{id:'members',label:'👥 الأعضاء ('+members.length+')'},{id:'msg',label:'💬 رسالة'}], sub)}`;
+    let body = '';
+    if(sub==='info'){
+      body = `
+      <div class="card">
+        <label>اسم الفريق</label>
         <input class="field" id="edit-tname-${t.id}" value="${escapeHtml(t.name)}" placeholder="اسم الفريق" />
         <label style="margin-top:10px;">شعار الفريق</label>
         <input type="file" accept="image/*" id="edit-tlogo-${t.id}" style="font-size:11px;" />
@@ -15085,22 +15274,26 @@ function renderAdminTeamsTab(){
           <button type="button" class="ps-btn ps-plus" data-action="apply-team-bonus" data-tid="${t.id}" data-sign="1">+</button>
         </div>
         <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="save-team" data-tid="${t.id}">حفظ التغييرات</button>
-      </div>
-      <div class="section-title">رسالة جماعية للفريق</div>
+      </div>`;
+    } else if(sub==='members'){
+      const search = members.length>6 ? `<input type="text" class="field admin-search-input" data-filter-target=".admin-member-tile" placeholder="🔍 دور على عضو..." style="margin-bottom:10px;" />` : '';
+      body = members.length ? `${search}<div class="admin-member-grid">${membersHtml}</div>` : adminEmptyState('👥','لا يوجد أعضاء في هذا الفريق','انقل مشاركين إليه من صفحة المشارك أو من فريق آخر');
+    } else {
+      body = `
       <div class="card">
-        <textarea class="field" id="team-broadcast-${t.id}" placeholder="اكتب رسالة لكل أعضاء ${escapeHtml(t.name)}..." style="min-height:70px;"></textarea>
-        <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="send-team-broadcast" data-tid="${t.id}">إرسال للفريق</button>
-      </div>
-      <div class="section-title">أعضاء الفريق</div>
-      <div class="admin-member-grid">${membersHtml}</div>
-      <button type="button" class="btn btn-ghost" style="margin-top:12px;width:100%;" data-action="cancel-edit-team">◀ رجوع لكل الفرق</button>
-    `;
+        <label>رسالة لكل أعضاء ${escapeHtml(t.name)}</label>
+        <textarea class="field" id="team-broadcast-${t.id}" placeholder="اكتب رسالة لكل أعضاء ${escapeHtml(t.name)}..." style="min-height:80px;"></textarea>
+        <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-team-broadcast" data-tid="${t.id}">إرسال للفريق</button>
+      </div>`;
+    }
+    return hero + body;
   }
-  const teamsSorted = TEAMS.slice().sort((a,b)=> rankedTeams().find(x=>x.id===b.id).total - rankedTeams().find(x=>x.id===a.id).total);
+  const rt = rankedTeams();
+  const teamsSorted = TEAMS.slice().sort((a,b)=> rt.find(x=>x.id===b.id).total - rt.find(x=>x.id===a.id).total);
   const rankClass = i => i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
   const teamCards = teamsSorted.map((t,i)=>{
     const members = PARTICIPANTS.filter(p=>p.teamId===t.id);
-    const total = rankedTeams().find(x=>x.id===t.id).total;
+    const total = rt.find(x=>x.id===t.id).total;
     return `<div class="admin-team-tile" data-action="open-edit-team" data-tid="${t.id}">
       <span class="att-chev">${ICO.chev}</span>
       <span class="att-rank ${rankClass(i)}">#${i+1}</span>
@@ -15110,106 +15303,142 @@ function renderAdminTeamsTab(){
       <div class="att-meta">${members.length} عضو${t.leaderId?` · قائد: ${escapeHtml((members.find(m=>m.id===t.leaderId)||{}).name||'')}`:''}</div>
     </div>`;
   }).join('');
-  return `
-    <div class="admin-team-grid">${teamCards}</div>
-    <div class="admin-glass-box">
-      <div class="admin-glass-title">➕ إضافة فريق جديد</div>
+  const top = teamsSorted[0];
+  const totalPts = rt.reduce((a,t)=>a+t.total,0);
+  const addBody = `
       ${state.addingTeam ? `
         <input class="field" id="new-team-name" placeholder="اسم الفريق الجديد" />
         <div style="display:flex;gap:8px;margin-top:10px;">
           <button type="button" class="btn btn-primary" style="flex:1;" data-action="submit-add-team">إضافة</button>
           <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-add-team">إلغاء</button>
         </div>
-      ` : `<button type="button" class="btn btn-primary" style="width:100%;" data-action="open-add-team">➕ إضافة فريق جديد</button>`}
-    </div>
-    <div class="section-title">رسالة لكل الفرق</div>
-    <div class="card">
+      ` : `<button type="button" class="btn btn-primary" style="width:100%;" data-action="open-add-team">➕ إضافة فريق جديد</button>`}`;
+  const bcastBody = `
       <textarea class="field" id="all-teams-broadcast" placeholder="اكتب رسالة تصل لكل المشاركين في كل الفرق..." style="min-height:70px;"></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="send-all-teams-broadcast">إرسال للجميع</button>
-    </div>
+      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-all-teams-broadcast">إرسال للجميع</button>`;
+  return `
+    ${adminKpis([{num:TEAMS.length,lab:'فريق'},{num:PARTICIPANTS.length,lab:'مشارك'},{num:top?escapeHtml(top.name):'—',lab:'المتصدر'},{num:totalPts,lab:'إجمالي النقاط'}])}
+    ${adminSectionTitle('🏆','ترتيب الفرق')}
+    <div class="admin-team-grid">${teamCards}</div>
+    ${adminSectionTitle('🛠️','إدارة')}
+    <div class="admin-glass-box"><div class="admin-glass-title">➕ فريق جديد</div>${addBody}</div>
+    ${adminCollapse('teams-bcast','📣','رسالة لكل الفرق','إرسال رسالة لكل المشاركين دفعة واحدة', bcastBody)}
   `;
 }
 
 /* ============================= ADMIN: ALERTS / NOTIFICATIONS TAB ============================= */
 function renderAdminAlertsTab(){
   const pending = ADMIN_ALERTS.filter(a=>!a.sent).sort((a,b)=>a.sendAt-b.sendAt);
-  const sent = ADMIN_ALERTS.filter(a=>a.sent).sort((a,b)=>b.sendAt-a.sendAt).slice(0,15);
+  const sentAll = ADMIN_ALERTS.filter(a=>a.sent).sort((a,b)=>b.sendAt-a.sendAt);
+  const sent = sentAll.slice(0,15);
+  const sub = adminSubGet('alerts','send');
   const hourOptions = Array.from({length:12},(_,i)=>i+1).map(h=>`<option value="${h}">${h}</option>`).join('');
   const minuteOptions = ['00','05','10','15','20','25','30','35','40','45','50','55'].map(m=>`<option value="${m}">${m}</option>`).join('');
-  const pendingHtml = pending.length ? pending.map(a=>`<div class="card" style="margin-bottom:8px;">
-      <div style="font-size:13px;line-height:1.6;">${escapeHtml(a.text)}</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">⏰ مجدولة الساعة ${a.hLabel}</div>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;padding:8px;font-size:11.5px;" data-action="cancel-admin-alert" data-id="${a.id}">إلغاء الجدولة</button>
-    </div>`).join('') : `<div class="empty-note">لا توجد تنبيهات مجدولة حاليًا</div>`;
-  const sentHtml = sent.length ? sent.map(a=>`<div class="card" style="margin-bottom:8px;opacity:.7;">
-      <div style="font-size:12.5px;line-height:1.6;">${escapeHtml(a.text)}</div>
-      <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;">✔️ أُرسلت</div>
-    </div>`).join('') : '';
 
-  const dailyHour24 = DAILY_MESSAGE?.hour ?? 8;
-  const dailyAmpm = dailyHour24 >= 12 ? 'PM' : 'AM';
-  const dailyHour12 = ((dailyHour24 % 12) || 12);
-  const dailyMinute = String(DAILY_MESSAGE?.minute ?? 0).padStart(2,'0');
-  const dailyHourOptions = Array.from({length:12},(_,i)=>i+1).map(h=>`<option value="${h}" ${h===dailyHour12?'selected':''}>${h}</option>`).join('');
-  const dailyMinuteOptions = ['00','05','10','15','20','25','30','35','40','45','50','55'].map(m=>`<option value="${m}" ${m===dailyMinute?'selected':''}>${m}</option>`).join('');
+  const kpis = adminKpis([
+    {num:PARTICIPANTS.length, lab:'مستلم محتمل'},
+    {num:pending.length, lab:'مجدولة', cls:pending.length?'is-alert':''},
+    {num:sentAll.length, lab:'أُرسلت'},
+    {num:(DAILY_MESSAGE && DAILY_MESSAGE.text) ? 'مفعّلة' : 'متوقفة', lab:'الرسالة الصباحية'},
+  ]);
+  const tabs = adminSubTabs('alerts', [
+    {id:'send', label:'✉️ إرسال'},
+    {id:'scheduled', label:'⏰ المجدولة', badge:pending.length||''},
+    {id:'history', label:'🕓 السجل'},
+    {id:'daily', label:'☀️ صباحية'},
+  ], sub);
 
-  const participantOptions = PARTICIPANTS.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-  const teamOptions2 = TEAMS.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-
-  return `
-    <div class="admin-glass-box">
-      <div class="admin-glass-title">📢 تنبيه عام</div>
-      <label>نص التنبيه</label>
-      <textarea class="field" id="alert-text" placeholder="اكتب رسالة التنبيه اللي هتوصل لكل المشاركين..." style="min-height:80px;"></textarea>
-      <div class="settings-row" style="margin-top:12px;">
-        <span>إرسال فوري الآن</span>
-        <button type="button" class="switch ${state.alertImmediate!==false?'on':''}" data-action="toggle-alert-immediate"></button>
-      </div>
-      ${state.alertImmediate===false ? `
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <select class="field" id="alert-hour" style="flex:1;">${hourOptions}</select>
-        <select class="field" id="alert-minute" style="flex:1;">${minuteOptions}</select>
-        <select class="field" id="alert-ampm" style="flex:1;">
-          <option value="AM">AM</option>
-          <option value="PM">PM</option>
-        </select>
-      </div>` : ''}
-      <button type="button" class="btn btn-primary" style="margin-top:14px;width:100%;" data-action="submit-admin-alert">${state.alertImmediate!==false?'📢 إرسال الآن':'⏰ جدولة الإرسال'}</button>
-    </div>
-
-    <div class="admin-glass-box">
-      <div class="admin-glass-title">☀️ الرسالة الصباحية اليومية</div>
-      <div class="hint" style="margin:0 0 10px;">بتتبعت تلقائيًا لكل مشارك مرة واحدة يوميًا في الميعاد اللي تحدده</div>
-      <textarea class="field" id="daily-msg-text" placeholder="اكتب رسالة صباحية ملهمة للمشاركين..." style="min-height:70px;">${escapeHtml(DAILY_MESSAGE?.text||'')}</textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <select class="field" id="daily-msg-hour" style="flex:1;">${dailyHourOptions}</select>
-        <select class="field" id="daily-msg-min" style="flex:1;">${dailyMinuteOptions}</select>
-        <select class="field" id="daily-msg-ampm" style="flex:1;">
-          <option value="AM" ${dailyAmpm==='AM'?'selected':''}>AM</option>
-          <option value="PM" ${dailyAmpm==='PM'?'selected':''}>PM</option>
-        </select>
-      </div>
-      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="save-daily-message">حفظ الرسالة الصباحية</button>
-    </div>
-
-    <div class="admin-glass-box">
-      <div class="admin-glass-title">👤 رسالة لمشارك معين</div>
-      <select class="field" id="alert-participant-select">${participantOptions}</select>
-      <textarea class="field" id="alert-participant-msg" placeholder="اكتب رسالة خاصة للمشارك المحدد..." style="min-height:60px;margin-top:10px;"></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="send-participant-alert">إرسال للمشارك</button>
-    </div>
-
-    <div class="admin-glass-box">
-      <div class="admin-glass-title">👥 رسالة لفريق معين</div>
-      <select class="field" id="alert-team-select">${teamOptions2}</select>
-      <textarea class="field" id="alert-team-msg" placeholder="اكتب رسالة لكل أعضاء الفريق المحدد..." style="min-height:60px;margin-top:10px;"></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="send-team-alert">إرسال للفريق</button>
-    </div>
-
-    <div class="section-title">تنبيهات مجدولة</div>
-    ${pendingHtml}
-    ${sentHtml ? `<div class="section-title">آخر التنبيهات المُرسلة</div>${sentHtml}` : ''}
-  `;
+  let body = '';
+  if(sub==='send'){
+    const target = adminSubGet('alerts-target','all');
+    const tt = adminSubTabs('alerts-target', [
+      {id:'all', label:'👥 للجميع'},
+      {id:'team', label:'🏷️ لفريق'},
+      {id:'person', label:'👤 لمشارك'},
+    ], target);
+    const participantOptions = PARTICIPANTS.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    const teamOptions2 = TEAMS.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+    if(target==='all'){
+      body = `
+      <div class="admin-glass-box">
+        <div class="admin-glass-title">📢 تنبيه عام لكل المشاركين</div>
+        <label>نص التنبيه</label>
+        <textarea class="field" id="alert-text" placeholder="اكتب رسالة التنبيه اللي هتوصل لكل المشاركين..." style="min-height:80px;"></textarea>
+        <div class="settings-row" style="margin-top:12px;">
+          <span>إرسال فوري الآن</span>
+          <button type="button" class="switch ${state.alertImmediate!==false?'on':''}" data-action="toggle-alert-immediate"></button>
+        </div>
+        ${state.alertImmediate===false ? `
+        <div class="hint" style="margin:10px 0 6px;">ميعاد الإرسال</div>
+        <div style="display:flex;gap:8px;">
+          <select class="field" id="alert-hour" style="flex:1;">${hourOptions}</select>
+          <select class="field" id="alert-minute" style="flex:1;">${minuteOptions}</select>
+          <select class="field" id="alert-ampm" style="flex:1;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>` : ''}
+        <button type="button" class="btn btn-primary" style="margin-top:14px;width:100%;" data-action="submit-admin-alert">${state.alertImmediate!==false?'📢 إرسال الآن':'⏰ جدولة الإرسال'}</button>
+      </div>`;
+    } else if(target==='team'){
+      body = `
+      <div class="admin-glass-box">
+        <div class="admin-glass-title">🏷️ رسالة لفريق معين</div>
+        <label>الفريق</label>
+        <select class="field" id="alert-team-select">${teamOptions2}</select>
+        <label style="margin-top:10px;">الرسالة</label>
+        <textarea class="field" id="alert-team-msg" placeholder="اكتب رسالة لكل أعضاء الفريق المحدد..." style="min-height:70px;"></textarea>
+        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="send-team-alert">إرسال للفريق</button>
+      </div>`;
+    } else {
+      body = `
+      <div class="admin-glass-box">
+        <div class="admin-glass-title">👤 رسالة لمشارك معين</div>
+        <label>المشارك</label>
+        <select class="field" id="alert-participant-select">${participantOptions}</select>
+        <label style="margin-top:10px;">الرسالة</label>
+        <textarea class="field" id="alert-participant-msg" placeholder="اكتب رسالة خاصة للمشارك المحدد..." style="min-height:70px;"></textarea>
+        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="send-participant-alert">إرسال للمشارك</button>
+      </div>`;
+    }
+    body = tt + body;
+  } else if(sub==='scheduled'){
+    body = pending.length ? pending.map(a=>`<div class="admin-item-card is-pending">
+      <div class="admin-item-head"><span class="admin-meta-chip">⏰ الساعة ${a.hLabel}</span></div>
+      <div class="admin-item-text">${escapeHtml(a.text)}</div>
+      <div class="admin-item-actions"><button type="button" class="btn btn-ghost" data-action="cancel-admin-alert" data-id="${a.id}">إلغاء الجدولة</button></div>
+    </div>`).join('') : adminEmptyState('⏰','لا توجد تنبيهات مجدولة','جدولة تنبيه جديد من تبويب "إرسال" بإيقاف خيار الإرسال الفوري');
+  } else if(sub==='history'){
+    body = sent.length ? `<div class="hint" style="margin-bottom:10px;">آخر ${sent.length} تنبيه أُرسل</div>` + sent.map(a=>`<div class="admin-item-card is-done">
+      <div class="admin-item-head"><span class="admin-meta-chip">✔️ أُرسلت</span></div>
+      <div class="admin-item-text">${escapeHtml(a.text)}</div>
+    </div>`).join('') : adminEmptyState('🕓','لسه مفيش تنبيهات اتبعتت','السجل هيظهر هنا بعد أول تنبيه');
+  } else {
+    const dailyHour24 = DAILY_MESSAGE?.hour ?? 8;
+    const dailyAmpm = dailyHour24 >= 12 ? 'PM' : 'AM';
+    const dailyHour12 = ((dailyHour24 % 12) || 12);
+    const dailyMinute = String(DAILY_MESSAGE?.minute ?? 0).padStart(2,'0');
+    const dailyHourOptions = Array.from({length:12},(_,i)=>i+1).map(h=>`<option value="${h}" ${h===dailyHour12?'selected':''}>${h}</option>`).join('');
+    const dailyMinuteOptions = ['00','05','10','15','20','25','30','35','40','45','50','55'].map(m=>`<option value="${m}" ${m===dailyMinute?'selected':''}>${m}</option>`).join('');
+    body = `
+      <div class="admin-glass-box">
+        <div class="admin-glass-title">☀️ الرسالة الصباحية اليومية</div>
+        <div class="hint" style="margin:0 0 10px;">بتتبعت تلقائيًا لكل مشارك مرة واحدة يوميًا في الميعاد اللي تحدده</div>
+        <label>نص الرسالة</label>
+        <textarea class="field" id="daily-msg-text" placeholder="اكتب رسالة صباحية ملهمة للمشاركين..." style="min-height:80px;">${escapeHtml(DAILY_MESSAGE?.text||'')}</textarea>
+        <label style="margin-top:10px;">وقت الإرسال</label>
+        <div style="display:flex;gap:8px;">
+          <select class="field" id="daily-msg-hour" style="flex:1;">${dailyHourOptions}</select>
+          <select class="field" id="daily-msg-min" style="flex:1;">${dailyMinuteOptions}</select>
+          <select class="field" id="daily-msg-ampm" style="flex:1;">
+            <option value="AM" ${dailyAmpm==='AM'?'selected':''}>AM</option>
+            <option value="PM" ${dailyAmpm==='PM'?'selected':''}>PM</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="save-daily-message">حفظ الرسالة الصباحية</button>
+      </div>`;
+  }
+  return kpis + tabs + body;
 }
 
 /* ============================= MASTER RENDER ============================= */
@@ -16524,10 +16753,12 @@ document.addEventListener('click', (e)=>{
     else if(t==='chefs' && state.editingChefId){ state.editingChefId = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
     else if(t==='teams' && state.editingTeamId){ state.editingTeamId = null; }
-    else if(t==='teams' && state.addingTeam){ state.addingTeam = false; }
     else { state.adminHub = true; state.adminDayId = null; state.editingChefId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
   }
+  else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
+  else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
+  else if(action==='admin-rank-all'){ state.adminRankAll = !state.adminRankAll; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
   else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.editingTeamId = null; state.addingTeam = false; state.editingChefId = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
@@ -17627,6 +17858,8 @@ function renderAdminStickersSubTab(){
     </div>`;
   }).join('');
   return `
+    ${adminKpis([{num:CUSTOM_STICKERS.length,lab:'استيكر'},{num:storeOpen?'مفتوح':'مقفول',lab:'حالة الـ Shop',cls:storeOpen?'is-ok':'is-alert'}])}
+    ${adminSectionTitle('⚙️','الإعدادات')}
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div>
         <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🛍️ الـ Shop مفتوح؟</div>
@@ -17634,6 +17867,7 @@ function renderAdminStickersSubTab(){
       </div>
       <button type="button" class="switch ${storeOpen?'on':''}" data-action="toggle-sticker-store"></button>
     </div>
+    ${adminSectionTitle('📤','رفع')}
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎨 رفع استيكرات جديدة</div>
       <div class="hint" style="margin:0 0 10px;">اختار صور بخلفية شفافة (PNG) من الهاتف — هتتضاف لتاب الاستيكرات في الـ Shop، والمشارك يقدر يشتريها بنقاطه وتتضاف لقائمة استيكراته هو بس</div>
@@ -17643,8 +17877,8 @@ function renderAdminStickersSubTab(){
         <input type="file" accept="image/*" multiple id="sticker-admin-upload" style="display:none;" />
       </label>
     </div>
-    <div class="admin-day-title">الاستيكرات الحالية (${CUSTOM_STICKERS.length})</div>
-    ${items ? `<div class="admin-sticker-grid">${items}</div>` : `<div class="empty-note">لسه مفيش استيكرات مرفوعة</div>`}
+    ${adminSectionTitle('🖼️','الاستيكرات الحالية ('+CUSTOM_STICKERS.length+')')}
+    ${items ? `<div class="admin-sticker-grid">${items}</div>` : adminEmptyState('🎨','لسه مفيش استيكرات مرفوعة','ارفع أول استيكر من الأعلى')}
   `;
 }
 function renderAdminCardThemeSubTab(tier){
