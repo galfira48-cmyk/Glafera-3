@@ -922,6 +922,38 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   html[data-theme="light"] .tap-ripple{background:rgba(30,24,10,.25);}
   @keyframes tapRippleAnim{ to{ transform:scale(2.6); opacity:0; } }
 
+
+  /* ---------- admin: organized hub (groups, search, status strip) ---------- */
+  .admin-hub-search{ margin-bottom:var(--a-pad); }
+  .admin-hub-group{ margin-bottom:var(--a-pad); }
+  .admin-hub-group-title{ display:flex; align-items:center; gap:8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px;
+    color:var(--gold); margin:4px 2px 10px; letter-spacing:.2px; }
+  .admin-hub-group-title::after{ content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .admin-hub-group-title .ahg-count{ font-size:10.5px; font-weight:700; color:var(--text-muted); order:3; }
+  .admin-hub-empty{ display:none; text-align:center; color:var(--text-muted); font-size:12.5px; padding:24px 0; }
+  button.admin-stat-cell{ background:transparent; border:none; border-inline-start:1px solid var(--border); color:inherit; font:inherit; cursor:pointer; padding:0; }
+  button.admin-stat-cell:first-child{ border-inline-start:none; }
+  button.admin-stat-cell:active{ transform:scale(.94); }
+  .admin-stat-cell.is-alert .admin-stat-num{ color:var(--danger); }
+  .admin-stat-cell.is-ok .admin-stat-num{ color:var(--good); }
+  /* ---------- admin: collapsible tools panel ---------- */
+  .admin-collapse-head{ width:100%; display:flex; align-items:center; gap:10px; padding:12px var(--a-pad); margin-bottom:var(--a-gap-sm);
+    background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-md); color:var(--text); font-family:'Cairo',sans-serif;
+    font-weight:800; font-size:13px; text-align:right; box-shadow:var(--a-shadow-tile); transition:transform .15s ease, border-color .15s ease; }
+  .admin-collapse-head:active{ transform:scale(.98); }
+  .admin-collapse-head.open{ border-color:var(--gold-2); }
+  .admin-collapse-head .ach-sub{ display:block; font-weight:500; font-size:10.5px; color:var(--text-muted); margin-top:2px; }
+  .admin-collapse-head .ach-chev{ margin-inline-start:auto; transition:transform .2s ease; opacity:.7; }
+  .admin-collapse-head.open .ach-chev{ transform:rotate(180deg); }
+  .admin-collapse-body{ margin-bottom:var(--a-pad); }
+  .admin-actions-row{ display:flex; gap:var(--a-gap-sm); margin-bottom:var(--a-pad); }
+  .admin-actions-row .btn{ flex:1; }
+  .admin-section-title{ display:flex; align-items:center; gap:8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--gold);
+    margin:22px 2px 10px; }
+  .admin-section-title:first-child{ margin-top:2px; }
+  .admin-section-title::after{ content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .admin-danger-zone{ border-color:rgba(214,71,58,.35)!important; }
+
   /* ---------- admin: shared entrance animation + tactile feedback ---------- */
   @keyframes aRise{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
   .admin-hub-tile, .admin-day-tile, .admin-session-tile, .admin-participant-tile,
@@ -6030,7 +6062,7 @@ function avgRatingOverall(){
 }
 
 /* ============================= STATE ============================= */
-const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
+const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminToolsOpen:false, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
 let state = FRESH_STATE();
 
 /* ============================= جلسة الجهاز الواحد (منع فتح نفس الكود من جهازين في نفس الوقت) ============================= */
@@ -14015,7 +14047,6 @@ function renderAdminSessionsTab(){
   return `
     <div class="hint" style="margin-bottom:14px;">اضغط على أي يوم لعرض وتعديل فقراته</div>
     <div class="admin-day-grid">${tiles}</div>
-    <button class="btn btn-ghost" data-action="reset-demo" style="margin-top:16px;">إعادة تعيين بيانات الحضور (تجريبي)</button>
   `;
 }
 function renderAdminDayDetail(dayId){
@@ -14235,12 +14266,18 @@ function renderAdminAuditTab(){
   const rows = entries.map(e=>{
     const d = new Date(e.ts);
     const timeStr = d.toLocaleString('ar-EG', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit' });
-    return `<div class="audit-row">
+    return `<div class="audit-row" data-search="${escapeHtml((e.name+' '+e.pid+' '+e.sessionName+' '+e.team).toLowerCase())}">
       <div class="audit-left">${escapeHtml(e.name)}<div class="audit-sub">${escapeHtml(e.sessionName)} · ${e.team} · +${e.points}ن</div></div>
       <div class="audit-time">${timeStr}</div>
     </div>`;
   }).join('');
-  return `<div class="card">${rows}</div>`;
+  return `
+    <div class="admin-stat-strip">
+      <div class="admin-stat-cell"><div class="admin-stat-num">${entries.length}</div><div class="admin-stat-lab">تسجيل حضور</div></div>
+      <div class="admin-stat-cell"><div class="admin-stat-num">${new Set(entries.map(e=>e.pid)).size}</div><div class="admin-stat-lab">مشارك حضر</div></div>
+    </div>
+    <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم أو الفقرة أو الفريق..." style="margin-bottom:10px;" />
+    <div class="card">${rows}</div>`;
 }
 
 function renderAdminAnalyticsTab(){
@@ -14327,7 +14364,7 @@ function renderAdminLogisticsTab(){
           <button type="button" class="btn btn-ghost" data-action="cancel-edit-logistics" style="flex:1;">إلغاء</button>
         </div>
       </div>` : '';
-    return `<div class="admin-session">
+    return `<div class="admin-session admin-lg-row" data-search="${escapeHtml((p.name+' '+p.id+' '+(lg.room||'')+' '+(lg.busNumber||'')).toLowerCase())}">
       <div class="admin-session-top">
         <div style="flex:1;">
           <div style="font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;">${escapeHtml(p.name)}</div>
@@ -14338,7 +14375,16 @@ function renderAdminLogisticsTab(){
       ${form}
     </div>`;
   }).join('');
+  const kitDone = PARTICIPANTS.filter(p=>{ const k=(logisticsOf(p.id).kit)||{}; return KIT_ITEMS.length && KIT_ITEMS.every(it=>k[it.key]); }).length;
+  const arrived = PARTICIPANTS.filter(p=>logisticsOf(p.id).tripStatus==='arrived').length;
+  const roomed = PARTICIPANTS.filter(p=>logisticsOf(p.id).room).length;
   return `
+    <div class="admin-stat-strip">
+      <div class="admin-stat-cell"><div class="admin-stat-num">${roomed}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">لهم غرفة</div></div>
+      <div class="admin-stat-cell"><div class="admin-stat-num">${kitDone}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">استلموا الكيت كامل</div></div>
+      <div class="admin-stat-cell"><div class="admin-stat-num">${arrived}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">وصلوا</div></div>
+    </div>
+    <input type="text" class="field admin-search-input" data-filter-target=".admin-lg-row" placeholder="🔍 دور بالاسم أو الكود أو الغرفة أو الأتوبيس..." style="margin-bottom:10px;" />
     <div class="admin-day-title">بيانات المشاركين (إقامة، مواصلات، كيت)</div>
     <div class="card">${rows}</div>
   `;
@@ -14351,6 +14397,7 @@ function renderAdminSettingsTab(){
   const startAt = CONF_SETTINGS.startAt || '';
   const endAt = CONF_SETTINGS.endAt || '';
   return `
+    <div class="admin-section-title"><span>📅</span><span>التوقيت وحالة المؤتمر</span></div>
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">توقيت المؤتمر (للعداد)</div>
       <div class="hint" style="margin:2px 0 12px;">هيتحسب عليها العداد التنازلي وشريط تقدّم المؤتمر اللي بيظهر لكل مشارك</div>
@@ -14362,22 +14409,21 @@ function renderAdminSettingsTab(){
         <button type="button" class="btn btn-primary" data-action="save-conf-dates" style="flex:1;">حفظ التوقيت</button>
       </div>
     </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">شكل اسم المشارك</div>
-      <div class="hint" style="margin:2px 0 12px;">تتحكم في حجم ونوع خط اسم المشارك اللي بيظهر على بطاقته في الصفحة الرئيسية</div>
-      <label>حجم الخط: <span id="name-font-size-val">${CONF_SETTINGS.nameFontSize||15}px</span></label>
-      <input type="range" id="name-font-size" min="11" max="26" step="1" value="${CONF_SETTINGS.nameFontSize||15}"
-        oninput="document.getElementById('name-font-size-val').textContent=this.value+'px'" style="width:100%;accent-color:var(--gold);" />
-      <label style="margin-top:12px;">نوع الخط</label>
-      <select id="name-font-family" class="field">
-        <option value="Tajawal" ${(CONF_SETTINGS.nameFontFamily||'Tajawal')==='Tajawal'?'selected':''}>Tajawal (افتراضي)</option>
-        <option value="Cairo" ${CONF_SETTINGS.nameFontFamily==='Cairo'?'selected':''}>Cairo</option>
-        <option value="Cormorant Garamond" ${CONF_SETTINGS.nameFontFamily==='Cormorant Garamond'?'selected':''}>Cormorant Garamond (أنيق)</option>
-      </select>
-      <div class="admin-edit-actions" style="margin-top:12px;">
-        <button type="button" class="btn btn-primary" data-action="save-name-font" style="flex:1;">حفظ شكل الاسم</button>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">المؤتمر انتهى؟</div>
+        <div class="hint" style="margin:2px 0 0;">تفعيل هذا الخيار يتيح تحميل الشهادات للمشاركين</div>
       </div>
+      <button type="button" class="switch ${ended?'on':''}" data-action="toggle-conf-ended"></button>
     </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 قفل خانة الألعاب</div>
+        <div class="hint" style="margin:2px 0 0;">هتتقفل خانة الألعاب لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID} (للمراجعة)، وترجع تفتح لما تدوس تاني</div>
+      </div>
+      <button type="button" class="switch ${CONF_SETTINGS.gamesLocked?'on':''}" data-action="toggle-games-locked"></button>
+    </div>
+    <div class="admin-section-title"><span>🎨</span><span>الهوية والمظهر</span></div>
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">لوجو المؤتمر</div>
       <div class="hint" style="margin:2px 0 12px;">هيظهر في شاشة الدخول وأعلى صفحة كل مشارك</div>
@@ -14405,20 +14451,23 @@ function renderAdminSettingsTab(){
         ${verseText?`<button type="button" class="btn btn-ghost" data-action="remove-conf-verse" style="flex:1;">حذف</button>`:''}
       </div>
     </div>
-    <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">المؤتمر انتهى؟</div>
-        <div class="hint" style="margin:2px 0 0;">تفعيل هذا الخيار يتيح تحميل الشهادات للمشاركين</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">شكل اسم المشارك</div>
+      <div class="hint" style="margin:2px 0 12px;">تتحكم في حجم ونوع خط اسم المشارك اللي بيظهر على بطاقته في الصفحة الرئيسية</div>
+      <label>حجم الخط: <span id="name-font-size-val">${CONF_SETTINGS.nameFontSize||15}px</span></label>
+      <input type="range" id="name-font-size" min="11" max="26" step="1" value="${CONF_SETTINGS.nameFontSize||15}"
+        oninput="document.getElementById('name-font-size-val').textContent=this.value+'px'" style="width:100%;accent-color:var(--gold);" />
+      <label style="margin-top:12px;">نوع الخط</label>
+      <select id="name-font-family" class="field">
+        <option value="Tajawal" ${(CONF_SETTINGS.nameFontFamily||'Tajawal')==='Tajawal'?'selected':''}>Tajawal (افتراضي)</option>
+        <option value="Cairo" ${CONF_SETTINGS.nameFontFamily==='Cairo'?'selected':''}>Cairo</option>
+        <option value="Cormorant Garamond" ${CONF_SETTINGS.nameFontFamily==='Cormorant Garamond'?'selected':''}>Cormorant Garamond (أنيق)</option>
+      </select>
+      <div class="admin-edit-actions" style="margin-top:12px;">
+        <button type="button" class="btn btn-primary" data-action="save-name-font" style="flex:1;">حفظ شكل الاسم</button>
       </div>
-      <button type="button" class="switch ${ended?'on':''}" data-action="toggle-conf-ended"></button>
     </div>
-    <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 قفل خانة الألعاب</div>
-        <div class="hint" style="margin:2px 0 0;">هتتقفل خانة الألعاب لكل المشاركين ما عدا كود ${GAMES_LOCK_REVIEWER_ID} (للمراجعة)، وترجع تفتح لما تدوس تاني</div>
-      </div>
-      <button type="button" class="switch ${CONF_SETTINGS.gamesLocked?'on':''}" data-action="toggle-games-locked"></button>
-    </div>
+    <div class="admin-section-title"><span>🔐</span><span>الأمان والنسخ الاحتياطي</span></div>
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 تغيير كود دخول المنظمين</div>
       <div class="hint" style="margin:2px 0 12px;">كود مكوّن من ${ADMIN_PASSCODE_LEN} أرقام، هيتطلب منك كل مرة تدخل بيها لوحة المنظمين</div>
@@ -14436,6 +14485,12 @@ function renderAdminSettingsTab(){
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">💾 نسخة احتياطية كاملة</div>
       <div class="hint" style="margin:2px 0 12px;">بتحمّل ملف واحد (JSON) فيه كل بيانات المؤتمر (المشاركين، النقاط، الحضور، الأكواد، الآراء، البلاغات، الصور... إلخ) على جهازك، تحسبًا لأي مشكلة. احتفظ بالملف في مكان آمن.</div>
       <button type="button" class="btn btn-primary" style="width:100%;" data-action="export-full-backup">⬇️ تحميل نسخة احتياطية كاملة (JSON)</button>
+    </div>
+    <div class="admin-section-title"><span>⚠️</span><span>منطقة الخطر</span></div>
+    <div class="card admin-danger-zone" style="margin-bottom:16px;">
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🧹 إعادة تعيين بيانات الحضور (تجريبي)</div>
+      <div class="hint" style="margin:2px 0 12px;">بتمسح كل تسجيلات الحضور. استخدمها بس بعد التجربة وقبل بداية المؤتمر.</div>
+      <button type="button" class="btn btn-ghost" style="width:100%;" data-action="reset-demo-confirm">إعادة تعيين بيانات الحضور</button>
     </div>
   `;
 }
@@ -14479,43 +14534,71 @@ function renderAdminPointCodesTab(){
 }
 
 
+const ADMIN_HUB_GROUPS = [
+  {id:'live', icon:'🔴', title:'التشغيل المباشر'},
+  {id:'people', icon:'👥', title:'المشاركون والفرق'},
+  {id:'points', icon:'🏆', title:'النقاط والتقييم'},
+  {id:'content', icon:'🎨', title:'المحتوى والمتجر'},
+  {id:'system', icon:'⚙️', title:'النظام'},
+];
 const ADMIN_HUB_ITEMS = [
-  {tab:'settings',   icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
-  {tab:'gallery',    icon:ICO.gallery, label:'معرض الصور',          color:'transparent'},
-  {tab:'chefs',      icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
-  {tab:'sessions',   icon:'🗓️', label:'الفقرات والأيام',    color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
-  {tab:'participants',icon:'👤', label:'المشاركين',          color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {tab:'teams',      icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
-  {tab:'alerts',     icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
-  {tab:'pointcodes', icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
-  {tab:'rankings',   icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
-  {tab:'audit',      icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
-  {tab:'analytics',  icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {tab:'questions',  icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
-  {tab:'opinions',   icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
-  {tab:'reports',    icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
-  {tab:'trash',      icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
-  {tab:'stickers',   icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
-  {tab:'cardshop',   icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+  {group:'live',   tab:'sessions',    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+  {group:'live',   tab:'pulse',       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'live',   tab:'alerts',      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
+  {group:'live',   tab:'questions',   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
+  {group:'live',   tab:'reports',     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
+  {group:'people', tab:'participants',icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
+  {group:'people', tab:'teams',       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {group:'people', tab:'logistics',   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
+  {group:'people', tab:'audit',       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
+  {group:'people', tab:'opinions',    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
+  {group:'points', tab:'pointcodes',  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
+  {group:'points', tab:'rankings',    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {group:'points', tab:'chefs',       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
+  {group:'points', tab:'analytics',   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'content',tab:'gallery',     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
+  {group:'content',tab:'stickers',    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {group:'content',tab:'cardshop',    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+  {group:'system', tab:'settings',    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
+  {group:'system', tab:'trash',       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
 function renderAdminHub(){
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
-  const tiles = ADMIN_HUB_ITEMS.map(it=>{
-    const badge = it.tab==='questions'&&pendingQ ? pendingQ : (it.tab==='reports'&&pendingR ? pendingR : (it.tab==='trash'&&TRASH.length ? TRASH.length : (it.tab==='cardshop'&&pendingCC ? pendingCC : 0)));
-    return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}">
+  const badgeOf = tab => tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
+  const tileHtml = it=>{
+    const badge = badgeOf(it.tab);
+    return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml(it.label.toLowerCase())}">
       ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
       <span class="admin-hub-lab">${it.label}</span>
     </button>`;
+  };
+  const groups = ADMIN_HUB_GROUPS.map(g=>{
+    const items = ADMIN_HUB_ITEMS.filter(it=>it.group===g.id);
+    if(!items.length) return '';
+    return `<section class="admin-hub-group">
+      <div class="admin-hub-group-title"><span>${g.icon}</span><span>${g.title}</span><span class="ahg-count">${items.length}</span></div>
+      <div class="admin-hub-grid">${items.map(tileHtml).join('')}</div>
+    </section>`;
   }).join('');
+  const strip = `
+    <div class="admin-stat-strip">
+      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="participants"><div class="admin-stat-num">${PARTICIPANTS.length}</div><div class="admin-stat-lab">مشارك</div></button>
+      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="teams"><div class="admin-stat-num">${TEAMS.length}</div><div class="admin-stat-lab">فريق</div></button>
+      <button type="button" class="admin-stat-cell ${pendingQ?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="questions"><div class="admin-stat-num">${pendingQ}</div><div class="admin-stat-lab">أسئلة جديدة</div></button>
+      <button type="button" class="admin-stat-cell ${pendingR?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="reports"><div class="admin-stat-num">${pendingR}</div><div class="admin-stat-lab">بلاغات مفتوحة</div></button>
+    </div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لوحة المنظمين</div>
     </div>
-    <div class="admin-hub-grid">${tiles}</div>
+    ${strip}
+    <input type="text" class="field admin-search-input admin-hub-search" data-filter-target=".admin-hub-tile" placeholder="🔍 دوّر على قسم..." />
+    ${groups}
+    <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
   `;
 }
 function renderAdmin(){
@@ -14738,15 +14821,24 @@ function renderAdminParticipantsTab(){
     </div>` : '';
   return `
     ${justAddedCard}
-    <button type="button" class="btn btn-primary" style="margin-bottom:14px;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
-    ${renderAdminBulkPointsCard()}
-    ${renderAdminGamePointsCard()}
-    ${renderAdminPointsResetCard()}
-    ${renderAdminVisaResetCard()}
+    <button type="button" class="btn btn-primary" style="margin-bottom:12px;width:100%;" data-action="open-add-participant">➕ إضافة مشارك جديد</button>
+    <button type="button" class="admin-collapse-head ${state.adminToolsOpen?'open':''}" data-action="toggle-admin-tools">
+      <span>🧰</span>
+      <span><span>أدوات النقاط والفيزا (للجميع)</span><span class="ach-sub">إضافة نقاط، نقاط ألعاب، تصفير النقاط والفيزا</span></span>
+      <span class="ach-chev">▾</span>
+    </button>
+    ${state.adminToolsOpen ? `<div class="admin-collapse-body">
+      ${renderAdminBulkPointsCard()}
+      ${renderAdminGamePointsCard()}
+      ${renderAdminPointsResetCard()}
+      ${renderAdminVisaResetCard()}
+    </div>` : ''}
+    <div class="admin-section-title"><span>👤</span><span>قائمة المشاركين (${PARTICIPANTS.length})</span></div>
     <input type="text" class="field admin-search-input" data-filter-target=".admin-participant-tile" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />
-    <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته — عددهم: ${PARTICIPANTS.length}</div>
+    <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته</div>
     <div class="admin-participant-grid">${tiles}</div>
-    <button type="button" class="btn btn-outline" style="margin-top:16px;width:100%;" data-action="download-all-qr">⬇️ تحميل كل أكواد QR الخاصة بالمشاركين</button>
+    <div class="admin-section-title"><span>📤</span><span>تصدير</span></div>
+    <button type="button" class="btn btn-outline" style="width:100%;" data-action="download-all-qr">⬇️ تحميل كل أكواد QR الخاصة بالمشاركين</button>
     <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="export-participants-xlsx">📊 تصدير تقرير Excel (الأسماء، الفرق، النقاط، الحضور)</button>
   `;
 }
@@ -16329,6 +16421,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-scan'){ openScanModal(el.dataset.mode || 'checkin', el.dataset.session); }
   else if(action==='close-scan'){ closeScanModal(); }
   else if(action==='submit-fallback-code'){ doFallbackSubmit(); }
+  else if(action==='reset-demo-confirm'){ showConfirmDialog('متأكد إنك عايز تمسح كل بيانات الحضور؟ الخطوة دي مش بترجع.', ()=>{ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }); }
+  else if(action==='toggle-admin-tools'){ state.adminToolsOpen = !state.adminToolsOpen; render(); }
   else if(action==='reset-demo'){ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }
   else if(action==='submit-admin-pass'){ doAdminUnlock(); }
   else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; state.viewingOpinionId = null; render(); }
@@ -16764,6 +16858,16 @@ document.addEventListener('input', (e)=>{
         const hay = (item.dataset.search||'').toLowerCase();
         item.style.display = (!q || hay.includes(q)) ? '' : 'none';
       });
+      if(sel==='.admin-hub-tile'){
+        let anyVisible = false;
+        document.querySelectorAll('.admin-hub-group').forEach(g=>{
+          const any = Array.from(g.querySelectorAll('.admin-hub-tile')).some(t=>t.style.display!=='none');
+          g.style.display = any ? '' : 'none';
+          if(any) anyVisible = true;
+        });
+        const em = document.getElementById('admin-hub-empty');
+        if(em) em.style.display = anyVisible ? 'none' : 'block';
+      }
     }
     return;
   }
