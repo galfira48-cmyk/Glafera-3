@@ -3228,7 +3228,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .stack-hud-score{font-size:clamp(28px,10vw,44px);}
     .stack-hint{font-size:10.5px; margin-top:6px;}
   }
-  /* ============================= GAMES: تاج الحكمة (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
+  /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
     background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
   .mil-overlay::before{content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
@@ -3285,17 +3285,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .mil-life-btn:not([disabled]):active{transform:scale(.94); background:rgba(244,183,64,.12);}
   .mil-life-btn[disabled]{opacity:.25; filter:grayscale(1); pointer-events:none;}
 
-  .mil-question{position:relative; flex-shrink:0; width:100%; max-width:640px; background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 26px; text-align:center; font-family:'Cairo',sans-serif; font-weight:700; font-size:15.5px; color:var(--text); line-height:1.55; box-shadow:0 8px 16px rgba(0,0,0,.35); animation: milQIn .3s ease-out;}
+  .mil-question{position:relative; flex-shrink:0; width:100%; max-width:640px; background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 26px; text-align:center; font-family:'Cairo',sans-serif; font-weight:700; font-size:15.5px; color:var(--text); line-height:1.55; box-shadow:0 8px 16px rgba(0,0,0,.35); overflow:hidden; animation: milQIn .6s cubic-bezier(.22,1,.36,1) both;}
   .mil-question>*{position:relative; z-index:1;}
-  @keyframes milQIn{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);}}
+  .mil-question::before{content:''; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
+    background:linear-gradient(120deg, transparent 35%, rgba(244,183,64,.4) 50%, transparent 65%);
+    background-size:220% 100%; background-position:160% 0; opacity:0; animation: milQShine 1s ease-out .25s both;}
+  @keyframes milQIn{0%{opacity:0; transform:translateY(-16px) scale(.94); filter:blur(5px);} 60%{opacity:1; filter:blur(0);} 100%{opacity:1; transform:translateY(0) scale(1); filter:blur(0);}}
+  @keyframes milQShine{0%{opacity:0; background-position:160% 0;} 12%{opacity:1;} 100%{opacity:0; background-position:-60% 0;}}
   .mil-options{display:grid; grid-template-columns:1fr 1fr; gap:9px; width:100%; max-width:640px; flex-shrink:0;}
-  .mil-option-btn{position:relative; display:flex; align-items:center; gap:10px; background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 18px; color:var(--text); font-family:'Tajawal',Arial; font-weight:600; font-size:13px; text-align:right; transition:.15s; animation: milOptIn .25s ease-out both;}
+  .mil-option-btn{position:relative; display:flex; align-items:center; gap:10px; background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 18px; color:var(--text); font-family:'Tajawal',Arial; font-weight:600; font-size:13px; text-align:right; transition:.15s; animation: milOptIn .45s cubic-bezier(.22,1,.36,1) both;}
   .mil-option-btn:not([disabled]):active{transform:scale(.98); background:var(--surface-2);}
-  .mil-option-btn:nth-of-type(1){animation-delay:.02s;}
-  .mil-option-btn:nth-of-type(2){animation-delay:.06s;}
-  .mil-option-btn:nth-of-type(3){animation-delay:.1s;}
-  .mil-option-btn:nth-of-type(4){animation-delay:.14s;}
-  @keyframes milOptIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+  .mil-option-btn:nth-of-type(1){animation-delay:.55s;}
+  .mil-option-btn:nth-of-type(2){animation-delay:.95s;}
+  .mil-option-btn:nth-of-type(3){animation-delay:1.35s;}
+  .mil-option-btn:nth-of-type(4){animation-delay:1.75s;}
+  @keyframes milOptIn{0%{opacity:0; transform:translateX(18px) scale(.94);} 65%{opacity:1; transform:translateX(-3px) scale(1.02);} 100%{opacity:1; transform:translateX(0) scale(1);}}
   .mil-option-btn .k{position:relative; z-index:1; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:var(--radius-sm); flex-shrink:0;
     background:linear-gradient(135deg,var(--gold),var(--gold-2)); border:none;
     color:#171449; font-size:13px; font-weight:800;}
@@ -8205,7 +8209,7 @@ const GAMES_CATALOG = [
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
   {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'ستاك', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
-  {id:'millionaire', icon:'👑', title:'تاج الحكمة', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
+  {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
 ];
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
@@ -10558,7 +10562,7 @@ function stkDraw(){
     stkDrawBlock(ctx, bx, bz, sx, sz, y0, y1, m.color, scale, cx, cy);
   }
 }
-/* ============================= GAMES: MILLIONAIRE — "تاج الحكمة" (أسئلة مسيحية) ============================= */
+/* ============================= GAMES: MILLIONAIRE — "من سيربح المليون" (أسئلة مسيحية) ============================= */
 
 const MIL_DIFFICULTY = {
   easy:  {sec:45, label:'سهل 🙂'},
@@ -10797,7 +10801,7 @@ function milStartScreenHtml(){
   return `
     <div class="mil-start">
       <div class="mil-start-ico">👑</div>
-      <div class="mil-start-title">تاج الحكمة</div>
+      <div class="mil-start-title">من سيربح المليون</div>
       <div class="mil-start-sub">15 سؤال مسيحي بيصعبوا شوية شوية، وعندك 3 مساعدات وإمكانية تاخد نقطك وتمشي في أي وقت. اختار مستوى الصعوبة الأول:</div>
       <div class="mil-diff-row">
         <button type="button" class="mil-diff-btn" data-action="mil-start" data-diff="easy"><b>سهل</b><small>45 ثانية للسؤال</small></button>
@@ -10816,7 +10820,7 @@ function milRenderShell(){
     shell.innerHTML = `
       <div class="mil-topbar">
         <button class="icon-btn mil-back" data-action="mil-close">${ICO.back}</button>
-        <div class="mil-title">👑 تاج الحكمة</div>
+        <div class="mil-title">👑 من سيربح المليون</div>
         <div class="mil-score-pill">🏆 ${best}</div>
       </div>
       <div class="mil-stage-center">${milStartScreenHtml()}</div>
@@ -10829,7 +10833,7 @@ function milRenderShell(){
   shell.innerHTML = `
     <div class="mil-topbar">
       <button class="icon-btn mil-back" data-action="mil-close">${ICO.back}</button>
-      <div class="mil-title">👑 تاج الحكمة</div>
+      <div class="mil-title">👑 من سيربح المليون</div>
       <div class="mil-score-pill">🏆 ${best}</div>
     </div>
     <div class="mil-stage">
@@ -10893,7 +10897,7 @@ function doMilPick(idx){
           g.finished = true; g.won = true;
           g.earnedPoints = MIL_LADDER[14].points;
           saveMilBestIfNeeded(g);
-          awardSoloGamePoints(g.earnedPoints, 'وصل للجايزة الكبرى في تاج الحكمة 👑');
+          awardSoloGamePoints(g.earnedPoints, 'وصل للجايزة الكبرى في من سيربح المليون 👑');
           milRenderShell();
         }, 900);
       } else {
@@ -10913,7 +10917,7 @@ function doMilPick(idx){
         g.finished = true; g.won = false;
         g.earnedPoints = milSafetyNetPoints(g.level-1);
         saveMilBestIfNeeded(g);
-        if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خرج من تاج الحكمة بنقط الأمان 🛡️');
+        if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خرج من من سيربح المليون بنقط الأمان 🛡️');
         milRenderShell();
       }, 1400);
     }
@@ -10929,7 +10933,7 @@ function doMilTimeout(){
     g.finished = true; g.won = false;
     g.earnedPoints = milSafetyNetPoints(g.level-1);
     saveMilBestIfNeeded(g);
-    if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خلص وقت السؤال في تاج الحكمة ⏰');
+    if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خلص وقت السؤال في من سيربح المليون ⏰');
     milRenderShell();
   }, 1200);
 }
@@ -10985,7 +10989,7 @@ function doMilWalkAway(){
   g.earnedPoints = milBankedPoints(g.level);
   SND.click();
   saveMilBestIfNeeded(g);
-  if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خد نقطه وطلع من تاج الحكمة 🚪');
+  if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خد نقطه وطلع من من سيربح المليون 🚪');
   milRenderShell();
 }
 
