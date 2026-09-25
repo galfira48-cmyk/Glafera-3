@@ -6218,7 +6218,7 @@ function initials(name){
   const parts = name.trim().split(' ');
   return (parts[0]?.[0]||'') + (parts[1]?.[0]||'');
 }
-function teamOf(teamId){ return TEAMS.find(t=>t.id===teamId); }
+function teamOf(teamId){ return TEAMS.find(t=>t.id===teamId) || {id:teamId||'', name:'بدون فريق', color:'#8A8A9A'}; }
 function timeGreeting(){
   const h = new Date().getHours();
   if(h<12) return 'صباح الخير';
