@@ -4226,7 +4226,12 @@ function createQR(el, opts){
   return qr;
 }
 
-const TEAMS = [];
+const TEAMS = [
+  {id:'t1', name:'فريق النور',    color:'#F4B740'},
+  {id:'t2', name:'فريق الأمل',    color:'#3FDCC9'},
+  {id:'t3', name:'فريق الشروق',   color:'#FF7A59'},
+  {id:'t4', name:'فريق الرسالة',  color:'#9B8CFF'},
+];
 
 const DAYS = [
   {id:'d1', label:'اليوم الأول', num:1, sessions:[
@@ -4247,7 +4252,12 @@ const DAYS = [
 ];
 const SESSION_TYPE_LABELS = { opening:'افتتاح', lecture:'محاضرة', workshop:'ورشة عمل', activity:'نشاط', closing:'ختام' };
 
-const NAMES = [];
+const NAMES = [
+  ['1234','جورج مجدى','t1'],['1002','مريم عادل','t1'],['1003','يوسف كريم','t1'],['1004','هبة فادي','t1'],
+  ['2001','عمر ناصر','t2'],['2002','ندى جورج','t2'],['2003','طارق رأفت','t2'],['2004','ياسمين إيهاب','t2'],
+  ['3001','خالد صبري','t3'],['3002','آية عماد','t3'],['3003','عمرو وجيه','t3'],['3004','دينا نبيل','t3'],
+  ['4001','كريم حنا','t4'],['4002','سلمى سمير','t4'],['4003','محمود زكريا','t4'],['4004','رنا ماجد','t4'],
+];
 const PARTICIPANTS = NAMES.map(([id,name,teamId])=>({id,name,teamId}));
 
 /* ============================= STORAGE (Firebase-backed, shared for real) ============================= */
@@ -5472,20 +5482,11 @@ async function loadCustomSessions(){
 async function saveCustomSessions(obj){
   try{ await window.storage.set('glavera-custom-sessions', JSON.stringify(obj), true); }catch(e){}
 }
-/* ملاحظة: window.storage.get بيرجع null سواء البيانات فاضية فعلاً على السيرفر أو مفيش نت خالص —
-   مش نعرف نفرّق بين الحالتين. فبنحتفظ بنسخة محلية (localStorage) من آخر بيانات نزلت بنجاح،
-   ولو الطلب فشل (من غير نت) بنرجّع النسخة المحفوظة دي بدل ما نرجع مصفوفة فاضية ونضيّع أكواد المشاركين. */
-function _lsCacheGet(key){ try{ const s = localStorage.getItem(key); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
-function _lsCacheSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
 async function loadCustomParticipants(){
-  try{
-    const r = await window.storage.get('glavera-custom-participants', true);
-    if(r){ const arr = JSON.parse(r.value) || []; _lsCacheSet('glavera-cache-participants', arr); return arr; }
-  }catch(e){}
-  return _lsCacheGet('glavera-cache-participants') || [];
+  try{ const r = await window.storage.get('glavera-custom-participants', true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
 }
 async function saveCustomParticipants(arr){
-  try{ await window.storage.set('glavera-custom-participants', JSON.stringify(arr), true); _lsCacheSet('glavera-cache-participants', arr); }catch(e){}
+  try{ await window.storage.set('glavera-custom-participants', JSON.stringify(arr), true); }catch(e){}
 }
 async function loadAdminAlerts(){
   try{ const r = await window.storage.get('glavera-admin-alerts', true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
@@ -5500,14 +5501,10 @@ async function saveTeamOverrides(obj){
   try{ await window.storage.set('glavera-team-overrides', JSON.stringify(obj), true); }catch(e){}
 }
 async function loadCustomTeams(){
-  try{
-    const r = await window.storage.get('glavera-custom-teams', true);
-    if(r){ const arr = JSON.parse(r.value) || []; _lsCacheSet('glavera-cache-teams', arr); return arr; }
-  }catch(e){}
-  return _lsCacheGet('glavera-cache-teams') || [];
+  try{ const r = await window.storage.get('glavera-custom-teams', true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
 }
 async function saveCustomTeams(arr){
-  try{ await window.storage.set('glavera-custom-teams', JSON.stringify(arr), true); _lsCacheSet('glavera-cache-teams', arr); }catch(e){}
+  try{ await window.storage.set('glavera-custom-teams', JSON.stringify(arr), true); }catch(e){}
 }
 async function loadTeamBonus(){
   try{ const r = await window.storage.get('glavera-team-bonus', true); return r ? JSON.parse(r.value) : {}; }catch(e){ return {}; }
