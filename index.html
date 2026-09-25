@@ -3228,42 +3228,107 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .stack-hud-score{font-size:clamp(28px,10vw,44px);}
     .stack-hint{font-size:10.5px; margin-top:6px;}
   }
-  /* ============================= GAMES: MILLIONAIRE — "مين هيربح؟" (أسئلة مسيحية) ============================= */
-  .mil-overlay{position:fixed; inset:0; z-index:9500; background:radial-gradient(ellipse at 50% -10%, #1b2a6b 0%, #060818 55%, #030410 100%); overflow:hidden;}
-  .mil-shell{max-width:520px; margin:0 auto; padding:calc(6px + env(safe-area-inset-top,0px)) 12px calc(10px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow-y:auto;}
+  /* ============================= GAMES: MILLIONAIRE — "مين هيربح؟" (أسئلة مسيحية) — تصميم مطابق لبرنامج "من سيربح المليون" ============================= */
+  .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
+    background:radial-gradient(circle at 50% 26%, #1a3a8f 0%, #0d1b52 28%, #060c2c 60%, #030614 100%);}
+  .mil-overlay::before{content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(ellipse 60px 26px at 12% 4%, rgba(150,200,255,.55), transparent 70%),
+      radial-gradient(ellipse 60px 26px at 32% 1%, rgba(150,200,255,.5), transparent 70%),
+      radial-gradient(ellipse 60px 26px at 52% 0%, rgba(150,200,255,.55), transparent 70%),
+      radial-gradient(ellipse 60px 26px at 72% 1%, rgba(150,200,255,.5), transparent 70%),
+      radial-gradient(ellipse 60px 26px at 90% 4%, rgba(150,200,255,.55), transparent 70%),
+      radial-gradient(ellipse 300px 500px at 8% 55%, rgba(30,90,220,.25), transparent 60%),
+      radial-gradient(ellipse 300px 500px at 92% 55%, rgba(30,90,220,.25), transparent 60%);}
+  .mil-shell{position:relative; z-index:1; max-width:480px; margin:0 auto; padding:calc(6px + env(safe-area-inset-top,0px)) 12px calc(10px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
   .mil-topbar{display:flex; align-items:center; gap:10px; flex-shrink:0;}
   .icon-btn.mil-back{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); backdrop-filter:blur(6px); color:#fff;}
-  .mil-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; color:#FFD873; font-size:15px; text-shadow:0 2px 10px rgba(0,0,0,.5);}
-  .mil-score-pill{background:rgba(255,255,255,.1); border:1px solid rgba(255,216,115,.3); border-radius:999px; padding:6px 13px; color:#FFD873; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; flex-shrink:0;}
-  .mil-body{flex:1; display:flex; flex-direction:column; gap:10px; margin-top:10px; overflow-y:auto; padding-bottom:10px;}
-  .mil-ladder{display:flex; flex-direction:column-reverse; gap:2px; background:rgba(10,12,40,.55); border:1px solid rgba(255,216,115,.18); border-radius:14px; padding:7px;}
-  .mil-ladder-item{display:flex; justify-content:space-between; align-items:center; padding:4px 10px; border-radius:8px; font-family:'Cairo',sans-serif; font-weight:700; font-size:11.5px; color:rgba(255,255,255,.45);}
-  .mil-ladder-item .n{opacity:.75; margin-left:6px;}
-  .mil-ladder-item.safety{color:#B7893A;}
-  .mil-ladder-item.passed{color:#fff;}
-  .mil-ladder-item.current{background:linear-gradient(90deg, rgba(255,216,115,.24), rgba(255,216,115,.05)); color:#FFD873; box-shadow:0 0 0 1px rgba(255,216,115,.45) inset;}
-  .mil-lifelines{display:flex; gap:8px; justify-content:center;}
-  .mil-life-btn{flex:1; max-width:96px; background:rgba(255,255,255,.08); border:1px solid rgba(255,216,115,.3); border-radius:12px; padding:8px 4px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; display:flex; flex-direction:column; align-items:center; gap:3px; transition:.15s;}
-  .mil-life-btn .ico{font-size:18px;}
+  .mil-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; color:#f4cd6b; font-size:15px; text-shadow:0 2px 10px rgba(0,0,0,.5);}
+  .mil-score-pill{background:rgba(255,255,255,.1); border:1px solid rgba(244,205,107,.3); border-radius:999px; padding:6px 13px; color:#f4cd6b; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; flex-shrink:0;}
+  .mil-body{flex:1; min-height:0; display:flex; flex-direction:column; gap:8px; margin-top:8px; overflow-y:auto; padding-bottom:6px;}
+
+  /* top row: ladder box + circular question counter, like the reference image */
+  .mil-hero{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-shrink:0;}
+  .mil-ladder{display:flex; flex-direction:column-reverse; gap:0; background:#060b26; border:2px solid #c9962f; border-radius:20px; padding:3px 6px; box-shadow:0 0 18px rgba(0,0,0,.6), 0 0 10px rgba(244,205,107,.25); width:110px; flex-shrink:0;}
+  .mil-ladder-item{display:flex; flex-direction:row-reverse; justify-content:space-between; align-items:center; padding:1.2px 5px; border-radius:8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:8.5px; color:#dfe6ff; line-height:1.3;}
+  .mil-ladder-item .n{opacity:.6; color:#8fa0d8; margin-left:6px;}
+  .mil-ladder-item.safety{border-top:1px solid #c9962f; border-bottom:1px solid #c9962f;}
+  .mil-ladder-item.passed{opacity:.35;}
+  .mil-ladder-item.current{background:linear-gradient(90deg,#c9962f,#f4cd6b); color:#1a1200; box-shadow:none;}
+  .mil-ladder-item.current .n{color:#1a1200; opacity:1;}
+  .mil-counter{flex-shrink:0; width:78px; height:78px; border-radius:50%; background:radial-gradient(circle at 50% 30%,#16205e,#080d2e);
+    border:2px solid #c9962f; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    box-shadow:0 0 14px rgba(244,205,107,.35), inset 0 0 10px rgba(244,205,107,.2);}
+  .mil-counter .lbl{font-family:'Cairo',sans-serif; font-size:9px; color:#f4cd6b; font-weight:800; letter-spacing:.5px;}
+  .mil-counter .num{font-family:'Cairo',sans-serif; font-size:14px; color:#fff; font-weight:900;}
+
+  /* circular emblem, like the show's logo badge */
+  .mil-emblem-wrap{position:relative; height:74px; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+  .mil-emblem-wrap::before{content:''; position:absolute; inset:0; margin:auto; width:150px; height:150px;
+    background:radial-gradient(circle, rgba(60,110,255,.55) 0%, rgba(30,60,180,.2) 45%, transparent 70%); filter:blur(2px);}
+  .mil-emblem-wrap::after{content:''; position:absolute; inset:0; margin:auto; width:150px; height:150px; z-index:0;
+    background:conic-gradient(from 0deg, rgba(255,235,180,.28) 0deg 4deg, transparent 4deg 40deg,
+      rgba(255,235,180,.24) 40deg 44deg, transparent 44deg 80deg,
+      rgba(255,235,180,.28) 80deg 84deg, transparent 84deg 120deg,
+      rgba(255,235,180,.24) 120deg 124deg, transparent 124deg 160deg,
+      rgba(255,235,180,.28) 160deg 164deg, transparent 164deg 200deg,
+      rgba(255,235,180,.24) 200deg 204deg, transparent 204deg 240deg,
+      rgba(255,235,180,.28) 240deg 244deg, transparent 244deg 280deg,
+      rgba(255,235,180,.24) 280deg 284deg, transparent 284deg 320deg,
+      rgba(255,235,180,.28) 320deg 324deg, transparent 324deg 360deg);
+    border-radius:50%; animation: milRaySpin 9s linear infinite; opacity:.8;}
+  @keyframes milRaySpin{to{transform:rotate(360deg);}}
+  .mil-emblem{position:relative; width:72px; height:72px; border-radius:50%; z-index:1;
+    background:radial-gradient(circle at 50% 40%, #14225e 0%, #060c2c 70%);
+    border:3px solid #f4cd6b; box-shadow:0 0 4px 2px rgba(255,235,180,.55), 0 0 22px rgba(244,205,107,.6), inset 0 0 12px rgba(0,0,0,.6);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3px;}
+  .mil-emblem .ico{font-size:14px;}
+  .mil-emblem .t{font-family:'Cairo',sans-serif; font-size:7.5px; color:#e9edff; font-weight:800; line-height:1.15;}
+
+  .mil-lifelines{display:flex; gap:6px; justify-content:space-around; background:#060b26; border:2px solid #c9962f; border-radius:34px; padding:5px; flex-shrink:0; box-shadow:0 0 10px rgba(244,205,107,.25);}
+  .mil-life-btn{width:40px; height:40px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#1c2c72,#0a1240);
+    border:2px solid #c9962f; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:7px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; transition:.15s;}
+  .mil-life-btn .ico{font-size:13px;}
   .mil-life-btn:active{transform:scale(.94);}
   .mil-life-btn[disabled]{opacity:.22; filter:grayscale(1); pointer-events:none;}
-  .mil-question{background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02)); border:1px solid rgba(255,216,115,.28); border-radius:16px; padding:14px 16px; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; color:#fff; line-height:1.55;}
-  .mil-options{display:flex; flex-direction:column; gap:8px;}
-  .mil-option-btn{display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,216,115,.25); border-radius:12px; padding:11px 14px; color:#fff; font-family:'Tajawal',Arial; font-weight:700; font-size:13px; text-align:right; transition:.15s;}
-  .mil-option-btn .k{background:rgba(255,216,115,.15); color:#FFD873; border-radius:50%; width:21px; height:21px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; flex-shrink:0;}
-  .mil-option-btn.eliminated{opacity:.15; pointer-events:none;}
-  .mil-option-btn.selected{background:rgba(255,216,115,.2); box-shadow:0 0 0 2px rgba(255,216,115,.5) inset;}
-  .mil-option-btn.correct{background:rgba(95,224,164,.28); box-shadow:0 0 0 2px #5FE0A4 inset;}
-  .mil-option-btn.wrong{background:rgba(255,122,122,.28); box-shadow:0 0 0 2px #FF7A7A inset;}
+  .mil-question{flex-shrink:0; background:linear-gradient(180deg,#0d1a52,#081040); border:2px solid #c9962f; border-radius:20px; padding:10px 14px; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#fff; line-height:1.4; box-shadow:0 0 14px rgba(0,0,0,.5);}
+  .mil-options{display:grid; grid-template-columns:1fr 1fr; gap:6px; flex-shrink:0;}
+  .mil-option-btn{display:flex; align-items:center; gap:6px; background:linear-gradient(180deg,#0d1a52,#081040); border:2px solid #c9962f; border-radius:16px; padding:8px 10px; color:#fff; font-family:'Tajawal',Arial; font-weight:700; font-size:11.5px; text-align:right; transition:.15s;}
+  .mil-option-btn .k{color:#f4cd6b; font-size:13px; font-weight:900; flex-shrink:0;}
+  .mil-option-btn.eliminated{visibility:hidden;}
+  .mil-option-btn.selected{background:linear-gradient(180deg,#1c2c72,#0a1240); box-shadow:0 0 0 2px rgba(244,205,107,.6) inset;}
+  .mil-option-btn.correct{background:linear-gradient(180deg,#1c7a34,#0e4d20); border-color:#2fbf4f;}
+  .mil-option-btn.wrong{background:linear-gradient(180deg,#8a2420,#5c1512); border-color:#e0433d;}
   .mil-option-btn[disabled]{pointer-events:none;}
-  .mil-audience{display:flex; align-items:flex-end; gap:6px; height:64px; padding:6px 10px; background:rgba(0,0,0,.22); border-radius:12px;}
-  .mil-audience-bar{flex:1; background:linear-gradient(180deg,#FFD873,#B7893A); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:#241d4a; font-size:9.5px; font-weight:900; padding-top:2px;}
-  .mil-phone-bubble{background:rgba(79,172,254,.15); border:1px solid rgba(79,172,254,.4); border-radius:12px; padding:10px 14px; color:#DCEEFF; font-family:Tajawal,Arial; font-size:12px; text-align:center;}
-  .mil-walkaway{background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.22); border-radius:12px; padding:9px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; text-align:center; width:100%;}
-  .mil-over-card{display:flex; flex-direction:column; align-items:center; gap:6px; padding:20px 16px; text-align:center; background:rgba(0,0,0,.32); border-radius:16px; border:1px solid rgba(255,216,115,.32);}
+  .mil-audience{flex-shrink:0; display:flex; align-items:flex-end; gap:6px; height:46px; padding:5px 10px; background:rgba(0,0,0,.22); border-radius:12px;}
+  .mil-audience-bar{flex:1; background:linear-gradient(180deg,#f4cd6b,#c9962f); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:#241d4a; font-size:9.5px; font-weight:900; padding-top:2px;}
+  .mil-phone-bubble{flex-shrink:0; background:rgba(79,172,254,.15); border:1px solid rgba(79,172,254,.4); border-radius:12px; padding:7px 12px; color:#DCEEFF; font-family:Tajawal,Arial; font-size:11px; text-align:center;}
+  .mil-walkaway{flex-shrink:0; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.22); border-radius:12px; padding:7px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; text-align:center; width:100%;}
+  .mil-over-card{display:flex; flex-direction:column; align-items:center; gap:6px; padding:20px 16px; text-align:center; background:linear-gradient(180deg,#0d1a52,#050a24); border-radius:22px; border:2px solid #f4cd6b; box-shadow:0 0 30px rgba(244,205,107,.4);}
   .mil-over-ico{font-size:44px;}
   .mil-over-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#fff;}
-  .mil-over-sub{font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#FFD873;}
+  .mil-over-sub{font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#f4cd6b;}
+  .mil-start{display:flex; flex-direction:column; align-items:center; gap:14px; padding:22px 8px; text-align:center;}
+  .mil-start-ico{font-size:52px; filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));}
+  .mil-start-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; color:#fff;}
+  .mil-start-sub{font-family:Tajawal,Arial; font-size:12.5px; color:rgba(255,255,255,.65); max-width:320px; line-height:1.6;}
+  .mil-diff-row{display:flex; gap:8px; width:100%; max-width:340px;}
+  .mil-diff-btn{flex:1; background:linear-gradient(180deg,#0d1a52,#081040); border:2px solid #c9962f; border-radius:16px; padding:12px 4px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; display:flex; flex-direction:column; gap:3px; align-items:center; transition:.15s;}
+  .mil-diff-btn:active{transform:scale(.95);}
+  .mil-diff-btn b{color:#f4cd6b; font-size:14px;}
+  .mil-diff-btn small{color:rgba(255,255,255,.55); font-size:10px;}
+  .mil-timer-pill{flex-shrink:0; background:rgba(255,255,255,.08); border:1px solid rgba(244,205,107,.3); border-radius:999px; padding:3px 14px; color:#f4cd6b; font-family:'Cairo',sans-serif; font-weight:900; font-size:11px; text-align:center; margin:0 auto;}
+  .mil-timer-pill.warn{color:#FF7A7A; border-color:rgba(255,122,122,.5); animation: milTimerPulse .5s ease-in-out infinite alternate;}
+  @keyframes milTimerPulse{from{transform:scale(1);} to{transform:scale(1.1);}}
+  .mil-ladder-item.current{animation: milLadderPulse 1.6s ease-in-out infinite;}
+  @keyframes milLadderPulse{0%,100%{box-shadow:0 0 0 1px rgba(244,205,107,.45) inset;} 50%{box-shadow:0 0 14px 2px rgba(244,205,107,.35), 0 0 0 1px rgba(244,205,107,.6) inset;}}
+  .mil-option-btn.selected{animation: milThink .55s ease-in-out infinite alternate;}
+  @keyframes milThink{from{box-shadow:0 0 0 2px rgba(244,205,107,.3) inset;} to{box-shadow:0 0 12px 2px rgba(244,205,107,.4), 0 0 0 2px rgba(244,205,107,.75) inset;}}
+  .mil-option-btn.correct{animation: milGlow .8s ease-in-out;}
+  @keyframes milGlow{0%{box-shadow:0 0 0 2px #2fbf4f inset;} 50%{box-shadow:0 0 18px 4px rgba(47,191,79,.6), 0 0 0 2px #2fbf4f inset;} 100%{box-shadow:0 0 0 2px #2fbf4f inset;}}
+  .mil-option-btn.wrong{animation: milShake .4s ease-in-out;}
+  @keyframes milShake{10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(3px);} 30%,50%,70%{transform:translateX(-5px);} 40%,60%{transform:translateX(5px);}}
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
   .xo-cell{aspect-ratio:1/1; border-radius:18px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); font-family:'Cairo',sans-serif; font-weight:900; font-size:34px;
@@ -10484,6 +10549,12 @@ function stkDraw(){
   }
 }
 /* ============================= GAMES: MILLIONAIRE — "مين هيربح المليون" (أسئلة مسيحية) ============================= */
+
+const MIL_DIFFICULTY = {
+  easy:  {sec:45, label:'سهل 🙂'},
+  medium:{sec:25, label:'متوسط 😐'},
+  hard:  {sec:15, label:'صعب 🔥'},
+};
 const MIL_LADDER = [
   {level:1,  points:5},
   {level:2,  points:10},
@@ -10501,67 +10572,97 @@ const MIL_LADDER = [
   {level:14, points:250},
   {level:15, points:300},
 ];
-/* بنك أسئلة مسيحية عامة — سؤالين لكل مستوى، كل ما ترقّى في السلم الأسئلة بتبقى أصعب */
+/* بنك أسئلة مسيحية عامة — 4 أسئلة لكل مستوى (بيتاختار واحد عشوائي منهم كل جولة)، وكل ما ترقّى في السلم الأسئلة بتبقى أصعب */
 const MIL_QUESTIONS = {
   1:[
     {q:'مين اللي بنى الفلك بأمر الله عشان ينجّي أهله والحيوانات من الطوفان؟', o:['نوح','إبراهيم','موسى','داود'], c:0},
     {q:'مين هي أم يسوع المسيح؟', o:['العذراء مريم','مرثا','مريم المجدلية','راحيل'], c:0},
+    {q:'في أنهي عيد بيحتفل المسيحيون بميلاد يسوع المسيح؟', o:['عيد الميلاد','عيد القيامة','عيد الغطاس','عيد العنصرة'], c:0},
+    {q:'كام يوم قضاها يسوع صايم في البرية؟', o:['40 يوم','30 يوم','7 أيام','12 يوم'], c:0},
   ],
   2:[
     {q:'مين أول إنسان خلقه الله بحسب سفر التكوين؟', o:['آدم','نوح','قايين','هابيل'], c:0},
     {q:'يسوع المسيح اتولد في أنهي مدينة؟', o:['بيت لحم','الناصرة','أورشليم','كفرناحوم'], c:0},
+    {q:'مين هي زوجة النبي إبراهيم اللي وعدها الله بابن في شيخوختها؟', o:['سارة','هاجر','رفقة','راحيل'], c:0},
+    {q:'مين هو الأخ اللي قتل أخوه هابيل؟', o:['قايين','شيث','يافث','حام'], c:0},
   ],
   3:[
     {q:'مين اللي خان يسوع المسيح مقابل 30 من الفضة؟', o:['يهوذا الإسخريوطي','بطرس','توما','فيلبس'], c:0},
     {q:'كام تلميذ اختارهم يسوع ليكونوا رسله الاثنى عشر؟', o:['12','10','7','14'], c:0},
+    {q:'مين حوّل الماء إلى خمر في أول معجزة ليسوع، في عرس قانا الجليل؟', o:['يسوع المسيح','يوحنا المعمدان','بطرس الرسول','موسى النبي'], c:0},
+    {q:'مين اللي عمّد يسوع المسيح في نهر الأردن؟', o:['يوحنا المعمدان','بطرس الرسول','إيليا النبي','زكريا الكاهن'], c:0},
   ],
   4:[
     {q:'مين قسم مياه البحر الأحمر بعصا بأمر الله؟', o:['موسى','هارون','يشوع','إبراهيم'], c:0},
     {q:'مين اللي أنكر معرفته بيسوع 3 مرات قبل صياح الديك؟', o:['بطرس','يوحنا','يعقوب','أندراوس'], c:0},
+    {q:'مين هو أول ملك على شعب إسرائيل، مسحه صموئيل النبي؟', o:['شاول','داود','سليمان','رحبعام'], c:0},
+    {q:'في معجزة إطعام الجموع (5000 رجل)، كام رغيف وسمكة استخدمها يسوع؟', o:['5 أرغفة وسمكتين','7 أرغفة وسمكة','رغيفين وسمكتين','3 أرغفة وسمكتين'], c:0},
   ],
   5:[
     {q:'مين كتب أكبر عدد من رسائل العهد الجديد؟', o:['بولس الرسول','بطرس الرسول','يوحنا','يعقوب'], c:0},
     {q:'مين قتل جالوت الجبار بمقلاع وحجر؟', o:['داود','شاول','يوناثان','صموئيل'], c:0},
+    {q:'مين هو النبي اللي بلعه حوت كبير وفضل في بطنه 3 أيام؟', o:['يونان','إرميا','حزقيال','عاموس'], c:0},
+    {q:'مين هو النبي اللي واجه أنبياء البعل في جبل الكرمل وأنزل نار من السماء؟', o:['إيليا','أليشع','ملاخي','عاموس'], c:0},
   ],
   6:[
     {q:'مين هو أول شهيد مذكور في العهد الجديد؟', o:['إسطفانوس (ستفانوس)','يعقوب','بطرس','فيلبس'], c:0},
     {q:'مين كتب سفر الرؤيا في نهاية العهد الجديد؟', o:['يوحنا اللاهوتي','بولس الرسول','بطرس الرسول','متى'], c:0},
+    {q:'مين هو التلميذ اللي كان جابي ضرائب قبل ما يتبع يسوع، وكتب أول الأناجيل؟', o:['متى','لوقا','مرقس','يوحنا'], c:0},
+    {q:'مين كتب سفر أعمال الرسل؟', o:['لوقا الإنجيلي','متى','مرقس','يوحنا'], c:0},
   ],
   7:[
     {q:'مين قاد شعب إسرائيل لدخول أرض الميعاد بعد وفاة موسى؟', o:['يشوع بن نون','كالب','صموئيل','جدعون'], c:0},
     {q:'مين هو النبي اللي صعد للسماء بمركبة نارية بدون أن يذوق الموت؟', o:['إيليا','أشعياء','إرميا','حزقيال'], c:0},
+    {q:'عند أنهي بئر التقى يسوع بالمرأة السامرية وكلّمها عن "ماء الحياة"؟', o:['بئر يعقوب','بئر سبع','بئر مريم','بئر لحي رئي'], c:0},
+    {q:'مين هو الملك اللي أمر بقتل أطفال بيت لحم بعد ميلاد يسوع؟', o:['هيرودس الكبير','بيلاطس البنطي','قيصر أغسطس','هيرودس أنتيباس'], c:0},
   ],
   8:[
     {q:'مين هو الرسول اللي لُقّب بـ"الشكّاك" لأنه رفض يصدّق قيامة المسيح غير لما شاف الجروح؟', o:['توما','فيلبس','برثولماوس','متى'], c:0},
     {q:'مين هو الملك الفارسي اللي كانت أستير ملكة له في سفر أستير؟', o:['أحشويروش','كورش','دارا','نبوخذ نصر'], c:0},
+    {q:'مين هو الملك اللي كتب معظم مزامير سفر المزامير؟', o:['الملك داود','الملك سليمان','الملك حزقيا','الملك يوشيا'], c:0},
+    {q:'مين كتب سفر الأمثال ومعظمه حكمة إلهية بحسب التقليد الكتابي؟', o:['الملك سليمان','الملك داود','آساف','أخيتوفل'], c:0},
   ],
   9:[
     {q:'مين بنى الهيكل الأول في أورشليم؟', o:['الملك سليمان','الملك داود','الملك حزقيا','زربابل'], c:0},
     {q:'مين هو القديس اللي يُعتبر مؤسس كنيسة الإسكندرية وبشّر بمصر؟', o:['مار مرقس الرسول','مار بطرس','مار بولس','مار يوحنا'], c:0},
+    {q:'مين هو التلميذ اللي مشى على الماء مع يسوع لحظة قبل ما يخاف ويبدأ يغرق؟', o:['بطرس','يوحنا','يعقوب','أندراوس'], c:0},
+    {q:'في إنجيل يوحنا، مين المرأة اللي مسحت قدمي يسوع بالطيب الغالي (الناردين) قبل عيد الفصح بستة أيام؟', o:['مريم أخت لعازر ومرثا','مريم المجدلية','سالومة','يونا زوجة خوزي'], c:0},
   ],
   10:[
     {q:'في أي مدينة انعقد أول مجمع مسكوني وضع "قانون الإيمان"؟', o:['نيقية','القسطنطينية','أفسس','خلقيدونية'], c:0},
     {q:'مين هو الملك اللي حلم بتمثال ضخم وفسّره له النبي دانيال؟', o:['نبوخذ نصر','كورش','داريوس','بيلشاصر'], c:0},
+    {q:'كام سنة استمرت خدمة يسوع المسيح العلنية بحسب التقليد الشائع؟', o:['3 سنوات تقريبًا','سنة واحدة','10 سنوات','40 سنة'], c:0},
+    {q:'مين هو القديس المُلقّب بـ"ذهبي الفم" لفصاحته في الوعظ، وكان بطريرك القسطنطينية؟', o:['يوحنا ذهبي الفم','باسيليوس الكبير','غريغوريوس النزينزي','كيرلس الكبير'], c:0},
   ],
   11:[
     {q:'بحسب التقليد المسيحي، مين يُعتبر أول أسقف لكنيسة روما؟', o:['بطرس الرسول','بولس الرسول','لينُس','كليمنضس'], c:0},
     {q:'في سفر أيوب، مين هو الرجل البار اللي اختبر الله إيمانه رغم الألم الشديد؟', o:['أيوب','إرميا','حزقيال','دانيال'], c:0},
+    {q:'مين هو ملك بابل اللي دمّر أورشليم وسبى شعب يهوذا؟', o:['نبوخذ نصر','كورش','حزقيال','بيلشاصر'], c:0},
+    {q:'مين هي القاضية الوحيدة المذكورة في سفر القضاة، وقادت انتصار إسرائيل؟', o:['دبورة','راحاب','يائيل','نعومي'], c:0},
   ],
   12:[
     {q:'مين هو القديس المُلقّب بـ"عمود الدين" اللي دافع عن الإيمان ضد بدعة آريوس؟', o:['أثناسيوس الرسولي','كيرلس الكبير','إغناطيوس','أوريجانوس'], c:0},
     {q:'أي مجمع مسكوني أدان بدعة "النسطورية" وأكّد لقب "والدة الإله" للعذراء مريم؟', o:['مجمع أفسس','مجمع نيقية','مجمع خلقيدونية','مجمع القسطنطينية'], c:0},
+    {q:'مين هو الإمبراطور الروماني اللي دعا لعقد مجمع نيقية سنة 325م؟', o:['قسطنطين الكبير','ثيؤدوسيوس','يوستنيان','مركيان'], c:0},
+    {q:'في أي مجمع مسكوني اكتملت صياغة "قانون الإيمان" في صورته المعروفة اليوم؟', o:['مجمع القسطنطينية الأول (381م)','مجمع نيقية (325م)','مجمع أفسس (431م)','مجمع خلقيدونية (451م)'], c:0},
   ],
   13:[
     {q:'مين هو أول رسول من الاثنى عشر استُشهد (باستثناء يهوذا)؟', o:['يعقوب بن زبدي','بطرس','أندراوس','فيلبس'], c:0},
     {q:'مين كتب أصحاح "المحبة" الشهير (كورنثوس الأولى 13)؟', o:['بولس الرسول','بطرس الرسول','يعقوب','يوحنا'], c:0},
+    {q:'مين هو القديس اللي عاش متوحدًا في برية مصر ويُعتبر "أب الرهبنة"؟', o:['الأنبا أنطونيوس الكبير','الأنبا باخوميوس','الأنبا بولا','الأنبا مقار'], c:0},
+    {q:'مين هو الملك اللي مزّق درج سفر إرميا وأحرقه، فأعاد إرميا كتابته؟', o:['يهوياقيم','صدقيا','يوشيا','يهوياكين'], c:0},
   ],
   14:[
     {q:'أي نبي من العهد القديم اتُّهم ظلمًا وأُلقي في جب الأسود ونجّاه الله؟', o:['دانيال','إرميا','حزقيال','يونان'], c:0},
     {q:'مين هو الإمبراطور الروماني اللي أصدر "مرسوم ميلانو" وأنهى اضطهاد المسيحيين؟', o:['قسطنطين','نيرون','دقلديانوس','ثيؤدوسيوس'], c:0},
+    {q:'من أي سنة ميلادية يبدأ "التقويم القبطي" (تقويم الشهداء)، نسبة لبداية اضطهاد دقلديانوس؟', o:['284م','33م','325م','451م'], c:0},
+    {q:'مين هو القديس اللي وضع قواعد "الرهبنة الشركوية المشتركة" ويُعتبر مؤسس هذا النظام بمصر؟', o:['الأنبا باخوميوس','الأنبا أنطونيوس','الأنبا مقار','الأنبا بولا الأول'], c:0},
   ],
   15:[
     {q:'في أي سنة ميلادية تقريبًا انعقد مجمع نيقية المسكوني الأول؟', o:['325م','451م','381م','33م'], c:0},
     {q:'مين هو القديس اللي تُرجمت على يديه أغلب أسفار الكتاب المقدس للاتينية فيما عُرف بـ"الفولجاتا"؟', o:['چيروم (إيرونيموس)','أوغسطينوس','أمبروسيوس','أوريجانوس'], c:0},
+    {q:'أي مجمع مسكوني شهد خلافًا حول طبيعة المسيح أدّى لانفصال كنائس مثل الكنيسة القبطية عن كنائس أخرى؟', o:['مجمع خلقيدونية (451م)','مجمع نيقية (325م)','مجمع أفسس (431م)','مجمع القسطنطينية الأول (381م)'], c:0},
+    {q:'مين هو بطريرك الإسكندرية اللي دافع بشدة عن لقب "ثيؤتوكوس" (والدة الإله) للعذراء في مجمع أفسس؟', o:['كيرلس الكبير','أثناسيوس الرسولي','ديسقورس','تيموثاوس'], c:0},
   ],
 };
 function milShuffleQuestion(q){
@@ -10576,13 +10677,16 @@ function milBuildRound(){
     return milShuffleQuestion(pick);
   });
 }
-function initMillionaireGame(){
+function initMillionaireGame(diff){
+  const dcfg = MIL_DIFFICULTY[diff] || MIL_DIFFICULTY.medium;
   state.millionaire = {
     level:1,
     round: milBuildRound(),
+    difficulty: diff || 'medium',
+    timerSec: dcfg.sec, timeLeft: dcfg.sec,
     usedFifty:false, usedAudience:false, usedPhone:false,
     eliminated:[],
-    selected:null, locked:false,
+    selected:null, locked:false, revealed:false,
     audienceResult:null, phoneResult:null,
     finished:false, won:false, walked:false,
     earnedPoints:0,
@@ -10594,8 +10698,32 @@ function milSafetyNetPoints(passedLevels){
   for(let i=0;i<MIL_LADDER.length;i++){ const row = MIL_LADDER[i]; if(row.safety && row.level<=passedLevels) net = row.points; }
   return net;
 }
+async function saveMilBestIfNeeded(g){
+  if(!state.pid) return;
+  const st = myGameStats(state.pid);
+  const levelReached = g.won ? 15 : Math.max(0, g.level-1);
+  let changed = false;
+  if(!st.milBest || g.earnedPoints > st.milBest){ st.milBest = g.earnedPoints; changed = true; }
+  if(!st.milBestLevel || levelReached > st.milBestLevel){ st.milBestLevel = levelReached; changed = true; }
+  if(changed) await saveGameStats(GAME_STATS);
+}
+let milTickInterval = null;
+function milStartTimer(){
+  milStopTimer();
+  const g = state.millionaire;
+  if(!g || g.finished || g.locked) return;
+  milTickInterval = setInterval(()=>{
+    const g2 = state.millionaire;
+    if(!g2 || g2.finished || g2.locked){ milStopTimer(); return; }
+    g2.timeLeft--;
+    const el = document.getElementById('mil-timer');
+    if(el){ el.textContent = '⏱️ '+Math.max(0,g2.timeLeft)+' ث'; el.classList.toggle('warn', g2.timeLeft<=5); }
+    if(g2.timeLeft<=0){ milStopTimer(); doMilTimeout(); }
+  }, 1000);
+}
+function milStopTimer(){ if(milTickInterval){ clearInterval(milTickInterval); milTickInterval=null; } }
 function openMillionaireGame(){
-  initMillionaireGame();
+  state.millionaire = null;
   const old = document.getElementById('mil-overlay');
   if(old) old.remove();
   const overlay = document.createElement('div');
@@ -10607,12 +10735,14 @@ function openMillionaireGame(){
   SND.click();
 }
 function closeMillionaireGame(){
+  milStopTimer();
   const overlay = document.getElementById('mil-overlay');
   if(overlay) overlay.remove();
   SND.back();
 }
 function milResetGame(){
-  initMillionaireGame();
+  milStopTimer();
+  state.millionaire = null;
   milRenderShell();
   SND.click();
 }
@@ -10623,15 +10753,21 @@ function milCurrentQuestion(){
 function milLadderHtml(g){
   return `<div class="mil-ladder">${MIL_LADDER.map(row=>{
     const cls = row.level===g.level && !g.finished ? 'current' : (row.level<g.level || (g.finished && (g.won||g.walked) && row.level<=g.level) ? 'passed' : (row.safety?'safety':''));
-    return `<div class="mil-ladder-item ${cls}"><span class="n">${row.level}</span><span>${row.points} نقطة${row.safety?' 🔒':''}</span></div>`;
+    return `<div class="mil-ladder-item ${cls}"><span class="n">${row.level}</span><span>${row.points}</span></div>`;
   }).join('')}</div>`;
+}
+function milCounterHtml(g){
+  return `<div class="mil-counter"><div class="lbl">السؤال</div><div class="num">${g.level} / 15</div></div>`;
+}
+function milEmblemHtml(){
+  return `<div class="mil-emblem-wrap"><div class="mil-emblem"><span class="ico">👑</span><span class="t">مين هيربح<br>المليون</span></div></div>`;
 }
 function milLifelinesHtml(g){
   return `
     <div class="mil-lifelines">
-      <button type="button" class="mil-life-btn" data-action="mil-fifty" ${g.usedFifty||g.finished?'disabled':''}><span class="ico">➗</span>الاتنين</button>
-      <button type="button" class="mil-life-btn" data-action="mil-audience" ${g.usedAudience||g.finished?'disabled':''}><span class="ico">👥</span>الجمهور</button>
-      <button type="button" class="mil-life-btn" data-action="mil-phone" ${g.usedPhone||g.finished?'disabled':''}><span class="ico">📞</span>اتصل بصديق</button>
+      <button type="button" class="mil-life-btn" data-action="mil-fifty" ${g.usedFifty||g.finished||g.locked?'disabled':''}><span class="ico">➗</span><span>50:50</span></button>
+      <button type="button" class="mil-life-btn" data-action="mil-audience" ${g.usedAudience||g.finished||g.locked?'disabled':''}><span class="ico">👥</span><span>الجمهور</span></button>
+      <button type="button" class="mil-life-btn" data-action="mil-phone" ${g.usedPhone||g.finished||g.locked?'disabled':''}><span class="ico">📞</span><span>صديق</span></button>
     </div>`;
 }
 function milOverCardHtml(g){
@@ -10645,27 +10781,57 @@ function milOverCardHtml(g){
       <button type="button" class="btn btn-primary" style="width:100%;margin-top:8px;" data-action="mil-reset">🔄 جولة جديدة</button>
     </div>`;
 }
+function milStartScreenHtml(){
+  const stats = state.pid ? myGameStats(state.pid) : {};
+  const bestLine = stats.milBest ? `أفضل نتيجة ليك: ${stats.milBest} نقطة (وصلت لسؤال ${(stats.milBestLevel||0)+1 > 15 ? 15 : (stats.milBestLevel||0)+1})` : 'أول مرة تلعب اللعبة دي 🎉';
+  return `
+    <div class="mil-start">
+      <div class="mil-start-ico">👑</div>
+      <div class="mil-start-title">مين هيربح المليون؟</div>
+      <div class="mil-start-sub">15 سؤال مسيحي بيصعبوا شوية شوية، وعندك 3 مساعدات وإمكانية تاخد نقطك وتمشي في أي وقت. اختار مستوى الصعوبة الأول:</div>
+      <div class="mil-diff-row">
+        <button type="button" class="mil-diff-btn" data-action="mil-start" data-diff="easy"><b>سهل</b><small>45 ثانية للسؤال</small></button>
+        <button type="button" class="mil-diff-btn" data-action="mil-start" data-diff="medium"><b>متوسط</b><small>25 ثانية للسؤال</small></button>
+        <button type="button" class="mil-diff-btn" data-action="mil-start" data-diff="hard"><b>صعب</b><small>15 ثانية للسؤال</small></button>
+      </div>
+      <div class="hint" style="margin-top:2px;">${bestLine}</div>
+    </div>`;
+}
 function milRenderShell(){
-  const g = state.millionaire; if(!g) return;
   const shell = document.getElementById('mil-shell'); if(!shell) return;
+  const g = state.millionaire;
+  const stats = state.pid ? myGameStats(state.pid) : {};
+  const best = stats.milBest || 0;
+  if(!g){
+    shell.innerHTML = `
+      <div class="mil-topbar">
+        <button class="icon-btn mil-back" data-action="mil-close">${ICO.back}</button>
+        <div class="mil-title">👑 مين هيربح المليون</div>
+        <div class="mil-score-pill">🏆 ${best}</div>
+      </div>
+      <div class="mil-body">${milStartScreenHtml()}</div>
+    `;
+    return;
+  }
   const qq = milCurrentQuestion();
   const walkVal = milBankedPoints(g.level);
+  const warn = (!g.finished && !g.locked && g.timeLeft<=5) ? 'warn' : '';
   shell.innerHTML = `
     <div class="mil-topbar">
       <button class="icon-btn mil-back" data-action="mil-close">${ICO.back}</button>
       <div class="mil-title">👑 مين هيربح المليون</div>
-      <div class="mil-score-pill">سؤال ${Math.min(g.level,15)}/15</div>
+      <div class="mil-score-pill">🏆 ${best}</div>
     </div>
     <div class="mil-body">
-      ${milLadderHtml(g)}
+      <div class="mil-hero">${milLadderHtml(g)}${milCounterHtml(g)}</div>
       ${g.finished ? milOverCardHtml(g) : `
-        ${milLifelinesHtml(g)}
+        ${!g.locked ? `<div class="mil-timer-pill ${warn}" id="mil-timer">⏱️ ${g.timeLeft} ث</div>` : ''}
         <div class="mil-question">${qq.q}</div>
         <div class="mil-options">
           ${qq.o.map((opt,i)=>{
             const elim = g.eliminated.includes(i);
             let cls = elim ? 'eliminated' : '';
-            if(g.locked){
+            if(g.revealed){
               if(i===qq.c) cls += ' correct';
               else if(i===g.selected) cls += ' wrong';
             } else if(g.selected===i) cls += ' selected';
@@ -10674,6 +10840,7 @@ function milRenderShell(){
         </div>
         ${g.audienceResult ? `<div class="mil-audience">${g.audienceResult.map((p,i)=> g.eliminated.includes(i)?'':`<div class="mil-audience-bar" style="height:${Math.max(6,p)}%">${p}%</div>`).join('')}</div>` : ''}
         ${g.phoneResult ? `<div class="mil-phone-bubble">📞 صاحبك بيقولك: "${g.phoneResult}"</div>` : ''}
+        ${milLifelinesHtml(g)}
         ${!g.locked ? `<button type="button" class="mil-walkaway" data-action="mil-walk">🚪 خد ${walkVal} نقطة واطلع دلوقتي</button>` : ''}
       `}
     </div>
@@ -10682,32 +10849,62 @@ function milRenderShell(){
 function doMilPick(idx){
   const g = state.millionaire;
   if(!g || g.finished || g.locked || g.eliminated.includes(idx)) return;
+  milStopTimer();
   g.selected = idx;
   g.locked = true;
+  g.revealed = false;
   milRenderShell();
   const qq = milCurrentQuestion();
   const correct = idx===qq.c;
   vibrate([12]);
   setTimeout(()=>{
+    g.revealed = true;
+    milRenderShell();
     if(correct){
       SND.cheer();
       if(g.level>=15){
-        g.finished = true; g.won = true;
-        g.earnedPoints = MIL_LADDER[14].points;
-        setTimeout(()=> awardSoloGamePoints(g.earnedPoints, 'وصل للجايزة الكبرى في مين هيربح المليون 👑'), 300);
+        setTimeout(()=>{
+          g.finished = true; g.won = true;
+          g.earnedPoints = MIL_LADDER[14].points;
+          saveMilBestIfNeeded(g);
+          awardSoloGamePoints(g.earnedPoints, 'وصل للجايزة الكبرى في مين هيربح المليون 👑');
+          milRenderShell();
+        }, 900);
       } else {
-        g.level++;
-        g.selected = null; g.locked = false;
-        g.eliminated = []; g.audienceResult = null; g.phoneResult = null;
+        setTimeout(()=>{
+          g.level++;
+          g.selected = null; g.locked = false; g.revealed = false;
+          g.eliminated = []; g.audienceResult = null; g.phoneResult = null;
+          g.timeLeft = g.timerSec;
+          milRenderShell();
+          milStartTimer();
+        }, 900);
       }
     } else {
       SND.error(); vibrate([15,40,15]);
-      g.finished = true; g.won = false;
-      g.earnedPoints = milSafetyNetPoints(g.level-1);
-      if(g.earnedPoints>0) setTimeout(()=> awardSoloGamePoints(g.earnedPoints, 'خرج من مين هيربح المليون بنقط الأمان 🛡️'), 300);
+      setTimeout(()=>{
+        g.finished = true; g.won = false;
+        g.earnedPoints = milSafetyNetPoints(g.level-1);
+        saveMilBestIfNeeded(g);
+        if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خرج من مين هيربح المليون بنقط الأمان 🛡️');
+        milRenderShell();
+      }, 1400);
     }
-    milRenderShell();
   }, 1150);
+}
+function doMilTimeout(){
+  const g = state.millionaire;
+  if(!g || g.finished || g.locked) return;
+  g.locked = true; g.revealed = true;
+  SND.error(); vibrate([15,40,15]);
+  milRenderShell();
+  setTimeout(()=>{
+    g.finished = true; g.won = false;
+    g.earnedPoints = milSafetyNetPoints(g.level-1);
+    saveMilBestIfNeeded(g);
+    if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خلص وقت السؤال في مين هيربح المليون ⏰');
+    milRenderShell();
+  }, 1200);
 }
 function doMilFifty(){
   const g = state.millionaire;
@@ -10756,12 +10953,15 @@ function doMilPhone(){
 function doMilWalkAway(){
   const g = state.millionaire;
   if(!g || g.finished || g.locked) return;
+  milStopTimer();
   g.finished = true; g.walked = true;
   g.earnedPoints = milBankedPoints(g.level);
   SND.click();
-  if(g.earnedPoints>0) setTimeout(()=> awardSoloGamePoints(g.earnedPoints, 'خد نقطه وطلع من مين هيربح المليون 🚪'), 250);
+  saveMilBestIfNeeded(g);
+  if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خد نقطه وطلع من مين هيربح المليون 🚪');
   milRenderShell();
 }
+
 /* ============================= GAMES: DOMINO ============================= */
 const DOMINO_PIPS = {0:[],1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
 function dominoHalfHtml(n){
@@ -18090,6 +18290,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='stack-reset'){ stkResetGame(); }
   else if(action==='mil-close'){ closeMillionaireGame(); }
   else if(action==='mil-reset'){ milResetGame(); }
+  else if(action==='mil-start'){ initMillionaireGame(el.dataset.diff); milRenderShell(); milStartTimer(); SND.click(); }
   else if(action==='mil-pick'){ doMilPick(parseInt(el.dataset.idx,10)); }
   else if(action==='mil-fifty'){ doMilFifty(); }
   else if(action==='mil-audience'){ doMilAudience(); }
