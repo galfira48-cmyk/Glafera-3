@@ -3300,6 +3300,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .mil-option-btn:nth-of-type(3){animation-delay:1.35s;}
   .mil-option-btn:nth-of-type(4){animation-delay:1.75s;}
   @keyframes milOptIn{0%{opacity:0; transform:translateX(18px) scale(.94);} 65%{opacity:1; transform:translateX(-3px) scale(1.02);} 100%{opacity:1; transform:translateX(0) scale(1);}}
+  /* re-renders of the SAME question (on selecting an answer / revealing correct-wrong) must not replay the entrance animation */
+  .mil-question.no-anim{animation:none; opacity:1; transform:none; filter:none;}
+  .mil-question.no-anim::before{display:none;}
+  .mil-option-btn.no-anim{animation:none; opacity:1; transform:none;}
   .mil-option-btn .k{position:relative; z-index:1; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:var(--radius-sm); flex-shrink:0;
     background:linear-gradient(135deg,var(--gold),var(--gold-2)); border:none;
     color:#171449; font-size:13px; font-weight:800;}
@@ -10692,6 +10696,7 @@ function milBuildRound(){
   });
 }
 function initMillionaireGame(diff){
+  milAnimKey = null;
   const dcfg = MIL_DIFFICULTY[diff] || MIL_DIFFICULTY.medium;
   state.millionaire = {
     level:1,
@@ -10722,6 +10727,7 @@ async function saveMilBestIfNeeded(g){
   if(changed) await saveGameStats(GAME_STATS);
 }
 let milTickInterval = null;
+let milAnimKey = null; // tracks which question+state was already animated in, so re-renders (select/reveal) don't replay the entrance animation
 function milStartTimer(){
   milStopTimer();
   const g = state.millionaire;
@@ -10830,6 +10836,9 @@ function milRenderShell(){
   const qq = milCurrentQuestion();
   const walkVal = milBankedPoints(g.level);
   const warn = (!g.finished && !g.locked && g.timeLeft<=5) ? 'warn' : '';
+  const freshQuestion = (milAnimKey !== g.level);
+  if(freshQuestion) milAnimKey = g.level;
+  const qAnimCls = freshQuestion ? '' : ' no-anim';
   shell.innerHTML = `
     <div class="mil-topbar">
       <button class="icon-btn mil-back" data-action="mil-close">${ICO.back}</button>
@@ -10846,7 +10855,7 @@ function milRenderShell(){
       </div>
       <div class="mil-center">
         ${g.finished ? milOverCardHtml(g) : `
-          <div class="mil-question">${qq.q}</div>
+          <div class="mil-question${qAnimCls}">${qq.q}</div>
           <div class="mil-options">
             ${qq.o.map((opt,i)=>{
               const elim = g.eliminated.includes(i);
@@ -10857,7 +10866,7 @@ function milRenderShell(){
               } else if(g.selected===i) cls += ' selected';
               let badgeTxt = ['A','B','C','D'][i];
               if(g.revealed){ if(i===qq.c) badgeTxt='✓'; else if(i===g.selected) badgeTxt='✗'; }
-              return `<button type="button" class="mil-option-btn ${cls}" data-action="mil-pick" data-idx="${i}" ${g.locked||elim?'disabled':''}><span class="k">${badgeTxt}</span><span>${opt}</span></button>`;
+              return `<button type="button" class="mil-option-btn ${cls}${qAnimCls}" data-action="mil-pick" data-idx="${i}" ${g.locked||elim?'disabled':''}><span class="k">${badgeTxt}</span><span>${opt}</span></button>`;
             }).join('')}
           </div>
           ${g.audienceResult ? `<div class="mil-audience">${g.audienceResult.map((p,i)=> g.eliminated.includes(i)?'':`<div class="mil-audience-bar" style="height:${Math.max(6,p)}%">${p}%</div>`).join('')}</div>` : ''}
