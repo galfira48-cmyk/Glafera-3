@@ -3831,6 +3831,102 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .numguess-key:not(:disabled):active{transform:scale(.93);}
   .numguess-key:disabled{opacity:.5;}
 
+  .reflex-zone{width:212px; height:212px; max-width:74vw; max-height:74vw;
+    font-family:'Cairo',sans-serif; text-align:center;
+    border-radius:50%; padding:0 22px; margin:22px auto 8px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    border:1.5px solid rgba(255,255,255,.14); position:relative; overflow:hidden;
+    background:rgba(255,255,255,.05);
+    -webkit-backdrop-filter:blur(18px) saturate(165%); backdrop-filter:blur(18px) saturate(165%);
+    box-shadow:0 20px 42px -18px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.16), inset 0 -14px 28px -16px rgba(0,0,0,.4);
+    transition:transform .12s ease, box-shadow .25s ease, background .3s ease, border-color .3s ease;}
+  .reflex-zone::before{content:''; position:absolute; inset:0; border-radius:50%; pointer-events:none; z-index:1;
+    background:linear-gradient(158deg, rgba(255,255,255,.38) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 66%, rgba(255,255,255,.08) 100%);}
+  .reflex-zone-icon{font-size:38px; line-height:1; position:relative; z-index:2; filter:drop-shadow(0 2px 7px rgba(0,0,0,.3));}
+  .reflex-zone-label{font-size:14.5px; font-weight:900; position:relative; z-index:2; line-height:1.3; max-width:150px;}
+  .reflex-zone.idle{color:var(--text-muted); border-color:rgba(244,183,64,.28);
+    background:radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--gold) 10%, transparent), rgba(255,255,255,.04) 72%);}
+  .reflex-zone.idle .reflex-zone-icon{color:var(--gold); opacity:.9;}
+  .reflex-zone.ready{color:#fff; border-color:rgba(255,90,90,.5);
+    background:radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--danger) 58%, transparent), rgba(255,255,255,.05) 74%);
+    box-shadow:0 0 0 1px rgba(255,90,90,.3) inset, 0 20px 46px -14px color-mix(in srgb, var(--danger) 70%, transparent), inset 0 1px 0 rgba(255,255,255,.18);}
+  .reflex-zone.go{color:#eafff3; border-color:rgba(80,255,175,.6);
+    background:radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--good) 62%, transparent), rgba(255,255,255,.06) 76%);
+    box-shadow:0 0 0 1px rgba(80,255,175,.38) inset, 0 0 60px 8px color-mix(in srgb, var(--good) 55%, transparent), 0 20px 46px -14px color-mix(in srgb, var(--good) 65%, transparent), inset 0 1px 0 rgba(255,255,255,.22);
+    animation:reflexPulse .5s ease infinite alternate;}
+  .reflex-zone.go::after,.reflex-zone.ready::after{content:''; position:absolute; inset:-7px; border-radius:50%; z-index:0; pointer-events:none;
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    animation:reflexRingSpin 1.15s linear infinite;}
+  .reflex-zone.go::after{background:conic-gradient(from 0deg, transparent 0%, rgba(120,255,185,.95) 16%, transparent 32%, transparent 100%);}
+  .reflex-zone.ready::after{background:conic-gradient(from 0deg, transparent 0%, rgba(255,120,120,.9) 16%, transparent 32%, transparent 100%);}
+  @keyframes reflexRingSpin{to{transform:rotate(360deg);}}
+  .reflex-zone.result{color:var(--gold); border-color:rgba(244,183,64,.35);
+    background:radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--gold) 20%, transparent), rgba(255,255,255,.04) 74%);}
+  .reflex-zone.result .reflex-zone-icon{font-size:44px;}
+  .reflex-zone:not(.idle):not(.result):active{transform:scale(.96);}
+  @keyframes reflexPulse{0%{transform:scale(1);} 100%{transform:scale(1.035);}}
+  .reflex-battle{margin-top:2px;}
+  .reflex-ms{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:20px; color:var(--text-muted);
+    background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); border-radius:12px;
+    padding:6px 10px; margin-bottom:6px;}
+  .reflex-ms span{font-size:11px; font-weight:600; opacity:.7; margin-inline-start:2px;}
+  .reflex-ms.is-win{color:var(--good); border-color:color-mix(in srgb, var(--good) 55%, var(--border));
+    box-shadow:0 0 0 1px color-mix(in srgb, var(--good) 35%, transparent) inset;}
+  .reflex-zone.ready.decoy{color:#3a2400; border-color:rgba(255,210,60,.6) !important;
+    background:radial-gradient(circle at 50% 32%, #FFD93D, #FF9C1B 78%) !important;
+    box-shadow:0 0 0 1px rgba(255,210,60,.4) inset, 0 20px 42px -12px rgba(255,180,20,.6) !important; animation:reflexDecoy .15s ease;}
+  .reflex-zone.ready.decoy::after{background:conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,.85) 16%, transparent 32%, transparent 100%) !important;}
+  @keyframes reflexDecoy{0%{transform:scale(1);} 50%{transform:scale(1.02);} 100%{transform:scale(1);}}
+  .reflex-streak-badge{display:inline-flex; align-items:center; gap:4px; margin:2px auto 0; padding:5px 12px;
+    border-radius:999px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#fff;
+    background:linear-gradient(135deg,#FF6B6B,#FFA53D); width:fit-content; display:flex;}
+  .reflex-tier-badge{text-align:center; margin-top:4px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px;
+    color:var(--gold);}
+  .reflex-history-strip{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:12px;}
+  .reflex-chip{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px; padding:5px 9px; border-radius:10px;
+    background:var(--surface-2); border:1.5px solid var(--border); color:var(--text-muted);}
+  .reflex-chip.win{color:var(--good); border-color:color-mix(in srgb, var(--good) 50%, var(--border));}
+  .reflex-chip.lose{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 45%, var(--border));}
+  .reflex-chip.early{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 45%, var(--border)); opacity:.8;}
+  .reflex-chip.draw{color:var(--text-muted);}
+  .reflex-zone.outcome-win{animation:reflexPop .35s ease;}
+  @keyframes reflexPop{0%{transform:scale(.94);} 55%{transform:scale(1.045);} 100%{transform:scale(1);}}
+  .reflex-zone.outcome-early,.reflex-zone.outcome-lose{animation:reflexShake .4s ease;}
+  @keyframes reflexShake{10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(3px);} 30%,50%,70%{transform:translateX(-5px);} 40%,60%{transform:translateX(5px);}}
+
+  .reflex-pro-btn{display:flex; align-items:center; justify-content:center; gap:10px;
+    width:fit-content; max-width:100%; margin:16px auto 4px; padding:13px 24px 13px 20px; border-radius:999px;
+    border:1.5px solid rgba(95,224,164,.5);
+    background:linear-gradient(160deg, rgba(20,60,45,.55), rgba(8,10,22,.88));
+    box-shadow:0 10px 26px rgba(0,0,0,.45), 0 0 22px rgba(95,224,164,.25), inset 0 1px 0 rgba(255,255,255,.16), inset 0 -3px 8px rgba(0,0,0,.32);
+    color:#EAFFF4; font-family:'Cairo',sans-serif; font-weight:900; font-size:15.5px;
+    letter-spacing:.2px; position:relative; overflow:hidden;
+    text-shadow:0 0 8px rgba(95,224,164,.45);
+    transition:transform .16s ease, box-shadow .16s ease;}
+  .reflex-pro-btn:active{transform:scale(.96);}
+  .reflex-pro-btn::after{content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.12) 46%,transparent 62%);
+    transform:translateX(-120%); animation:reflexCtaShine 3.4s ease-in-out infinite;}
+  @keyframes reflexCtaShine{0%{transform:translateX(-120%);} 40%{transform:translateX(120%);} 100%{transform:translateX(120%);}}
+  .reflex-pro-btn .rpb-ico{width:28px; height:28px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
+    background:radial-gradient(circle at 35% 30%, rgba(170,255,215,.5), rgba(10,60,40,.3) 62%, transparent 72%), rgba(6,26,18,.6);
+    border:1.5px solid rgba(95,224,164,.75); box-shadow:inset 0 0 7px rgba(95,224,164,.4), 0 0 8px rgba(95,224,164,.4);}
+  .reflex-pro-btn .rpb-ico svg{width:14px; height:14px; color:#D9FFEC; filter:drop-shadow(0 0 3px rgba(95,224,164,.9));}
+  .reflex-pro-btn span:last-child{position:relative; z-index:1;}
+
+  .reflex-rules-card{max-width:320px;}
+  .reflex-rules-card .confirm-icon{font-size:40px; margin-bottom:6px;}
+  .reflex-rules-card .confirm-msg{font-size:16.5px;}
+  .reflex-rules-list{margin:14px 0 2px; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+  .reflex-rules-list li{display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-muted); line-height:1.6; text-align:right;}
+  .reflex-rules-list li b{color:var(--text); font-weight:800;}
+  .reflex-rules-ico{flex:0 0 auto; width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:15px; background:var(--surface-2); border:1.5px solid var(--border);}
+  .reflex-rules-ico.warn{background:color-mix(in srgb, var(--danger) 16%, var(--surface-2)); border-color:color-mix(in srgb, var(--danger) 35%, var(--border));}
+  .reflex-rules-ico.go{background:color-mix(in srgb, var(--good) 16%, var(--surface-2)); border-color:color-mix(in srgb, var(--good) 35%, var(--border));}
+  .reflex-rules-ico.decoy{background:color-mix(in srgb, #FFD93D 22%, var(--surface-2)); border-color:color-mix(in srgb, #FFD93D 45%, var(--border));}
+
   .room-join-row{display:flex; gap:10px; align-items:center;}
   .room-code-input{flex:1; text-align:center; letter-spacing:6px; font-family:'Cairo',sans-serif; font-weight:800; font-size:22px;
     padding:14px 10px; border-radius:14px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
@@ -5901,7 +5997,8 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
   soloNumGuessReward:100, soloNumGuessMaxTries:3,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
-  soloSnlReward:30, soloSnlWinsNeeded:3};
+  soloSnlReward:30, soloSnlWinsNeeded:3,
+  soloReflexReward:30, soloReflexWinsNeeded:5};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
     ? `<img src="${CONF_SETTINGS.logo}" alt="لوجو المؤتمر" class="conf-logo-img" />`
@@ -8211,6 +8308,7 @@ const GAMES_CATALOG = [
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
+  {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
   {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'Stack', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
@@ -8219,9 +8317,10 @@ const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
+  reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
   stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد',
-  millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 10 ثواني للسؤال، وكمّلهم كلهم واكسب 300 نقطة'
+  millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 10 ثواني للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
 };
 function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
 const GH_INFO_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 5.5v8" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" fill="none"/><circle cx="12" cy="18.2" r="1.7" fill="currentColor"/></svg>';
@@ -9069,6 +9168,260 @@ function renderRpsGame(){
       ${['rock','paper','scissors'].map(c=>`<button type="button" class="rps-btn" data-action="rps-pick" data-choice="${c}" ${g.spinning?'disabled':''}>${RPS_ICONS[c]}<span>${RPS_LABELS[c]}</span></button>`).join('')}
     </div>
   `;
+}
+
+/* ============================= GAMES: REFLEX (أسرع واحد) ============================= */
+const REFLEX_CONFIG = {waitMin:1200, waitMax:3400, cpuMin:220, cpuMax:570, decoyChance:0.18};
+function reflexTier(ms){
+  if(ms==null) return null;
+  if(ms<180) return {label:'رد فعل نينجا', icon:'🥷⚡'};
+  if(ms<230) return {label:'رد فعل محترف', icon:'🏅'};
+  if(ms<300) return {label:'رد فعل جامد', icon:'👏'};
+  if(ms<400) return {label:'رد فعل كويس', icon:'👍'};
+  return {label:'محتاج تتمرن شوية', icon:'🙂'};
+}
+function initReflexGame(){
+  if(state.reflex && state.reflex.timer) clearTimeout(state.reflex.timer);
+  if(state.reflex && state.reflex.decoyTimer) clearTimeout(state.reflex.decoyTimer);
+  state.reflex = { score:{win:0,lose:0,draw:0}, phase:'idle', goAt:0, userMs:null, cpuMs:null, outcome:null,
+    timer:null, decoyTimer:null, decoy:false,
+    matchOver:false, matchWinner:null, streak:0, bestStreakRound:0, history:[] };
+}
+async function saveReflexStatsIfNeeded(ms, bestStreak){
+  if(!state.pid) return;
+  const st = myGameStats(state.pid);
+  let changed = false;
+  if(ms!=null){
+    if(!st.reflexBest || ms < st.reflexBest){ st.reflexBest = ms; changed = true; }
+    st.reflexSum = (st.reflexSum||0) + ms;
+    st.reflexCount = (st.reflexCount||0) + 1;
+    changed = true;
+  }
+  if(bestStreak!=null && (!st.reflexBestStreak || bestStreak > st.reflexBestStreak)){ st.reflexBestStreak = bestStreak; changed = true; }
+  if(changed) await saveGameStats(GAME_STATS);
+}
+function doReflexStart(){
+  if(!state.reflex) initReflexGame();
+  const g = state.reflex;
+  if(g.phase==='ready' || g.phase==='go' || g.matchOver) return;
+  g.phase='ready'; g.userMs=null; g.cpuMs=null; g.outcome=null; g.decoy=false;
+  SND.click();
+  render();
+  const diff = REFLEX_CONFIG;
+  const wait = diff.waitMin + Math.random()*(diff.waitMax-diff.waitMin);
+  if(diff.decoyChance && Math.random()<diff.decoyChance && wait>900){
+    const decoyDelay = 280 + Math.random()*(wait-650);
+    g.decoyTimer = setTimeout(()=>{
+      if(state.reflex!==g || g.phase!=='ready') return;
+      g.decoy = true; render();
+      setTimeout(()=>{ if(state.reflex===g && g.phase==='ready'){ g.decoy=false; render(); } }, 150);
+    }, decoyDelay);
+  }
+  g.timer = setTimeout(()=>{
+    if(state.reflex!==g || g.phase!=='ready') return;
+    g.decoy = false;
+    g.phase='go'; g.goAt=Date.now();
+    render();
+  }, wait);
+}
+function reflexProBtn(action, isNext){
+  const icoSvg = isNext
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115.36-6.36"/><path d="M21 12a9 9 0 01-15.36 6.36"/><path d="M17 3v5h-5"/><path d="M7 21v-5h5"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  const label = isNext ? 'الجولة الجاية' : 'ابدأ الجولة';
+  return `<button type="button" class="reflex-pro-btn" data-action="${action}">
+    <span class="rpb-ico">${icoSvg}</span>
+    <span>${label}</span>
+  </button>`;
+}
+function closeReflexRulesModal(){
+  const el = document.getElementById('reflex-rules-overlay');
+  if(el) el.remove();
+}
+function showReflexRulesModal(){
+  closeReflexRulesModal();
+  if(!state.reflex) initReflexGame();
+  const g = state.reflex;
+  const diff = REFLEX_CONFIG;
+  const isNext = g.phase==='result';
+  const decoyRow = diff.decoyChance ? `
+      <li><span class="reflex-rules-ico decoy">⚠️</span><span>ممكن تيجي <b>إشارة صفرا خدّاعة</b> قبل الأخضر — خليك مركّز ومتستعجلش.</span></li>` : '';
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay confirm-overlay reflex-rules-overlay';
+  overlay.id = 'reflex-rules-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-card reflex-rules-card">
+      <div class="confirm-icon">✋</div>
+      <div class="confirm-msg">استعد.. الجولة على وشك تبدأ</div>
+      <ul class="reflex-rules-list">
+        <li><span class="reflex-rules-ico go">🟢</span><span><b>استنى الإشارة الخضرا</b> ودوس بأسرع ما تقدر.</span></li>
+        <li><span class="reflex-rules-ico warn">🚫</span><span><b>الدوس بدري</b> — قبل ما تظهر الإشارة — بيخسّرك الجولة على طول.</span></li>${decoyRow}
+      </ul>
+      <div class="confirm-actions" style="flex-direction:column; margin-top:18px;">
+        <button type="button" class="reflex-pro-btn" id="reflex-rules-start-btn" style="margin:0 auto;">
+          <span class="rpb-ico">${isNext
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115.36-6.36"/><path d="M21 12a9 9 0 01-15.36 6.36"/><path d="M17 3v5h-5"/><path d="M7 21v-5h5"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'}</span>
+          <span>${isNext?'يلا الجولة الجاية':'فهمت.. يلا نبدأ'}</span>
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('reflex-rules-start-btn').addEventListener('click', ()=>{
+    closeReflexRulesModal();
+    doReflexStart();
+  });
+}
+function reflexPushHistory(g, entry){
+  g.history.unshift(entry);
+  if(g.history.length>8) g.history.length = 8;
+}
+function reflexCheckMatch(g){
+  const need = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloReflexWinsNeeded)||5;
+  if(g.score.win>=need || g.score.lose>=need){
+    g.matchOver = true;
+    g.matchWinner = g.score.win>=need ? 'user' : 'cpu';
+    if(g.matchWinner==='user'){
+      const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloReflexReward)||0;
+      awardSoloGamePoints(reward, 'مبروك! كسبت معركة أسرع واحد');
+    }
+  }
+}
+function doReflexTap(){
+  const g = state.reflex; if(!g || g.matchOver) return;
+  if(g.phase==='ready'){
+    if(g.timer) clearTimeout(g.timer);
+    if(g.decoyTimer) clearTimeout(g.decoyTimer);
+    g.decoy = false;
+    g.phase='result'; g.outcome='early'; g.score.lose++;
+    g.streak = 0;
+    reflexPushHistory(g, {outcome:'early', ms:null});
+    vibrate([12,15,12]);
+    reflexCheckMatch(g);
+    render();
+  } else if(g.phase==='go'){
+    const diff = REFLEX_CONFIG;
+    g.userMs = Date.now()-g.goAt;
+    g.cpuMs = Math.round(diff.cpuMin+Math.random()*(diff.cpuMax-diff.cpuMin));
+    if(g.userMs<g.cpuMs){
+      g.outcome='win'; g.score.win++; g.streak++;
+      if(g.streak>g.bestStreakRound) g.bestStreakRound = g.streak;
+      SND.coinChime(); launchConfetti();
+      saveReflexStatsIfNeeded(g.userMs, g.bestStreakRound);
+    }
+    else if(g.userMs>g.cpuMs){ g.outcome='lose'; g.score.lose++; g.streak=0; vibrate(15); }
+    else { g.outcome='draw'; g.score.draw++; g.streak=0; vibrate(10); }
+    reflexPushHistory(g, {outcome:g.outcome, ms:g.userMs});
+    g.phase='result';
+    reflexCheckMatch(g);
+    render();
+  }
+}
+function renderReflexGame(){
+  if(!state.reflex) initReflexGame();
+  const g = state.reflex;
+  const diff = REFLEX_CONFIG;
+  const need = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloReflexWinsNeeded)||5;
+  const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloReflexReward)||0;
+  const stats = state.pid ? myGameStats(state.pid) : {};
+  if(g.matchOver){
+    const iWon = g.matchWinner==='user';
+    const bestLine2 = [
+      stats.reflexBest ? `أسرع رد فعل ليك: <b style="color:var(--gold)">${stats.reflexBest} م.ث</b> ⚡` : '',
+      stats.reflexBestStreak ? `أطول متتالية فوز: <b style="color:var(--gold)">${stats.reflexBestStreak}</b> 🔥` : ''
+    ].filter(Boolean).join(' • ');
+    return `
+      <div class="back-row">
+        <button class="icon-btn" data-action="back">${ICO.back}</button>
+        <div class="back-title">أسرع واحد</div>
+      </div>
+      <div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز ضد الجهاز تاخد <b>${reward}</b> نقطة</div>
+      <div class="match-result-card ${iWon?'win':'lose'}">
+        <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
+        <div class="match-result-title">${iWon?'مبروك! كسبت المعركة':'خسرت المعركة'}</div>
+        <div class="match-result-sub">${iWon?'أنت':'الجهاز'} وصل ${need} فوز وحسم المعركة</div>
+        ${iWon
+          ? `<div class="match-result-points win">+${reward} نقطة 🎉</div>`
+          : `<div class="match-result-points lose">😢 حظ أوفر المرة الجاية</div>`}
+        <div class="xo-score-row" style="margin-top:16px;">
+          ${scorePill(gameAvatar(state.pid), g.score.win)}
+          <div class="xo-score-pill draw"><span>تعادل</span><b>${g.score.draw}</b></div>
+          ${scorePill(gameAiAvatar(), g.score.lose, 'o')}
+        </div>
+      </div>
+      ${bestLine2 ? `<div class="hint" style="text-align:center;margin-top:10px;">${bestLine2}</div>` : ''}
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" data-action="reflex-reset">🔄 معركة جديدة</button>
+    `;
+  }
+  const zoneCls = g.phase + (g.phase==='result' ? ' outcome-'+g.outcome : '') + (g.decoy && g.phase==='ready' ? ' decoy' : '');
+  const zoneIcon = g.decoy ? '⚠️' : g.phase==='ready' ? '✋' : g.phase==='go' ? '⚡' : g.phase==='result' ? (g.outcome==='win'?'🏆':g.outcome==='draw'?'🤝':g.outcome==='early'?'🚫':'😅') : '⚡';
+  const zoneLabel = g.decoy ? 'لسه! متستعجلش' : g.phase==='ready' ? 'استنى...' : g.phase==='go' ? 'دوس دلوقتي!'
+    : g.phase==='result' ? (g.outcome==='early' ? 'دست بدري!' : g.outcome==='win' ? 'فزت في الجولة!' : g.outcome==='draw' ? 'تعادل!' : 'الجهاز كان أسرع')
+    : 'دوس ابدأ الجولة';
+  const zoneAction = (g.phase==='ready'||g.phase==='go') ? ' data-action="reflex-tap"' : '';
+  const tier = (g.phase==='result' && g.outcome==='win') ? reflexTier(g.userMs) : null;
+  const battleHtml = (g.phase==='result' && g.outcome!=='early') ? `
+    <div class="rps-battle reflex-battle">
+      <div class="rps-side"><div class="reflex-ms ${g.outcome==='win'?'is-win':''}">${g.userMs} <span>م.ث</span></div>${gameAvatar(state.pid)}<div class="rps-lab">أنت</div></div>
+      <div class="rps-vs">VS</div>
+      <div class="rps-side"><div class="reflex-ms ${g.outcome==='lose'?'is-win':''}">${g.cpuMs} <span>م.ث</span></div>${gameAiAvatar()}<div class="rps-lab">الجهاز</div></div>
+    </div>
+    ${tier ? `<div class="reflex-tier-badge">${tier.icon} ${tier.label}</div>` : ''}` : '';
+  const avgLine = stats.reflexCount ? ` • متوسطك: <b style="color:var(--gold)">${Math.round(stats.reflexSum/stats.reflexCount)} م.ث</b> 📊` : '';
+  const streakLine = stats.reflexBestStreak ? ` • أطول متتالية: <b style="color:var(--gold)">${stats.reflexBestStreak}</b> 🔥` : '';
+  const bestLine = (stats.reflexBest ? `أسرع رد فعل ليك: <b style="color:var(--gold)">${stats.reflexBest} م.ث</b> ⚡` : 'اكسب أول جولة عشان تسجّل رقمك القياسي 🏅') + avgLine + streakLine;
+  const historyHtml = g.history.length ? `<div class="reflex-history-strip">${g.history.map(h=>{
+    const cls = h.outcome==='win'?'win':h.outcome==='lose'?'lose':h.outcome==='early'?'early':'draw';
+    const txt = h.outcome==='early' ? '🚫' : h.outcome==='win' ? (h.ms+'م') : h.outcome==='draw' ? '🤝' : (h.ms+'م');
+    return `<span class="reflex-chip ${cls}">${txt}</span>`;
+  }).join('')}</div>` : '';
+  const lbOpen = !!state.reflexLeaderboardOpen;
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">أسرع واحد</div>
+    </div>
+    <div class="xo-stakes-banner">🎯 أول ما توصل <b>${need}</b> فوز تاخد <b>${reward}</b> نقطة</div>
+    <div class="xo-score-row">
+      <div class="xo-score-pill"><span>فوز</span><b>${g.score.win}</b></div>
+      <div class="xo-score-pill draw"><span>تعادل</span><b>${g.score.draw}</b></div>
+      <div class="xo-score-pill o"><span>خسارة</span><b>${g.score.lose}</b></div>
+    </div>
+    ${g.streak>=2 ? `<div class="reflex-streak-badge">🔥 متتالية فوز: ${g.streak}</div>` : ''}
+    <button type="button" class="reflex-zone ${zoneCls}"${zoneAction} aria-live="polite" role="status">
+      <span class="reflex-zone-icon">${zoneIcon}</span>
+      <span class="reflex-zone-label">${zoneLabel}</span>
+    </button>
+    ${battleHtml}
+    ${(g.phase==='idle'||g.phase==='result') ? reflexProBtn('reflex-start', g.phase==='result') : ''}
+    ${historyHtml}
+    <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
+    <button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="reflex-toggle-leaderboard">${lbOpen?'🔽 إخفاء لوحة الصدارة':'🏆 لوحة صدارة أسرع واحد'}</button>
+    ${lbOpen ? renderReflexLeaderboard() : ''}
+  `;
+}
+function reflexLeaderboardRows(){
+  return PARTICIPANTS
+    .map(p=>({p, best:(GAME_STATS[p.id]&&GAME_STATS[p.id].reflexBest)||null}))
+    .filter(x=>x.best!=null)
+    .sort((a,b)=>a.best-b.best)
+    .slice(0,10);
+}
+function renderReflexLeaderboard(){
+  const rows = reflexLeaderboardRows();
+  if(!rows.length) return `<div class="hint" style="text-align:center;margin-top:8px;">لسه محدش سجّل وقت رسمي — يلا اكسب أول جولة وكن الأول! 🥇</div>`;
+  return `<div class="card" style="margin-top:8px;">${rows.map((r,i)=>{
+    const t = teamOf(r.p.teamId);
+    const mine = r.p.id===state.pid;
+    const rankHtml = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    return `<div class="lb-row ${mine?'gh-lb-me':''}">
+      <div class="lb-rank">${rankHtml}</div>
+      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(r.p.name)}</div>
+      <div class="lb-name">${escapeHtml(r.p.name)}${mine?' '+tr('lb_you'):''}</div>
+      <div class="lb-pts">${r.best} م.ث</div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 /* ============================= GAMES: NUMBER GUESS ============================= */
@@ -13279,6 +13632,9 @@ async function createGameRoom(gameType, paid){
   } else if(gameType==='math'){
     Object.assign(room, {problem:genMathProblem(), qIndex:0, total:10, locked:{host:false,guest:false},
       finished:false, winner:null, scoreHost:0, scoreGuest:0});
+  } else if(gameType==='reflex'){
+    Object.assign(room, {phase:'idle', round:0, tap:{host:null, guest:null}, roundResult:null, goAt:0,
+      scoreHost:0, scoreGuest:0, scoreDraw:0, matchTarget:5, matchOver:false, matchWinner:null, hist:[]});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -13827,6 +14183,7 @@ const ROOM_GAMES = [
   {id:'numguess', sub:'خمّنوا الرقم بالدور'},
   {id:'math',     sub:'سباق — الأسرع ياخد النقطة'},
   {id:'uno',      sub:'لحد 4 أصحاب، خلّص ورقك الأول'},
+  {id:'reflex',   sub:'استنى الإشارة ودوس بأسرع وقت'},
 ];
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 function renderRoomUnoLobby(room){
@@ -14584,6 +14941,185 @@ function renderRoomMath(){
   `;
 }
 
+
+/* ---------- rooms: REFLEX (أسرع واحد — استنى الإشارة ودوس بأسرع وقت) ---------- */
+async function doRoomReflexGo(code, atRound){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[code];
+  if(!room || room.status!=='playing' || room.phase!=='ready' || room.round!==atRound) return;
+  room.phase = 'go'; room.goAt = Date.now();
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomReflexSetTarget(n){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.hostId!==state.pid) return;
+  if(room.round>0 || room.phase==='ready' || room.phase==='go') return;
+  room.matchTarget = Math.max(1, parseInt(n,10)||5);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  SND.click();
+  render();
+}
+async function doRoomReflexRematch(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing') return;
+  room.round = 0; room.phase = 'idle'; room.tap = {host:null, guest:null}; room.roundResult = null;
+  room.scoreHost = 0; room.scoreGuest = 0; room.scoreDraw = 0;
+  room.matchOver = false; room.matchWinner = null; room.hist = [];
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  SND.click();
+  render();
+}
+async function doRoomReflexStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.matchOver) return;
+  if(room.phase==='ready' || room.phase==='go') return;
+  room.phase = 'ready';
+  room.tap = {host:null, guest:null};
+  room.roundResult = null;
+  room.round = (room.round||0)+1;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  SND.click();
+  render();
+  const atRound = room.round, code = room.code;
+  setTimeout(()=>doRoomReflexGo(code, atRound), 1200 + Math.random()*2200);
+}
+async function doRoomReflexTap(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.matchOver) return;
+  const role = room.hostId===state.pid ? 'host' : 'guest';
+  if(!room.tap) room.tap = {host:null, guest:null};
+  if(room.tap[role]!=null) return;
+  if(room.phase==='ready'){
+    room.tap[role] = 'early';
+    vibrate(30);
+  } else if(room.phase==='go'){
+    const local = state.roomReflexGoLocal;
+    const localAt = (local && local.code===room.code && local.round===room.round) ? local.at : room.goAt;
+    room.tap[role] = Math.max(1, Date.now()-localAt);
+    SND.click();
+  } else { return; }
+  if(room.tap.host!=null && room.tap.guest!=null){
+    const h = room.tap.host, g = room.tap.guest;
+    const hEarly = h==='early', gEarly = g==='early';
+    let res;
+    if(hEarly && gEarly) res='draw';
+    else if(hEarly) res='guest';
+    else if(gEarly) res='host';
+    else res = h<g ? 'host' : (g<h ? 'guest' : 'draw');
+    room.roundResult = res;
+    if(res==='draw') room.scoreDraw=(room.scoreDraw||0)+1;
+    else if(res==='host') room.scoreHost=(room.scoreHost||0)+1;
+    else room.scoreGuest=(room.scoreGuest||0)+1;
+    room.phase = 'result';
+    if(!room.hist) room.hist = [];
+    room.hist.unshift({res, h, g});
+    if(room.hist.length>8) room.hist.length = 8;
+    const target = room.matchTarget || 5;
+    if(room.scoreHost>=target || room.scoreGuest>=target){
+      room.matchOver = true;
+      room.matchWinner = room.scoreHost>=target ? 'host' : 'guest';
+    }
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.phase==='result' && room.roundResult!=='draw'){
+    vibrate([20,20,30]); SND.coinChime();
+    if(room.roundResult===role) launchConfetti();
+  }
+}
+function renderRoomReflex(){
+  const room = GAME_ROOMS[state.roomCode];
+  const gate = roomGate('أسرع واحد', room);
+  if(gate) return gate;
+  const me = roomMe(room);
+  const phase = room.phase || 'idle';
+  const target = room.matchTarget || 5;
+  if(phase==='go'){
+    if(!state.roomReflexGoLocal || state.roomReflexGoLocal.code!==room.code || state.roomReflexGoLocal.round!==room.round){
+      state.roomReflexGoLocal = {code:room.code, round:room.round, at:Date.now()};
+    }
+  } else if(state.roomReflexGoLocal && state.roomReflexGoLocal.code===room.code){
+    state.roomReflexGoLocal = null;
+  }
+  const targetSwitch = (!room.round && me.isHost && !room.matchOver) ? `
+    <div class="game-mode-switch">
+      ${[3,5,7].map(n=>`<button type="button" class="gms-btn ${target===n?'active':''}" data-action="room-reflex-target" data-n="${n}">أول لـ ${n}</button>`).join('')}
+    </div>` : (!room.round ? `<div class="hint" style="text-align:center;margin:2px 0 8px;">المعركة أول واحد يوصل ${target} جولات</div>` : '');
+  if(room.matchOver){
+    const iWon = room.matchWinner===me.role;
+    return `
+      ${roomHead('أسرع واحد', room)}
+      <div class="match-result-card ${iWon?'win':'lose'}">
+        <div class="match-result-ico">${iWon?'🏆':'😭'}</div>
+        <div class="match-result-title">${iWon?'مبروك! كسبت المعركة':'خسرت المعركة'}</div>
+        <div class="match-result-sub">${iWon?'أنت':'صاحبك'} وصل ${target} جولات وحسم المعركة</div>
+        <div class="xo-score-row" style="margin-top:16px;">
+          ${scorePill(gameAvatar(me.myId), me.myScore)}
+          <div class="xo-score-pill draw"><span>تعادل</span><b>${room.scoreDraw||0}</b></div>
+          ${scorePill(gameAvatar(me.oppId), me.oppScore, 'o')}
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" data-action="room-reflex-rematch">🔄 معركة جديدة</button>
+    `;
+  }
+  const tap = room.tap || {host:null, guest:null};
+  const myTap = tap[me.role], oppTap = tap[me.oppRole];
+  const iWon = phase==='result' && room.roundResult===me.role;
+  const iLost = phase==='result' && room.roundResult===me.oppRole;
+  let statusText;
+  if(phase==='result') statusText = room.roundResult==='draw' ? '🤝 تعادل في الجولة!' : (iWon ? '🎉 فزت في الجولة!' : '😅 صاحبك كان أسرع');
+  else if(phase==='ready') statusText = '✋ استنى... متستعجلش، الدوس بدري بيخسّرك الجولة!';
+  else if(phase==='go') statusText = '⚡ دوس دلوقتي!';
+  else statusText = 'اللي يدوس أسرع بعد الإشارة الخضرا ياخد الجولة';
+  const zoneCls = (phase==='ready' ? 'ready' : phase==='go' ? 'go' : phase==='result' ? 'result' : 'idle') + (phase==='result' ? ' outcome-'+(room.roundResult==='draw'?'draw':(iWon?'win':'lose')) : '');
+  const zoneIcon = phase==='ready' ? '✋' : phase==='go' ? '⚡' : phase==='result' ? (room.roundResult==='draw'?'🤝':(iWon?'🏆':'😅')) : '⚡';
+  const zoneLabel = phase==='ready' ? 'استنى...' : phase==='go' ? 'دوس دلوقتي!'
+    : phase==='result' ? (room.roundResult==='draw' ? 'تعادل!' : (iWon ? 'فزت في الجولة!' : 'صاحبك كان أسرع')) : 'استنى بداية الجولة';
+  const zoneAction = (phase==='ready'||phase==='go') ? ' data-action="room-reflex-tap"' : '';
+  const showStart = (phase==='idle' || phase==='result');
+  const fmtTap = v => v==='early' ? '🚫 بدري' : (v==null ? '—' : v+' <span>م.ث</span>');
+  const battleHtml = (phase==='result') ? `
+    <div class="rps-battle reflex-battle">
+      <div class="rps-side"><div class="reflex-ms ${iWon?'is-win':''}">${fmtTap(myTap)}</div>${gameAvatar(me.myId)}<div class="rps-lab">أنت</div></div>
+      <div class="rps-vs">VS</div>
+      <div class="rps-side"><div class="reflex-ms ${iLost?'is-win':''}">${fmtTap(oppTap)}</div>${gameAvatar(me.oppId)}<div class="rps-lab">صاحبك</div></div>
+    </div>` : '';
+  const hist = room.hist || [];
+  const historyHtml = hist.length ? `<div class="reflex-history-strip">${hist.map(x=>{
+    const won = x.res===me.role, lost = x.res===me.oppRole, drew = x.res==='draw';
+    const cls = drew ? 'draw' : (won ? 'win' : 'lose');
+    const mine = x[me.role[0]];
+    const txt = mine==='early' ? '🚫' : (mine+'م');
+    return `<span class="reflex-chip ${cls}">${txt}</span>`;
+  }).join('')}</div>` : '';
+  return `
+    ${roomHead('أسرع واحد', room)}
+    ${targetSwitch}
+    <div class="xo-score-row">
+      ${scorePill(gameAvatar(me.myId), me.myScore)}
+      <div class="xo-score-pill draw"><span>جولة</span><b>${room.round||0}</b></div>
+      ${scorePill(gameAvatar(me.oppId), me.oppScore, 'o')}
+    </div>
+    <div class="xo-status">${statusText}</div>
+    <button type="button" class="reflex-zone ${zoneCls}"${zoneAction} aria-live="polite" role="status">
+      <span class="reflex-zone-icon">${zoneIcon}</span>
+      <span class="reflex-zone-label">${zoneLabel}</span>
+    </button>
+    ${battleHtml}
+    ${showStart ? reflexProBtn('room-reflex-start', phase==='result') : ''}
+    ${historyHtml}
+  `;
+}
 
 /* ============================= ROOMS: VS INTRO + EMOJI REACTIONS ============================= */
 const ROOM_EMOJIS = ['🤌','😡','😭','😜','🤔','🤫','🥱','😤','😂','😨','🤨','🌹','👍'];
@@ -17012,6 +17548,7 @@ function render(){
   else if(state.view==='game-ludo') html = renderLudoGame();
   else if(state.view==='game-memory') html = renderMemoryGame();
   else if(state.view==='game-rps') html = renderRpsGame();
+  else if(state.view==='game-reflex') html = renderReflexGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
   else if(state.view==='game-math') html = renderMathGame();
   else if(state.view==='game-uno') html = renderUnoGame();
@@ -17024,6 +17561,7 @@ function render(){
   else if(state.view==='room-memory') html = renderRoomMemory();
   else if(state.view==='room-numguess') html = renderRoomNumGuess();
   else if(state.view==='room-math') html = renderRoomMath();
+  else if(state.view==='room-reflex') html = renderRoomReflex();
   else if(state.view==='room-uno') html = renderRoomUno();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='pass') html = renderPassPage();
@@ -18144,7 +18682,8 @@ function closeScanModal(){
 /* ============================= EVENTS ============================= */
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
-  'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next'
+  'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
+  'reflex-reset','room-reflex-rematch'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
@@ -18152,6 +18691,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-memory-card','room-memory-next','room-num-key','room-num-next','room-math-pick','room-math-next',
   'room-ludo-start','room-ludo-skip','ludo-token','ludo-roll',
   'room-uno-start','room-uno-play','room-uno-draw','room-uno-endturn','room-uno-color','room-uno-uno','room-uno-catch','room-uno-next',
+  'room-reflex-start','room-reflex-tap','room-reflex-target','room-reflex-rematch',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
@@ -18360,6 +18900,7 @@ document.addEventListener('click', (e)=>{
     else if(gid==='ludo') initLudoGame();
     else if(gid==='memory') initMemoryGame();
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
+    else if(gid==='reflex') initReflexGame();
     else if(gid==='numguess') initNumberGame();
     else if(gid==='math') initMathGame();
     else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
@@ -18470,6 +19011,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-num-next'){ doRoomNumNext(); }
   else if(action==='room-math-pick'){ doRoomMathPick(el.dataset.val); }
   else if(action==='room-math-next'){ doRoomMathNext(); }
+  else if(action==='room-reflex-start'){ doRoomReflexStart(); }
+  else if(action==='room-reflex-tap'){ doRoomReflexTap(); }
+  else if(action==='room-reflex-target'){ doRoomReflexSetTarget(el.dataset.n); }
+  else if(action==='room-reflex-rematch'){ doRoomReflexRematch(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
@@ -18569,6 +19114,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='memory-card'){ doMemoryFlip(parseInt(el.dataset.idx,10)); }
   else if(action==='memory-reset'){ initMemoryGame(); render(); }
   else if(action==='rps-pick'){ doRpsPick(el.dataset.choice); }
+  else if(action==='reflex-start'){ showReflexRulesModal(); }
+  else if(action==='reflex-tap'){ doReflexTap(); }
+  else if(action==='reflex-reset'){ initReflexGame(); render(); }
+  else if(action==='reflex-toggle-leaderboard'){ state.reflexLeaderboardOpen = !state.reflexLeaderboardOpen; render(); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
   else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); }); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
