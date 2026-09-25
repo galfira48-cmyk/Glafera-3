@@ -3822,6 +3822,24 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .rps-btn:not(:disabled):active{transform:scale(.93);}
   .rps-btn:disabled{opacity:.5;}
 
+  .quiz-opts{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  .quiz-opt{padding:14px 10px; border-radius:16px; font-family:'Tajawal',Arial; font-weight:700; font-size:14px; text-align:center; line-height:1.4;
+    background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); color:var(--text);}
+  .quiz-opt:not(:disabled):active{transform:scale(.96);}
+  .quiz-opt:disabled{opacity:.55;}
+  .quiz-opt.quiz-correct{border-color:var(--good); background:rgba(95,224,164,.15); opacity:1;}
+  .quiz-opt.quiz-wrong{border-color:var(--danger); background:rgba(255,107,107,.15); opacity:1;}
+  .quiz-score-row{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:10px 0;}
+  .quiz-img{font-size:56px; text-align:center; margin:6px 0 2px;}
+  .quiz-qtext{font-family:'Cairo',sans-serif; font-weight:800; font-size:17px; text-align:center; color:var(--text); line-height:1.55;
+    background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); border-radius:18px;
+    padding:16px 12px; margin:10px 0 4px;}
+  .quiz-lb-row{display:flex; align-items:center; gap:10px; width:100%;
+    background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); border-radius:14px;
+    padding:10px 14px; margin-bottom:8px;}
+  .quiz-lb-rank{font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:var(--text-muted); min-width:20px;}
+  .quiz-lb-name{flex:1; text-align:right; font-weight:700; font-size:13px; color:var(--text);}
+
   .numguess-display{font-family:'Cairo',sans-serif; font-weight:900; font-size:44px; text-align:center; color:var(--gold);
     background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); border-radius:20px;
     padding:18px 10px; margin:14px 0; min-height:64px; display:flex; align-items:center; justify-content:center;}
@@ -5625,6 +5643,17 @@ async function loadQuestions(){
 }
 async function saveQuestions(obj){
   try{ await window.storage.set('glavera-questions', JSON.stringify(obj), true); }catch(e){}
+}
+/* بنك أسئلة لعبة "تحدي الأسئلة" — الأدمن بس هو اللي بيضيف ويعدّل فيه، متخزّن على فايربيز زي باقي بيانات الأدمن */
+async function loadQuizQuestions(){
+  try{
+    const r = await window.storage.get('glavera-quiz-questions', true);
+    if(!r){ await saveQuizQuestions(QUIZ_QUESTIONS_DEFAULT); return QUIZ_QUESTIONS_DEFAULT.slice(); }
+    return JSON.parse(r.value);
+  }catch(e){ return QUIZ_QUESTIONS_DEFAULT.slice(); }
+}
+async function saveQuizQuestions(obj){
+  try{ await window.storage.set('glavera-quiz-questions', JSON.stringify(obj), true); }catch(e){}
 }
 async function loadReports(){
   try{
@@ -13635,6 +13664,8 @@ async function createGameRoom(gameType, paid){
   } else if(gameType==='reflex'){
     Object.assign(room, {phase:'idle', round:0, tap:{host:null, guest:null}, roundResult:null, goAt:0,
       scoreHost:0, scoreGuest:0, scoreDraw:0, matchTarget:5, matchOver:false, matchWinner:null, hist:[]});
+  } else if(gameType==='quiz'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], quiz:null});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -13663,7 +13694,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -14184,7 +14215,12 @@ const ROOM_GAMES = [
   {id:'math',     sub:'سباق — الأسرع ياخد النقطة'},
   {id:'uno',      sub:'لحد 4 أصحاب، خلّص ورقك الأول'},
   {id:'reflex',   sub:'استنى الإشارة ودوس بأسرع وقت'},
+  {id:'quiz',     sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر'},
 ];
+/* لعبة تحدي الأسئلة متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
+const ROOM_ONLY_TILES = {
+  quiz: {id:'quiz', icon:'❓', title:'تحدي الأسئلة', sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
+};
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 function renderRoomUnoLobby(room){
   const ps = room.players || [];
@@ -14338,9 +14374,275 @@ async function doRoomUnoNext(){
   await saveGameRooms(GAME_ROOMS);
   render();
 }
+/* ---------- rooms: تحدي الأسئلة (لحد 4 أصحاب — نفس الأسئلة، الأسرع والصح ياخد نقط أكتر) ---------- */
+/* بنك أسئلة افتراضي (بيتزرع مرة واحدة بس أول ما اللعبة تتفتح لأول مرة)؛ بعد كده الأدمن هو اللي بيضيف/يعدّل/يحذف الأسئلة من لوحة التحكم.
+   img اختياري (إيموجي كبير بديل عن صورة) لأي سؤال محتاج توضيح بصري */
+const QUIZ_QUESTIONS_DEFAULT = [
+  {id:'qzd01', q:'كام عدد ألوان علم مصر؟', o:['لونين','3 ألوان','4 ألوان','5 ألوان'], c:1, img:'🇪🇬'},
+  {id:'qzd02', q:'إيه أكبر محيط في العالم؟', o:['الأطلسي','الهندي','الهادي','المتجمد الشمالي'], c:2},
+  {id:'qzd03', q:'مين رسم لوحة الموناليزا؟', o:['بيكاسو','ليوناردو دافنشي','فان جوخ','مايكل أنجلو'], c:1, img:'🖼️'},
+  {id:'qzd04', q:'كام قارة في العالم؟', o:['5','6','7','8'], c:2, img:'🌍'},
+  {id:'qzd05', q:'إيه أسرع حيوان بري في العالم؟', o:['الأسد','الفهد', 'الحصان','النمر'], c:1, img:'🐆'},
+  {id:'qzd06', q:'في أي دولة موجود برج إيفل؟', o:['إيطاليا','إسبانيا','فرنسا','ألمانيا'], c:2, img:'🗼'},
+  {id:'qzd07', q:'كام لاعب في فريق كرة القدم داخل الملعب؟', o:['9','10','11','12'], c:2, img:'⚽'},
+  {id:'qzd08', q:'إيه أطول نهر في العالم؟', o:['الأمازون','النيل','المسيسيبي','اليانغتسي'], c:1, img:'🌊'},
+  {id:'qzd09', q:'مين مؤسس شركة مايكروسوفت؟', o:['ستيف جوبز','بيل جيتس','إيلون ماسك','مارك زوكربيرج'], c:1, img:'💻'},
+  {id:'qzd10', q:'كام كوكب في المجموعة الشمسية؟', o:['7','8','9','10'], c:1, img:'🪐'},
+  {id:'qzd11', q:'إيه عاصمة اليابان؟', o:['بكين','سول','طوكيو','بانكوك'], c:2, img:'🗾'},
+  {id:'qzd12', q:'أكبر محيط مائي يغطي كام % تقريبًا من سطح الأرض؟', o:['30%','50%','70%','90%'], c:2},
+  {id:'qzd13', q:'كام ضلع للمثلث؟', o:['اتنين','3','4','5'], c:1, img:'🔺'},
+  {id:'qzd14', q:'مين كتب رواية "الحرافيش"؟', o:['نجيب محفوظ','طه حسين','يوسف إدريس','توفيق الحكيم'], c:0, img:'📖'},
+  {id:'qzd15', q:'إيه أكبر دولة في العالم من حيث المساحة؟', o:['الصين','كندا','روسيا','أمريكا'], c:2},
+  {id:'qzd16', q:'كام دقيقة في الساعة؟', o:['30','45','60','90'], c:2, img:'⏰'},
+  {id:'qzd17', q:'إيه العملة الرسمية في اليابان؟', o:['الوون','الين','اليوان','الدولار'], c:1, img:'💴'},
+  {id:'qzd18', q:'مين اخترع المصباح الكهربائي؟', o:['أديسون','نيوتن','أينشتاين','تسلا'], c:0, img:'💡'},
+  {id:'qzd19', q:'كام عظمة في جسم الإنسان البالغ تقريبًا؟', o:['106','156','206','256'], c:2, img:'🦴'},
+  {id:'qzd20', q:'إيه أصغر دولة في العالم من حيث المساحة؟', o:['موناكو','مالطا','الفاتيكان','سان مارينو'], c:2, img:'⛪'},
+  {id:'qzd21', q:'في أي قارة تقع صحراء الصحراء الكبرى؟', o:['آسيا','أفريقيا','أستراليا','أمريكا الجنوبية'], c:1, img:'🏜️'},
+  {id:'qzd22', q:'كام يوم في السنة الكبيسة؟', o:['364','365','366','367'], c:2, img:'📅'},
+  {id:'qzd23', q:'مين أول رائد فضاء وصل للقمر؟', o:['يوري جاجارين','نيل أرمسترونج','باز ألدرين','جون جلين'], c:1, img:'🚀'},
+  {id:'qzd24', q:'إيه الغاز اللي بيتنفسه الإنسان أساسًا؟', o:['ثاني أكسيد الكربون','النيتروجين','الأكسجين','الهيدروجين'], c:2},
+];
+let QUIZ_QUESTIONS = []; // ده اللي بيتحمّل فعليًا من فايربيز وبيتلعب بيه — الأدمن بس هو اللي بيتحكم فيه
+const QUIZ_TOTAL_QUESTIONS = 10;
+function quizPickQuestions(n){
+  const bank = (QUIZ_QUESTIONS && QUIZ_QUESTIONS.length) ? QUIZ_QUESTIONS : QUIZ_QUESTIONS_DEFAULT;
+  return shuffleArray(bank.slice()).slice(0, Math.min(n, bank.length));
+}
+const QUIZ_RANK_POINTS = [3,2,1]; // أول واحد يجاوب صح ياخد 3، التاني 2، والباقي نقطة واحدة
+function quizNewState(players){
+  const qs = quizPickQuestions(QUIZ_TOTAL_QUESTIONS);
+  return {
+    questions: qs, qIndex:0, total: qs.length,
+    scores: Object.fromEntries((players||[]).map(p=>[p.id,0])),
+    answered:{}, correctOrder:[], finished:false
+  };
+}
+function renderRoomQuizLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين ❓ — كلكم بتجاوبوا على نفس الأسئلة</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-quiz-start" ${ps.length<2?'disabled':''}>❓ ابدأ التحدي (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ التحدي</div>`}
+    </div>`;
+}
+function quizWinner(room){
+  const Q = room.quiz; if(!Q) return null;
+  const ps = room.players||[];
+  let best=null, bestScore=-1, tie=false;
+  ps.forEach(p=>{
+    const s = Q.scores[p.id]||0;
+    if(s>bestScore){ best=p.id; bestScore=s; tie=false; }
+    else if(s===bestScore){ tie=true; }
+  });
+  return tie ? 'draw' : best;
+}
+function quizAdvance(room){
+  const Q = room.quiz;
+  Q.qIndex++;
+  if(Q.qIndex>=Q.total){ Q.finished = true; }
+  else { Q.answered = {}; Q.correctOrder = []; }
+}
+async function doRoomQuizStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='quiz' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.quiz = quizNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomQuizPick(idxRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.quiz || room.quiz.finished) return;
+  const Q = room.quiz;
+  if(Q.answered[state.pid]) return;
+  const idx = parseInt(idxRaw,10);
+  const q = Q.questions[Q.qIndex];
+  const correct = idx===q.c;
+  if(correct){
+    const rank = Q.correctOrder.length;
+    const pts = QUIZ_RANK_POINTS[rank]!==undefined ? QUIZ_RANK_POINTS[rank] : 1;
+    Q.correctOrder.push(state.pid);
+    Q.scores[state.pid] = (Q.scores[state.pid]||0) + pts;
+    Q.answered[state.pid] = {correct:true, pts, pickedIdx:idx};
+    SND.cheer();
+  } else {
+    Q.answered[state.pid] = {correct:false, pts:0, pickedIdx:idx};
+    vibrate(30);
+  }
+  const ps = room.players||[];
+  const allAnswered = ps.every(p=>!!Q.answered[p.id]);
+  if(allAnswered) quizAdvance(room);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.quiz.finished){ SND.coinChime(); if(quizWinner(room)===state.pid) launchConfetti(); }
+}
+async function doRoomQuizNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.quiz = quizNewState(room.players||[]);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomQuiz(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('تحدي الأسئلة', room);
+  if(room.status==='waiting' || !room.quiz) return roomHead('تحدي الأسئلة', room) + renderRoomQuizLobby(room);
+  const Q = room.quiz;
+  const ps = room.players || [];
+  if(Q.finished){
+    const w = quizWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(Q.scores[b.id]||0)-(Q.scores[a.id]||0));
+    const winnerP = PARTICIPANTS.find(x=>x.id===w);
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 فزت في تحدي الأسئلة!' : `🏆 ${winnerP?escapeHtml(winnerP.name):'صاحبك'} كسب التحدي`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${Q.scores[p.id]||0}</b>
+      </div>`).join('');
+    return `
+      ${roomHead('تحدي الأسئلة', room)}
+      <div class="xo-status">${title}</div>
+      <div style="margin-top:14px;">${rows}</div>
+      ${nextProBtn('room-quiz-next')}
+    `;
+  }
+  const q = Q.questions[Q.qIndex];
+  const mine = Q.answered[state.pid];
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), Q.scores[p.id]||0, '', false)).join('');
+  const answeredCount = ps.filter(p=>Q.answered[p.id]).length;
+  let statusText;
+  if(mine) statusText = mine.correct ? `✅ إجابة صح! +${mine.pts} نقطة — استنى الباقيين` : '❌ إجابة غلط — استنى الباقيين';
+  else statusText = '⚡ اختار الإجابة الصح بأسرع ما تقدر';
+  const opts = q.o.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(mine){
+      if(i===q.c) cls += ' quiz-correct';
+      else if(!mine.correct && i===mine.pickedIdx) cls += ' quiz-wrong';
+    }
+    return `<button type="button" class="${cls}" data-action="room-quiz-pick" data-idx="${i}" ${mine?'disabled':''}>${escapeHtml(opt)}</button>`;
+  }).join('');
+  return `
+    ${roomHead('تحدي الأسئلة', room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
+    <div class="xo-status">${statusText}</div>
+    ${q.img ? `<div class="quiz-img">${q.img}</div>` : ''}
+    <div class="quiz-qtext">${escapeHtml(q.q)}</div>
+    <div class="quiz-opts">${opts}</div>
+  `;
+}
+/* ---------- admin: إدارة بنك أسئلة "تحدي الأسئلة" (إضافة/تعديل/حذف) ---------- */
+function renderAdminQuizQuestionsTab(){
+  const optRow = (idPrefix, i, val, correctName, correctVal, checked)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+      <input type="radio" name="${correctName}" value="${correctVal}" ${checked?'checked':''} style="flex:0 0 auto;width:18px;height:18px;" />
+      <input class="field" id="${idPrefix}-${i}" value="${escapeHtml(val||'')}" placeholder="اختيار ${i+1}" style="flex:1;" />
+    </div>`;
+  const addBody = `
+    <label>نص السؤال</label>
+    <input class="field" id="new-quizq-q" placeholder="مثال: كام عدد قارات العالم؟" />
+    <label style="margin-top:10px;">إيموجي/صورة (اختياري)</label>
+    <input class="field" id="new-quizq-img" placeholder="مثلًا 🌍 (سيبها فاضية لو مش عايز صورة)" style="max-width:160px;" />
+    <label style="margin-top:10px;">الاختيارات الأربعة — اختار دائرة الإجابة الصح</label>
+    ${[0,1,2,3].map(i=>optRow('new-quizq-opt', i, '', 'new-quizq-correct', i, i===0)).join('')}
+    <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="admin-add-quizq">➕ إضافة السؤال</button>
+  `;
+  const rows = QUIZ_QUESTIONS.map(q=>`
+    <div class="card quizq-row" style="margin-bottom:12px;">
+      <label>نص السؤال</label>
+      <input class="field" id="qz-q-${q.id}" value="${escapeHtml(q.q)}" placeholder="نص السؤال" />
+      <label style="margin-top:10px;">إيموجي/صورة (اختياري)</label>
+      <input class="field" id="qz-img-${q.id}" value="${escapeHtml(q.img||'')}" placeholder="مثلًا 🌍" style="max-width:160px;" />
+      <label style="margin-top:10px;">الاختيارات — اختار دائرة الإجابة الصح</label>
+      ${[0,1,2,3].map(i=>optRow('qz-opt-'+q.id, i, q.o[i], 'qz-correct-'+q.id, i, q.c===i)).join('')}
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" data-action="admin-save-quizq" data-id="${q.id}">💾 حفظ</button>
+        <button type="button" class="btn btn-ghost" style="color:var(--danger);" data-action="admin-delete-quizq" data-id="${q.id}">✕ حذف</button>
+      </div>
+    </div>`).join('');
+  return `
+    ${adminKpis([{num:QUIZ_QUESTIONS.length,lab:'سؤال'}])}
+    ${adminSectionTitle('➕','إضافة سؤال جديد')}
+    <div class="card">${addBody}</div>
+    ${adminSectionTitle('❓','الأسئلة الحالية ('+QUIZ_QUESTIONS.length+')')}
+    ${QUIZ_QUESTIONS.length>5 ? `<input type="text" class="field admin-search-input" data-filter-target=".quizq-row" placeholder="🔍 دور في نص الأسئلة..." style="margin-bottom:10px;" />` : ''}
+    ${rows || adminEmptyState('❓','لسه مفيش أسئلة مضافة','ضيف أول سؤال من الأعلى — دي هي الأسئلة اللي هتظهر في لعبة تحدي الأسئلة')}
+  `;
+}
+async function quizQPersist(msgOk){
+  const ok = await (async ()=>{ try{ await window.storage.set('glavera-quiz-questions', JSON.stringify(QUIZ_QUESTIONS), true); return true; }catch(e){ return false; } })();
+  if(ok){ if(msgOk) showToast(msgOk); }
+  else showToast('⚠️ الحفظ ماتأكدش — اتأكد من الإنترنت وجرّب تاني', true);
+  return ok;
+}
+function quizQReadOptionsFromDom(idPrefix, correctName){
+  const opts = [0,1,2,3].map(i=>{
+    const el = document.getElementById(idPrefix+'-'+i);
+    return el ? el.value.trim() : '';
+  });
+  const radios = document.getElementsByName(correctName);
+  let correct = 0;
+  for(const r of radios){ if(r.checked){ correct = parseInt(r.value,10); break; } }
+  return {opts, correct};
+}
+async function doAdminAddQuizQ(){
+  const qEl = document.getElementById('new-quizq-q');
+  const imgEl = document.getElementById('new-quizq-img');
+  const q = qEl ? qEl.value.trim() : '';
+  if(!q){ showToast('اكتب نص السؤال الأول', true); return; }
+  const {opts, correct} = quizQReadOptionsFromDom('new-quizq-opt', 'new-quizq-correct');
+  if(opts.some(o=>!o)){ showToast('لازم تملأ الاختيارات الأربعة كلها', true); return; }
+  const img = imgEl ? imgEl.value.trim() : '';
+  QUIZ_QUESTIONS.push({ id: chefNewId('qz'), q, o:opts, c:correct, img: img || undefined });
+  await quizQPersist('تمت إضافة السؤال ✅');
+  render();
+}
+async function doAdminSaveQuizQ(id){
+  const item = QUIZ_QUESTIONS.find(x=>x.id===id); if(!item) return;
+  const qEl = document.getElementById('qz-q-'+id);
+  const imgEl = document.getElementById('qz-img-'+id);
+  const q = qEl ? qEl.value.trim() : '';
+  if(!q){ showToast('نص السؤال مينفعش يبقى فاضي', true); return; }
+  const {opts, correct} = quizQReadOptionsFromDom('qz-opt-'+id, 'qz-correct-'+id);
+  if(opts.some(o=>!o)){ showToast('لازم تملأ الاختيارات الأربعة كلها', true); return; }
+  const img = imgEl ? imgEl.value.trim() : '';
+  item.q = q; item.o = opts; item.c = correct; item.img = img || undefined;
+  await quizQPersist('تم حفظ السؤال');
+  render();
+}
+function confirmAdminDeleteQuizQ(id){
+  const item = QUIZ_QUESTIONS.find(x=>x.id===id); if(!item) return;
+  showConfirmDialog(`حذف السؤال "${escapeHtml(item.q)}"؟`, async ()=>{
+    QUIZ_QUESTIONS = QUIZ_QUESTIONS.filter(x=>x.id!==id);
+    await quizQPersist('تم حذف السؤال');
+    render();
+  });
+}
 function renderRoomsLobby(){
   const tiles = ROOM_GAMES.map((rg,i)=>{
-    const g = GAMES_CATALOG.find(x=>x.id===rg.id);
+    const g = GAMES_CATALOG.find(x=>x.id===rg.id) || ROOM_ONLY_TILES[rg.id];
     return g ? ghGameTile(g, rg.sub, 'create-room', i) : '';
   }).join('');
   return `
@@ -16790,6 +17092,7 @@ const ADMIN_HUB_ITEMS = [
   {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
   {group:'content',tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
   {group:'content',tab:'cardshop', short:"ثيمات وطلبات الكروت", desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+  {group:'content',tab:'quizq', short:"أسئلة تحدي الأسئلة", desc:"إضافة وتعديل وحذف أسئلة لعبة تحدي الأسئلة",    icon:'❓', label:'أسئلة التحدي',        color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
   {group:'system', tab:'settings', short:"التوقيت والهوية والأمان", desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
   {group:'system', tab:'trash', short:"استرجاع أو حذف نهائي", desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
@@ -16898,6 +17201,7 @@ function renderAdmin(){
   else if(tab==='trash') body = renderAdminTrashTab();
   else if(tab==='stickers') body = renderAdminStickersTab();
   else if(tab==='cardshop') body = renderAdminCardShopTab();
+  else if(tab==='quizq') body = renderAdminQuizQuestionsTab();
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
   let pageTitle = hubItem ? hubItem.label : 'لوحة المنظمين';
   if(tab==='sessions'){
@@ -17563,6 +17867,7 @@ function render(){
   else if(state.view==='room-math') html = renderRoomMath();
   else if(state.view==='room-reflex') html = renderRoomReflex();
   else if(state.view==='room-uno') html = renderRoomUno();
+  else if(state.view==='room-quiz') html = renderRoomQuiz();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='pass') html = renderPassPage();
   else if(state.view==='stay') html = renderStayPage();
@@ -18683,7 +18988,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch'
+  'reflex-reset','room-reflex-rematch','room-quiz-next'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
@@ -18692,6 +18997,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-ludo-start','room-ludo-skip','ludo-token','ludo-roll',
   'room-uno-start','room-uno-play','room-uno-draw','room-uno-endturn','room-uno-color','room-uno-uno','room-uno-catch','room-uno-next',
   'room-reflex-start','room-reflex-tap','room-reflex-target','room-reflex-rematch',
+  'room-quiz-start','room-quiz-pick','room-quiz-next',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
@@ -19015,6 +19321,12 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-reflex-tap'){ doRoomReflexTap(); }
   else if(action==='room-reflex-target'){ doRoomReflexSetTarget(el.dataset.n); }
   else if(action==='room-reflex-rematch'){ doRoomReflexRematch(); }
+  else if(action==='admin-add-quizq'){ doAdminAddQuizQ(); }
+  else if(action==='admin-save-quizq'){ doAdminSaveQuizQ(el.dataset.id); }
+  else if(action==='admin-delete-quizq'){ confirmAdminDeleteQuizQ(el.dataset.id); }
+  else if(action==='room-quiz-start'){ doRoomQuizStart(); }
+  else if(action==='room-quiz-pick'){ doRoomQuizPick(el.dataset.idx); }
+  else if(action==='room-quiz-next'){ doRoomQuizNext(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
@@ -22628,7 +22940,7 @@ async function refreshAllData(){
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
    CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
    CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CHEFS, CUSTOM_STICKERS, OWNED_STICKERS,
-   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, HIDDEN_BUILTIN_THEMES, VISA_CARDS] = await Promise.all([
+   OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, HIDDEN_BUILTIN_THEMES, VISA_CARDS, QUIZ_QUESTIONS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
     loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
@@ -22636,7 +22948,7 @@ async function refreshAllData(){
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
     loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
     loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadChefs(), loadCustomStickers(), loadOwnedStickers(),
-    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadHiddenBuiltinThemes(), loadVisaCards()
+    loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadHiddenBuiltinThemes(), loadVisaCards(), loadQuizQuestions()
   ]);
   if(customAdminHash) ADMIN_PASSCODE_HASH = customAdminHash;
   await preloadGalleryPhotos(GALLERY_ALBUMS);
