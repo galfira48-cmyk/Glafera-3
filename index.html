@@ -3199,6 +3199,34 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .bil-hint{display:none;}
     .bil-table-wrap{padding:1px;}
   }
+  /* ============================= GAMES: STACK — GLASS UI OVER 3D CANVAS ============================= */
+  .stack-overlay{position:fixed; inset:0; z-index:9500; background:#171449; overflow:hidden;}
+  .stack-shell{max-width:520px; margin:0 auto; padding:calc(6px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
+  .stack-topbar{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .icon-btn.stack-back{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); backdrop-filter:blur(6px); color:#fff; transition:.15s;}
+  .icon-btn.stack-back:active{transform:scaleX(-1) scale(.9);}
+  .stack-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; color:#fff; font-size:15px; letter-spacing:.2px; text-shadow:0 2px 8px rgba(0,0,0,.35);}
+  .stack-score-pill{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); backdrop-filter:blur(6px); border-radius:999px; padding:6px 13px; display:flex; align-items:center; gap:5px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; flex-shrink:0;}
+  .stack-score-pill b{color:#FFD873; font-size:14.5px;}
+  .stack-canvas-wrap{position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:8px; border-radius:22px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;}
+  .stack-canvas-wrap canvas{display:block; touch-action:none;}
+  .stack-hud{position:absolute; top:6%; left:0; right:0; text-align:center; pointer-events:none; z-index:3;}
+  .stack-hud-score{font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(34px,11vw,58px); color:#fff; text-shadow:0 4px 20px rgba(0,0,0,.45), 0 0 24px rgba(255,255,255,.15); line-height:1; transition:transform .12s ease;}
+  .stack-perfect-pop{position:absolute; top:24%; left:50%; transform:translate(-50%,0); font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:#FFE9A8; text-shadow:0 2px 10px rgba(0,0,0,.5); background:rgba(0,0,0,.28); border:1px solid rgba(255,233,168,.4); padding:6px 16px; border-radius:999px; z-index:4; pointer-events:none; animation:stackPopFloat .85s ease-out forwards;}
+  @keyframes stackPopFloat{0%{opacity:0; transform:translate(-50%,10px) scale(.85);}18%{opacity:1; transform:translate(-50%,0) scale(1.06);}75%{opacity:1;}100%{opacity:0; transform:translate(-50%,-26px) scale(1);}}
+  .stack-hint{text-align:center; color:rgba(255,255,255,.55); font-family:Tajawal,Arial; font-size:11.5px; margin-top:9px; flex-shrink:0;}
+  .stack-over-card{position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:26px; text-align:center;
+    background:linear-gradient(180deg, rgba(10,8,28,.28), rgba(10,8,28,.62)); backdrop-filter:blur(3px); animation:stackOverIn .3s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes stackOverIn{from{opacity:0; transform:scale(.9);} to{opacity:1; transform:scale(1);}}
+  .stack-over-ico{font-size:48px; filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));}
+  .stack-over-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.5);}
+  .stack-over-sub{font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px; color:#FFE9A8;}
+  .stack-over-card .btn{max-width:230px;}
+  @media (max-height:640px){
+    .stack-hud{top:4%;}
+    .stack-hud-score{font-size:clamp(28px,10vw,44px);}
+    .stack-hint{font-size:10.5px; margin-top:6px;}
+  }
   .xo-board{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; max-width:330px; margin:0 auto;}
   .xo-cell{aspect-ratio:1/1; border-radius:18px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
     border:1.5px solid var(--border); font-family:'Cairo',sans-serif; font-weight:900; font-size:34px;
@@ -5235,6 +5263,7 @@ async function loadGamePointsSettings(){
     soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
     soloNumGuessReward:100, soloNumGuessMaxTries:3,
+    soloStackPerBlock:3, soloStackPerfectBonus:2,
     soloSnlReward:30, soloSnlWinsNeeded:3};
   try{
     const r = await window.storage.get('glavera-game-points-settings', true);
@@ -5751,6 +5780,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
   soloNumGuessReward:100, soloNumGuessMaxTries:3,
+  soloStackPerBlock:3, soloStackPerfectBonus:2,
   soloSnlReward:30, soloSnlWinsNeeded:3};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
@@ -8062,12 +8092,14 @@ const GAMES_CATALOG = [
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
+  {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'ستاك', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
 ];
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
-  billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم'
+  billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
+  stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد'
 };
 function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
 const GH_INFO_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 5.5v8" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" fill="none"/><circle cx="12" cy="18.2" r="1.7" fill="currentColor"/></svg>';
@@ -10077,6 +10109,306 @@ function bilDraw(){
       bilDrawBall(ctx, b);
     });
     bilDrawFX(ctx);
+  }
+}
+/* ============================= GAMES: STACK (ستاك — أبراج ثلاثية الأبعاد بإسقاط أيزومتري احترافي) ============================= */
+const STK = {
+  W:420, H:760,          /* نظام إحداثيات منطقي ثابت — بيتحوّل لبكسلات الجهاز الحقيقية وقت الرسم */
+  BASE:210,              /* حجم القطعة الأساسية */
+  BH:42,                 /* ارتفاع كل طابق */
+  AMPL:190,              /* مدى تأرجح القطعة المتحركة يمين/شمال */
+  MIN_OVERLAP:5,         /* أقل تراكب يخلي القطعة تنجو، غير كده تقع */
+  PERFECT_RATIO:.94,     /* نسبة التراكب اللي تتحسب "مضبوط بالظبط" (بدون قصّ)*/
+  SPEED0:150, SPEED_STEP:5, SPEED_MAX:400,
+  VISIBLE_LAYERS:8,      /* عدد الطوابق اللي فاضل تفضل ظاهرة قبل ما الكاميرا تتحرك */
+  ISO_A: Math.PI/6,      /* زاوية الإسقاط الأيزومتري 30° */
+  SCALE:.62,
+};
+const STK_PALETTE = ['#4FACFE','#43E7D0','#5FE0A4','#B7E85A','#FFDE7A','#FFB259','#FF7A7A','#FF6FB8','#C77DFF','#8C9EFF','#5AD1FF','#2EE6C4'];
+function stkColor(i){ return STK_PALETTE[((i%STK_PALETTE.length)+STK_PALETTE.length)%STK_PALETTE.length]; }
+function stkShade(hex, amt){
+  let c = hex.replace('#','');
+  if(c.length===3) c = c.split('').map(ch=>ch+ch).join('');
+  const num = parseInt(c,16)||0;
+  const r0=(num>>16)&255, g0=(num>>8)&255, b0=num&255;
+  const f = v => Math.max(0, Math.min(255, Math.round(v + v*amt/100)));
+  return `rgb(${f(r0)},${f(g0)},${f(b0)})`;
+}
+let STK_CANVAS = null, STK_CTX = null;
+function initStackGame(){
+  STK_CANVAS = null; STK_CTX = null;
+  const base = { x:0, z:0, sx:STK.BASE, sz:STK.BASE, color:'#241d4a' };
+  state.stack = {
+    blocks:[base],
+    axis:'x',
+    moving:{ pos:-STK.AMPL, dir:1, speed:STK.SPEED0, sx:STK.BASE, sz:STK.BASE, color:stkColor(0) },
+    score:0, perfect:0, combo:0,
+    camY:0, camTarget:0,
+    debris:[],
+    over:false,
+    t:0, raf:null, lastTs:0,
+  };
+}
+async function saveStackBestIfNeeded(score){
+  if(!state.pid) return;
+  const st = myGameStats(state.pid);
+  if(!st.stackBest || score > st.stackBest){
+    st.stackBest = score;
+    await saveGameStats(GAME_STATS);
+  }
+}
+function openStackGame(){
+  initStackGame();
+  const old = document.getElementById('stk-overlay');
+  if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'stk-overlay';
+  overlay.className = 'stack-overlay';
+  overlay.innerHTML = `<div id="stk-shell" class="stack-shell"></div>`;
+  document.body.appendChild(overlay);
+  stkRenderShell();
+  window.addEventListener('resize', stkOnResize);
+  window.addEventListener('orientationchange', stkOnResize);
+  SND.click();
+}
+function closeStackGame(){
+  const g = state.stack;
+  if(g && g.raf){ cancelAnimationFrame(g.raf); g.raf = null; }
+  STK_CANVAS = null; STK_CTX = null;
+  window.removeEventListener('resize', stkOnResize);
+  window.removeEventListener('orientationchange', stkOnResize);
+  const overlay = document.getElementById('stk-overlay');
+  if(overlay) overlay.remove();
+  SND.back();
+}
+function stkResetGame(){
+  initStackGame();
+  stkRenderShell();
+  SND.click();
+}
+function stkGameOverCardHtml(g){
+  return `
+    <div class="stack-over-card">
+      <div class="stack-over-ico">${g.score>0?'🏗️':'💥'}</div>
+      <div class="stack-over-title">${g.score>0 ? 'وصلت لـ '+g.score+' طابق!' : 'وقع البرج من أول طوبة 😅'}</div>
+      ${g.perfect>0 ? `<div class="stack-over-sub">✨ ${g.perfect} تراص مضبوط بالظبط</div>` : ''}
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:6px;" data-action="stack-reset">🔄 برج جديد</button>
+    </div>`;
+}
+function stkRenderShell(){
+  const g = state.stack; if(!g) return;
+  const shell = document.getElementById('stk-shell'); if(!shell) return;
+  const stats = state.pid ? myGameStats(state.pid) : {};
+  const best = stats.stackBest || 0;
+  shell.innerHTML = `
+    <div class="stack-topbar">
+      <button class="icon-btn stack-back" data-action="stack-close">${ICO.back}</button>
+      <div class="stack-title">🗼 ستاك</div>
+      <div class="stack-score-pill">🏆 <b>${best}</b></div>
+    </div>
+    <div class="stack-canvas-wrap" id="stk-canvas-wrap">
+      <div class="stack-hud"><div class="stack-hud-score" id="stk-hud-score">${g.score}</div></div>
+      <canvas id="stk-canvas" width="${STK.W}" height="${STK.H}"></canvas>
+      ${g.over ? stkGameOverCardHtml(g) : ''}
+    </div>
+    <div class="stack-hint">${g.over ? '' : 'دوس في أي مكان عشان تنزّل الطوبة 👆'}</div>
+  `;
+  stkMountCanvas();
+}
+function stkFitCanvas(){
+  const wrap = document.getElementById('stk-canvas-wrap');
+  const canvas = document.getElementById('stk-canvas');
+  if(!wrap || !canvas) return;
+  const availW = Math.max(60, wrap.clientWidth), availH = Math.max(60, wrap.clientHeight);
+  const ratio = STK.W/STK.H;
+  let dispW = availW, dispH = dispW/ratio;
+  if(dispH > availH){ dispH = availH; dispW = dispH*ratio; }
+  dispW = Math.floor(dispW); dispH = Math.floor(dispH);
+  canvas.style.width = dispW+'px';
+  canvas.style.height = dispH+'px';
+  const dpr = Math.min(window.devicePixelRatio||1, 3);
+  const bw = Math.max(1, Math.round(dispW*dpr)), bh = Math.max(1, Math.round(dispH*dpr));
+  if(canvas.width!==bw || canvas.height!==bh){ canvas.width = bw; canvas.height = bh; stkDraw(); }
+}
+function stkOnResize(){ if(document.getElementById('stk-overlay')) stkFitCanvas(); }
+function stkPointerDown(e){
+  e.preventDefault();
+  const g = state.stack;
+  if(!g || g.over) return;
+  stkDrop();
+}
+function stkMountCanvas(){
+  STK_CANVAS = document.getElementById('stk-canvas');
+  if(!STK_CANVAS) return;
+  STK_CTX = STK_CANVAS.getContext('2d');
+  STK_CANVAS.onpointerdown = stkPointerDown;
+  stkFitCanvas();
+  requestAnimationFrame(stkFitCanvas);
+  const g = state.stack;
+  if(g && !g.raf){ g.lastTs = performance.now(); g.raf = requestAnimationFrame(stkLoop); }
+}
+function stkPerfectPop(combo){
+  const wrap = document.getElementById('stk-canvas-wrap');
+  if(!wrap) return;
+  document.querySelectorAll('.stack-perfect-pop').forEach(x=>x.remove());
+  const el = document.createElement('div');
+  el.className = 'stack-perfect-pop';
+  el.textContent = combo>=3 ? `🔥 كومبو ×${combo}` : '✨ مضبوط بالظبط!';
+  wrap.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode) el.remove(); }, 900);
+}
+function stkDrop(){
+  const g = state.stack;
+  if(!g || g.over) return;
+  const axis = g.axis;
+  const below = g.blocks[g.blocks.length-1];
+  const m = g.moving;
+  const belowCenter = axis==='x' ? below.x : below.z;
+  const belowSize = axis==='x' ? below.sx : below.sz;
+  const movingCenter = belowCenter + m.pos;
+  const movingSize = axis==='x' ? m.sx : m.sz;
+  const belowMin = belowCenter-belowSize/2, belowMax = belowCenter+belowSize/2;
+  const movMin = movingCenter-movingSize/2, movMax = movingCenter+movingSize/2;
+  const overlapMin = Math.max(belowMin,movMin), overlapMax = Math.min(belowMax,movMax);
+  const overlap = overlapMax-overlapMin;
+  if(overlap < STK.MIN_OVERLAP){ stkGameOver(true, movingCenter, movingSize); return; }
+  const isPerfect = (overlap/movingSize) >= STK.PERFECT_RATIO && (overlap/belowSize) >= STK.PERFECT_RATIO;
+  const newSize = isPerfect ? belowSize : overlap;
+  const newCenter = isPerfect ? belowCenter : (overlapMin+overlapMax)/2;
+  if(!isPerfect){
+    const leftover = movingSize-overlap;
+    if(leftover > 1.5){
+      const onMinSide = movMin < overlapMin;
+      const debCenter = onMinSide ? (movMin+overlapMin)/2 : (overlapMax+movMax)/2;
+      g.debris.push({
+        axis, center:debCenter, size:leftover,
+        otherCenter: axis==='x'?below.z:below.x, otherSize: axis==='x'?below.sz:below.sx,
+        level:g.blocks.length, color:m.color,
+        y:0, vy:-70, rot:0, vrot:(onMinSide?-1:1)*(2.5+Math.random()*2.5), life:1.15
+      });
+    }
+  }
+  const newBlock = axis==='x'
+    ? { x:newCenter, z:below.z, sx:newSize, sz:below.sz, color:m.color }
+    : { x:below.x, z:newCenter, sx:below.sx, sz:newSize, color:m.color };
+  g.blocks.push(newBlock);
+  g.score++;
+  if(isPerfect){ g.perfect++; g.combo++; stkPerfectPop(g.combo); SND.whoosh(); }
+  else { g.combo = 0; SND.click(); }
+  vibrate([12]);
+  const nextAxis = axis==='x' ? 'z' : 'x';
+  const speed = Math.min(STK.SPEED_MAX, STK.SPEED0 + g.score*STK.SPEED_STEP);
+  const startSide = Math.random()<.5 ? -1 : 1;
+  g.axis = nextAxis;
+  g.moving = { pos:startSide*STK.AMPL, dir:-startSide, speed, sx:newBlock.sx, sz:newBlock.sz, color:stkColor(g.score) };
+  g.camTarget = Math.max(0, (g.blocks.length-STK.VISIBLE_LAYERS)*STK.BH);
+  const hud = document.getElementById('stk-hud-score');
+  if(hud){ hud.textContent = String(g.score); hud.style.transform='scale(1.28)'; setTimeout(()=>{ hud.style.transform='scale(1)'; },120); }
+}
+function stkGameOver(missed, movingCenter, movingSize){
+  const g = state.stack;
+  if(!g || g.over) return;
+  g.over = true;
+  if(g.raf){ cancelAnimationFrame(g.raf); g.raf = null; }
+  if(missed){
+    const axis = g.axis, below = g.blocks[g.blocks.length-1];
+    g.debris.push({
+      axis, center:movingCenter, size:movingSize,
+      otherCenter: axis==='x'?below.z:below.x, otherSize: axis==='x'?below.sz:below.sx,
+      level:g.blocks.length, color:g.moving.color,
+      y:0, vy:-40, rot:0, vrot:(Math.random()<.5?-1:1)*3.4, life:1.3
+    });
+  }
+  SND.error(); vibrate([15,40,15]);
+  saveStackBestIfNeeded(g.score);
+  g.lastTs = performance.now();
+  g.raf = requestAnimationFrame(stkLoop);
+  stkRenderShell();
+  const perBlock = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloStackPerBlock)||0;
+  const perfectBonus = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloStackPerfectBonus)||0;
+  const pts = g.score*perBlock + g.perfect*perfectBonus;
+  if(pts>0) setTimeout(()=> awardSoloGamePoints(pts, `برج ${g.score} طابق 🗼`), 550);
+}
+function stkLoop(ts){
+  const g = state.stack;
+  if(!g || !document.getElementById('stk-overlay')) return;
+  const dt = Math.min(.05, (ts-(g.lastTs||ts))/1000);
+  g.lastTs = ts;
+  if(!g.over){
+    const m = g.moving;
+    m.pos += m.dir*m.speed*dt;
+    if(m.pos > STK.AMPL){ m.pos = STK.AMPL; m.dir = -1; }
+    if(m.pos < -STK.AMPL){ m.pos = -STK.AMPL; m.dir = 1; }
+  }
+  if(g.debris.length){
+    g.debris.forEach(d=>{ d.vy += 900*dt; d.y -= d.vy*dt; d.rot += d.vrot*dt; d.life -= dt; });
+    g.debris = g.debris.filter(d=> d.life>0 && d.y > -900);
+  }
+  g.camY += (g.camTarget-g.camY) * Math.min(1, dt*6);
+  stkDraw();
+  if(g.over && !g.debris.length){ g.raf = null; return; }
+  g.raf = requestAnimationFrame(stkLoop);
+}
+function stkProject(x,y,z,scale,cx,cy){
+  const isoX = (x-z)*Math.cos(STK.ISO_A);
+  const isoY = (x+z)*Math.sin(STK.ISO_A) - y;
+  return { x:cx+isoX*scale, y:cy+isoY*scale };
+}
+function stkDrawBlock(ctx, cx0, cz0, sx, sz, y0, y1, color, scale, cx, cy){
+  const hx = sx/2, hz = sz/2;
+  const P = (x,y,z)=> stkProject(x,y,z,scale,cx,cy);
+  const A = P(cx0-hx, y1, cz0-hz), B = P(cx0+hx, y1, cz0-hz);
+  const C = P(cx0+hx, y1, cz0+hz), D = P(cx0-hx, y1, cz0+hz);
+  const B0 = P(cx0+hx, y0, cz0-hz), C0 = P(cx0+hx, y0, cz0+hz), D0 = P(cx0-hx, y0, cz0+hz);
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+  ctx.fillStyle = color; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(C0.x,C0.y); ctx.lineTo(B0.x,B0.y); ctx.closePath();
+  ctx.fillStyle = stkShade(color,-20); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.lineTo(D0.x,D0.y); ctx.lineTo(C0.x,C0.y); ctx.closePath();
+  ctx.fillStyle = stkShade(color,-36); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.12)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath(); ctx.stroke();
+}
+function stkDraw(){
+  const ctx = STK_CTX, canvas = STK_CANVAS, g = state.stack;
+  if(!ctx || !canvas || !g) return;
+  const scaleX = (canvas.width||STK.W)/STK.W, scaleY = (canvas.height||STK.H)/STK.H;
+  ctx.setTransform(scaleX,0,0,scaleY,0,0);
+  ctx.clearRect(0,0,STK.W,STK.H);
+  const hue = (208 + g.score*5) % 360;
+  const bg = ctx.createLinearGradient(0,0,0,STK.H);
+  bg.addColorStop(0, `hsl(${hue},62%,74%)`);
+  bg.addColorStop(.55, `hsl(${(hue+22)%360},52%,52%)`);
+  bg.addColorStop(1, `hsl(${(hue+40)%360},42%,26%)`);
+  ctx.fillStyle = bg; ctx.fillRect(0,0,STK.W,STK.H);
+  const scale = STK.SCALE, cx = STK.W/2, cy = STK.H*0.64, camY = g.camY;
+  const startLevel = Math.max(0, g.blocks.length-STK.VISIBLE_LAYERS-2);
+  for(let i=startLevel; i<g.blocks.length; i++){
+    const b = g.blocks[i], y0 = i*STK.BH-camY, y1 = y0+STK.BH;
+    stkDrawBlock(ctx, b.x, b.z, b.sx, b.sz, y0, y1, b.color, scale, cx, cy);
+  }
+  g.debris.forEach(d=>{
+    const y0 = d.level*STK.BH-camY+d.y, y1 = y0+STK.BH;
+    const bx = d.axis==='x' ? d.center : d.otherCenter;
+    const bz = d.axis==='x' ? d.otherCenter : d.center;
+    const sx = d.axis==='x' ? d.size : d.otherSize;
+    const sz = d.axis==='x' ? d.otherSize : d.size;
+    ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1,d.life));
+    stkDrawBlock(ctx, bx, bz, sx, sz, y0, y1, d.color, scale, cx, cy);
+    ctx.restore();
+  });
+  if(!g.over){
+    const axis = g.axis, below = g.blocks[g.blocks.length-1], m = g.moving;
+    const belowCenter = axis==='x' ? below.x : below.z;
+    const center = belowCenter + m.pos;
+    const bx = axis==='x' ? center : below.x, bz = axis==='x' ? below.z : center;
+    const sx = axis==='x' ? m.sx : below.sx, sz = axis==='x' ? below.sz : m.sz;
+    const y0 = g.blocks.length*STK.BH-camY, y1 = y0+STK.BH;
+    const shadowP = stkProject(bx, below.x!==undefined ? (g.blocks.length-1)*STK.BH-camY+STK.BH : y0, bz, scale, cx, cy);
+    ctx.save(); ctx.globalAlpha = .22; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(shadowP.x, shadowP.y, (sx*scale*0.72)/2, (sz*scale*0.3)/2, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    stkDrawBlock(ctx, bx, bz, sx, sz, y0, y1, m.color, scale, cx, cy);
   }
 }
 /* ============================= GAMES: DOMINO ============================= */
@@ -17387,6 +17719,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-game'){
     const gid = el.dataset.game;
     if(gid==='billiards'){ openBilliardsGame(); return; }
+    if(gid==='stack'){ openStackGame(); return; }
     if(gid==='xo'){ initXoGame(); xoStartPick(450); }
     else if(gid==='connect4'){ initConnect4Game(); c4SoloPick('R', 450); }
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
@@ -17401,6 +17734,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='billiards-close'){ closeBilliardsGame(); }
   else if(action==='billiards-mode'){ bilSetMode(el.dataset.mode); }
   else if(action==='billiards-reset'){ bilResetGame(); }
+  else if(action==='stack-close'){ closeStackGame(); }
+  else if(action==='stack-reset'){ stkResetGame(); }
   else if(action==='open-dish'){ openDishSheet(el.dataset.cid, el.dataset.did); }
   else if(action==='close-dish-sheet'){ closeDishSheet(); }
   else if(action==='ds-star'){ dsSetStars(parseInt(el.dataset.n,10)||0); }
