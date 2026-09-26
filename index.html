@@ -15865,11 +15865,11 @@ function chMakeMove(S, from, to, mv, promoPiece){
   if(inCheck) notation += S.winner ? ' #' : ' +';
   S.moveLog.push({notation, color});
   try{
-    if(S.winner && S.winner!=='draw') SND.cheer();
-    else if(S.winner==='draw') SND.click();
-    else if(inCheck) SND.error();
-    else if(capturedPiece) SND.success();
-    else SND.click();
+    if(S.winner && S.winner!=='draw') SND.chessCheckmate();
+    else if(S.winner==='draw') SND.chessMove();
+    else if(inCheck) SND.chessCheck();
+    else if(capturedPiece) SND.chessCapture();
+    else SND.chessMove();
   }catch(e){}
 }
 function initChessGame(){
@@ -15896,7 +15896,7 @@ function doChessUndo(){
     Object.assign(S, S.history.pop()); S.moveLog.pop();
   }
   S.selected=null; S.legalTargets=[];
-  try{ SND.back(); }catch(e){}
+  try{ SND.chessUndo(); }catch(e){}
   render();
 }
 function doChSquareClick(r,c){
@@ -15984,18 +15984,6 @@ function renderChessGame(){
       ${adv>0 ? `<span class="chess-cap-adv">+${adv}</span>` : ''}
     </div>`;
   const canUndo = (S.history && S.history.length) || S.promoPending;
-  const logRows = [];
-  for(let i=0;i<(S.moveLog||[]).length;i+=2) logRows.push({n:(i/2)+1, w:S.moveLog[i], b:S.moveLog[i+1]});
-  const logHtml = `
-    <div class="chess-log-box">
-      <div class="chess-log-title">📜 سجل النقلات</div>
-      ${logRows.length ? `<div class="chess-log-list">${logRows.map(row=>`
-        <div class="chess-log-row">
-          <span class="chess-log-num">${row.n}</span>
-          <span class="chess-log-mv">${row.w?row.w.notation:''}</span>
-          <span class="chess-log-mv">${row.b?row.b.notation:''}</span>
-        </div>`).join('')}</div>` : `<div class="chess-log-empty">لسه مفيش نقلات</div>`}
-    </div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -16017,7 +16005,6 @@ function renderChessGame(){
     </div>
     ${promoHtml}
     ${S.winner ? nextProBtn('chess-reset') : ''}
-    ${logHtml}
   `;
 }
 /* ================= الداما (أسر إجباري ومتسلسل + تتويج) ================= */
@@ -20343,6 +20330,32 @@ function waterDropTone(idx){
     osc.stop(now+0.3);
   }catch(e){}
 }
+function woodKnock(vol, pitch){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    const ctx = window.__glavCtx || (window.__glavCtx = new Ctx());
+    if(ctx.state==='suspended'){ ctx.resume(); }
+    const dur = 0.1;
+    const bufSize = Math.floor(ctx.sampleRate*dur);
+    const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufSize;i++){ data[i] = (Math.random()*2-1) * Math.pow(1-i/bufSize, 3); }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = pitch || 260;
+    filter.Q.value = 1.1;
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(vol||0.3, now+0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+    noise.connect(filter); filter.connect(gain); gain.connect(getMasterOut(ctx));
+    noise.start(now);
+  }catch(e){}
+}
 function tick(vol){
   try{
     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -20435,6 +20448,28 @@ const SND = {
   },
   unoDrawPenalty(){
     [1,2,3].forEach(i=> setTimeout(()=>luxTone(220-i*20, .12, 'sawtooth', .07, {wet:.15}), i*70));
+  },
+  chessMove(){
+    woodKnock(.28, 260);
+    setTimeout(()=>luxTone(180, .07, 'sine', .03, {cutoff:900, wet:.12}), 15);
+  },
+  chessCapture(){
+    woodKnock(.36, 200);
+    setTimeout(()=>luxTone(140, .09, 'sine', .04, {cutoff:800, wet:.14}), 15);
+    setTimeout(()=>luxTone(90, .12, 'sine', .03, {cutoff:600, wet:.16}), 60);
+  },
+  chessCheck(){
+    luxTone(740, .1, 'triangle', .07, {wet:.16});
+    setTimeout(()=>luxTone(740, .1, 'triangle', .07, {wet:.16}), 140);
+  },
+  chessCheckmate(){
+    [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>{
+      setTimeout(()=>luxTone(f, .5, 'triangle', .09, {chorus:true, wet:.3}), i*110);
+    });
+  },
+  chessUndo(){
+    woodKnock(.22, 300);
+    setTimeout(()=>luxTone(300, .08, 'sine', .03, {cutoff:1200, wet:.14}), 30);
   },
   ludoHop(){
     try{
