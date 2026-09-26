@@ -4192,6 +4192,25 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .reflex-rules-ico.go{background:color-mix(in srgb, var(--good) 16%, var(--surface-2)); border-color:color-mix(in srgb, var(--good) 35%, var(--border));}
   .reflex-rules-ico.decoy{background:color-mix(in srgb, #FFD93D 22%, var(--surface-2)); border-color:color-mix(in srgb, #FFD93D 45%, var(--border));}
 
+  /* ---------- Games section intro modal ---------- */
+  .games-intro-card{max-width:370px;}
+  .games-intro-card .confirm-icon{font-size:40px; margin-bottom:4px; filter:drop-shadow(0 4px 14px color-mix(in srgb, var(--gold) 45%, transparent));}
+  .games-intro-card .confirm-msg{font-size:18.5px;}
+  .games-intro-list{margin:16px 0 4px; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px;}
+  .games-intro-list li{display:flex; align-items:flex-start; gap:11px; font-size:15px; color:var(--text-muted); line-height:1.75; text-align:right; font-weight:600;}
+  .games-intro-list li b{color:var(--gold); font-weight:800;}
+  .games-intro-ico{flex:0 0 auto; width:34px; height:34px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    font-size:17px; background:color-mix(in srgb, var(--gold) 14%, var(--surface-2)); border:1.5px solid color-mix(in srgb, var(--gold) 32%, var(--border));}
+  .games-intro-remind{display:flex; align-items:center; gap:10px; margin-top:18px; padding-top:16px; border-top:1px dashed var(--border); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .games-intro-remind input{position:absolute; opacity:0; width:0; height:0;}
+  .games-intro-remind-box{flex:0 0 auto; width:21px; height:21px; border-radius:6px; border:1.5px solid var(--border); background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center; transition:background .15s,border-color .15s;}
+  .games-intro-remind-box::after{content:''; width:11px; height:7px; border-left:2.5px solid var(--bg); border-bottom:2.5px solid var(--bg);
+    transform:rotate(-45deg) translateY(-1px); opacity:0; transition:opacity .12s;}
+  .games-intro-remind input:checked + .games-intro-remind-box{background:var(--gold); border-color:var(--gold);}
+  .games-intro-remind input:checked + .games-intro-remind-box::after{opacity:1;}
+  .games-intro-remind-text{font-size:13.5px; color:var(--text-muted); font-weight:700;}
+
   .room-join-row{display:flex; gap:10px; align-items:center;}
   .room-code-input{flex:1; text-align:center; letter-spacing:6px; font-family:'Cairo',sans-serif; font-weight:800; font-size:22px;
     padding:14px 10px; border-radius:14px; background:linear-gradient(180deg, var(--surface), var(--surface-2));
@@ -6927,6 +6946,64 @@ function go(view, extra={}){
   render();
   if(typeof handleVoiceForView==='function') handleVoiceForView();
   if(typeof handleMusicForView==='function') handleMusicForView();
+  if(view==='games') maybeShowGamesIntroModal();
+}
+/* ============================= Games section intro modal ============================= */
+/* بتظهر أول ما المشارك يدخل خانة الألعاب، بتشرحله إزاي نقاط الألعاب/الفيزا شغالة. بتفضل تظهر كل مرة
+   لحد ما يعلّم على "عدم تذكيري مرة أخرى" — وقتها بنحفظ العلامة في PROFILE_EXTRA بتاعته ومتظهرش تاني. */
+function maybeShowGamesIntroModal(){
+  if(!state.pid) return;
+  const extra = myExtra(state.pid);
+  if(extra.gamesIntroDismissed) return;
+  setTimeout(()=>{ if(state.view==='games') showGamesIntroModal(); }, 320);
+}
+function closeGamesIntroModal(){
+  const o = document.getElementById('games-intro-overlay');
+  if(o) o.remove();
+}
+async function rememberGamesIntroIfChecked(){
+  const chk = document.getElementById('games-intro-dont-remind');
+  if(chk && chk.checked && state.pid){
+    myExtra(state.pid).gamesIntroDismissed = true;
+    await saveProfileExtra(PROFILE_EXTRA);
+  }
+}
+function showGamesIntroModal(){
+  closeGamesIntroModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay confirm-overlay games-intro-overlay';
+  overlay.id = 'games-intro-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-card games-intro-card">
+      <div class="confirm-icon">🎮</div>
+      <div class="confirm-msg">إزاي نقاط الألعاب شغالة؟</div>
+      <ul class="games-intro-list">
+        <li><span class="games-intro-ico">🏆</span><span>كل نقطة تكسبها من الألعاب بتتحول <b>مباشرة لرصيدك في الفيزا</b> 💳، ومش بتضاف لنقاط الفقرات ولا بتأثر على ترتيبك في اللوحة.</span></li>
+        <li><span class="games-intro-ico">📥</span><span>تقدر <b>تودع</b> من نقاط فقراتك في الفيزا وقت ما تحب، عشان يبقى عندك رصيد كافي تلعب بيه.</span></li>
+        <li><span class="games-intro-ico">🛍️</span><span>رصيد الفيزا هو اللي بتدفع بيه رسوم الألعاب والغرف، وتشتري بيه تصاميم الكروت.</span></li>
+        <li><span class="games-intro-ico">🤝</span><span>وكمان تقدر <b>تبعت</b> من رصيدك لأي صاحب ليك في المؤتمر برقم فيزته مباشرة.</span></li>
+        <li><span class="games-intro-ico">📤</span><span>ولما رصيدك يكبر كفاية تقدر <b>تسحب</b> منه يرجع نقاط فقرات تاني.</span></li>
+      </ul>
+      <label class="games-intro-remind" for="games-intro-dont-remind">
+        <input type="checkbox" id="games-intro-dont-remind" />
+        <span class="games-intro-remind-box"></span>
+        <span class="games-intro-remind-text">عدم تذكيري مرة أخرى</span>
+      </label>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" id="games-intro-cancel-btn">إلغاء</button>
+        <button type="button" class="btn btn-primary" id="games-intro-ok-btn">فهمت</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('games-intro-ok-btn').addEventListener('click', async ()=>{
+    await rememberGamesIntroIfChecked();
+    closeGamesIntroModal();
+  });
+  document.getElementById('games-intro-cancel-btn').addEventListener('click', async ()=>{
+    await rememberGamesIntroIfChecked();
+    closeGamesIntroModal();
+    goBack();
+  });
 }
 function goBack(){
   if(typeof closeDishSheet==='function') closeDishSheet(true);
