@@ -11301,7 +11301,10 @@ function dartsBuildFxImages(){
   DRT_IMG_DART_BOT_FX = dartsMakeFx(DRT_IMG_DART_BOT, 'saturate(1.35) contrast(1.12) brightness(1.05)');
 }
 const DRT_MAX_PULL = 110;
-const DRT_THROW_SCALE = (DRT.handY - DRT.cyBoard) / DRT_MAX_PULL;
+/* ملحوظة: كانت أقصى رميه (سحب كامل بالعمودي) توصل بالظبط لمركز اللوحة (بُل مضمون).
+   دلوقتي أقصى سحب يوصلك لحد حافة اللوحة (منطقة الدبل فوق) مش النص، عشان أقصى قوة
+   تبقى مخاطرة (دبل أو برّه اللوحة) مش بُل مضمون؛ اللي عايز يصيب النص لازم يتحكم في قوة السحب. */
+const DRT_THROW_SCALE = (DRT.handY - (DRT.cyBoard - DRT.R)) / DRT_MAX_PULL;
 function dartsComputeThrowTarget(g){
   const dx = g.aimX - DRT.cx, dy = g.aimY - DRT.handY;
   return { x: DRT.cx + dx*DRT_THROW_SCALE, y: DRT.handY + dy*DRT_THROW_SCALE };
