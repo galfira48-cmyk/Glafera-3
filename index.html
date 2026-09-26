@@ -3237,6 +3237,34 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .stack-hud-score{font-size:clamp(28px,10vw,44px);}
     .stack-hint{font-size:10.5px; margin-top:6px;}
   }
+  /* ============================= GAMES: DARTS (لعبة النشان) ============================= */
+  .darts-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#241a12,#120c08); overflow:hidden;}
+  .darts-shell{max-width:520px; margin:0 auto; padding:calc(6px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
+  .darts-topbar{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .icon-btn.darts-back{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); backdrop-filter:blur(6px); color:#fff; transition:.15s;}
+  .icon-btn.darts-back:active{transform:scaleX(-1) scale(.9);}
+  .darts-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; color:#fff; font-size:15px; letter-spacing:.2px; text-shadow:0 2px 8px rgba(0,0,0,.35);}
+  .darts-timer-pill{position:relative; z-index:0; overflow:hidden; flex-shrink:0; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 14px; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; display:flex; align-items:center; gap:4px;}
+  .darts-timer-pill::before{content:''; position:absolute; inset:0; z-index:-1; width:var(--p,100%); background:rgba(79,172,254,.22); transition:width 1s linear;}
+  .darts-timer-pill.warn::before{background:rgba(255,107,107,.3);}
+  .darts-timer-pill.warn{color:#FFD8D8;}
+  .darts-score-row{display:flex; align-items:center; gap:8px; margin-top:10px; flex-shrink:0;}
+  .drt-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); transition:.2s;}
+  .drt-side.active{background:rgba(244,183,64,.14); border-color:rgba(244,183,64,.5); box-shadow:0 0 16px -4px rgba(244,183,64,.4);}
+  .drt-side-name{font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(255,255,255,.7);}
+  .drt-side-score{font-family:'Cairo',sans-serif; font-weight:900; font-size:22px; color:#fff;}
+  .drt-vs{font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; color:rgba(255,255,255,.4); flex-shrink:0;}
+  .drt-pips{display:flex; gap:3px; margin-top:2px;}
+  .drt-pip{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.18); flex-shrink:0;}
+  .drt-pip.filled{background:var(--pc,#4FACFE);}
+  .darts-canvas-wrap{position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:8px; border-radius:22px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;}
+  .darts-canvas-wrap canvas{display:block; touch-action:none;}
+  .darts-log{flex-shrink:0; margin-top:8px; max-height:64px; overflow-y:auto; display:flex; flex-direction:column-reverse; gap:2px;}
+  .darts-log-line{font-family:Tajawal,Arial; font-size:11px; color:rgba(255,255,255,.6); text-align:center;}
+  @media (max-height:640px){
+    .darts-log{display:none;}
+    .drt-side-score{font-size:18px;}
+  }
   /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
     background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
@@ -3890,6 +3918,58 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .chess-promo-row{display:flex; gap:8px; justify-content:center; margin-top:10px;}
   .chess-promo-btn{width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:var(--a-card-bg); border:var(--a-border); border-radius:var(--a-r-md); padding:4px; cursor:pointer;}
   .chess-promo-btn .chess-pc-img{width:88%; height:88%;}
+  /* ---------- chess: wooden/felt table frame behind board + trays ---------- */
+  .chess-frame{ position:relative; max-width:380px; margin:8px auto 4px; padding:14px 10px 16px; border-radius:26px;
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgba(244,183,64,.10), transparent 60%),
+      linear-gradient(165deg, #241a10, #150f09 55%, #0c0805);
+    border:1px solid rgba(244,183,64,.20);
+    box-shadow:0 20px 44px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06), inset 0 0 40px rgba(0,0,0,.35);
+    overflow:hidden; }
+  .chess-frame::before{ content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:
+      repeating-linear-gradient(112deg, rgba(255,255,255,.03) 0 2px, transparent 2px 8px),
+      repeating-linear-gradient(22deg, rgba(0,0,0,.06) 0 2px, transparent 2px 10px); }
+  .chess-frame .chess-board{ position:relative; z-index:1; box-shadow:0 14px 30px -14px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05); }
+  /* ---------- chess: captured-pieces glass tray ---------- */
+  .chess-cap-tray{ position:relative; z-index:1; display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+    min-height:32px; padding:5px 12px; margin:7px 3px; border-radius:var(--a-r-pill);
+    background:linear-gradient(160deg, rgba(255,255,255,.11), rgba(255,255,255,.02));
+    backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 8px 20px -10px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
+  .chess-cap-tray .chess-pc-img.cap{ width:18px; height:18px; opacity:.95; }
+  .chess-cap-empty{ font-size:11px; color:rgba(255,255,255,.4); }
+  .chess-cap-adv{ margin-inline-start:auto; font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px; color:var(--gold);
+    background:rgba(244,183,64,.15); border:1px solid rgba(244,183,64,.32); border-radius:var(--a-r-pill); padding:1px 9px; white-space:nowrap; }
+  /* ---------- chess: board coordinates ---------- */
+  .chess-sq:nth-child(8n+1)::before{ content:attr(data-rank); position:absolute; top:2px; left:4px; font-size:9px; font-weight:800; z-index:2; pointer-events:none; font-family:'Montserrat',sans-serif; }
+  .chess-sq:nth-last-child(-n+8)::after{ content:attr(data-file); position:absolute; bottom:2px; right:4px; font-size:9px; font-weight:800; z-index:2; pointer-events:none; font-family:'Montserrat',sans-serif; }
+  .chess-sq.light::before, .chess-sq.light::after{ color:rgba(120,80,30,.7); }
+  .chess-sq.dark::before, .chess-sq.dark::after{ color:rgba(255,240,210,.8); }
+  /* ---------- chess: check pulse ---------- */
+  .chess-sq.check{ animation:chessCheckPulse 1s ease-in-out infinite; }
+  @keyframes chessCheckPulse{ 0%,100%{ box-shadow:inset 0 0 0 3px rgba(255,80,80,.5); } 50%{ box-shadow:inset 0 0 0 4px rgba(255,80,80,.95), 0 0 14px 2px rgba(255,60,60,.55); } }
+  /* ---------- chess: tools row (undo / new game) ---------- */
+  .chess-tools-row{ display:flex; gap:8px; margin:0 0 10px; }
+  .chess-tool-btn{ flex:1; padding:9px; border-radius:var(--a-r-md); border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    color:var(--text); font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px; transition:opacity .2s ease; }
+  .chess-tool-btn:disabled{ opacity:.4; }
+  /* ---------- chess: move log ---------- */
+  .chess-log-box{ position:relative; margin-top:12px; border-radius:var(--a-r-lg); padding:12px;
+    background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 10px 24px -12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08); }
+  .chess-log-title{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--gold); margin-bottom:6px; }
+  .chess-log-empty{ font-size:12px; color:var(--text-muted); text-align:center; padding:4px 0; }
+  .chess-log-list{ max-height:150px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+  .chess-log-row{ display:grid; grid-template-columns:22px 1fr 1fr; gap:6px; font-size:12px; padding:3px 4px; border-radius:8px; }
+  .chess-log-row:nth-child(odd){ background:rgba(255,255,255,.04); }
+  .chess-log-num{ color:var(--text-muted); font-weight:700; }
+  .chess-log-mv{ font-family:'IBM Plex Mono','Cairo',sans-serif; }
   /* ===== الداما ===== */
   .checkers-board{display:grid; grid-template-columns:repeat(8,1fr); max-width:380px; margin:10px auto; border-radius:12px; overflow:hidden;
     box-shadow:var(--a-shadow-tile); border:2px solid var(--border);}
@@ -6118,7 +6198,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloNumGuessReward:100, soloNumGuessMaxTries:3,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
   soloSnlReward:30, soloSnlWinsNeeded:3,
-  soloReflexReward:30, soloReflexWinsNeeded:5};
+  soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
     ? `<img src="${CONF_SETTINGS.logo}" alt="لوجو المؤتمر" class="conf-logo-img" />`
@@ -8465,6 +8545,7 @@ const GAMES_CATALOG = [
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
+  {id:'darts', icon:'🎯', title:'لعبة النشان', sub:'اسحب السهم وصوّبه على اللوحة وسيبه يطير — ضد الجهاز', color:'linear-gradient(145deg,#C23B3B,#2b0e0e)'},
   {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'Stack', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
   {id:'chess', icon:'♟️', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
@@ -8478,6 +8559,7 @@ const GH_SOLO_SUB = {
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
+  darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
   stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 10 ثواني للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
@@ -11087,6 +11169,395 @@ function stkDraw(){
     ctx.restore();
     stkDrawBlock(ctx, bx, bz, sx, sz, y0, y1, m.color, scale, cx, cy);
   }
+}
+/* ============================= GAMES: DARTS (لعبة النشان) ============================= */
+const DRT = { W:400, H:700, cx:200, cyBoard:230, R:170, handY:610, turnSeconds:16,
+  bullIn:0.045, bullOut:0.11, tripleIn:0.58, tripleOut:0.63, doubleIn:0.94, doubleOut:1.0 };
+const DRT_NUMBERS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const DRT_START_SCORE = 101;
+const DRT_DARTS_PER_TURN = 3;
+let DRT_CANVAS = null, DRT_CTX = null;
+function initDartsGame(){
+  DRT_CANVAS = null; DRT_CTX = null;
+  state.darts = {
+    you: DRT_START_SCORE, bot: DRT_START_SCORE,
+    turn: 'you', dartsLeft: DRT_DARTS_PER_TURN,
+    thrown: [], aiming:false, aimX: DRT.cx, aimY: DRT.cyBoard,
+    flying: null, timeLeft: DRT.turnSeconds, timerId: null,
+    log: [], over: false, winner: null, raf: null,
+  };
+}
+function dartsClearTimer(){ const g=state.darts; if(g && g.timerId){ clearInterval(g.timerId); g.timerId=null; } }
+function dartsUpdateTimerUI(){
+  const g = state.darts; if(!g) return;
+  const numEl = document.getElementById('drt-timer-num');
+  const pillEl = document.getElementById('drt-timer');
+  if(numEl) numEl.textContent = g.timeLeft;
+  if(pillEl){
+    pillEl.style.setProperty('--p', Math.max(0,(g.timeLeft/DRT.turnSeconds)*100)+'%');
+    pillEl.classList.toggle('warn', g.turn==='you' && g.timeLeft<=5);
+  }
+}
+function dartsStartTurnTimer(){
+  const g = state.darts; if(!g || g.over) return;
+  dartsClearTimer();
+  g.timeLeft = DRT.turnSeconds;
+  dartsUpdateTimerUI();
+  if(g.turn!=='you') return;
+  g.timerId = setInterval(()=>{
+    const gg = state.darts;
+    if(!gg || gg.over){ dartsClearTimer(); return; }
+    gg.timeLeft--;
+    dartsUpdateTimerUI();
+    if(gg.timeLeft<=0){
+      dartsClearTimer();
+      if(!gg.flying && gg.turn==='you' && !gg.over){ gg.aiming=false; dartsThrowAt(gg.aimX, gg.aimY, 'you'); }
+    }
+  }, 1000);
+}
+function dartsScoreAt(x,y){
+  const dx = x-DRT.cx, dy = y-DRT.cyBoard;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  const r = dist/DRT.R;
+  if(r > DRT.doubleOut) return {value:0, mult:1, label:'برّه اللوحة 😬', x, y};
+  if(r <= DRT.bullIn) return {value:50, mult:1, label:'بُلْ! 🎯', bull:true, x, y};
+  if(r <= DRT.bullOut) return {value:25, mult:1, label:'بُل خارجي', bull:true, x, y};
+  let ang = Math.atan2(dx, -dy) * 180/Math.PI;
+  if(ang<0) ang += 360;
+  const idx = Math.floor((ang+9)/18) % 20;
+  const num = DRT_NUMBERS[idx];
+  let mult=1, label=String(num);
+  if(r>=DRT.tripleIn && r<=DRT.tripleOut){ mult=3; label='تربل '+num; }
+  else if(r>=DRT.doubleIn && r<=DRT.doubleOut){ mult=2; label='دبل '+num; }
+  return {value:num*mult, mult, num, label, x, y};
+}
+function dartsApplyThrow(owner, score){
+  const g = state.darts;
+  const cur = g[owner];
+  const next = cur - score.value;
+  let bust = false;
+  if(next < 0) bust = true; else g[owner] = next;
+  g.thrown.push({x:score.x, y:score.y, owner});
+  const who = owner==='you' ? 'أنت' : 'الجهاز';
+  g.log.unshift(`${who}: ${score.value>0 ? score.label+' ('+score.value+')' : 'مية 😅'}${bust?' — بست 💥':''}`);
+  if(g.log.length>6) g.log.length = 6;
+  g.dartsLeft--;
+  if(!bust && g[owner]===0){ g.over = true; g.winner = owner; }
+  if(bust) g.dartsLeft = 0;
+  return bust;
+}
+function dartsAfterThrow(){
+  const g = state.darts;
+  if(g.over){ dartsFinish(); return; }
+  if(g.dartsLeft<=0){
+    g.turn = g.turn==='you' ? 'bot' : 'you';
+    g.dartsLeft = DRT_DARTS_PER_TURN;
+    g.thrown = [];
+  }
+  dartsStartTurnTimer();
+  dartsRenderShell();
+  if(g.turn==='bot' && !g.over) setTimeout(dartsBotThrowOne, 700);
+}
+function dartsFinish(){
+  dartsClearTimer();
+  const g = state.darts;
+  dartsRenderShell();
+  if(g.winner==='you'){
+    vibrate([20,20,30]); launchConfetti();
+    const reward = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.soloDartsReward) || 35;
+    if(reward>0) setTimeout(()=>awardSoloGamePoints(reward, 'مبروك! كسبت لعبة النشان'), 400); else SND.coinChime();
+  } else {
+    SND.error();
+  }
+}
+function dartsBotAimTarget(){
+  const g = state.darts;
+  const remaining = g.bot;
+  let targetNum, targetMult;
+  if(remaining<=40 && remaining>0 && remaining%2===0){ targetNum = remaining/2; targetMult = 2; }
+  else if(remaining>60){ targetNum = 20; targetMult = 3; }
+  else if(remaining<=20 && remaining>0){ targetNum = remaining; targetMult = 1; }
+  else { targetNum = 20; targetMult = 3; }
+  const idx = DRT_NUMBERS.indexOf(targetNum);
+  const angDeg = idx*18;
+  const angRad = angDeg*Math.PI/180;
+  let radiusFrac;
+  if(targetMult===3) radiusFrac = (DRT.tripleIn+DRT.tripleOut)/2;
+  else if(targetMult===2) radiusFrac = (DRT.doubleIn+DRT.doubleOut)/2;
+  else radiusFrac = 0.3;
+  const baseR = radiusFrac*DRT.R;
+  const jitterAng = (Math.random()-0.5) * (10*Math.PI/180);
+  const jitterR = (Math.random()-0.5) * (0.14*DRT.R);
+  const finalAng = angRad + jitterAng;
+  const r = Math.max(4, baseR + jitterR);
+  return { x: DRT.cx + r*Math.sin(finalAng), y: DRT.cyBoard - r*Math.cos(finalAng) };
+}
+function dartsBotThrowOne(){
+  const g = state.darts;
+  if(!g || g.over || g.turn!=='bot') return;
+  const t = dartsBotAimTarget();
+  dartsThrowAt(t.x, t.y, 'bot');
+}
+function dartsCurveControl(f){
+  return { cx:(f.fromX+f.toX)/2 + (f.fromX-f.toX)*0.15, cy:Math.min(f.fromY,f.toY)-60 };
+}
+function dartsBezier(f, t){
+  const c = dartsCurveControl(f);
+  const it = 1-t;
+  return {
+    x: it*it*f.fromX + 2*it*t*c.cx + t*t*f.toX,
+    y: it*it*f.fromY + 2*it*t*c.cy + t*t*f.toY,
+  };
+}
+function dartsStrokeCurve(ctx, f, color){
+  const c = dartsCurveControl(f);
+  ctx.beginPath();
+  ctx.moveTo(f.fromX, f.fromY);
+  ctx.quadraticCurveTo(c.cx, c.cy, f.toX, f.toY);
+  ctx.strokeStyle = color || 'rgba(79,172,254,.85)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([2,7]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+function dartsThrowAt(tx, ty, owner){
+  const g = state.darts;
+  if(!g || g.over || g.flying) return;
+  g.aiming = false;
+  g.flying = { fromX:DRT.cx, fromY:DRT.handY, toX:tx, toY:ty, t:0, owner, start:performance.now(), dur:380 };
+  SND.click();
+  dartsLoop();
+}
+function dartsLoop(){
+  const g = state.darts;
+  if(!g || !g.flying || !document.getElementById('drt-overlay')) return;
+  const f = g.flying;
+  f.t = Math.min(1, (performance.now()-f.start)/f.dur);
+  dartsDraw();
+  if(f.t<1){ g.raf = requestAnimationFrame(dartsLoop); }
+  else{
+    const score = dartsScoreAt(f.toX, f.toY);
+    const owner = f.owner;
+    const bust = dartsApplyThrow(owner, score);
+    g.flying = null;
+    if(score.bull) vibrate([15,20,15]);
+    if(bust) SND.error(); else if(score.value>0) SND.click();
+    dartsAfterThrow();
+  }
+}
+function dartsDrawHandDart(ctx, atX, atY, owner){
+  ctx.save();
+  ctx.translate(atX, atY);
+  ctx.fillStyle = owner==='you' ? '#4FACFE' : '#FF6B6B';
+  ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(6,10); ctx.lineTo(0,4); ctx.lineTo(-6,10); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.arc(0,-16,3,0,Math.PI*2); ctx.fillStyle='#e8e8e8'; ctx.fill();
+  ctx.restore();
+}
+function dartsDrawLanded(ctx){
+  const g = state.darts; if(!g) return;
+  g.thrown.forEach(d=>{
+    ctx.beginPath(); ctx.arc(d.x, d.y, 4.5, 0, Math.PI*2);
+    ctx.fillStyle = d.owner==='you' ? '#4FACFE' : '#FF6B6B';
+    ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.stroke();
+  });
+}
+function dartsDrawBoard(ctx){
+  const cx = DRT.cx, cy = DRT.cyBoard, R = DRT.R;
+  ctx.clearRect(0,0,DRT.W,DRT.H);
+  ctx.fillStyle = '#2b1c12'; ctx.fillRect(0,0,DRT.W,DRT.H);
+  ctx.beginPath(); ctx.arc(cx,cy,R+18,0,Math.PI*2); ctx.fillStyle='#4b3220'; ctx.fill();
+  const sectorAngle = Math.PI/10;
+  for(let i=0;i<20;i++){
+    const a0 = (i*18-9-90)*Math.PI/180, a1 = a0+sectorAngle;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R*DRT.doubleOut,a0,a1); ctx.closePath();
+    ctx.fillStyle = i%2===0 ? '#efe3c8' : '#161616'; ctx.fill();
+    const mid = (a0+a1)/2;
+    ctx.fillStyle = '#fff'; ctx.font = "700 15px Cairo, sans-serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(DRT_NUMBERS[i]), cx+Math.cos(mid)*(R*1.1), cy+Math.sin(mid)*(R*1.1));
+  }
+  function ring(rIn, rOut){
+    for(let i=0;i<20;i++){
+      const a0 = (i*18-9-90)*Math.PI/180, a1 = a0+sectorAngle;
+      ctx.beginPath(); ctx.arc(cx,cy,R*rOut,a0,a1); ctx.arc(cx,cy,R*rIn,a1,a0,true); ctx.closePath();
+      ctx.fillStyle = i%2===0 ? '#1e8a4c' : '#c23b3b'; ctx.fill();
+    }
+  }
+  ring(DRT.tripleIn, DRT.tripleOut);
+  ring(DRT.doubleIn, DRT.doubleOut);
+  ctx.beginPath(); ctx.arc(cx,cy,R*DRT.doubleOut,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,R*DRT.bullOut,0,Math.PI*2); ctx.fillStyle='#1e8a4c'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,R*DRT.bullIn,0,Math.PI*2); ctx.fillStyle='#c23b3b'; ctx.fill();
+}
+function dartsDraw(){
+  if(!DRT_CTX) return;
+  const ctx = DRT_CTX;
+  dartsDrawBoard(ctx);
+  dartsDrawLanded(ctx);
+  const g = state.darts; if(!g) return;
+  if(g.flying){
+    const p = dartsBezier(g.flying, g.flying.t);
+    dartsStrokeCurve(ctx, {fromX:g.flying.fromX, fromY:g.flying.fromY, toX:p.x, toY:p.y}, g.flying.owner==='you' ? 'rgba(79,172,254,.6)' : 'rgba(255,107,107,.6)');
+    dartsDrawHandDart(ctx, p.x, p.y, g.flying.owner);
+  } else if(g.over){
+    /* لا سهم في اليد بعد انتهاء اللعبة */
+  } else if(g.turn==='you'){
+    if(g.aiming){
+      dartsStrokeCurve(ctx, {fromX:DRT.cx, fromY:DRT.handY, toX:g.aimX, toY:g.aimY});
+      dartsDrawHandDart(ctx, g.aimX, g.aimY, 'you');
+    } else {
+      dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'you');
+    }
+  } else {
+    dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'bot');
+  }
+}
+function dartsClampAim(g){
+  g.aimX = Math.max(10, Math.min(DRT.W-10, g.aimX));
+  g.aimY = Math.max(10, Math.min(DRT.H-10, g.aimY));
+}
+function dartsEventToCanvas(e){
+  const canvas = DRT_CANVAS;
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x:(clientX-rect.left)*(DRT.W/rect.width), y:(clientY-rect.top)*(DRT.H/rect.height) };
+}
+function dartsPointerDown(e){
+  const g = state.darts;
+  if(!g || g.over || g.flying || g.turn!=='you') return;
+  e.preventDefault();
+  try{ DRT_CANVAS.setPointerCapture(e.pointerId); }catch(err){}
+  const pos = dartsEventToCanvas(e);
+  g.aiming = true; g.aimX = pos.x; g.aimY = pos.y;
+  dartsClampAim(g);
+  dartsDraw();
+}
+function dartsPointerMove(e){
+  const g = state.darts;
+  if(!g || !g.aiming) return;
+  e.preventDefault();
+  const pos = dartsEventToCanvas(e);
+  g.aimX = pos.x; g.aimY = pos.y;
+  dartsClampAim(g);
+  dartsDraw();
+}
+function dartsPointerUp(e){
+  const g = state.darts;
+  if(!g || !g.aiming) return;
+  e.preventDefault();
+  g.aiming = false;
+  dartsThrowAt(g.aimX, g.aimY, 'you');
+}
+function dartsFitCanvas(){
+  const wrap = document.getElementById('drt-canvas-wrap');
+  const canvas = document.getElementById('drt-canvas');
+  if(!wrap || !canvas) return;
+  const availW = Math.max(60, wrap.clientWidth), availH = Math.max(60, wrap.clientHeight);
+  const ratio = DRT.W/DRT.H;
+  let dispW = availW, dispH = dispW/ratio;
+  if(dispH > availH){ dispH = availH; dispW = dispH*ratio; }
+  dispW = Math.floor(dispW); dispH = Math.floor(dispH);
+  canvas.style.width = dispW+'px'; canvas.style.height = dispH+'px';
+  const dpr = Math.min(window.devicePixelRatio||1, 3);
+  canvas.width = Math.max(1, Math.round(DRT.W*dpr));
+  canvas.height = Math.max(1, Math.round(DRT.H*dpr));
+  if(DRT_CTX) DRT_CTX.setTransform(dpr,0,0,dpr,0,0);
+  dartsDraw();
+}
+function dartsOnResize(){ if(document.getElementById('drt-overlay')) dartsFitCanvas(); }
+function dartsMountCanvas(){
+  DRT_CANVAS = document.getElementById('drt-canvas');
+  if(!DRT_CANVAS) return;
+  DRT_CTX = DRT_CANVAS.getContext('2d');
+  DRT_CANVAS.onpointerdown = dartsPointerDown;
+  DRT_CANVAS.onpointermove = dartsPointerMove;
+  DRT_CANVAS.onpointerup = dartsPointerUp;
+  DRT_CANVAS.onpointercancel = dartsPointerUp;
+  dartsFitCanvas();
+  requestAnimationFrame(dartsFitCanvas);
+}
+function dartsPipsHtml(count, total, color){
+  let html = '';
+  for(let i=0;i<total;i++) html += `<span class="drt-pip ${i<count?'filled':''}" style="--pc:${color}"></span>`;
+  return html;
+}
+function dartsResultCardHtml(g){
+  const iWon = g.winner==='you';
+  const reward = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.soloDartsReward) || 35;
+  return `
+    <div class="match-result-card ${iWon?'win':'lose'}" style="position:absolute; inset:8px; margin:auto; align-self:center; z-index:5;">
+      <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
+      <div class="match-result-title">${iWon?'مبروك! كسبت اللعبة':'خسرت اللعبة'}</div>
+      <div class="match-result-sub">${iWon?'أنت':'الجهاز'} وصل بالظبط لصفر الأول</div>
+      ${iWon ? `<div class="match-result-points win">+${reward} نقطة 🎉</div>` : `<div class="match-result-points lose">😢 حظ أوفر المرة الجاية</div>`}
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" data-action="darts-reset">🔄 لعبة جديدة</button>
+    </div>`;
+}
+function dartsRenderShell(){
+  const g = state.darts; if(!g) return;
+  const shell = document.getElementById('drt-shell'); if(!shell) return;
+  const youActive = g.turn==='you' && !g.over;
+  const botActive = g.turn==='bot' && !g.over;
+  shell.innerHTML = `
+    <div class="darts-topbar">
+      <button class="icon-btn darts-back" data-action="darts-close">${ICO.back}</button>
+      <div class="darts-title">🎯 لعبة النشان</div>
+      <div class="darts-timer-pill${g.turn==='you'&&g.timeLeft<=5?' warn':''}" id="drt-timer" style="--p:${Math.max(0,(g.timeLeft/DRT.turnSeconds)*100)}%">⏱ <span id="drt-timer-num">${g.timeLeft}</span></div>
+    </div>
+    <div class="darts-score-row">
+      <div class="drt-side ${youActive?'active':''}">
+        ${gameAvatar(state.pid)}
+        <div class="drt-side-name">أنت</div>
+        <div class="drt-side-score">${g.you}</div>
+        <div class="drt-pips">${dartsPipsHtml(youActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#4FACFE')}</div>
+      </div>
+      <div class="drt-vs">VS</div>
+      <div class="drt-side ${botActive?'active':''}">
+        ${gameAiAvatar()}
+        <div class="drt-side-name">الجهاز</div>
+        <div class="drt-side-score">${g.bot}</div>
+        <div class="drt-pips">${dartsPipsHtml(botActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#FF6B6B')}</div>
+      </div>
+    </div>
+    <div class="darts-canvas-wrap" id="drt-canvas-wrap">
+      <canvas id="drt-canvas"></canvas>
+      ${g.over ? dartsResultCardHtml(g) : ''}
+    </div>
+    ${g.log.length ? `<div class="darts-log">${g.log.map(l=>`<div class="darts-log-line">${escapeHtml(l)}</div>`).join('')}</div>` : ''}
+    <div class="hint" style="text-align:center;margin-top:6px;">${g.over ? '' : (g.turn==='you' ? 'اسحب من السهم تحت وسيبه عشان ترمي 🎯' : 'دور الجهاز...')}</div>
+  `;
+  dartsMountCanvas();
+}
+function openDartsGame(){
+  initDartsGame();
+  const old = document.getElementById('drt-overlay'); if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'drt-overlay';
+  overlay.className = 'darts-overlay';
+  overlay.innerHTML = `<div id="drt-shell" class="darts-shell"></div>`;
+  document.body.appendChild(overlay);
+  dartsRenderShell();
+  dartsStartTurnTimer();
+  window.addEventListener('resize', dartsOnResize);
+  window.addEventListener('orientationchange', dartsOnResize);
+  SND.click();
+}
+function closeDartsGame(){
+  const g = state.darts;
+  if(g && g.raf) cancelAnimationFrame(g.raf);
+  dartsClearTimer();
+  DRT_CANVAS = null; DRT_CTX = null;
+  window.removeEventListener('resize', dartsOnResize);
+  window.removeEventListener('orientationchange', dartsOnResize);
+  const overlay = document.getElementById('drt-overlay');
+  if(overlay) overlay.remove();
+  SND.back();
+}
+function dartsResetGame(){
+  initDartsGame();
+  dartsRenderShell();
+  dartsStartTurnTimer();
+  SND.click();
 }
 /* ============================= GAMES: MILLIONAIRE — "من سيربح المليون" (أسئلة مسيحية) ============================= */
 
@@ -15298,7 +15769,10 @@ function chAllLegalMoves(S, color){
   for(let r=0;r<8;r++) for(let c=0;c<8;c++){ const p=S.board[r][c]; if(p && p[0]===color){ chLegalMovesForSquare(S,r,c).forEach(mv=>list.push({from:[r,c], to:[mv.r,mv.c], mv})); } }
   return list;
 }
+function chSquareName(r,c){ return 'abcdefgh'[c] + (8-r); }
 function chMakeMove(S, from, to, mv, promoPiece){
+  S.history = S.history||[]; S.moveLog = S.moveLog||[];
+  S.history.push(chSnapshot(S));
   const board=S.board; const piece=board[from[0]][from[1]]; const color=piece[0];
   let capturedPiece = board[to[0]][to[1]];
   board[from[0]][from[1]]=null;
@@ -15323,11 +15797,44 @@ function chMakeMove(S, from, to, mv, promoPiece){
   const inCheck = kp ? chSquareAttacked(S, kp[0], kp[1], chOpp(nt)) : false;
   S.check = inCheck; S.checkSquare = inCheck ? kp : null;
   if(legal.length===0){ S.winner = inCheck ? color : 'draw'; S.winnerReason = inCheck ? 'checkmate' : 'stalemate'; }
+  let notation = mv.castle==='K' ? 'O-O' : mv.castle==='Q' ? 'O-O-O' :
+    `${CHESS_GLYPH[finalPiece]} ${chSquareName(from[0],from[1])}${capturedPiece?'×':'-'}${chSquareName(to[0],to[1])}`;
+  if(inCheck) notation += S.winner ? ' #' : ' +';
+  S.moveLog.push({notation, color});
+  try{
+    if(S.winner && S.winner!=='draw') SND.cheer();
+    else if(S.winner==='draw') SND.click();
+    else if(inCheck) SND.error();
+    else if(capturedPiece) SND.success();
+    else SND.click();
+  }catch(e){}
 }
 function initChessGame(){
   state.chess = { board: chInitBoard(), turn:'w', mode:(state.chess?state.chess.mode:'ai'), selected:null, legalTargets:[],
     castling:{wK:true,wQ:true,bK:true,bQ:true}, epTarget:null, lastMove:null, check:false, checkSquare:null,
-    winner:null, winnerReason:'', promoPending:null, capturedBy:{w:[],b:[]} };
+    winner:null, winnerReason:'', promoPending:null, capturedBy:{w:[],b:[]}, history:[], moveLog:[] };
+}
+function chSnapshot(S){
+  return {
+    board: chCloneBoard(S.board), turn: S.turn, castling: Object.assign({}, S.castling),
+    epTarget: S.epTarget ? S.epTarget.slice() : null,
+    capturedBy: {w:S.capturedBy.w.slice(), b:S.capturedBy.b.slice()},
+    lastMove: S.lastMove ? {from:S.lastMove.from.slice(), to:S.lastMove.to.slice()} : null,
+    check: S.check, checkSquare: S.checkSquare ? S.checkSquare.slice() : null,
+    winner: S.winner, winnerReason: S.winnerReason
+  };
+}
+function doChessUndo(){
+  const S=state.chess; if(!S) return;
+  if(S.promoPending){ S.promoPending=null; S.selected=null; S.legalTargets=[]; render(); return; }
+  if(!S.history || !S.history.length) return;
+  Object.assign(S, S.history.pop()); S.moveLog.pop();
+  if(S.mode==='ai' && S.turn==='b' && S.history.length){
+    Object.assign(S, S.history.pop()); S.moveLog.pop();
+  }
+  S.selected=null; S.legalTargets=[];
+  try{ SND.back(); }catch(e){}
+  render();
 }
 function doChSquareClick(r,c){
   const S=state.chess; if(!S||S.winner||S.promoPending) return;
@@ -15339,7 +15846,6 @@ function doChSquareClick(r,c){
       if(mv.promo){ S.promoPending = {from:S.selected, mv}; S.selected=null; S.legalTargets=[]; render(); return; }
       chMakeMove(S, S.selected, [r,c], mv);
       S.selected=null; S.legalTargets=[];
-      try{ SND.click(); }catch(e){}
       render();
       chMaybeBotMove();
       return;
@@ -15370,7 +15876,6 @@ function chMaybeBotMove(){
       if(score>bestScore){ bestScore=score; best=m; }
     });
     chMakeMove(S2, best.from, best.to, best.mv, 'q');
-    try{ SND.click(); }catch(e){}
     render();
   }, 550);
 }
@@ -15394,7 +15899,7 @@ function renderChessGame(){
       if(isLast) cls+=' last';
       if(isCheck) cls+=' check';
       const glyph = piece ? `<img class="chess-pc-img" src="${CHESS_PIECE_IMG[piece]}" alt="">` : '';
-      cellsHtml += `<button type="button" class="${cls}" data-action="chess-sq" data-r="${r}" data-c="${c}">${glyph}</button>`;
+      cellsHtml += `<button type="button" class="${cls}" data-action="chess-sq" data-r="${r}" data-c="${c}" data-rank="${8-r}" data-file="${'abcdefgh'[c]}">${glyph}</button>`;
     }
   }
   let statusText;
@@ -15408,6 +15913,26 @@ function renderChessGame(){
     <div class="chess-promo-row">
       ${['q','r','b','n'].map(p=>`<button type="button" class="chess-promo-btn" data-action="chess-promo" data-p="${p}"><img class="chess-pc-img" src="${CHESS_PIECE_IMG[S.turn+p]}" alt=""></button>`).join('')}
     </div>` : '';
+  const capWVal = (S.capturedBy.w||[]).reduce((s,p)=>s+(CHESS_VAL[p[1]]||0),0);
+  const capBVal = (S.capturedBy.b||[]).reduce((s,p)=>s+(CHESS_VAL[p[1]]||0),0);
+  const capTray = (list, adv) => `
+    <div class="chess-cap-tray">
+      ${(list&&list.length) ? list.map(p=>`<img class="chess-pc-img cap" src="${CHESS_PIECE_IMG[p]}" alt="">`).join('') : '<span class="chess-cap-empty">لا يوجد أسرى</span>'}
+      ${adv>0 ? `<span class="chess-cap-adv">+${adv}</span>` : ''}
+    </div>`;
+  const canUndo = (S.history && S.history.length) || S.promoPending;
+  const logRows = [];
+  for(let i=0;i<(S.moveLog||[]).length;i+=2) logRows.push({n:(i/2)+1, w:S.moveLog[i], b:S.moveLog[i+1]});
+  const logHtml = `
+    <div class="chess-log-box">
+      <div class="chess-log-title">📜 سجل النقلات</div>
+      ${logRows.length ? `<div class="chess-log-list">${logRows.map(row=>`
+        <div class="chess-log-row">
+          <span class="chess-log-num">${row.n}</span>
+          <span class="chess-log-mv">${row.w?row.w.notation:''}</span>
+          <span class="chess-log-mv">${row.b?row.b.notation:''}</span>
+        </div>`).join('')}</div>` : `<div class="chess-log-empty">لسه مفيش نقلات</div>`}
+    </div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -15417,12 +15942,19 @@ function renderChessGame(){
       <button type="button" class="gms-btn ${S.mode==='ai'?'active':''}" data-action="chess-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${S.mode==='2p'?'active':''}" data-action="chess-mode" data-mode="2p">👥 لاعبين اتنين</button>
     </div>
-    <div class="chess-capbar">${(S.capturedBy.b||[]).map(p=>`<img class="chess-pc-img cap" src="${CHESS_PIECE_IMG[p]}" alt="">`).join(' ')}</div>
+    <div class="chess-tools-row">
+      <button type="button" class="chess-tool-btn" data-action="chess-undo" ${canUndo?'':'disabled'}>↩️ تراجع</button>
+      <button type="button" class="chess-tool-btn" data-action="chess-reset">🔄 لعبة جديدة</button>
+    </div>
     <div class="xo-status">${statusText}</div>
-    <div class="chess-board">${cellsHtml}</div>
-    <div class="chess-capbar">${(S.capturedBy.w||[]).map(p=>`<img class="chess-pc-img cap" src="${CHESS_PIECE_IMG[p]}" alt="">`).join(' ')}</div>
+    <div class="chess-frame">
+      ${capTray(S.capturedBy.b, capBVal-capWVal)}
+      <div class="chess-board">${cellsHtml}</div>
+      ${capTray(S.capturedBy.w, capWVal-capBVal)}
+    </div>
     ${promoHtml}
     ${S.winner ? nextProBtn('chess-reset') : ''}
+    ${logHtml}
   `;
 }
 /* ================= الداما (أسر إجباري ومتسلسل + تتويج) ================= */
@@ -20500,6 +21032,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-game'){
     const gid = el.dataset.game;
     if(gid==='billiards'){ openBilliardsGame(); return; }
+    if(gid==='darts'){ openDartsGame(); return; }
     if(gid==='stack'){ openStackGame(); return; }
     if(gid==='millionaire'){ openMillionaireGame(); return; }
     if(gid==='xo'){ initXoGame(); xoStartPick(450); }
@@ -20523,6 +21056,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='billiards-reset'){ bilResetGame(); }
   else if(action==='stack-close'){ closeStackGame(); }
   else if(action==='stack-reset'){ stkResetGame(); }
+  else if(action==='darts-close'){ closeDartsGame(); }
+  else if(action==='darts-reset'){ dartsResetGame(); }
   else if(action==='mil-close'){ closeMillionaireGame(); }
   else if(action==='mil-reset'){ milResetGame(); }
   else if(action==='mil-start'){ initMillionaireGame(); milRenderShell(); milStartTimer(); SND.click(); }
@@ -20646,6 +21181,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='chess-sq'){ doChSquareClick(parseInt(el.dataset.r,10), parseInt(el.dataset.c,10)); }
   else if(action==='chess-mode'){ doChessMode(el.dataset.mode); }
   else if(action==='chess-reset'){ doChessReset(); }
+  else if(action==='chess-undo'){ doChessUndo(); }
   else if(action==='chess-promo'){ doChPromoChoose(el.dataset.p); }
   else if(action==='ck-sq'){ doCkSquareClick(parseInt(el.dataset.r,10), parseInt(el.dataset.c,10)); }
   else if(action==='ck-mode'){ doCkMode(el.dataset.mode); }
