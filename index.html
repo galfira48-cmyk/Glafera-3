@@ -8561,7 +8561,7 @@ const GH_SOLO_SUB = {
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
   darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
   stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد',
-  millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 10 ثواني للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
+  millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
   backgammon:'زهرين، بار، وخروج القطع — اللعبة الشرقية الكلاسيكية',
@@ -11171,7 +11171,7 @@ function stkDraw(){
   }
 }
 /* ============================= GAMES: DARTS (لعبة النشان) ============================= */
-const DRT = { W:400, H:700, cx:200, cyBoard:230, R:170, handY:610, turnSeconds:16,
+const DRT = { W:400, H:620, cx:200, cyBoard:225, R:182, handY:540, turnSeconds:16,
   bullIn:0.045, bullOut:0.11, tripleIn:0.58, tripleOut:0.63, doubleIn:0.94, doubleOut:1.0 };
 const DRT_NUMBERS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 const DRT_START_SCORE = 101;
@@ -11383,7 +11383,7 @@ function dartsDrawHandDart(ctx, atX, atY, owner, angle, scale){
   ctx.save();
   ctx.translate(atX, atY);
   if(img && img.complete && img.naturalWidth){
-    const targetLen = 104*s;
+    const targetLen = 116*s;
     const k = targetLen/Math.max(img.naturalWidth, img.naturalHeight);
     const w = img.naturalWidth*k, h = img.naturalHeight*k;
     ctx.rotate(a - DRT_DART_TIP_ANGLE);
@@ -11420,6 +11420,26 @@ function dartsDrawBoard(ctx){
     ctx.beginPath(); ctx.arc(cx,cy,R*DRT.doubleOut,0,Math.PI*2); ctx.fillStyle='#161616'; ctx.fill();
   }
 }
+function dartsDrawPowerMeter(ctx, x, y, pct){
+  const r = 32;
+  ctx.save();
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,.16)';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, y, r, -Math.PI/2 + Math.PI*2*0.72, Math.PI*1.5);
+  ctx.strokeStyle = 'rgba(155,140,255,.4)';
+  ctx.stroke();
+  const col = pct < 0.45 ? '#FF7A59' : (pct < 0.72 ? '#F4B740' : '#9B8CFF');
+  ctx.beginPath();
+  ctx.arc(x, y, r, -Math.PI/2, -Math.PI/2 + Math.PI*2*pct);
+  ctx.strokeStyle = col;
+  ctx.stroke();
+  ctx.restore();
+}
 function dartsDraw(){
   if(!DRT_CTX) return;
   const ctx = DRT_CTX;
@@ -11435,8 +11455,11 @@ function dartsDraw(){
     /* لا سهم في اليد بعد انتهاء اللعبة */
   } else if(g.turn==='you'){
     if(g.aiming){
-      const ang = Math.atan2(g.aimY-DRT.handY, g.aimX-DRT.cx);
+      const dx = g.aimX-DRT.cx, dy = g.aimY-DRT.handY;
+      const pct = Math.min(1, Math.sqrt(dx*dx+dy*dy)/DRT_MAX_PULL);
+      const ang = Math.atan2(dy, dx);
       dartsStrokeCurve(ctx, {fromX:DRT.cx, fromY:DRT.handY, toX:g.aimX, toY:g.aimY});
+      dartsDrawPowerMeter(ctx, g.aimX, g.aimY, pct);
       dartsDrawHandDart(ctx, g.aimX, g.aimY, 'you', ang);
     } else {
       dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'you', -Math.PI/2);
@@ -11601,7 +11624,7 @@ function dartsResetGame(){
 }
 /* ============================= GAMES: MILLIONAIRE — "من سيربح المليون" (أسئلة مسيحية) ============================= */
 
-const MIL_TIMER_SEC = 10; // تايمر ثابت 10 ثواني لكل الأسئلة
+const MIL_TIMER_SEC = 15; // تايمر ثابت 15 ثانية لكل الأسئلة
 const MIL_TOTAL_QUESTIONS = 50;
 const MIL_TIER_VALUES = [1,2,4,8,15]; // نقطة كل سؤال في كل مرحلة (10 أسئلة للمرحلة) — لو جاوبت الـ50 صح مجموعهم 300 نقطة
 /* سلم الجايزة: 50 مستوى مقسّمين 5 مراحل (كل مرحلة 10 أسئلة)، وبيبقى في نقطة أمان آخر كل مرحلة */
@@ -11876,7 +11899,7 @@ function milStartScreenHtml(){
         ${MIL_TOTAL_QUESTIONS} سؤال مسيحي مقسّمين 5 مراحل، كل مرحلة 10 أسئلة وكل ما تتقدّم الصعوبة بتزيد جدًا:<br>
         🥉 أسئلة 1-10: نقطة للسؤال &nbsp; 🥈 أسئلة 11-20: نقطتين للسؤال &nbsp; 🥇 أسئلة 21-30: 4 نقط للسؤال<br>
         💎 أسئلة 31-40: 8 نقط للسؤال &nbsp; 👑 أسئلة 41-50: 15 نقطة للسؤال — كمّلهم كلهم واكسب 300 نقطة!<br>
-        عندك 10 ثواني بس لكل سؤال، 3 مساعدات (50:50، الجمهور، صديق)، وإمكانية تاخد نقطك وتمشي في أي وقت. والأسئلة بتتغيّر كل مرة تلعب من جديد.
+        عندك 15 ثانية بس لكل سؤال، 3 مساعدات (50:50، الجمهور، صديق)، وإمكانية تاخد نقطك وتمشي في أي وقت. والأسئلة بتتغيّر كل مرة تلعب من جديد.
       </div>
       <button type="button" class="btn btn-primary" style="width:100%;max-width:260px;" data-action="mil-start">🚀 ابدأ اللعب</button>
       <div class="hint" style="margin-top:2px;">${bestLine}</div>
