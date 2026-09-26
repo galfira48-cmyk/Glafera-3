@@ -4201,6 +4201,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .gh-lb-me{border-top:2px dashed var(--border); margin-top:6px; padding-top:14px !important;}
   .gh-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:6px;}
   .gh-grid > .gh-tile:last-child:nth-child(odd){grid-column:1 / -1; width:calc(50% - 7px); justify-self:center;}
+  .gh-cat-list{display:flex; flex-direction:column; gap:12px; margin-top:10px;}
+  .gh-cat-card{position:relative; display:flex; align-items:center; gap:14px; width:100%; padding:16px 18px; border-radius:20px; overflow:hidden; isolation:isolate; text-align:right; font-family:inherit; color:#fff; cursor:pointer;
+    box-shadow:0 14px 32px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.20), inset 0 -1px 0 rgba(255,255,255,.05);
+    transition:transform .15s;}
+  .gh-cat-card::before{content:''; position:absolute; inset:0; z-index:-1; background:var(--g);}
+  .gh-cat-card::after{content:''; position:absolute; inset:0; z-index:-1; background:rgba(0,0,0,.18);}
+  .gh-cat-card:active{transform:scale(.97);}
+  .gh-cat-card-ico{flex-shrink:0; width:50px; height:50px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:rgba(255,255,255,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.3);}
+  .gh-cat-card-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+  .gh-cat-card-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; text-shadow:0 2px 6px rgba(0,0,0,.3);}
+  .gh-cat-card-sub{font-family:'Tajawal',Arial; font-size:11.5px; color:rgba(255,255,255,.85);}
+  .gh-cat-card-arrow{flex-shrink:0; opacity:.85;}
   .gh-tile{position:relative; aspect-ratio:1/1; border-radius:26px; overflow:hidden; isolation:isolate; color:var(--text);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:12px; text-align:center;
     font-family:inherit;
@@ -8554,6 +8567,46 @@ function showGameWinModal(pts, title){
 }
 
 /* ============================= GAMES: HUB ============================= */
+const GAME_CATEGORIES = [
+  {key:'board', label:'ألعاب الطاولة الكلاسيكية', icon:'🎲', color:'linear-gradient(145deg,#7C4A2A,#2b1608)'},
+  {key:'skill', label:'تحديات السرعة والمهارة', icon:'⚡', color:'linear-gradient(145deg,#FFD93D,#C23B3B)'},
+  {key:'mind',  label:'ذكاء وأسئلة', icon:'🧠', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {key:'cards', label:'ورق وحظ', icon:'🃏', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
+  {key:'party', label:'تحديات جماعية', icon:'🎉', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
+];
+const GAME_CATEGORY_OF = {
+  xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', backgammon:'board', snakes:'board',
+  reflex:'skill', billiards:'skill', darts:'skill', stack:'skill',
+  memory:'mind', numguess:'mind', math:'mind', millionaire:'mind',
+  uno:'cards', rps:'cards',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party',
+};
+/* rectangular category cards — tap one to open the games inside it */
+function ghCatListHtml(list, catAction){
+  const known = new Set(Object.keys(GAME_CATEGORY_OF));
+  const extra = list.some(g=> g && !known.has(g.id));
+  const cats = extra ? [...GAME_CATEGORIES, {key:'more', label:'ألعاب تانية', icon:'✨', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'}] : GAME_CATEGORIES;
+  const cards = cats.map(cat=>{
+    const count = list.filter(g => g && ((GAME_CATEGORY_OF[g.id]||'more')===cat.key)).length;
+    if(!count) return '';
+    return `
+      <button type="button" class="gh-cat-card" style="--g:${cat.color}" data-action="${catAction}" data-cat="${cat.key}">
+        <span class="gh-cat-card-ico">${cat.icon}</span>
+        <span class="gh-cat-card-body">
+          <span class="gh-cat-card-title">${cat.label}</span>
+          <span class="gh-cat-card-sub">${count} ${count===1?'لعبة':'ألعاب'}</span>
+        </span>
+        <span class="gh-cat-card-arrow">${ICO.chev}</span>
+      </button>`;
+  }).join('');
+  return `<div class="gh-cat-list">${cards}</div>`;
+}
+/* the grid of game tiles inside one chosen category */
+function ghCatGamesHtml(list, subMap, action, catKey){
+  const items = list.filter(g => g && ((GAME_CATEGORY_OF[g.id]||'more')===catKey));
+  const tiles = items.map((g,i)=> ghGameTile(g, (subMap&&subMap[g.id])||g.sub, action, i)).join('');
+  return { items, html: `<div class="gh-grid">${tiles}</div>` };
+}
 const GAMES_CATALOG = [
   {id:'xo', icon:'⭕', logo:'xo-logo.png', title:'إكس أو', sub:'تحدَّ صديقك أو العب ضد الجهاز', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'connect4', icon:'🔴', logo:'connect4-logo.png', title:'كونكت فور', sub:'', color:'linear-gradient(145deg,#FF7A59,#FFDE94)'},
@@ -9003,17 +9056,31 @@ function spectateBannerHtml(room){
   </div>`;
 }
 function renderSoloGames(){
-  const tiles = GAMES_CATALOG.map((g,i)=> ghGameTile(g, GH_SOLO_SUB[g.id]||g.sub, 'open-game', i)).join('');
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">العب ضد الجهاز</div>
     </div>
     <div class="gh-lobby-head">
-      <div class="gh-lobby-title">اختار لعبتك 🎮</div>
+      <div class="gh-lobby-title">اختار نوع اللعبة 🎮</div>
       <div class="gh-lobby-sub">ألعاب سريعة تلعبها لوحدك</div>
     </div>
-    <div class="gh-grid">${tiles}</div>
+    ${ghCatListHtml(GAMES_CATALOG, 'open-solo-cat')}
+  `;
+}
+function renderSoloGamesInCategory(){
+  const cat = GAME_CATEGORIES.find(c=>c.key===state.soloCatKey) || GAME_CATEGORIES[0];
+  const {items, html} = ghCatGamesHtml(GAMES_CATALOG, GH_SOLO_SUB, 'open-game', cat.key);
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${cat.icon} ${cat.label}</div>
+    </div>
+    <div class="gh-lobby-head">
+      <div class="gh-lobby-title">اختار لعبتك 🎮</div>
+      <div class="gh-lobby-sub">${items.length} ${items.length===1?'لعبة':'ألعاب'} في القسم ده</div>
+    </div>
+    ${html}
   `;
 }
 function setFriendTile(mode){
@@ -16607,21 +16674,36 @@ function confirmAdminDeleteQuizQ(id){
   });
 }
 function renderRoomsLobby(){
-  const tiles = ROOM_GAMES.map((rg,i)=>{
-    const g = GAMES_CATALOG.find(x=>x.id===rg.id) || ROOM_ONLY_TILES[rg.id];
-    return g ? ghGameTile(g, rg.sub, 'create-room', i) : '';
-  }).join('');
+  const list = ROOM_GAMES.map(rg=> GAMES_CATALOG.find(x=>x.id===rg.id) || ROOM_ONLY_TILES[rg.id]).filter(Boolean);
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">إنشاء غرفة</div>
     </div>
     <div class="gh-lobby-head">
-      <div class="gh-lobby-title">اختار اللعبة 🎮</div>
+      <div class="gh-lobby-title">اختار نوع اللعبة 🎮</div>
       <div class="gh-lobby-sub">هتفتح غرفة وتبعت الكود لصاحبك عشان تلعبوا ضد بعض</div>
       <div class="gh-turn-chip">🔁 اللي بيبدأ بيتبدل بينكم في كل جولة</div>
     </div>
-    <div class="gh-grid">${tiles}</div>
+    ${ghCatListHtml(list, 'open-room-cat')}
+  `;
+}
+function renderRoomGamesInCategory(){
+  const list = ROOM_GAMES.map(rg=> GAMES_CATALOG.find(x=>x.id===rg.id) || ROOM_ONLY_TILES[rg.id]).filter(Boolean);
+  const subMap = {}; ROOM_GAMES.forEach(rg=>{ subMap[rg.id] = rg.sub; });
+  const cat = GAME_CATEGORIES.find(c=>c.key===state.roomCatKey) || GAME_CATEGORIES[0];
+  const {items, html} = ghCatGamesHtml(list, subMap, 'create-room', cat.key);
+  return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="back">${ICO.back}</button>
+      <div class="back-title">${cat.icon} ${cat.label}</div>
+    </div>
+    <div class="gh-lobby-head">
+      <div class="gh-lobby-title">اختار اللعبة 🎮</div>
+      <div class="gh-lobby-sub">${items.length} ${items.length===1?'لعبة':'ألعاب'} في القسم ده</div>
+      <div class="gh-turn-chip">🔁 اللي بيبدأ بيتبدل بينكم في كل جولة</div>
+    </div>
+    ${html}
   `;
 }
 function roomCodeCard(code){
@@ -19842,6 +19924,7 @@ function render(){
   else if(state.view==='visa') html = renderVisaPage();
   else if(state.view==='visa-history') html = renderVisaHistoryPage();
   else if(state.view==='games-solo') html = renderSoloGames();
+  else if(state.view==='games-solo-cat') html = renderSoloGamesInCategory();
   else if(state.view==='watch-rooms') html = renderWatchRooms();
   else if(state.view==='sticker-store') html = renderShopPage();
   else if(state.view==='chefs') html = renderChefsPage();
@@ -19862,6 +19945,7 @@ function render(){
   else if(state.view==='game-backgammon') html = renderBackgammonGame();
   else if(state.view==='game-snakes') html = renderSnakesGame();
   else if(state.view==='game-rooms') html = renderRoomsLobby();
+  else if(state.view==='game-rooms-cat') html = renderRoomGamesInCategory();
   else if(state.view==='room-xo') html = renderRoomXo();
   else if(state.view==='room-domino') html = renderRoomDomino();
   else if(state.view==='room-ludo') html = renderRoomLudo();
@@ -21320,6 +21404,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-dish-stars'){ doAdminDishStars(el.dataset.cid, el.dataset.did, parseInt(el.dataset.n,10)||0, el); }
   else if(action==='admin-save-dish-name'){ doAdminSaveDishName(el.dataset.cid, el.dataset.did); }
   else if(action==='admin-delete-dish'){ confirmAdminDeleteDish(el.dataset.cid, el.dataset.did); }
+  else if(action==='open-room-cat'){ go('game-rooms-cat', {roomCatKey: el.dataset.cat}); }
   else if(action==='open-rooms'){ state.friendTile = null; go('game-rooms'); }
   else if(action==='open-visa'){ openVisaPage(); }
   else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
@@ -21343,6 +21428,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
+  else if(action==='open-solo-cat'){ go('games-solo-cat', {soloCatKey: el.dataset.cat}); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
   else if(action==='open-sticker-store'){
