@@ -3500,11 +3500,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     contain:layout style paint;}
   .c4-cell:disabled{cursor:default;}
   .c4-cell:not(:disabled):active{transform:scale(.93);}
-  .c4-disc{width:88%; height:88%; border-radius:50%; background-color:transparent; background-size:100% 100%; background-position:center; background-repeat:no-repeat;}
+  .c4-disc{width:88%; height:88%; border-radius:50%; background-color:transparent; background-size:100% 100%; background-position:center; background-repeat:no-repeat; position:relative;}
   .c4-cell.c4-r .c4-disc, .c4-cell.c4-y .c4-disc{animation:c4Drop .28s cubic-bezier(.34,1.56,.64,1);}
+  .c4-disc::after{content:''; position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,255,255,.6); opacity:0; pointer-events:none;}
+  .c4-cell.c4-r .c4-disc::after, .c4-cell.c4-y .c4-disc::after{animation:c4Impact .45s ease-out .2s both;}
   .c4-cell.c4-win{animation:none;}
-  .c4-cell.c4-win .c4-disc{animation:c4WinPulse 1s ease-in-out 4; box-shadow:0 0 14px 3px var(--gold);}
+  .c4-cell.c4-win .c4-disc{animation:c4WinPop .45s cubic-bezier(.34,1.56,.64,1) both, c4WinPulse 1s ease-in-out 1s 3; animation-delay:var(--c4wd,0ms), calc(var(--c4wd,0ms) + .45s); box-shadow:0 0 14px 3px var(--gold);}
   @keyframes c4Drop{0%{transform:translateY(-20px) scale(.5); opacity:0;} 55%{transform:translateY(3px) scale(1.08); opacity:1;} 100%{transform:translateY(0) scale(1);}}
+  @keyframes c4Impact{0%{transform:scale(.55); opacity:.75;} 100%{transform:scale(1.7); opacity:0;}}
+  @keyframes c4WinPop{0%{transform:scale(1);} 45%{transform:scale(1.25);} 100%{transform:scale(1);}}
   @keyframes c4WinPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.1);}}
 
   .domino-opp-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 10px; flex-wrap:wrap;}
@@ -10312,12 +10316,14 @@ function renderConnect4Game(){
   for(let row=5; row>=0; row--){
     for(let col=0; col<7; col++){
       const v = g.board[col][row] || null;
-      const isWin = g.winCells && g.winCells.some(cc=>cc[0]===col && cc[1]===row);
+      const winIdx = g.winCells ? g.winCells.findIndex(cc=>cc[0]===col && cc[1]===row) : -1;
+      const isWin = winIdx>-1;
       const cls = (v?('c4-'+v.toLowerCase()):'') + (isWin?' c4-win':'');
       const full = g.board[col].length>=6;
       const disabled = (g.winner || full || (g.mode==='ai' && g.turn==='Y')) ? 'disabled' : '';
       const discStyle = v ? `style="background-image:url('${c4BtnImg(v==='R'?g.colorR:g.colorY)}')"` : '';
-      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="c4-col" data-col="${col}" ${disabled}><span class="c4-disc" ${discStyle}></span></button>`;
+      const winDelayStyle = isWin ? ` style="--c4wd:${winIdx*130}ms"` : '';
+      cellsHtml += `<button type="button" class="c4-cell ${cls}" data-action="c4-col" data-col="${col}" ${disabled}${winDelayStyle}><span class="c4-disc" ${discStyle}></span></button>`;
     }
   }
   let statusText;
