@@ -14566,12 +14566,53 @@ function c4RoomDialogSync(room, myColor, oppColor, oppId){
 }
 
 /* ============================= GAMES: ROOMS (LIVE MULTIPLAYER) ============================= */
+/* ملحوظة مهمة: كل الغرف كانت بتتخزن قبل كده في مفتاح واحد مشترك (glavera-game-rooms)، فكل حركة في
+   أي غرفة كانت بتحمّل كل الغرف وتحفظها كلها تاني. أي كتابة تانية بتحصل في نفس اللحظة (نبضة حياة
+   من لاعب في غرفة تانية، أو حركة صاحبك) كانت ممكن تمسح حركتك من غير أي رسالة خطأ — وده سبب إحساس
+   إن "اللوحة مش بترد". دلوقتي كل غرفة ليها مفتاحها الخاص، وبنحفظ بس الغرف اللي اتغيّرت فعلاً محليًا،
+   فحركتك متتمسحش بسبب غرفة تانية خالص. الدالتين ليهم نفس الشكل والاستخدام زي الأول بالظبط. */
 let GAME_ROOMS = {};
+const _ROOMS_INDEX_KEY = 'glavera-rooms-index';
+const _ROOM_KEY_PREFIX = 'glavera-room-';
+let _lastLoadedRoomsRaw = {}; // code -> آخر نص JSON اتقرأ من السيرفر، بنقارن بيه عشان نعرف الغرفة اتغيّرت فعلاً ولا لأ
 async function loadGameRooms(){
-  try{ const r = await window.storage.get('glavera-game-rooms', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; }
+  try{
+    const idxRes = await window.storage.get(_ROOMS_INDEX_KEY, true);
+    let codes = [];
+    try{ codes = idxRes && idxRes.value ? (JSON.parse(idxRes.value)||[]) : []; }catch(e){ codes = []; }
+    const out = {};
+    const rawMap = {};
+    await Promise.all(codes.map(async (code)=>{
+      try{
+        const r = await window.storage.get(_ROOM_KEY_PREFIX+code, true);
+        if(r && r.value){ rawMap[code] = r.value; out[code] = JSON.parse(r.value); }
+      }catch(e){ /* غرفة واحدة اتعطلت متوقفش تحميل الباقي */ }
+    }));
+    _lastLoadedRoomsRaw = rawMap;
+    return out;
+  }catch(e){ return {}; }
 }
 async function saveGameRooms(obj){
-  try{ await window.storage.set('glavera-game-rooms', JSON.stringify(obj), true); }catch(e){}
+  try{
+    obj = obj || {};
+    const codes = Object.keys(obj);
+    const prevCodes = Object.keys(_lastLoadedRoomsRaw);
+    const nextRaw = {};
+    const writes = [];
+    codes.forEach(code=>{
+      const json = JSON.stringify(obj[code]);
+      nextRaw[code] = json;
+      if(_lastLoadedRoomsRaw[code] !== json){
+        writes.push(window.storage.set(_ROOM_KEY_PREFIX+code, json, true));
+      }
+    });
+    prevCodes.forEach(code=>{
+      if(codes.indexOf(code)===-1) writes.push(window.storage.delete(_ROOM_KEY_PREFIX+code, true));
+    });
+    writes.push(window.storage.set(_ROOMS_INDEX_KEY, JSON.stringify(codes), true));
+    await Promise.all(writes);
+    _lastLoadedRoomsRaw = nextRaw;
+  }catch(e){}
 }
 /* بتشيل الغرف المهجورة خالص (مفيش حركة فيها من ربع ساعة) عشان متتراكمش على السيرفر */
 const ROOM_ABANDONED_MS = 15*60*1000;
