@@ -14574,14 +14574,18 @@ function c4RoomDialogSync(room, myColor, oppColor, oppId){
    عدّلتها"، والسيرفر نفسه بيتأكد إن محدش بيداس على حد تاني ويعيد المحاولة تلقائي لو لقى تعارض. */
 let GAME_ROOMS = {};
 const _GAME_ROOMS_KEY = 'glavera-game-rooms';
-let _lastLoadedRoomsRaw = {}; // code -> آخر نص JSON اتقرأ من السيرفر لكل غرفة، بنقارن بيه عشان نعرف احنا فعلاً عدّلنا غرفة ولا لأ
+/* نسخة مستقلة (مش نفس الأوبجكت اللي بيتعدّل في اللعبة) من آخر حالة معروفة لكل غرفة، عشان نقدر
+   نحسب "إيه اللي اتغيّر فعلاً" بعدين. لازم نسخة مستقلة وإلا أي push على room.board هيغيّر النسخة
+   دي كمان (نفس المرجع) ومكانش هيبان أي فرق أبدًا. */
+let _lastLoadedRooms = {};
+function _c4DeepClone(v){ return v===undefined ? undefined : JSON.parse(JSON.stringify(v)); }
 async function loadGameRooms(){
   try{
     const r = await window.storage.get(_GAME_ROOMS_KEY, true);
     const val = r && r.value ? (JSON.parse(r.value)||{}) : {};
-    const rawMap = {};
-    Object.keys(val).forEach(code=>{ rawMap[code] = JSON.stringify(val[code]); });
-    _lastLoadedRoomsRaw = rawMap;
+    const baseline = {};
+    Object.keys(val).forEach(code=>{ baseline[code] = _c4DeepClone(val[code]); });
+    _lastLoadedRooms = baseline;
     return val;
   }catch(e){ return {}; }
 }
@@ -14589,30 +14593,47 @@ async function saveGameRooms(obj){
   try{
     obj = obj || {};
     const codes = Object.keys(obj);
-    const changed = {};
+    /* بنحسب بس الحقول (fields) اللي اتغيّرت فعلاً جوه كل غرفة، مش الغرفة كلها. عشان كده لما يحصل
+       تعارض (مثلاً نبضة حياة من صاحبك بتوصل في نفس ثانية حركتك)، السيرفر بيدمج بس الحقول اللي كل
+       طرف فعلاً غيّرها فوق آخر نسخة حقيقية عنده، بدل ما حد يمسح غرفة التاني بالكامل. */
+    const patches = {};
     codes.forEach(code=>{
-      const json = JSON.stringify(obj[code]);
-      if(_lastLoadedRoomsRaw[code] !== json) changed[code] = obj[code];
+      const prevRoom = _lastLoadedRooms[code];
+      const newRoom = obj[code];
+      if(!prevRoom){ patches[code] = {__full:true, room:newRoom}; return; }
+      const patch = {};
+      let any = false;
+      const allKeys = new Set(Object.keys(prevRoom).concat(Object.keys(newRoom)));
+      allKeys.forEach(k=>{
+        if(JSON.stringify(prevRoom[k]) !== JSON.stringify(newRoom[k])){ patch[k] = newRoom[k]; any = true; }
+      });
+      if(any) patches[code] = {__full:false, patch};
     });
-    const removed = Object.keys(_lastLoadedRoomsRaw).filter(c=>codes.indexOf(c)===-1);
-    if(Object.keys(changed).length===0 && removed.length===0) return; // مفيش أي غرفة اتغيّرت فعلاً، متبعتش حاجة
+    const removed = Object.keys(_lastLoadedRooms).filter(c=>codes.indexOf(c)===-1);
+    if(Object.keys(patches).length===0 && removed.length===0) return; // مفيش أي حاجة اتغيّرت فعلاً، متبعتش حاجة
 
     const res = await window.storage.update(_GAME_ROOMS_KEY, (curRaw)=>{
       let cur = {};
       try{ cur = curRaw ? (JSON.parse(curRaw)||{}) : {}; }catch(e){ cur = {}; }
-      Object.keys(changed).forEach(code=>{ cur[code] = changed[code]; });
+      Object.keys(patches).forEach(code=>{
+        const p = patches[code];
+        if(p.__full){ cur[code] = p.room; return; }
+        const base = cur[code] || {};
+        cur[code] = Object.assign({}, base, p.patch);
+      });
       removed.forEach(code=>{ delete cur[code]; });
       return JSON.stringify(cur);
     }, true);
 
     if(res && typeof res.value === 'string'){
       const finalVal = JSON.parse(res.value)||{};
-      const rawMap = {};
-      Object.keys(finalVal).forEach(code=>{ rawMap[code] = JSON.stringify(finalVal[code]); });
-      _lastLoadedRoomsRaw = rawMap;
-      // نحدّث نسخة الكولر المحلية كمان عشان يكمّل يشتغل بأحدث نسخة فعلاً اتحفظت
-      Object.keys(finalVal).forEach(code=>{ obj[code] = finalVal[code]; });
+      // نحدّث نسخة الكولر المحلية عشان يكمّل يشتغل بأحدث نسخة فعلاً اتحفظت (ممكن تكون فيها حقول
+      // من صاحبك ماكانش عارفها)، وكل واحدة بنسخة مستقلة عن الـ baseline عشان نفس السبب فوق.
       Object.keys(obj).forEach(code=>{ if(!(code in finalVal)) delete obj[code]; });
+      Object.keys(finalVal).forEach(code=>{ obj[code] = finalVal[code]; });
+      const baseline = {};
+      Object.keys(finalVal).forEach(code=>{ baseline[code] = _c4DeepClone(finalVal[code]); });
+      _lastLoadedRooms = baseline;
     }
   }catch(e){}
 }
