@@ -3273,18 +3273,49 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   }
   /* ---- Center hit-value popup (replaces the bottom text log) ---- */
   .drt-hit-popup{position:absolute; left:50%; top:50%; z-index:6; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:2px; transform:translate(-50%,-50%) scale(.55); opacity:0; filter:blur(2px);}
-  .drt-hit-popup.show{animation:drtHitPop 1.15s cubic-bezier(.2,.9,.25,1) forwards;}
-  .drt-hit-popup .drt-hit-mult{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; letter-spacing:.5px; color:var(--drt-hc,#FFDE94); text-shadow:0 2px 10px rgba(0,0,0,.55); opacity:.92;}
-  .drt-hit-popup .drt-hit-num{font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(46px,16vw,72px); line-height:1; color:#fff; background:linear-gradient(180deg,var(--drt-hc,#FFDE94),var(--drt-hc2,#F4B740)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 26px var(--drt-hg,rgba(244,183,64,.55)); filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));}
-  .drt-hit-popup .drt-hit-who{font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(255,255,255,.75); background:rgba(0,0,0,.32); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(6px); padding:3px 12px; border-radius:999px; margin-top:2px;}
+  .drt-hit-popup.show{animation:drtHitPop 1.35s cubic-bezier(.2,.9,.25,1) forwards;}
+  .drt-hit-popup::before{content:''; position:absolute; top:50%; left:50%; width:150px; height:150px; margin:-75px 0 0 -75px; border-radius:50%; background:radial-gradient(circle, var(--drt-hg,rgba(244,183,64,.55)) 0%, transparent 68%); opacity:0; z-index:-2; pointer-events:none;}
+  .drt-hit-popup.show::before{animation:drtRingBurst 1.35s cubic-bezier(.16,1,.3,1) forwards;}
+  .drt-hit-popup::after{content:''; position:absolute; top:50%; left:50%; width:112px; height:78px; margin:-39px 0 0 -56px; border:3px solid var(--drt-hc,#FFDE94); border-radius:52% / 62%; opacity:0; z-index:-1; pointer-events:none; box-shadow:0 0 20px var(--drt-hg,rgba(244,183,64,.6)), inset 0 0 12px var(--drt-hg,rgba(244,183,64,.35));}
+  .drt-hit-popup.show::after{animation:drtRingDraw 1.35s cubic-bezier(.2,.9,.25,1) forwards;}
+  .drt-hit-popup .drt-hit-mult{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; letter-spacing:.5px; color:var(--drt-hc,#FFDE94); text-shadow:0 2px 10px rgba(0,0,0,.55); opacity:0; transform:translateY(6px);}
+  .drt-hit-popup.show .drt-hit-mult{animation:drtChildIn .45s cubic-bezier(.2,.9,.25,1) .08s forwards, drtChildOut .35s ease-in 1.05s forwards;}
+  .drt-hit-popup .drt-hit-num{position:relative; font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(46px,16vw,72px); line-height:1; color:#fff; background:linear-gradient(180deg,var(--drt-hc,#FFDE94),var(--drt-hc2,#F4B740)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 26px var(--drt-hg,rgba(244,183,64,.55)); filter:drop-shadow(0 6px 14px rgba(0,0,0,.5)); isolation:isolate;}
+  .drt-hit-popup .drt-hit-num::after{content:'';position:absolute; inset:-6px -14px; background:linear-gradient(100deg, transparent 30%, rgba(255,255,255,.85) 48%, transparent 66%); background-size:220% 100%; background-position:150% 0; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; mix-blend-mode:overlay; opacity:0;}
+  .drt-hit-popup.show .drt-hit-num::after{animation:drtNumShine 1.35s cubic-bezier(.2,.9,.25,1) .12s forwards;}
+  .drt-hit-popup .drt-hit-who{font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(255,255,255,.75); background:rgba(0,0,0,.32); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(6px); padding:3px 12px; border-radius:999px; margin-top:2px; opacity:0; transform:translateY(6px);}
+  .drt-hit-popup.show .drt-hit-who{animation:drtChildIn .45s cubic-bezier(.2,.9,.25,1) .18s forwards, drtChildOut .35s ease-in 1.05s forwards;}
   .drt-hit-popup.bust .drt-hit-num{background:linear-gradient(180deg,#FF9A8B,#FF5B5B); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 26px rgba(255,90,90,.55);}
   .drt-hit-popup.bust .drt-hit-mult{color:#FF9A8B;}
   @keyframes drtHitPop{
-    0%{ transform:translate(-50%,-50%) scale(.55); opacity:0; filter:blur(4px); }
-    14%{ transform:translate(-50%,-50%) scale(1.12); opacity:1; filter:blur(0); }
-    22%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
-    72%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
-    100%{ transform:translate(-50%,-62%) scale(.92); opacity:0; }
+    0%{ transform:translate(-50%,-50%) scale(.32) rotate(-6deg); opacity:0; filter:blur(6px); }
+    9%{ transform:translate(-50%,-50%) scale(1.24) rotate(2deg); opacity:1; filter:blur(0); }
+    16%{ transform:translate(-50%,-50%) scale(.93) rotate(-1deg); opacity:1; }
+    24%{ transform:translate(-50%,-50%) scale(1.04) rotate(0deg); opacity:1; }
+    30%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+    78%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+    100%{ transform:translate(-50%,-68%) scale(.82) rotate(1deg); opacity:0; filter:blur(4px); }
+  }
+  @keyframes drtRingBurst{
+    0%{ transform:scale(.2); opacity:0; }
+    18%{ transform:scale(1); opacity:.95; }
+    55%{ transform:scale(1.35); opacity:.3; }
+    100%{ transform:scale(1.75); opacity:0; }
+  }
+  @keyframes drtRingDraw{
+    0%{ transform:scale(.4) rotate(-10deg); opacity:0; }
+    16%{ transform:scale(1.1) rotate(3deg); opacity:.9; }
+    26%{ transform:scale(1) rotate(0deg); opacity:.65; }
+    78%{ transform:scale(1) rotate(0deg); opacity:.5; }
+    100%{ transform:scale(1.18) rotate(4deg); opacity:0; }
+  }
+  @keyframes drtChildIn{ from{opacity:0; transform:translateY(6px);} to{opacity:.95; transform:translateY(0);} }
+  @keyframes drtChildOut{ to{opacity:0; transform:translateY(-4px);} }
+  @keyframes drtNumShine{
+    0%,20%{ background-position:150% 0; opacity:0; }
+    32%{ opacity:.9; }
+    52%{ background-position:-50% 0; opacity:0; }
+    100%{ background-position:-50% 0; opacity:0; }
   }
   /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
@@ -3699,6 +3730,30 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .uno-lobby-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border);}
   .uno-lobby-row.empty{opacity:.5; justify-content:center;}
   .uno-lobby-pname{font-size:13px; font-weight:800; color:var(--text); flex:1;}
+  /* ---- شاشة المواجهة (VS) قبل بدء اليونو ---- */
+  .uno-vs-screen{text-align:center; padding:22px 6px 8px;}
+  .uno-vs-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--gold); margin-bottom:20px; letter-spacing:.3px; animation:unoVsTitleIn .5s ease both;}
+  .uno-vs-arena{position:relative; display:flex; justify-content:center; align-items:center; min-height:126px; margin-bottom:22px;}
+  .uno-vs-players{display:flex; flex-wrap:wrap; justify-content:center; gap:20px 26px; width:100%;}
+  .uno-vs-card{display:flex; flex-direction:column; align-items:center; gap:7px; opacity:0; animation:unoVsCardIn .55s cubic-bezier(.34,1.56,.64,1) both;}
+  .uno-vs-pname{font-size:12px; font-weight:800; color:var(--text); max-width:82px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .uno-vs-badge{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); width:54px; height:54px; border-radius:50%;
+    background:linear-gradient(145deg,var(--gold),var(--gold-2)); color:#171449; font-family:'Cinzel',serif; font-weight:800; font-size:14px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px var(--bg-2),0 8px 24px rgba(0,0,0,.4);
+    animation:unoVsBadgeIn .5s .32s cubic-bezier(.34,1.56,.64,1) both, unoVsBadgePulse 1.1s 1s ease-in-out infinite;}
+  .uno-vs-loading{font-size:12.5px; color:var(--text-muted); font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px;}
+  .uno-vs-dots span{display:inline-block; width:4px; height:4px; border-radius:50%; background:var(--text-muted); margin:0 1px; animation:unoVsDot 1.1s infinite ease-in-out;}
+  .uno-vs-dots span:nth-child(2){animation-delay:.15s;}
+  .uno-vs-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes unoVsTitleIn{from{opacity:0; transform:translateY(-8px);}to{opacity:1; transform:none;}}
+  @keyframes unoVsCardIn{from{opacity:0; transform:translateY(14px) scale(.8);}to{opacity:1; transform:none;}}
+  @keyframes unoVsBadgeIn{from{transform:translate(-50%,-50%) scale(0) rotate(-25deg);}to{transform:translate(-50%,-50%) scale(1) rotate(0);}}
+  @keyframes unoVsBadgePulse{0%,100%{box-shadow:0 0 0 4px var(--bg-2),0 8px 24px rgba(0,0,0,.4);}50%{box-shadow:0 0 0 4px var(--bg-2),0 8px 34px rgba(244,183,64,.6);}}
+  @keyframes unoVsDot{0%,80%,100%{opacity:.25; transform:scale(.7);}40%{opacity:1; transform:scale(1);}}
+  @media (prefers-reduced-motion: reduce){
+    .uno-vs-card,.uno-vs-badge,.uno-vs-title{animation:none !important; opacity:1 !important; transform:translate(-50%,-50%) !important;}
+    .uno-vs-title{transform:none !important;}
+  }
   /* ===================== LUDO ===================== */
   .ludo-hero{text-align:center; padding:6px 0 10px;}
   .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #F00315; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
@@ -4165,6 +4220,30 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-wait-dots span:nth-child(2){animation-delay:.2s;}
   .room-wait-dots span:nth-child(3){animation-delay:.4s;}
   @keyframes roomWaitPulse{0%,60%,100%{opacity:.3; transform:scale(.75);} 30%{opacity:1; transform:scale(1);}}
+  /* ---- شاشة "البحث عن لاعبين" (matchmaking) قبل ما اليونو يبدأ ---- */
+  .uno-mm-header{text-align:center; margin-bottom:16px;}
+  .uno-mm-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15.5px; color:var(--text); display:flex;
+    align-items:center; justify-content:center; gap:6px;}
+  .uno-mm-title::before{content:''; width:8px; height:8px; border-radius:50%; background:var(--good);
+    box-shadow:0 0 0 0 rgba(95,224,164,.6); animation:unoMmLive 1.6s infinite;}
+  .uno-mm-count{font-size:12px; font-weight:700; color:var(--text-muted); margin-top:4px;}
+  .uno-mm-bar{height:6px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin:10px auto 0; max-width:220px;}
+  .uno-mm-bar-fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--gold),var(--gold-2)); transition:width .5s ease;}
+  @keyframes unoMmLive{0%{box-shadow:0 0 0 0 rgba(95,224,164,.55);}70%{box-shadow:0 0 0 7px rgba(95,224,164,0);}100%{box-shadow:0 0 0 0 rgba(95,224,164,0);}}
+  .uno-lobby-row{position:relative; overflow:hidden;}
+  .uno-lobby-row.uno-row-in{animation:unoRowIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes unoRowIn{from{opacity:0; transform:translateY(-10px) scale(.96);}to{opacity:1; transform:none;}}
+  .uno-lobby-joined{font-size:10.5px; font-weight:800; color:var(--good); background:rgba(95,224,164,.12);
+    border-radius:999px; padding:3px 8px; animation:unoJoinedFade 2.2s ease forwards;}
+  @keyframes unoJoinedFade{0%,70%{opacity:1;}100%{opacity:0;}}
+  .uno-lobby-radar{position:relative; width:9px; height:9px; border-radius:50%; background:var(--text-muted); opacity:.5; margin-left:8px; flex-shrink:0;}
+  .uno-lobby-radar::before{content:''; position:absolute; inset:-6px; border-radius:50%; border:1.5px solid var(--text-muted); opacity:.4; animation:unoRadarPing 1.8s ease-out infinite;}
+  @keyframes unoRadarPing{0%{transform:scale(.4); opacity:.6;}100%{transform:scale(1.8); opacity:0;}}
+  .uno-mm-share{display:flex; align-items:center; justify-content:center; gap:6px;}
+  @media (prefers-reduced-motion: reduce){
+    .uno-mm-title::before,.uno-lobby-row.uno-row-in,.uno-lobby-radar::before{animation:none !important;}
+    .uno-lobby-row.uno-row-in{opacity:1 !important; transform:none !important;}
+  }
   /* legacy alias kept so any old markup still renders sanely */
   .room-code-display{font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--text);
     background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--gold); border-radius:20px;
@@ -11301,13 +11380,18 @@ function dartsBuildFxImages(){
   DRT_IMG_DART_BOT_FX = dartsMakeFx(DRT_IMG_DART_BOT, 'saturate(1.35) contrast(1.12) brightness(1.05)');
 }
 const DRT_MAX_PULL = 110;
-/* ملحوظة: كانت أقصى رميه (سحب كامل بالعمودي) توصل بالظبط لمركز اللوحة (بُل مضمون).
-   دلوقتي أقصى سحب يوصلك لحد حافة اللوحة (منطقة الدبل فوق) مش النص، عشان أقصى قوة
-   تبقى مخاطرة (دبل أو برّه اللوحة) مش بُل مضمون؛ اللي عايز يصيب النص لازم يتحكم في قوة السحب. */
-const DRT_THROW_SCALE = (DRT.handY - (DRT.cyBoard - DRT.R)) / DRT_MAX_PULL;
+/* ملحوظة: أقصى سحب (قوة 100%) يوصلك لحد حافة اللوحة (منطقة الدبل) مش النص، عشان أقصى قوة
+   تبقى مخاطرة (دبل أو برّه اللوحة) مش بُل مضمون؛ اللي عايز يصيب النص لازم يتحكم في قوة السحب.
+   بنحوّل اتجاه السحب لزاوية على اللوحة (بنفس منطق dartsScoreAt) ونحوّل مقدار السحب لنسبة
+   من نصف قطر اللوحة، عشان أي ميل بسيط يمين أو شمال وإنت بتسحب ما يطلعش السهم برّه فورًا. */
 function dartsComputeThrowTarget(g){
   const dx = g.aimX - DRT.cx, dy = g.aimY - DRT.handY;
-  return { x: DRT.cx + dx*DRT_THROW_SCALE, y: DRT.handY + dy*DRT_THROW_SCALE };
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if(dist < 1){ return { x: DRT.cx, y: DRT.cyBoard }; }
+  const pct = Math.min(1, dist/DRT_MAX_PULL);
+  let ang = Math.atan2(dx, -dy);
+  const radius = pct * DRT.R;
+  return { x: DRT.cx + Math.sin(ang)*radius, y: DRT.cyBoard - Math.cos(ang)*radius };
 }
 function initDartsGame(){
   DRT_CANVAS = null; DRT_CTX = null;
@@ -15107,31 +15191,77 @@ const ROOM_ONLY_TILES = {
   proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
+/* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
+const _unoLobbySeen = {};
 function renderRoomUnoLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
+  if(!_unoLobbySeen[room.code]) _unoLobbySeen[room.code] = new Set();
+  const seen = _unoLobbySeen[room.code];
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
-    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+    if(!p) return `<div class="uno-lobby-row empty"><span class="uno-lobby-radar"></span>⏳ في انتظار لاعب...</div>`;
+    const isNew = !seen.has(p.id);
+    seen.add(p.id);
+    return `<div class="uno-lobby-row${isNew?' uno-row-in':''}">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div>${isNew?'<span class="uno-lobby-joined">انضم الآن ✅</span>':''}</div>`;
   }).join('');
+  const filled = ps.length;
+  const pct = Math.round((filled/4)*100);
   return `
     <div class="room-waiting">
+      <div class="uno-mm-header">
+        <div class="uno-mm-title">جاري تجهيز الطاولة...</div>
+        <div class="uno-mm-count">${filled}/4 لاعبين انضموا</div>
+        <div class="uno-mm-bar"><div class="uno-mm-bar-fill" style="width:${pct}%"></div></div>
+      </div>
       ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
+      <button type="button" class="btn btn-ghost uno-mm-share" style="width:100%;margin-bottom:12px;" data-action="room-uno-share" data-code="${room.code}">📤 شارك الكود مع صحابك</button>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
         ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-uno-start" ${ps.length<2?'disabled':''}>🃏 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
         : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
     </div>`;
 }
+async function doRoomUnoShare(code){
+  const text = `تعال العب أونو معايا في جلافيرا 3! 🃏 كود الغرفة: ${code}`;
+  if(navigator.share){
+    try{ await navigator.share({ title:'جلافيرا 3 — أونو', text }); return; }catch(e){}
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('تم نسخ رسالة الدعوة — شاركها مع أصحابك');
+  }catch(e){
+    showToast('انسخ الكود يدويًا: '+code, true);
+  }
+}
 function renderRoomUno(){
+
   const room = GAME_ROOMS[state.roomCode];
   if(!room) return roomGate('أونو', room);
+  if(room.status==='vs') return roomHead('أونو', room) + renderUnoVsScreen(room);
   if(room.status==='waiting' || !room.uno) return roomHead('أونو', room) + renderRoomUnoLobby(room);
   const G = room.uno;
   const myKey = state.pid;
   return G.winner ? unoWinHtml(G, myKey, 'room-', 'room-uno-next') : unoTableHtml(G, myKey, 'room-');
+}
+/* شاشة المواجهة (VS) اللي بتظهر لكل اللاعبين لثواني قليلة قبل ما ورق اليونو يتوزع */
+function renderUnoVsScreen(room){
+  const ps = room.players || [];
+  const cards = ps.map((p,i)=>`
+    <div class="uno-vs-card" style="animation-delay:${i*110}ms">
+      ${gameAvatar(p.id,'','xl')}
+      <div class="uno-vs-pname">${escapeHtml(p.name)}</div>
+    </div>`).join('');
+  return `
+    <div class="uno-vs-screen">
+      <div class="uno-vs-title">🃏 استعدوا للمواجهة!</div>
+      <div class="uno-vs-arena">
+        <div class="uno-vs-players">${cards}</div>
+        <div class="uno-vs-badge">VS</div>
+      </div>
+      <div class="uno-vs-loading">جاري تحضير الطاولة<span class="uno-vs-dots"><span></span><span></span><span></span></span></div>
+    </div>`;
 }
 async function doRoomUnoStart(){
   GAME_ROOMS = await loadGameRooms();
@@ -15139,13 +15269,36 @@ async function doRoomUnoStart(){
   if(!room || room.game!=='uno' || room.hostId!==state.pid || room.status!=='waiting') return;
   const ps = room.players || [];
   if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
-  const players = ps.map(p=>({key:p.id, name:p.name, isBot:false}));
-  room.uno = unoNewGame(players);
-  room.status = 'playing';
+  room.status = 'vs';
   roomTouch(room);
   await saveGameRooms(GAME_ROOMS);
+  delete _unoLobbySeen[room.code];
   try{ SND.coinChime(); }catch(e){}
   render();
+  scheduleUnoVsCommit(room.code);
+}
+/* بعد ما شاشة الـ VS تتعرض لثانيتين ونص، صاحب الغرفة (وبس هو، وبس لو لسه صاحبها) بيوزع الورق فعلياً ويبدأ اللعبة.
+   بنعيد قراءة قايمة اللاعبين وقت التنفيذ نفسه (مش قايمة قديمة) عشان لو حد خرج من الغرفة أثناء عرض شاشة الـ VS. */
+function scheduleUnoVsCommit(code){
+  setTimeout(async ()=>{
+    GAME_ROOMS = await loadGameRooms();
+    const room = GAME_ROOMS[code];
+    if(!room || room.status!=='vs' || room.hostId!==state.pid) return;
+    const ps = room.players || [];
+    if(ps.length<2){
+      room.status = 'waiting';
+      roomTouch(room);
+      await saveGameRooms(GAME_ROOMS);
+      if(state.view==='room-uno' && state.roomCode===code) render();
+      return;
+    }
+    const players = ps.map(p=>({key:p.id, name:p.name, isBot:false}));
+    room.uno = unoNewGame(players);
+    room.status = 'playing';
+    roomTouch(room);
+    await saveGameRooms(GAME_ROOMS);
+    if(state.view==='room-uno' && state.roomCode===code) render();
+  }, 2600);
 }
 async function doRoomUnoPlay(cardId){
   GAME_ROOMS = await loadGameRooms();
@@ -16197,10 +16350,6 @@ function renderChessGame(){
     <div class="game-mode-switch">
       <button type="button" class="gms-btn ${S.mode==='ai'?'active':''}" data-action="chess-mode" data-mode="ai">🤖 ضد الجهاز</button>
       <button type="button" class="gms-btn ${S.mode==='2p'?'active':''}" data-action="chess-mode" data-mode="2p">👥 لاعبين اتنين</button>
-    </div>
-    <div class="chess-tools-row">
-      <button type="button" class="chess-tool-btn" data-action="chess-undo" ${canUndo?'':'disabled'}>↩️ تراجع</button>
-      <button type="button" class="chess-tool-btn" data-action="chess-reset">🔄 لعبة جديدة</button>
     </div>
     <div class="xo-status">${statusText}</div>
     <div class="chess-frame">
@@ -19644,6 +19793,12 @@ function renderAdminParticipantDetail(p){
         <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="edit-pbonus-${p.id}" placeholder="0" />
         <button type="button" class="ps-btn ps-plus" data-action="apply-participant-bonus" data-pid="${p.id}" data-sign="1">+</button>
       </div>
+      <label style="margin-top:14px;">🎮 إضافة / خصم نقاط ألعاب — فيزا (الرصيد الحالي: ${WALLET[p.id]||0})</label>
+      <div class="point-stepper">
+        <button type="button" class="ps-btn ps-minus" data-action="apply-participant-game-points" data-pid="${p.id}" data-sign="-1">−</button>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="edit-pgame-${p.id}" placeholder="0" />
+        <button type="button" class="ps-btn ps-plus" data-action="apply-participant-game-points" data-pid="${p.id}" data-sign="1">+</button>
+      </div>
       
     </div>
     ${adminSectionTitle('📋','سجل الحضور')}
@@ -21267,6 +21422,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-cancel-checkin'){ confirmCancelCheckin(el.dataset.pid, el.dataset.session); }
   else if(action==='delete-participant'){ confirmDeleteParticipant(el.dataset.pid); }
   else if(action==='apply-participant-bonus'){ doApplyParticipantBonus(el.dataset.pid, parseInt(el.dataset.sign,10)); }
+  else if(action==='apply-participant-game-points'){ doApplyParticipantGamePoints(el.dataset.pid, parseInt(el.dataset.sign,10)); }
   else if(action==='open-edit-team'){ state.editingTeamId = el.dataset.tid; render(); }
   else if(action==='cancel-edit-team'){ state.editingTeamId = null; render(); }
   else if(action==='open-add-team'){ state.addingTeam = true; render(); }
@@ -21458,6 +21614,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='join-room'){ const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
   else if(action==='copy-room-code'){ doCopyRoomCode(el); }
+  else if(action==='room-uno-share'){ doRoomUnoShare(el.dataset.code); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
   else if(action==='room-domino-tile'){ doRoomDominoMove(parseInt(el.dataset.idx,10)); }
@@ -22990,6 +23147,41 @@ async function doApplyParticipantBonus(pid, sign){
   showToast(val>0 ? `تمت إضافة ${val} نقطة` : `تم خصم ${Math.abs(val)} نقطة`);
   if(input) input.value = '';
   render();
+}
+/* بتضيف/تخصم نقاط ألعاب (رصيد فيزا Games) لمشارك واحد بعينه فقط. زي نسخة "الجميع" بالظبط، لكن بتستخدم
+   transaction على Firebase (لو متاحة) عشان لو المشارك بيلعب أو بيدفع رسوم في نفس اللحظة رصيده ما يتلخبطش. */
+let _participantGamePointsBusy = false;
+async function doApplyParticipantGamePoints(pid, sign){
+  if(_participantGamePointsBusy) return;
+  const input = document.getElementById('edit-pgame-'+pid);
+  const magnitude = input ? Math.abs(parseInt(normalizeDigits(input.value),10)||0) : 0;
+  if(!magnitude){ showToast('اكتب قيمة النقاط الأول', true); return; }
+  const val = magnitude * (sign||1);
+  _participantGamePointsBusy = true;
+  try{
+    showToast('⏳ جاري تحديث نقاط الألعاب...');
+    const apply = (curStr)=>{
+      let o = {};
+      try{ o = curStr ? JSON.parse(curStr) : {}; }catch(e){ o = {}; }
+      if(!o || typeof o!=='object') o = {};
+      o[pid] = Math.max(0, (Number(o[pid])||0) + val);
+      return JSON.stringify(o);
+    };
+    let res = null;
+    if(window.storage && window.storage.update){
+      res = await window.storage.update('glavera-visa-wallet', apply, true, 20000);
+    } else {
+      const cur = await window.storage.get('glavera-visa-wallet', true);
+      res = await window.storage.set('glavera-visa-wallet', apply(cur ? cur.value : null), true);
+    }
+    if(!res){ showToast('تعذر الحفظ على السيرفر — مفيش حاجة اتغيرت. تحقق من الاتصال وحاول تاني', true, 6000); return; }
+    try{ WALLET = JSON.parse(res.value) || {}; }catch(e){ WALLET = await loadWallet(); }
+    vtxLogSafe([{ pid, type:(val>0?'admin_add':'admin_deduct'), amount:Math.abs(val), balAfter:(WALLET[pid]||0), note:'نقاط ألعاب (فردي)' }]);
+    pushNotification(pid, val>0 ? `🎮 حصلت على ${val} نقطة ألعاب في فيزتك من المنظمين` : `تم خصم ${Math.abs(val)} نقطة ألعاب من فيزتك`, val>0?'🎮':'⚠️');
+    showToast(val>0 ? `✅ تمت إضافة ${val} نقطة ألعاب` : `✅ تم خصم ${Math.abs(val)} نقطة ألعاب`);
+    if(input) input.value = '';
+    render();
+  } finally { _participantGamePointsBusy = false; }
 }
 /* ============================= ADMIN: تصفير / استرجاع نقاط الجميع ============================= */
 /* التصفير بياخد نسخة كاملة من (نقاط الفقرات + البونص + بونص الفرق) ويحفظها في مفتاح منفصل على Firebase
