@@ -3268,6 +3268,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .darts-log{display:none;}
     .drt-side-score{font-size:18px;}
   }
+  /* ---- Center hit-value popup (replaces the bottom text log) ---- */
+  .drt-hit-popup{position:absolute; left:50%; top:50%; z-index:6; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:2px; transform:translate(-50%,-50%) scale(.55); opacity:0; filter:blur(2px);}
+  .drt-hit-popup.show{animation:drtHitPop 1.15s cubic-bezier(.2,.9,.25,1) forwards;}
+  .drt-hit-popup .drt-hit-mult{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; letter-spacing:.5px; color:var(--drt-hc,#FFDE94); text-shadow:0 2px 10px rgba(0,0,0,.55); opacity:.92;}
+  .drt-hit-popup .drt-hit-num{font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(46px,16vw,72px); line-height:1; color:#fff; background:linear-gradient(180deg,var(--drt-hc,#FFDE94),var(--drt-hc2,#F4B740)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 26px var(--drt-hg,rgba(244,183,64,.55)); filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));}
+  .drt-hit-popup .drt-hit-who{font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(255,255,255,.75); background:rgba(0,0,0,.32); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(6px); padding:3px 12px; border-radius:999px; margin-top:2px;}
+  .drt-hit-popup.bust .drt-hit-num{background:linear-gradient(180deg,#FF9A8B,#FF5B5B); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 26px rgba(255,90,90,.55);}
+  .drt-hit-popup.bust .drt-hit-mult{color:#FF9A8B;}
+  @keyframes drtHitPop{
+    0%{ transform:translate(-50%,-50%) scale(.55); opacity:0; filter:blur(4px); }
+    14%{ transform:translate(-50%,-50%) scale(1.12); opacity:1; filter:blur(0); }
+    22%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+    72%{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+    100%{ transform:translate(-50%,-62%) scale(.92); opacity:0; }
+  }
   /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
     background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
@@ -11290,6 +11305,31 @@ function dartsApplyThrow(owner, score, angle){
   if(bust) g.dartsLeft = 0;
   return bust;
 }
+function dartsShowHitPopup(owner, score, bust){
+  const el = document.getElementById('drt-hit-popup');
+  if(!el) return;
+  const isYou = owner==='you';
+  const who = isYou ? 'أنت' : 'الجهاز';
+  el.style.setProperty('--drt-hc', isYou ? '#FFDE94' : '#FFB199');
+  el.style.setProperty('--drt-hc2', isYou ? '#F4B740' : '#FF6B6B');
+  el.style.setProperty('--drt-hg', isYou ? 'rgba(244,183,64,.55)' : 'rgba(255,107,107,.5)');
+  let multTxt = '';
+  if(score.bull) multTxt = score.value===50 ? '🎯 بُل مباشر' : 'بُل خارجي';
+  else if(score.mult===3) multTxt = '💥 تربل';
+  else if(score.mult===2) multTxt = 'دبل';
+  else if(score.value===0) multTxt = 'برّه اللوحة';
+  const numTxt = score.value>0 ? String(score.value) : (score.value===0 && !score.bull ? '😅' : '0');
+  el.classList.remove('show','bust');
+  // force reflow so the animation restarts on back-to-back throws
+  void el.offsetWidth;
+  el.innerHTML = `
+    ${multTxt ? `<div class="drt-hit-mult">${multTxt}</div>` : ''}
+    <div class="drt-hit-num">${numTxt}</div>
+    <div class="drt-hit-who">${who}${bust?' — بست 💥':''}</div>
+  `;
+  if(bust) el.classList.add('bust');
+  requestAnimationFrame(()=> el.classList.add('show'));
+}
 function dartsAfterThrow(){
   const g = state.darts;
   if(g.over){ dartsFinish(); return; }
@@ -11393,6 +11433,7 @@ function dartsLoop(){
     g.flying = null;
     if(score.bull) vibrate([15,20,15]);
     if(bust) SND.error(); else if(score.value>0) SND.click();
+    dartsShowHitPopup(owner, score, bust);
     dartsAfterThrow();
   }
 }
@@ -11609,9 +11650,9 @@ function dartsRenderShell(){
     </div>
     <div class="darts-canvas-wrap" id="drt-canvas-wrap">
       <canvas id="drt-canvas"></canvas>
+      <div class="drt-hit-popup" id="drt-hit-popup"></div>
       ${g.over ? dartsResultCardHtml(g) : ''}
     </div>
-    ${g.log.length ? `<div class="darts-log">${g.log.map(l=>`<div class="darts-log-line">${escapeHtml(l)}</div>`).join('')}</div>` : ''}
     <div class="hint" style="text-align:center;margin-top:6px;">${g.over ? '' : (g.turn==='you' ? 'اسحب من السهم تحت وسيبه عشان ترمي 🎯' : 'دور الجهاز...')}</div>
   `;
   dartsMountCanvas();
