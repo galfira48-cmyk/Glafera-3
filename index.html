@@ -3248,14 +3248,17 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .darts-timer-pill::before{content:''; position:absolute; inset:0; z-index:-1; width:var(--p,100%); background:rgba(79,172,254,.22); transition:width 1s linear;}
   .darts-timer-pill.warn::before{background:rgba(255,107,107,.3);}
   .darts-timer-pill.warn{color:#FFD8D8;}
-  .darts-score-row{display:flex; align-items:center; gap:8px; margin-top:10px; flex-shrink:0;}
-  .drt-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); transition:.2s;}
-  .drt-side.active{background:rgba(244,183,64,.14); border-color:rgba(244,183,64,.5); box-shadow:0 0 16px -4px rgba(244,183,64,.4);}
-  .drt-side-name{font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(255,255,255,.7);}
-  .drt-side-score{font-family:'Cairo',sans-serif; font-weight:900; font-size:22px; color:#fff;}
-  .drt-vs{font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; color:rgba(255,255,255,.4); flex-shrink:0;}
-  .drt-pips{display:flex; gap:3px; margin-top:2px;}
-  .drt-pip{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.18); flex-shrink:0;}
+  .darts-score-row{display:flex; align-items:center; gap:6px; margin-top:6px; flex-shrink:0;}
+  .drt-side{flex:1; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:7px; padding:5px 8px; border-radius:13px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); transition:.2s;}
+  .drt-side.active{background:rgba(244,183,64,.14); border-color:rgba(244,183,64,.5); box-shadow:0 0 12px -4px rgba(244,183,64,.4);}
+  .darts-score-row .pl-avatar{width:26px; height:26px; font-size:14px; margin:0; flex-shrink:0;}
+  .darts-score-row .pl-avatar.pl-ai{font-size:15px;}
+  .drt-side-info{display:flex; flex-direction:column; align-items:center; gap:0;}
+  .drt-side-name{font-family:'Cairo',sans-serif; font-weight:700; font-size:10px; color:rgba(255,255,255,.7);}
+  .drt-side-score{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#fff; line-height:1.15;}
+  .drt-vs{font-family:'Cairo',sans-serif; font-weight:800; font-size:10px; color:rgba(255,255,255,.4); flex-shrink:0;}
+  .drt-pips{display:flex; gap:3px; margin-top:0;}
+  .drt-pip{width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.18); flex-shrink:0;}
   .drt-pip.filled{background:var(--pc,#4FACFE);}
   .darts-overlay{touch-action:none;}
   .darts-shell{touch-action:none;}
@@ -3266,7 +3269,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .darts-log-line{font-family:Tajawal,Arial; font-size:11px; color:rgba(255,255,255,.6); text-align:center;}
   @media (max-height:640px){
     .darts-log{display:none;}
-    .drt-side-score{font-size:18px;}
+    .drt-side-score{font-size:15px;}
   }
   /* ---- Center hit-value popup (replaces the bottom text log) ---- */
   .drt-hit-popup{position:absolute; left:50%; top:50%; z-index:6; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:2px; transform:translate(-50%,-50%) scale(.55); opacity:0; filter:blur(2px);}
@@ -11525,14 +11528,28 @@ function dartsDraw(){
       const pct = Math.min(1, Math.sqrt(dx*dx+dy*dy)/DRT_MAX_PULL);
       const ang = Math.atan2(dy, dx);
       dartsStrokeCurve(ctx, {fromX:DRT.cx, fromY:DRT.handY, toX:g.aimX, toY:g.aimY});
+      dartsDrawDartSpotlight(ctx, g.aimX, g.aimY);
       dartsDrawPowerMeter(ctx, g.aimX, g.aimY, pct);
-      dartsDrawHandDart(ctx, g.aimX, g.aimY, 'you', ang);
+      dartsDrawHandDart(ctx, g.aimX, g.aimY, 'you', ang, 1.12);
     } else {
-      dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'you', -Math.PI/2);
+      dartsDrawDartSpotlight(ctx, DRT.cx, DRT.handY);
+      dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'you', -Math.PI/2, 1.12);
     }
   } else {
     dartsDrawHandDart(ctx, DRT.cx, DRT.handY, 'bot', -Math.PI/2);
   }
+}
+function dartsDrawDartSpotlight(ctx, x, y){
+  /* soft glowing halo so the dart stays clearly visible against the dark board */
+  const r = 48;
+  const gr = ctx.createRadialGradient(x, y-10, 2, x, y-10, r);
+  gr.addColorStop(0, 'rgba(255,224,148,.4)');
+  gr.addColorStop(.6, 'rgba(255,224,148,.14)');
+  gr.addColorStop(1, 'rgba(255,224,148,0)');
+  ctx.save();
+  ctx.fillStyle = gr;
+  ctx.beginPath(); ctx.arc(x, y-10, r, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 function dartsClampAim(g){
   const dx = g.aimX - DRT.cx, dy = g.aimY - DRT.handY;
@@ -11557,6 +11574,7 @@ function dartsPointerDown(e){
   try{ DRT_CANVAS.setPointerCapture(e.pointerId); }catch(err){}
   const pos = dartsEventToCanvas(e);
   g.aiming = true; g.aimX = pos.x; g.aimY = pos.y;
+  g.aimTrail = [{x:pos.x, y:pos.y, t:performance.now()}];
   dartsClampAim(g);
   dartsDraw();
 }
@@ -11567,15 +11585,50 @@ function dartsPointerMove(e){
   const pos = dartsEventToCanvas(e);
   g.aimX = pos.x; g.aimY = pos.y;
   dartsClampAim(g);
+  if(!g.aimTrail) g.aimTrail = [];
+  g.aimTrail.push({x:g.aimX, y:g.aimY, t:performance.now()});
+  if(g.aimTrail.length>10) g.aimTrail.shift();
   dartsDraw();
+}
+function dartsReleaseSpeed(g){
+  /* estimate release speed (px/ms) from the last ~90ms of drag movement,
+     so whipping the dart back fast right before letting go reads as fast
+     even if the earlier part of the drag was slow */
+  const trail = g.aimTrail;
+  if(!trail || trail.length<2) return 0;
+  const last = trail[trail.length-1];
+  let ref = trail[0];
+  for(let k=trail.length-1;k>=0;k--){
+    if(last.t - trail[k].t <= 90) ref = trail[k]; else break;
+  }
+  const dt = Math.max(8, last.t - ref.t);
+  const dist = Math.hypot(last.x-ref.x, last.y-ref.y);
+  return dist/dt;
+}
+function dartsApplySpeedInaccuracy(t, speed){
+  /* Throwing fast is no longer a free bullseye: past a comfortable release
+     speed, accuracy drops off and the dart drifts away from the aimed spot
+     in a random direction — the faster the flick, the wilder the miss. A
+     slow, controlled release stays fully accurate. */
+  const SAFE_SPEED = 0.85;      // px/ms below this: no penalty at all
+  const MAX_EXCESS = 2.4;       // speed excess is capped so it stays playable
+  if(speed <= SAFE_SPEED) return t;
+  const excess = Math.min(speed - SAFE_SPEED, MAX_EXCESS);
+  const maxDev = 26 + excess*44;              // up to ~130px drift at top speed
+  const dev = maxDev * (0.4 + Math.random()*0.6);
+  const ang = Math.random()*Math.PI*2;
+  return { x: t.x + Math.cos(ang)*dev, y: t.y + Math.sin(ang)*dev };
 }
 function dartsPointerUp(e){
   const g = state.darts;
   if(!g || !g.aiming) return;
   e.preventDefault();
   g.aiming = false;
+  const speed = dartsReleaseSpeed(g);
+  g.aimTrail = null;
   const t = dartsComputeThrowTarget(g);
-  dartsThrowAt(t.x, t.y, 'you');
+  const adj = dartsApplySpeedInaccuracy(t, speed);
+  dartsThrowAt(adj.x, adj.y, 'you');
 }
 function dartsFitCanvas(){
   const wrap = document.getElementById('drt-canvas-wrap');
@@ -11636,16 +11689,20 @@ function dartsRenderShell(){
     <div class="darts-score-row">
       <div class="drt-side ${youActive?'active':''}">
         ${gameAvatar(state.pid)}
-        <div class="drt-side-name">أنت</div>
-        <div class="drt-side-score">${g.you}</div>
-        <div class="drt-pips">${dartsPipsHtml(youActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#4FACFE')}</div>
+        <div class="drt-side-info">
+          <div class="drt-side-name">أنت</div>
+          <div class="drt-side-score">${g.you}</div>
+          <div class="drt-pips">${dartsPipsHtml(youActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#4FACFE')}</div>
+        </div>
       </div>
       <div class="drt-vs">VS</div>
       <div class="drt-side ${botActive?'active':''}">
         ${gameAiAvatar()}
-        <div class="drt-side-name">الجهاز</div>
-        <div class="drt-side-score">${g.bot}</div>
-        <div class="drt-pips">${dartsPipsHtml(botActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#FF6B6B')}</div>
+        <div class="drt-side-info">
+          <div class="drt-side-name">الجهاز</div>
+          <div class="drt-side-score">${g.bot}</div>
+          <div class="drt-pips">${dartsPipsHtml(botActive?g.dartsLeft:0, DRT_DARTS_PER_TURN, '#FF6B6B')}</div>
+        </div>
       </div>
     </div>
     <div class="darts-canvas-wrap" id="drt-canvas-wrap">
@@ -11653,7 +11710,7 @@ function dartsRenderShell(){
       <div class="drt-hit-popup" id="drt-hit-popup"></div>
       ${g.over ? dartsResultCardHtml(g) : ''}
     </div>
-    <div class="hint" style="text-align:center;margin-top:6px;">${g.over ? '' : (g.turn==='you' ? 'اسحب من السهم تحت وسيبه عشان ترمي 🎯' : 'دور الجهاز...')}</div>
+    <div class="hint" style="text-align:center;margin-top:6px;">${g.over ? '' : (g.turn==='you' ? 'اسحب بثبات وسيبه براحتك عشان تصوب صح 🎯' : 'دور الجهاز...')}</div>
   `;
   dartsMountCanvas();
 }
