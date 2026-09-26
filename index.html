@@ -3839,6 +3839,28 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     padding:10px 14px; margin-bottom:8px;}
   .quiz-lb-rank{font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:var(--text-muted); min-width:20px;}
   .quiz-lb-name{flex:1; text-align:right; font-weight:700; font-size:13px; color:var(--text);}
+  /* ===== غرفة الغموض ===== */
+  .myst-timer-wrap{display:flex; align-items:center; justify-content:center; gap:8px; margin:6px 0 12px;}
+  .myst-timer{font-family:'Cairo',sans-serif; font-weight:900; font-size:22px; letter-spacing:.5px; color:var(--gold);
+    background:var(--a-card-bg); border:var(--a-border); border-radius:var(--a-r-pill); padding:6px 18px; box-shadow:var(--a-shadow-tile);}
+  .myst-timer.myst-danger{color:var(--danger); animation:mystPulse 1s infinite;}
+  @keyframes mystPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.06);}}
+  .myst-stage-card{background:var(--a-card-bg); border:var(--a-border); border-radius:var(--radius); padding:18px 16px; margin:10px 0; box-shadow:var(--a-shadow-tile);}
+  .myst-stage-label{font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:var(--gold); text-align:center; margin-bottom:6px;}
+  .myst-riddle{font-family:'Cairo',sans-serif; font-weight:800; font-size:16.5px; color:var(--text); text-align:center; line-height:1.7;}
+  .myst-hint-box{margin-top:12px; background:rgba(244,183,64,.12); border:1px dashed var(--gold); border-radius:var(--a-r-md);
+    padding:10px 12px; font-size:13.5px; color:var(--text); text-align:center; font-weight:700;}
+  .myst-answer-row{display:flex; gap:8px; margin-top:14px;}
+  .myst-answer-row input{flex:1;}
+  .myst-progress-dots{display:flex; justify-content:center; gap:6px; margin:4px 0 2px;}
+  .myst-dot{width:9px; height:9px; border-radius:50%; background:var(--border);}
+  .myst-dot.done{background:var(--good);}
+  .myst-dot.cur{background:var(--gold); box-shadow:0 0 0 3px rgba(244,183,64,.25);}
+  .myst-players-row{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:8px 0 4px;}
+  .myst-solver-note{text-align:center; font-size:12.5px; color:var(--text-muted); margin-top:6px;}
+  .myst-result-icon{font-size:54px; text-align:center; margin:6px 0;}
+  .myst-shake{animation:mystShake .4s;}
+  @keyframes mystShake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-8px);}40%,60%{transform:translateX(8px);}}
 
   .numguess-display{font-family:'Cairo',sans-serif; font-weight:900; font-size:44px; text-align:center; color:var(--gold);
     background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); border-radius:20px;
@@ -13666,6 +13688,12 @@ async function createGameRoom(gameType, paid){
       scoreHost:0, scoreGuest:0, scoreDraw:0, matchTarget:5, matchOver:false, matchWinner:null, hist:[]});
   } else if(gameType==='quiz'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], quiz:null});
+  } else if(gameType==='mystery'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], mystery:null});
+  } else if(gameType==='emojibible'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], eb:null});
+  } else if(gameType==='proverb'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], pv:null});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -13694,7 +13722,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -14216,10 +14244,16 @@ const ROOM_GAMES = [
   {id:'uno',      sub:'لحد 4 أصحاب، خلّص ورقك الأول'},
   {id:'reflex',   sub:'استنى الإشارة ودوس بأسرع وقت'},
   {id:'quiz',     sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر'},
+  {id:'mystery',  sub:'ادخلوا الغرفة مع بعض وفكّوا الألغاز والأقفال قبل ما الوقت يخلص'},
+  {id:'emojibible', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر'},
+  {id:'proverb',  sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر'},
 ];
-/* لعبة تحدي الأسئلة متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
+/* الألعاب دي متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
 const ROOM_ONLY_TILES = {
   quiz: {id:'quiz', icon:'❓', title:'تحدي الأسئلة', sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
+  mystery: {id:'mystery', icon:'🕵️', title:'غرفة الغموض', sub:'ادخلوا مع أصحابكم وفكّوا الألغاز والأدلة والأقفال قبل ما الوقت يخلص', color:'linear-gradient(145deg,#241246,#5B2A86)'},
+  emojibible: {id:'emojibible', icon:'😇', title:'إيموجي تحدي', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#2E5A8C,#6FB1E8)'},
+  proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 function renderRoomUnoLobby(room){
@@ -14549,6 +14583,497 @@ function renderRoomQuiz(){
     <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
     <div class="xo-status">${statusText}</div>
     ${q.img ? `<div class="quiz-img">${q.img}</div>` : ''}
+    <div class="quiz-qtext">${escapeHtml(q.q)}</div>
+    <div class="quiz-opts">${opts}</div>
+  `;
+}
+/* ================= غرفة الغموض (تعاوني — كل اللاعبين في نفس الغرفة بيحلوا نفس الألغاز مع بعض) ================= */
+const MYSTERY_TIME_LIMIT = 600; /* 10 دقايق للغرفة كلها */
+const MYSTERY_STAGES = [
+  {q:'🔒 القفل الأول: على باب الغرفة رسمة معادلة: (٥ × ٣) − ٧ = ؟ اكتبوا الناتج علشان يتفتح الباب.', hint:'اضربوا الأول، وبعدين اطرحوا.', a:['8']},
+  {q:'🕯️ القفل الثاني: الساعة القديمة المعلقة على الحيط، عقربها الكبير واقف على 12 وعقربها الصغير واقف على 6. اكتبوا رقم الساعة اللي بتشاور عليها.', hint:'العقرب الصغير هو اللي بيدل على الساعة الحالية.', a:['6']},
+  {q:'📖 القفل الثالث: في كتاب قديم صفحة ممزقة مكتوب عليها "أنا أصغر عدد أوّلي في الوجود". اكتبوا الرقم.', hint:'مفيش عدد أوّلي أصغر منه، وهو العدد الأوّلي الزوجي الوحيد.', a:['2']},
+  {q:'🗝️ القفل الرابع: ليّا مفاتيح كتير لكن معنديش قفل، وليّا مساحة لكن معنديش غرف، تقدروا تدخلوا فيّا لكن متقدروش تمشوا. أنا مين؟', hint:'بتستخدموه كل يوم عشان تكتبوا بيه على الكمبيوتر أو الموبايل.', a:['كيبورد','لوحة المفاتيح','لوحه المفاتيح','الكيبورد']},
+  {q:'🧮 القفل الخامس: على الباب 3 حراس، كل حارس شايل 4 مفاتيح متطابقة. اكتبوا إجمالي عدد المفاتيح عند الحراس التلاتة.', hint:'3 حراس × 4 مفاتيح = ؟', a:['12']},
+  {q:'🕳️ القفل السادس والأخير: الرمز اللي هيفتحلكم باب الخروج هو أصغر عدد فيه 3 خانات (يعني أول عدد بعد الـ99).', hint:'العدد اللي بعد 99 على طول.', a:['100']},
+];
+function mysteryNormalize(s){
+  return String(s||'').trim()
+    .replace(/[\u064B-\u0652]/g,'') /* تشكيل */
+    .replace(/[إأآا]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')
+    .replace(/\s+/g,'').toLowerCase();
+}
+function mysteryNewState(players){
+  return {
+    stages: MYSTERY_STAGES, stageIndex:0, total: MYSTERY_STAGES.length,
+    startedAt: Date.now(), timeLimit: MYSTERY_TIME_LIMIT,
+    hintUsed:{}, wrongCount:0, solvedBy:{}, finished:false, success:null,
+    endedAt:null, pointsAwarded:false
+  };
+}
+function mysteryTimeLeft(M){
+  if(!M) return 0;
+  if(M.finished) return Math.max(0, M.timeLimit - Math.floor(((M.endedAt||M.startedAt)-M.startedAt)/1000));
+  return Math.max(0, M.timeLimit - Math.floor((Date.now()-M.startedAt)/1000));
+}
+function mysteryFmtTime(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function renderRoomMysteryLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🕵️ — كلكم هتدخلوا نفس الغرفة وتتعاونوا تفكّوا الألغاز والأقفال قبل ما الوقت يخلص</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-mystery-start">🕵️ ادخلوا الغرفة (${ps.length}/4)</button>`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ</div>`}
+    </div>`;
+}
+async function awardMysteryTeamPoints(room){
+  try{
+    const pts = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.mysteryWin) || 60;
+    const ps = room.players || [];
+    if(!ps.length || pts<=0) return;
+    WALLET = await loadWallet();
+    ps.forEach(p=>{ WALLET[p.id] = (WALLET[p.id]||0) + pts; });
+    await saveWallet(WALLET);
+    ps.forEach(p=> pushNotification(p.id, `🕵️ فكّيتوا كل ألغاز غرفة الغموض مع أصحابك! +${pts} نقطة`, '🏆'));
+    vtxLogSafe(ps.map(p=>({ pid:p.id, type:'game_win', amount:pts, balAfter:(WALLET[p.id]||0), note:'غرفة الغموض' })));
+  }catch(e){}
+}
+async function doRoomMysteryStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='mystery' || room.hostId!==state.pid || room.status!=='waiting') return;
+  room.mystery = mysteryNewState(room.players||[]);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomMysteryHint(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mystery || room.mystery.finished) return;
+  const M = room.mystery;
+  M.hintUsed[M.stageIndex] = true;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomMysterySubmit(){
+  const inputEl = document.getElementById('mystery-answer-input');
+  const raw = inputEl ? inputEl.value : '';
+  if(!mysteryNormalize(raw)) return;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mystery || room.mystery.finished) return;
+  const M = room.mystery;
+  if(mysteryTimeLeft(M)<=0){ doRoomMysteryTimeUp(); return; }
+  const stage = M.stages[M.stageIndex];
+  const norm = mysteryNormalize(raw);
+  const correct = (stage.a||[]).some(a=>mysteryNormalize(a)===norm);
+  if(correct){
+    M.solvedBy[M.stageIndex] = {pid:state.pid, at:Date.now()};
+    M.stageIndex++;
+    if(M.stageIndex>=M.total){ M.finished = true; M.success = true; M.endedAt = Date.now(); }
+    SND.cheer();
+    if(inputEl) inputEl.value = '';
+  } else {
+    M.wrongCount = (M.wrongCount||0)+1;
+    vibrate(30);
+    const card = document.getElementById('mystery-stage-card');
+    if(card){ card.classList.remove('myst-shake'); void card.offsetWidth; card.classList.add('myst-shake'); }
+    showToast('القفل لسه متفتحش، جرّبوا تاني 🔒', true);
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(M.finished && M.success && !M.pointsAwarded){
+    M.pointsAwarded = true;
+    await saveGameRooms(GAME_ROOMS);
+    SND.coinChime(); launchConfetti();
+    awardMysteryTeamPoints(room);
+  }
+}
+async function doRoomMysteryTimeUp(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mystery || room.mystery.finished) return;
+  const M = room.mystery;
+  if(mysteryTimeLeft(M)>0) return;
+  M.finished = true; M.success = false; M.endedAt = Date.now();
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  vibrate(60);
+  render();
+}
+async function doRoomMysteryNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.mystery = mysteryNewState(room.players||[]);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+let mysteryTickInterval = null;
+function startMysteryTimer(){
+  stopMysteryTimer();
+  mysteryTickInterval = setInterval(()=>{
+    const room = GAME_ROOMS[state.roomCode];
+    const M = room && room.mystery;
+    if(!M || M.finished){ stopMysteryTimer(); if(M && M.finished) render(); return; }
+    const left = mysteryTimeLeft(M);
+    const el = document.getElementById('mystery-timer');
+    if(el){ el.textContent = mysteryFmtTime(left); el.classList.toggle('myst-danger', left<=60); }
+    if(left<=0){ stopMysteryTimer(); doRoomMysteryTimeUp(); }
+  }, 1000);
+}
+function stopMysteryTimer(){ if(mysteryTickInterval){ clearInterval(mysteryTickInterval); mysteryTickInterval=null; } }
+function renderRoomMystery(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('غرفة الغموض', room);
+  if(room.status==='waiting' || !room.mystery) return roomHead('غرفة الغموض', room) + renderRoomMysteryLobby(room);
+  const M = room.mystery;
+  const ps = room.players || [];
+  const left = mysteryTimeLeft(M);
+  if(M.finished){
+    const icon = M.success ? '🎉' : '⏳';
+    const title = M.success ? 'فكّيتوا كل الألغاز وخرجتوا من الغرفة!' : 'خلص الوقت ولسه فيه أقفال متفتحتش 😢';
+    const solvedCount = Object.keys(M.solvedBy||{}).length;
+    return `
+      ${roomHead('غرفة الغموض', room)}
+      <div class="myst-result-icon">${icon}</div>
+      <div class="xo-status">${title}</div>
+      <div class="hint" style="text-align:center;margin-top:6px;">فكّيتوا ${solvedCount} من ${M.total} قفل • محاولات غلط: ${M.wrongCount||0}</div>
+      <div class="myst-players-row">${ps.map(p=>gameAvatar(p.id)).join('')}</div>
+      ${nextProBtn('room-mystery-next')}
+    `;
+  }
+  const stage = M.stages[M.stageIndex];
+  const hintShown = !!M.hintUsed[M.stageIndex];
+  const dots = M.stages.map((s,i)=>{
+    let cls = 'myst-dot';
+    if(i<M.stageIndex) cls += ' done'; else if(i===M.stageIndex) cls += ' cur';
+    return `<span class="${cls}"></span>`;
+  }).join('');
+  return `
+    ${roomHead('غرفة الغموض', room)}
+    <div class="myst-timer-wrap"><span class="myst-timer${left<=60?' myst-danger':''}" id="mystery-timer">${mysteryFmtTime(left)}</span></div>
+    <div class="myst-progress-dots">${dots}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 4px;">القفل ${M.stageIndex+1} من ${M.total}</div>
+    <div class="myst-players-row">${ps.map(p=>gameAvatar(p.id)).join('')}</div>
+    <div class="myst-stage-card" id="mystery-stage-card">
+      <div class="myst-stage-label">🔒 قفل رقم ${M.stageIndex+1}</div>
+      <div class="myst-riddle">${escapeHtml(stage.q)}</div>
+      ${hintShown ? `<div class="myst-hint-box">💡 دليل: ${escapeHtml(stage.hint)}</div>` : ''}
+      <div class="myst-answer-row">
+        <input class="field" id="mystery-answer-input" placeholder="اكتبوا الحل هنا..." />
+        <button type="button" class="btn btn-primary" data-action="room-mystery-submit">✅ فتح</button>
+      </div>
+      ${!hintShown ? `<button type="button" class="btn btn-ghost" style="width:100%;margin-top:10px;" data-action="room-mystery-hint">💡 عايزين دليل</button>` : ''}
+    </div>
+    <div class="myst-solver-note">أي حد في الغرفة يقدر يكتب الحل — أول إجابة صح تفتح القفل للكل</div>
+  `;
+}
+/* ================= إيموجي تحدي: خمّن القصة/المناسبة المسيحية من الإيموجيز ================= */
+const EMOJIBIBLE_QUESTIONS = [
+  {id:'eb1', e:'🐟🐟🍞🍞🍞🍞🍞', o:['تكثير الخبز والسمك','عرس قانا الجليل','دخول أورشليم','عماد يسوع'], c:0},
+  {id:'eb2', e:'🚢🌊🕊️🌈', o:['سفينة نوح والطوفان','عبور البحر الأحمر','برج بابل','طوفان سدوم وعمورة'], c:0},
+  {id:'eb3', e:'🍎🐍🌳', o:['آدم وحواء وشجرة المعرفة','قايين وهابيل','يوسف وإخوته','داود وجليات'], c:0},
+  {id:'eb4', e:'👶⭐🐑🐫', o:['ميلاد السيد المسيح','عماد يسوع','العشاء الأخير','قيامة المسيح'], c:0},
+  {id:'eb5', e:'✝️🪦☀️', o:['قيامة المسيح','صعود المسيح','عيد الغطاس','دخول أورشليم'], c:0},
+  {id:'eb6', e:'🕊️💧🏞️', o:['عماد يسوع في نهر الأردن','معجزة شفاء الأعمى','عبور الأردن','غسل الأرجل'], c:0},
+  {id:'eb7', e:'🍞🍷🕛', o:['العشاء الأخير','عرس قانا الجليل','تكثير الخبز والسمك','عيد الفصح'], c:0},
+  {id:'eb8', e:'👦🦁🕳️', o:['دانيال في جب الأسود','شمشون والأسد','يونان والحوت','داود الراعي'], c:0},
+  {id:'eb9', e:'🐳🌊😱', o:['يونان والحوت','نوح والفلك','بطرس وصيد السمك','موسى وعبور البحر'], c:0},
+  {id:'eb10', e:'🌊➗🚶', o:['عبور البحر الأحمر','معمودية المسيح','طوفان نوح','غرق فرعون'], c:0},
+  {id:'eb11', e:'🏛️📯💥', o:['سقوط أسوار أريحا','برج بابل','هيكل سليمان','خراب أورشليم'], c:0},
+  {id:'eb12', e:'🧒👑⚔️🗿', o:['داود وجليات','شاول الملك','سليمان الحكيم','يوشع القائد'], c:0},
+  {id:'eb13', e:'🍷💧', o:['معجزة عرس قانا الجليل (الماء خمر)','العشاء الأخير','غسل الأرجل','معمودية المسيح'], c:0},
+  {id:'eb14', e:'🌟🧙‍♂️🧙‍♂️🧙‍♂️', o:['المجوس ونجم بيت لحم','رعاة بيت لحم','هروب العائلة المقدسة لمصر','عيد الغطاس'], c:0},
+  {id:'eb15', e:'👣🌊', o:['يسوع يمشي على الماء','عبور البحر الأحمر','غرق بطرس','سفينة نوح'], c:0},
+];
+function ebPickQuestions(n){ return shuffleArray(EMOJIBIBLE_QUESTIONS.slice()).slice(0, Math.min(n, EMOJIBIBLE_QUESTIONS.length)); }
+const EB_TOTAL_QUESTIONS = 10;
+function ebNewState(players){
+  const qs = ebPickQuestions(EB_TOTAL_QUESTIONS);
+  return { questions: qs, qIndex:0, total: qs.length, scores: Object.fromEntries((players||[]).map(p=>[p.id,0])), answered:{}, correctOrder:[], finished:false };
+}
+function renderRoomEbLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 😇 — خمّنوا القصة أو المناسبة المسيحية من الإيموجيز</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-eb-start" ${ps.length<2?'disabled':''}>😇 ابدأ التحدي (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ التحدي</div>`}
+    </div>`;
+}
+function ebWinner(room){
+  const Q = room.eb; if(!Q) return null;
+  const ps = room.players||[];
+  let best=null, bestScore=-1, tie=false;
+  ps.forEach(p=>{ const s = Q.scores[p.id]||0; if(s>bestScore){ best=p.id; bestScore=s; tie=false; } else if(s===bestScore){ tie=true; } });
+  return tie ? 'draw' : best;
+}
+function ebAdvance(room){ const Q = room.eb; Q.qIndex++; if(Q.qIndex>=Q.total){ Q.finished = true; } else { Q.answered = {}; Q.correctOrder = []; } }
+async function doRoomEbStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='emojibible' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.eb = ebNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomEbPick(idxRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.eb || room.eb.finished) return;
+  const Q = room.eb;
+  if(Q.answered[state.pid]) return;
+  const idx = parseInt(idxRaw,10);
+  const q = Q.questions[Q.qIndex];
+  const correct = idx===q.c;
+  if(correct){
+    const rank = Q.correctOrder.length;
+    const pts = QUIZ_RANK_POINTS[rank]!==undefined ? QUIZ_RANK_POINTS[rank] : 1;
+    Q.correctOrder.push(state.pid);
+    Q.scores[state.pid] = (Q.scores[state.pid]||0) + pts;
+    Q.answered[state.pid] = {correct:true, pts, pickedIdx:idx};
+    SND.cheer();
+  } else {
+    Q.answered[state.pid] = {correct:false, pts:0, pickedIdx:idx};
+    vibrate(30);
+  }
+  const ps = room.players||[];
+  const allAnswered = ps.every(p=>!!Q.answered[p.id]);
+  if(allAnswered) ebAdvance(room);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.eb.finished){ SND.coinChime(); if(ebWinner(room)===state.pid) launchConfetti(); }
+}
+async function doRoomEbNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.eb = ebNewState(room.players||[]);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomEb(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('إيموجي تحدي', room);
+  if(room.status==='waiting' || !room.eb) return roomHead('إيموجي تحدي', room) + renderRoomEbLobby(room);
+  const Q = room.eb;
+  const ps = room.players || [];
+  if(Q.finished){
+    const w = ebWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(Q.scores[b.id]||0)-(Q.scores[a.id]||0));
+    const winnerP = PARTICIPANTS.find(x=>x.id===w);
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 فزت في إيموجي تحدي!' : `🏆 ${winnerP?escapeHtml(winnerP.name):'صاحبك'} كسب التحدي`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${Q.scores[p.id]||0}</b>
+      </div>`).join('');
+    return `
+      ${roomHead('إيموجي تحدي', room)}
+      <div class="xo-status">${title}</div>
+      <div style="margin-top:14px;">${rows}</div>
+      ${nextProBtn('room-eb-next')}
+    `;
+  }
+  const q = Q.questions[Q.qIndex];
+  const mine = Q.answered[state.pid];
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), Q.scores[p.id]||0, '', false)).join('');
+  const answeredCount = ps.filter(p=>Q.answered[p.id]).length;
+  let statusText;
+  if(mine) statusText = mine.correct ? `✅ إجابة صح! +${mine.pts} نقطة — استنى الباقيين` : '❌ إجابة غلط — استنى الباقيين';
+  else statusText = '⚡ اختار الإجابة الصح بأسرع ما تقدر';
+  const opts = q.o.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(mine){ if(i===q.c) cls += ' quiz-correct'; else if(!mine.correct && i===mine.pickedIdx) cls += ' quiz-wrong'; }
+    return `<button type="button" class="${cls}" data-action="room-eb-pick" data-idx="${i}" ${mine?'disabled':''}>${escapeHtml(opt)}</button>`;
+  }).join('');
+  return `
+    ${roomHead('إيموجي تحدي', room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
+    <div class="xo-status">${statusText}</div>
+    <div class="quiz-img" style="font-size:44px;letter-spacing:4px;">${q.e}</div>
+    <div class="quiz-qtext">إيه القصة أو المناسبة دي؟</div>
+    <div class="quiz-opts">${opts}</div>
+  `;
+}
+/* ================= أكمل المثل: أمثال ومقولات مسيحية ناقصة ================= */
+const PROVERB_QUESTIONS = [
+  {id:'pv1', q:'الإيمان بلا أعمال ___', o:['ميت','ناقص','ضعيف','كامل'], c:0},
+  {id:'pv2', q:'اطلبوا تجدوا، اقرعوا يُفتح لكم، و___ يُعطى لكم', o:['اسألوا','ابحثوا','امشوا','انتظروا'], c:0},
+  {id:'pv3', q:'المحبة تحتمل كل شيء، تؤمن كل شيء، و___ كل شيء', o:['ترجو','تصبر','تغفر','تعطي'], c:0},
+  {id:'pv4', q:'الرب راعيّ فلا ___', o:['يعوزني شيء','أخاف شيء','أتعب أبداً','أضل الطريق'], c:0},
+  {id:'pv5', q:'اطلبوا أولاً ملكوت الله و___', o:['بره','مجده','حبه','رحمته'], c:0},
+  {id:'pv6', q:'كل من يرفع نفسه يتضع، ومن يضع نفسه ___', o:['يرتفع','يُكرَّم','يُبارَك','يفرح'], c:0},
+  {id:'pv7', q:'الرب نوري و___، فممن أخاف؟', o:['خلاصي','حياتي','قوتي','رجائي'], c:0},
+  {id:'pv8', q:'من آمن و___ خلص', o:['اعتمد','صلى','صام','تاب'], c:0},
+  {id:'pv9', q:'أحبوا أعداءكم و___ لأجل الذين يضطهدونكم', o:['صلّوا','اصبروا','اغفروا','ابتعدوا'], c:0},
+  {id:'pv10', q:'من يزرع بالدموع، ب___ يحصد', o:['الابتهاج','الفرح','السلام','الرجاء'], c:0},
+  {id:'pv11', q:'طوبى ل___ القلب، لأنهم يعاينون الله', o:['أنقياء','ودعاء','مساكين','رحماء'], c:0},
+  {id:'pv12', q:'الحكمة خير من ___', o:['اللآلئ','الذهب','الفضة','الجواهر'], c:0},
+];
+function pvPickQuestions(n){ return shuffleArray(PROVERB_QUESTIONS.slice()).slice(0, Math.min(n, PROVERB_QUESTIONS.length)); }
+const PV_TOTAL_QUESTIONS = 10;
+function pvNewState(players){
+  const qs = pvPickQuestions(PV_TOTAL_QUESTIONS);
+  return { questions: qs, qIndex:0, total: qs.length, scores: Object.fromEntries((players||[]).map(p=>[p.id,0])), answered:{}, correctOrder:[], finished:false };
+}
+function renderRoomPvLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 📖 — كمّلوا المثل أو الآية الناقصة</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-pv-start" ${ps.length<2?'disabled':''}>📖 ابدأ التحدي (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ التحدي</div>`}
+    </div>`;
+}
+function pvWinner(room){
+  const Q = room.pv; if(!Q) return null;
+  const ps = room.players||[];
+  let best=null, bestScore=-1, tie=false;
+  ps.forEach(p=>{ const s = Q.scores[p.id]||0; if(s>bestScore){ best=p.id; bestScore=s; tie=false; } else if(s===bestScore){ tie=true; } });
+  return tie ? 'draw' : best;
+}
+function pvAdvance(room){ const Q = room.pv; Q.qIndex++; if(Q.qIndex>=Q.total){ Q.finished = true; } else { Q.answered = {}; Q.correctOrder = []; } }
+async function doRoomPvStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='proverb' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.pv = pvNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+async function doRoomPvPick(idxRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.pv || room.pv.finished) return;
+  const Q = room.pv;
+  if(Q.answered[state.pid]) return;
+  const idx = parseInt(idxRaw,10);
+  const q = Q.questions[Q.qIndex];
+  const correct = idx===q.c;
+  if(correct){
+    const rank = Q.correctOrder.length;
+    const pts = QUIZ_RANK_POINTS[rank]!==undefined ? QUIZ_RANK_POINTS[rank] : 1;
+    Q.correctOrder.push(state.pid);
+    Q.scores[state.pid] = (Q.scores[state.pid]||0) + pts;
+    Q.answered[state.pid] = {correct:true, pts, pickedIdx:idx};
+    SND.cheer();
+  } else {
+    Q.answered[state.pid] = {correct:false, pts:0, pickedIdx:idx};
+    vibrate(30);
+  }
+  const ps = room.players||[];
+  const allAnswered = ps.every(p=>!!Q.answered[p.id]);
+  if(allAnswered) pvAdvance(room);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.pv.finished){ SND.coinChime(); if(pvWinner(room)===state.pid) launchConfetti(); }
+}
+async function doRoomPvNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.pv = pvNewState(room.players||[]);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+function renderRoomPv(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('أكمل المثل', room);
+  if(room.status==='waiting' || !room.pv) return roomHead('أكمل المثل', room) + renderRoomPvLobby(room);
+  const Q = room.pv;
+  const ps = room.players || [];
+  if(Q.finished){
+    const w = pvWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(Q.scores[b.id]||0)-(Q.scores[a.id]||0));
+    const winnerP = PARTICIPANTS.find(x=>x.id===w);
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 فزت في أكمل المثل!' : `🏆 ${winnerP?escapeHtml(winnerP.name):'صاحبك'} كسب التحدي`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${Q.scores[p.id]||0}</b>
+      </div>`).join('');
+    return `
+      ${roomHead('أكمل المثل', room)}
+      <div class="xo-status">${title}</div>
+      <div style="margin-top:14px;">${rows}</div>
+      ${nextProBtn('room-pv-next')}
+    `;
+  }
+  const q = Q.questions[Q.qIndex];
+  const mine = Q.answered[state.pid];
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), Q.scores[p.id]||0, '', false)).join('');
+  const answeredCount = ps.filter(p=>Q.answered[p.id]).length;
+  let statusText;
+  if(mine) statusText = mine.correct ? `✅ إجابة صح! +${mine.pts} نقطة — استنى الباقيين` : '❌ إجابة غلط — استنى الباقيين';
+  else statusText = '⚡ اختار الكلمة الصح بأسرع ما تقدر';
+  const opts = q.o.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(mine){ if(i===q.c) cls += ' quiz-correct'; else if(!mine.correct && i===mine.pickedIdx) cls += ' quiz-wrong'; }
+    return `<button type="button" class="${cls}" data-action="room-pv-pick" data-idx="${i}" ${mine?'disabled':''}>${escapeHtml(opt)}</button>`;
+  }).join('');
+  return `
+    ${roomHead('أكمل المثل', room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
+    <div class="xo-status">${statusText}</div>
     <div class="quiz-qtext">${escapeHtml(q.q)}</div>
     <div class="quiz-opts">${opts}</div>
   `;
@@ -17868,6 +18393,9 @@ function render(){
   else if(state.view==='room-reflex') html = renderRoomReflex();
   else if(state.view==='room-uno') html = renderRoomUno();
   else if(state.view==='room-quiz') html = renderRoomQuiz();
+  else if(state.view==='room-mystery') html = renderRoomMystery();
+  else if(state.view==='room-emojibible') html = renderRoomEb();
+  else if(state.view==='room-proverb') html = renderRoomPv();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='pass') html = renderPassPage();
   else if(state.view==='stay') html = renderStayPage();
@@ -17900,6 +18428,7 @@ function render(){
   if(state.view==='gallery'){ attachGalleryEvents(); }
   if(state.view==='game-memory'){ startMemoryTicker(); } else { stopMemoryTicker(); }
   if(state.view==='game-math' && state.mathgame && !state.mathgame.finished){ startMathTimer(); } else { stopMathTimer(); }
+  if(state.view==='room-mystery' && GAME_ROOMS[state.roomCode] && GAME_ROOMS[state.roomCode].mystery && !GAME_ROOMS[state.roomCode].mystery.finished){ startMysteryTimer(); } else { stopMysteryTimer(); }
   if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
   if(state.view==='watch-rooms'){ if(!watchListPollInterval) startWatchListPolling(); } else { stopWatchListPolling(); }
   if(state.view==='gallery-album'){ attachGalleryAlbumEvents(); }
@@ -18988,7 +19517,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next'
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-xo-cell','room-xo-next','room-domino-tile','room-domino-side','room-domino-next',
@@ -18998,12 +19527,19 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-uno-start','room-uno-play','room-uno-draw','room-uno-endturn','room-uno-color','room-uno-uno','room-uno-catch','room-uno-next',
   'room-reflex-start','room-reflex-tap','room-reflex-target','room-reflex-rematch',
   'room-quiz-start','room-quiz-pick','room-quiz-next',
+  'room-mystery-start','room-mystery-submit','room-mystery-hint','room-mystery-next',
+  'room-eb-start','room-eb-pick','room-eb-next',
+  'room-pv-start','room-pv-pick','room-pv-next',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
   if(e.key==='Enter' && e.target && e.target.id==='room-join-code'){
     e.preventDefault();
     attemptJoinRoom(e.target.value);
+  }
+  if(e.key==='Enter' && e.target && e.target.id==='mystery-answer-input'){
+    e.preventDefault();
+    doRoomMysterySubmit();
   }
   if(e.key==='Enter' && e.target && e.target.id==='room-chat-free-input'){
     e.preventDefault();
@@ -19327,6 +19863,16 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-quiz-start'){ doRoomQuizStart(); }
   else if(action==='room-quiz-pick'){ doRoomQuizPick(el.dataset.idx); }
   else if(action==='room-quiz-next'){ doRoomQuizNext(); }
+  else if(action==='room-mystery-start'){ doRoomMysteryStart(); }
+  else if(action==='room-mystery-submit'){ doRoomMysterySubmit(); }
+  else if(action==='room-mystery-hint'){ doRoomMysteryHint(); }
+  else if(action==='room-mystery-next'){ doRoomMysteryNext(); }
+  else if(action==='room-eb-start'){ doRoomEbStart(); }
+  else if(action==='room-eb-pick'){ doRoomEbPick(el.dataset.idx); }
+  else if(action==='room-eb-next'){ doRoomEbNext(); }
+  else if(action==='room-pv-start'){ doRoomPvStart(); }
+  else if(action==='room-pv-pick'){ doRoomPvPick(el.dataset.idx); }
+  else if(action==='room-pv-next'){ doRoomPvNext(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
