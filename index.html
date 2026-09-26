@@ -5801,7 +5801,8 @@ async function loadGamePointsSettings(){
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
     soloNumGuessReward:100, soloNumGuessMaxTries:3,
     soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
-    soloSnlReward:30, soloSnlWinsNeeded:3};
+    soloSnlReward:30, soloSnlWinsNeeded:3,
+    visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
   try{
     const r = await window.storage.get('glavera-game-points-settings', true);
     return r ? Object.assign({}, fallback, JSON.parse(r.value)) : fallback;
@@ -19219,6 +19220,22 @@ function renderAdminSettingsTab(){
       </div>
       <button type="button" class="switch ${CONF_SETTINGS.gamesLocked?'on':''}" data-action="toggle-games-locked"></button>
     </div>
+    <div class="admin-section-title"><span>💳</span><span>إعدادات الفيزا</span></div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="hint" style="margin:0 0 12px;">تتحكم في قيم فيزا Games لكل المشاركين — بتتطبق على الفيزا الموجودة فعلاً من غير ما تأثر على رصيد أي حد.</div>
+      <label>💰 الحد الأدنى للسحب (نقطة)</label>
+      <input type="number" id="visa-min-withdraw" value="${GAME_POINTS_SETTINGS.visaMinWithdraw||600}" min="0" />
+      <div class="hint" style="margin-top:4px;">أقل رصيد فيزا لازم يوصله المشارك عشان يقدر يسحب منه لنقاط الفقرات تاني</div>
+      <label style="margin-top:12px;">🔄 رسوم تجديد الفيزا (نقطة)</label>
+      <input type="number" id="visa-renew-fee" value="${GAME_POINTS_SETTINGS.visaRenewFee||100}" min="0" />
+      <div class="hint" style="margin-top:4px;">المبلغ اللي بيتخصم (من رصيد الفيزا أو نقاط الفقرات) عشان يجدد الفيزا بعد ما تنتهي صلاحيتها</div>
+      <label style="margin-top:12px;">📅 مدة صلاحية الفيزا (يوم)</label>
+      <input type="number" id="visa-valid-days" value="${GAME_POINTS_SETTINGS.visaValidDays||14}" min="1" />
+      <div class="hint" style="margin-top:4px;">عدد الأيام من لحظة إنشاء/تجديد الفيزا لحد ما تحتاج تجديد تاني</div>
+      <div class="admin-edit-actions" style="margin-top:12px;">
+        <button type="button" class="btn btn-primary" data-action="save-visa-settings" style="flex:1;">حفظ إعدادات الفيزا</button>
+      </div>
+    </div>
     <div class="admin-section-title"><span>🎨</span><span>الهوية والمظهر</span></div>
     <div class="card" style="margin-bottom:16px;">
       <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">لوجو المؤتمر</div>
@@ -21572,6 +21589,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='toggle-sticker-store'){ doToggleStickerStore(); }
   else if(action==='toggle-games-locked'){ doToggleGamesLocked(); }
   else if(action==='save-conf-dates'){ doSaveConfDates(); }
+  else if(action==='save-visa-settings'){ doSaveVisaSettings(); }
   else if(action==='save-name-font'){ doSaveNameFont(); }
   else if(action==='export-participants-xlsx'){ exportParticipantsXlsx(); }
   else if(action==='save-conf-verse'){ doSaveConfVerse(); }
@@ -24871,6 +24889,20 @@ async function doSaveConfDates(){
   CONF_SETTINGS.endAt = endVal;
   await saveConfSettings(CONF_SETTINGS);
   showToast('تم حفظ توقيت المؤتمر');
+  render();
+}
+async function doSaveVisaSettings(){
+  const minEl = document.getElementById('visa-min-withdraw');
+  const feeEl = document.getElementById('visa-renew-fee');
+  const daysEl = document.getElementById('visa-valid-days');
+  const min = minEl ? Math.max(0, parseInt(normalizeDigits(minEl.value),10)||0) : 600;
+  const fee = feeEl ? Math.max(0, parseInt(normalizeDigits(feeEl.value),10)||0) : 100;
+  const days = daysEl ? Math.max(1, parseInt(normalizeDigits(daysEl.value),10)||1) : 14;
+  GAME_POINTS_SETTINGS.visaMinWithdraw = min;
+  GAME_POINTS_SETTINGS.visaRenewFee = fee;
+  GAME_POINTS_SETTINGS.visaValidDays = days;
+  await saveGamePointsSettings(GAME_POINTS_SETTINGS);
+  showToast('✅ تم حفظ إعدادات الفيزا');
   render();
 }
 async function doSaveNameFont(){
