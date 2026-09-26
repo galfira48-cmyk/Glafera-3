@@ -4237,27 +4237,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .room-code-copy svg{width:14px; height:14px; flex-shrink:0;}
   .room-code-copy:active{transform:scale(.95);}
   .room-code-copy.is-copied{color:var(--good); border-color:rgba(95,224,164,.4);}
-  /* ---------- دعوة صديق أونلاين لنفس الغرفة ---------- */
-  .room-invite-btn{position:relative; width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
-    margin-top:12px; padding:13px 14px; border-radius:16px; border:1.5px dashed rgba(244,183,64,.4); cursor:pointer;
-    background:linear-gradient(135deg, rgba(244,183,64,.14), rgba(244,183,64,.03));
-    color:var(--gold); font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px;}
-  .room-invite-btn svg{width:16px; height:16px; flex-shrink:0;}
-  .room-invite-btn:active{transform:scale(.97);}
-  .invite-pick-row{display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:16px;
-    background:var(--bg-2); border:1px solid var(--border);}
-  .invite-pick-mid{flex:1; min-width:0;}
-  .invite-pick-name{font-family:'Cairo',sans-serif; font-weight:700; font-size:13.5px; color:var(--text);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .invite-pick-status{display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:var(--good); margin-top:3px;}
-  .invite-pick-status i{width:7px; height:7px; border-radius:50%; background:var(--good); box-shadow:0 0 0 3px rgba(95,224,164,.18); display:inline-block; flex-shrink:0;}
-  .invite-pick-send{flex:0 0 auto; padding:9px 16px; border-radius:12px; border:1px solid rgba(244,183,64,.4);
-    background:linear-gradient(135deg,var(--gold),var(--gold-2)); color:#241b04; font-family:'Cairo',sans-serif;
-    font-weight:800; font-size:12px; cursor:pointer;}
-  .invite-pick-send:active{transform:scale(.94);}
-  .invite-pick-send.is-sent{background:var(--bg-2); color:var(--good); border-color:rgba(95,224,164,.35); cursor:default;}
-  .invite-pick-empty{text-align:center; color:var(--text-muted); font-size:13px; line-height:1.8; padding:26px 8px;}
-  .incoming-invite-card .confirm-icon{font-size:38px;}
   .room-wait-status{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px;
     font-family:'Tajawal',sans-serif; font-size:12.5px; font-weight:700; color:var(--text-muted);}
   .room-wait-dots{display:inline-flex; gap:3px;}
@@ -13828,7 +13807,7 @@ function renderRoomLudoLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🎲</div>
       <div class="ls-list">${slots}</div>
       ${isHost
@@ -14566,53 +14545,12 @@ function c4RoomDialogSync(room, myColor, oppColor, oppId){
 }
 
 /* ============================= GAMES: ROOMS (LIVE MULTIPLAYER) ============================= */
-/* ملحوظة مهمة: كل الغرف كانت بتتخزن قبل كده في مفتاح واحد مشترك (glavera-game-rooms)، فكل حركة في
-   أي غرفة كانت بتحمّل كل الغرف وتحفظها كلها تاني. أي كتابة تانية بتحصل في نفس اللحظة (نبضة حياة
-   من لاعب في غرفة تانية، أو حركة صاحبك) كانت ممكن تمسح حركتك من غير أي رسالة خطأ — وده سبب إحساس
-   إن "اللوحة مش بترد". دلوقتي كل غرفة ليها مفتاحها الخاص، وبنحفظ بس الغرف اللي اتغيّرت فعلاً محليًا،
-   فحركتك متتمسحش بسبب غرفة تانية خالص. الدالتين ليهم نفس الشكل والاستخدام زي الأول بالظبط. */
 let GAME_ROOMS = {};
-const _ROOMS_INDEX_KEY = 'glavera-rooms-index';
-const _ROOM_KEY_PREFIX = 'glavera-room-';
-let _lastLoadedRoomsRaw = {}; // code -> آخر نص JSON اتقرأ من السيرفر، بنقارن بيه عشان نعرف الغرفة اتغيّرت فعلاً ولا لأ
 async function loadGameRooms(){
-  try{
-    const idxRes = await window.storage.get(_ROOMS_INDEX_KEY, true);
-    let codes = [];
-    try{ codes = idxRes && idxRes.value ? (JSON.parse(idxRes.value)||[]) : []; }catch(e){ codes = []; }
-    const out = {};
-    const rawMap = {};
-    await Promise.all(codes.map(async (code)=>{
-      try{
-        const r = await window.storage.get(_ROOM_KEY_PREFIX+code, true);
-        if(r && r.value){ rawMap[code] = r.value; out[code] = JSON.parse(r.value); }
-      }catch(e){ /* غرفة واحدة اتعطلت متوقفش تحميل الباقي */ }
-    }));
-    _lastLoadedRoomsRaw = rawMap;
-    return out;
-  }catch(e){ return {}; }
+  try{ const r = await window.storage.get('glavera-game-rooms', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; }
 }
 async function saveGameRooms(obj){
-  try{
-    obj = obj || {};
-    const codes = Object.keys(obj);
-    const prevCodes = Object.keys(_lastLoadedRoomsRaw);
-    const nextRaw = {};
-    const writes = [];
-    codes.forEach(code=>{
-      const json = JSON.stringify(obj[code]);
-      nextRaw[code] = json;
-      if(_lastLoadedRoomsRaw[code] !== json){
-        writes.push(window.storage.set(_ROOM_KEY_PREFIX+code, json, true));
-      }
-    });
-    prevCodes.forEach(code=>{
-      if(codes.indexOf(code)===-1) writes.push(window.storage.delete(_ROOM_KEY_PREFIX+code, true));
-    });
-    writes.push(window.storage.set(_ROOMS_INDEX_KEY, JSON.stringify(codes), true));
-    await Promise.all(writes);
-    _lastLoadedRoomsRaw = nextRaw;
-  }catch(e){}
+  try{ await window.storage.set('glavera-game-rooms', JSON.stringify(obj), true); }catch(e){}
 }
 /* بتشيل الغرف المهجورة خالص (مفيش حركة فيها من ربع ساعة) عشان متتراكمش على السيرفر */
 const ROOM_ABANDONED_MS = 15*60*1000;
@@ -15362,7 +15300,7 @@ function renderRoomUnoLobby(room){
         <div class="uno-mm-count">${filled}/4 لاعبين انضموا</div>
         <div class="uno-mm-bar"><div class="uno-mm-bar-fill" style="width:${pct}%"></div></div>
       </div>
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
       <button type="button" class="btn btn-ghost uno-mm-share" style="width:100%;margin-bottom:12px;" data-action="room-uno-share" data-code="${room.code}">📤 شارك الكود مع صحابك</button>
       <div class="uno-lobby-list">${slots}</div>
@@ -15614,7 +15552,7 @@ function renderRoomQuizLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين ❓ — كلكم بتجاوبوا على نفس الأسئلة</div>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
@@ -15782,7 +15720,7 @@ function renderRoomMysteryLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🕵️ — كلكم هتدخلوا نفس الغرفة وتتعاونوا تفكّوا الألغاز والأقفال قبل ما الوقت يخلص</div>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
@@ -15974,7 +15912,7 @@ function renderRoomEbLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 😇 — خمّنوا القصة أو المناسبة المسيحية من الإيموجيز</div>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
@@ -16118,7 +16056,7 @@ function renderRoomPvLobby(room){
   }).join('');
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 📖 — كمّلوا المثل أو الآية الناقصة</div>
       <div class="uno-lobby-list">${slots}</div>
       ${isHost
@@ -17006,7 +16944,7 @@ function renderRoomGamesInCategory(){
     ${html}
   `;
 }
-function roomCodeCard(code, game){
+function roomCodeCard(code){
   return `
     <div class="room-code-card">
       <div class="room-code-eyebrow">
@@ -17018,206 +16956,7 @@ function roomCodeCard(code, game){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A2.5 2.5 0 012 12.5v-8A2.5 2.5 0 014.5 2h8A2.5 2.5 0 0115 4.5V5"/></svg>
         <span>نسخ الكود</span>
       </button>
-      <button type="button" class="room-invite-btn" data-action="invite-room-friend" data-code="${code}" data-game="${game||''}">
-        ${ICO.invite}<span>دعوة صديق أونلاين</span>
-      </button>
     </div>`;
-}
-/* ============================= ONLINE PRESENCE (لمعرفة مين فاتح التطبيق دلوقتي) ============================= */
-const PRESENCE_ONLINE_MS = 15000; /* آخر نبضة خلال آخر 15 ثانية = يعتبر أونلاين */
-async function loadPresence(){
-  try{ const r = await window.storage.get('glavera-presence', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; }
-}
-async function sendPresenceHeartbeat(){
-  if(!state.pid || !window.storage) return;
-  try{
-    const now = Date.now();
-    const apply = (cur)=>{
-      let obj = {}; try{ obj = cur ? JSON.parse(cur) : {}; }catch(e){ obj = {}; }
-      obj[state.pid] = now;
-      const cutoff = now - 10*60*1000;
-      Object.keys(obj).forEach(k=>{ if((obj[k]||0) < cutoff) delete obj[k]; });
-      return JSON.stringify(obj);
-    };
-    if(window.storage.update) await window.storage.update('glavera-presence', apply, true);
-    else { const cur = await window.storage.get('glavera-presence', true); await window.storage.set('glavera-presence', apply(cur?cur.value:null), true); }
-  }catch(e){}
-}
-function isPidOnline(presenceObj, pid){
-  const ts = presenceObj && presenceObj[pid];
-  return !!ts && (Date.now()-ts) <= PRESENCE_ONLINE_MS;
-}
-/* ============================= ROOM INVITES (دعوة صديق أونلاين ينضم لنفس الغرفة لحظيًا) ============================= */
-const ROOM_INVITE_TTL_MS = 90*1000;
-async function loadRoomInvites(){
-  try{ const r = await window.storage.get('glavera-room-invites', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; }
-}
-async function saveRoomInvites(obj){
-  try{ await window.storage.set('glavera-room-invites', JSON.stringify(obj), true); }catch(e){}
-}
-function pruneRoomInvitesObj(obj){
-  let changed = false;
-  Object.keys(obj||{}).forEach(id=>{
-    const inv = obj[id];
-    if(!inv || inv.status!=='pending' || (Date.now()-(inv.ts||0)) > ROOM_INVITE_TTL_MS){ delete obj[id]; changed = true; }
-  });
-  return changed;
-}
-function gameLabelOf(id){
-  const g = GAMES_CATALOG.find(x=>x.id===id) || ROOM_ONLY_TILES[id];
-  return g ? g.title : 'اللعبة';
-}
-function gameIconOf(id){
-  const g = GAMES_CATALOG.find(x=>x.id===id) || ROOM_ONLY_TILES[id];
-  return g ? g.icon : '🎮';
-}
-function roomInviteExcludedIds(room){
-  const ids = new Set([room.hostId]);
-  if(room.guestId) ids.add(room.guestId);
-  (room.players||[]).forEach(p=>ids.add(p.id));
-  return ids;
-}
-/* ---------- شاشة اختيار الصديق (تظهر لصاحب الغرفة) ---------- */
-async function openInvitePicker(code, gameType){
-  closeInvitePicker();
-  const overlay = document.createElement('div');
-  overlay.className = 'notif-overlay';
-  overlay.id = 'invite-pick-overlay';
-  overlay.dataset.code = code || '';
-  overlay.dataset.game = gameType || '';
-  overlay._sentPids = new Set();
-  overlay.innerHTML = `
-    <div class="notif-panel">
-      <div class="notif-panel-handle"></div>
-      <div class="notif-panel-head">
-        <div class="notif-panel-title"><span class="notif-title-badge">${ICO.invite}</span> دعوة صديق أونلاين</div>
-        <button type="button" class="icon-btn" data-action="close-invite-picker">${ICO.chev}</button>
-      </div>
-      <div class="notif-list" id="invite-pick-list"><div class="invite-pick-empty">جاري تحميل الأصدقاء المتاحين... ⏳</div></div>
-    </div>`;
-  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeInvitePicker(); });
-  document.body.appendChild(overlay);
-  await refreshInvitePickerList();
-  overlay._timer = setInterval(refreshInvitePickerList, 5000);
-}
-function closeInvitePicker(){
-  const el = document.getElementById('invite-pick-overlay');
-  if(el){ if(el._timer) clearInterval(el._timer); el.remove(); }
-}
-async function refreshInvitePickerList(){
-  const overlay = document.getElementById('invite-pick-overlay');
-  const listEl = document.getElementById('invite-pick-list');
-  if(!overlay || !listEl) return;
-  const code = overlay.dataset.code;
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[code];
-  if(!room){ listEl.innerHTML = `<div class="invite-pick-empty">الغرفة دي خلصت أو مش موجودة دلوقتي</div>`; return; }
-  const presence = await loadPresence();
-  const excluded = roomInviteExcludedIds(room);
-  const online = PARTICIPANTS.filter(p=> p.id!==state.pid && !excluded.has(p.id) && isPidOnline(presence, p.id));
-  if(!online.length){
-    listEl.innerHTML = `<div class="invite-pick-empty">مفيش حد من صحابك أونلاين دلوقتي 👀<br>جرّب تاني بعد شوية أو ابعتله كود الغرفة مباشرة</div>`;
-    return;
-  }
-  listEl.innerHTML = online.map(p=>{
-    const sent = overlay._sentPids && overlay._sentPids.has(p.id);
-    return `
-    <div class="invite-pick-row">
-      ${gameAvatar(p.id)}
-      <div class="invite-pick-mid">
-        <div class="invite-pick-name">${escapeHtml(p.name)}</div>
-        <div class="invite-pick-status"><i></i> أونلاين الآن</div>
-      </div>
-      <button type="button" class="invite-pick-send${sent?' is-sent':''}" ${sent?'disabled':''} data-action="send-room-invite" data-pid="${p.id}" data-name="${escapeHtml(p.name)}">${sent?'اتبعتت ✅':'دعوة'}</button>
-    </div>`;
-  }).join('');
-}
-async function sendRoomInvite(toPid, toName, btnEl){
-  if(!state.pid) return;
-  const overlay = document.getElementById('invite-pick-overlay');
-  const code = overlay ? overlay.dataset.code : (state.roomCode||'');
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[code];
-  if(!room){ showToast('الغرفة دي مش موجودة دلوقتي', true); closeInvitePicker(); return; }
-  const me = PARTICIPANTS.find(x=>x.id===state.pid);
-  const invites = await loadRoomInvites();
-  pruneRoomInvitesObj(invites);
-  const id = 'inv'+Date.now()+Math.random().toString(36).slice(2,7);
-  invites[id] = { id, toPid, toName: toName||'', fromPid: state.pid, fromName: me?me.name:'صديقك', roomCode: code, game: room.game, ts: Date.now(), status:'pending' };
-  await saveRoomInvites(invites);
-  if(overlay){ overlay._sentPids = overlay._sentPids || new Set(); overlay._sentPids.add(toPid); }
-  if(btnEl){ btnEl.disabled = true; btnEl.classList.add('is-sent'); btnEl.textContent = 'اتبعتت ✅'; }
-  showToast(`تم إرسال الدعوة إلى ${toName||'صاحبك'} 🎉`);
-}
-/* ---------- الدعوة الواردة (تظهر لصديقك في نص الشاشة لحظيًا) ---------- */
-function inviteSeenGet(){
-  try{ const s = localStorage.getItem('glavera-invites-seen'); return s? JSON.parse(s): []; }catch(e){ return []; }
-}
-function inviteSeenAdd(id){
-  try{ const arr = inviteSeenGet(); arr.unshift(id); localStorage.setItem('glavera-invites-seen', JSON.stringify(arr.slice(0,60))); }catch(e){}
-}
-async function checkIncomingInvites(){
-  if(!state.pid || document.getElementById('incoming-invite-overlay')) return;
-  let invites;
-  try{ invites = await loadRoomInvites(); }catch(e){ return; }
-  const changed = pruneRoomInvitesObj(invites);
-  const seen = inviteSeenGet();
-  const mine = Object.values(invites).find(i=> i.toPid===state.pid && i.status==='pending' && !seen.includes(i.id));
-  if(changed){ try{ await saveRoomInvites(invites); }catch(e){} }
-  if(mine) showIncomingInvite(mine);
-}
-function showIncomingInvite(inv){
-  if(document.getElementById('incoming-invite-overlay')) return;
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay confirm-overlay';
-  overlay.id = 'incoming-invite-overlay';
-  overlay.innerHTML = `
-    <div class="confirm-card incoming-invite-card">
-      <div class="confirm-icon">${gameIconOf(inv.game)}</div>
-      <div class="confirm-msg">${escapeHtml(inv.fromName||'صديقك')} بيدعوّك تلعب "${escapeHtml(gameLabelOf(inv.game))}" 🎮</div>
-      <div class="confirm-sub">انضم دلوقتي وابدأوا اللعب مع بعض في نفس الغرفة</div>
-      <div class="confirm-actions">
-        <button type="button" class="btn btn-ghost" id="incoming-invite-decline">إلغاء</button>
-        <button type="button" class="btn btn-primary" id="incoming-invite-accept">انضمام 🚀</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  document.getElementById('incoming-invite-decline').addEventListener('click', ()=> declineRoomInvite(inv));
-  document.getElementById('incoming-invite-accept').addEventListener('click', ()=> acceptRoomInvite(inv));
-}
-function closeIncomingInvite(){
-  const el = document.getElementById('incoming-invite-overlay');
-  if(el) el.remove();
-}
-async function acceptRoomInvite(inv){
-  inviteSeenAdd(inv.id);
-  closeIncomingInvite();
-  try{
-    const invites = await loadRoomInvites();
-    if(invites[inv.id]){ invites[inv.id].status = 'accepted'; await saveRoomInvites(invites); }
-  }catch(e){}
-  const myName = (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'صديقك';
-  pushNotification(inv.fromPid, `${myName} وافق على دعوتك وجاي يلعب معاك 🎮`, '✅');
-  attemptJoinRoom(inv.roomCode);
-}
-async function declineRoomInvite(inv){
-  inviteSeenAdd(inv.id);
-  closeIncomingInvite();
-  try{
-    const invites = await loadRoomInvites();
-    if(invites[inv.id]) delete invites[inv.id];
-    await saveRoomInvites(invites);
-  }catch(e){}
-  showToast('تم إلغاء الدعوة');
-}
-function startPresenceAndInviteLoop(){
-  sendPresenceHeartbeat();
-  checkIncomingInvites();
-  setInterval(()=>{
-    if(!state.pid) return;
-    sendPresenceHeartbeat();
-    checkIncomingInvites();
-  }, 5000);
 }
 function renderRoomWaiting(room){
   const badge = room.paid
@@ -17225,7 +16964,7 @@ function renderRoomWaiting(room){
     : `<div class="hint" style="text-align:center;margin-top:8px;">🆓 غرفة مجانية — انضمام بدون نقط</div>`;
   return `
     <div class="room-waiting">
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code)}
       ${badge}
       <div class="hint" style="text-align:center;margin-top:14px;">شارك الكود مع صاحبك عشان ينضم للغرفة</div>
       <div class="room-wait-status">
@@ -21978,9 +21717,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='join-room'){ const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
   else if(action==='copy-room-code'){ doCopyRoomCode(el); }
-  else if(action==='invite-room-friend'){ openInvitePicker(el.dataset.code, el.dataset.game); }
-  else if(action==='close-invite-picker'){ closeInvitePicker(); }
-  else if(action==='send-room-invite'){ sendRoomInvite(el.dataset.pid, el.dataset.name, el); }
   else if(action==='room-uno-share'){ doRoomUnoShare(el.dataset.code); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
@@ -26147,7 +25883,6 @@ function loginWaitAndRetry(retry){
   __markLoginDataReady();
   render();
   startLivePolling();
-  startPresenceAndInviteLoop();
   try{ ensureVisaTxListener(); }catch(e){}
   checkDailyMessage();
   if('serviceWorker' in navigator){
