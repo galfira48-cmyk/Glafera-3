@@ -3257,8 +3257,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .drt-pips{display:flex; gap:3px; margin-top:2px;}
   .drt-pip{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.18); flex-shrink:0;}
   .drt-pip.filled{background:var(--pc,#4FACFE);}
-  .darts-canvas-wrap{position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:8px; border-radius:22px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;}
-  .darts-canvas-wrap canvas{display:block; touch-action:none;}
+  .darts-overlay{touch-action:none;}
+  .darts-shell{touch-action:none;}
+  .darts-canvas-wrap{position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:8px; touch-action:none;}
+  .darts-canvas-wrap canvas{display:block; touch-action:none; border-radius:22px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;}
+  .darts-log{touch-action:pan-y;}
   .darts-log{flex-shrink:0; margin-top:8px; max-height:64px; overflow-y:auto; display:flex; flex-direction:column-reverse; gap:2px;}
   .darts-log-line{font-family:Tajawal,Arial; font-size:11px; color:rgba(255,255,255,.6); text-align:center;}
   @media (max-height:640px){
@@ -11171,7 +11174,7 @@ function stkDraw(){
   }
 }
 /* ============================= GAMES: DARTS (لعبة النشان) ============================= */
-const DRT = { W:400, H:620, cx:200, cyBoard:225, R:182, handY:540, turnSeconds:16,
+const DRT = { W:400, H:620, cx:200, cyBoard:225, R:188, handY:540, turnSeconds:16,
   bullIn:0.045, bullOut:0.11, tripleIn:0.58, tripleOut:0.63, doubleIn:0.94, doubleOut:1.0 };
 const DRT_NUMBERS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 const DRT_START_SCORE = 101;
@@ -11383,11 +11386,14 @@ function dartsDrawHandDart(ctx, atX, atY, owner, angle, scale){
   ctx.save();
   ctx.translate(atX, atY);
   if(img && img.complete && img.naturalWidth){
-    const targetLen = 116*s;
+    const targetLen = 152*s;
     const k = targetLen/Math.max(img.naturalWidth, img.naturalHeight);
     const w = img.naturalWidth*k, h = img.naturalHeight*k;
     ctx.rotate(a - DRT_DART_TIP_ANGLE);
+    ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+    try{ ctx.filter = 'saturate(1.35) contrast(1.12) brightness(1.05)'; }catch(err){}
     ctx.drawImage(img, -w*0.98, -h*0.97, w, h);
+    ctx.filter = 'none';
   } else {
     ctx.rotate(a + Math.PI/2);
     ctx.fillStyle = owner==='you' ? '#4FACFE' : '#FF6B6B';
@@ -11399,7 +11405,7 @@ function dartsDrawHandDart(ctx, atX, atY, owner, angle, scale){
 function dartsDrawLanded(ctx){
   const g = state.darts; if(!g) return;
   g.thrown.forEach(d=>{
-    dartsDrawHandDart(ctx, d.x, d.y, d.owner, d.angle, 0.5);
+    dartsDrawHandDart(ctx, d.x, d.y, d.owner, d.angle, 0.66);
   });
 }
 function dartsDrawBoard(ctx){
@@ -11412,8 +11418,10 @@ function dartsDrawBoard(ctx){
     const dx = cx - DRT_BOARD_CENTER_FRAC_X*drawSize;
     const dy = cy - DRT_BOARD_CENTER_FRAC_Y*drawSize;
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+    ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 8;
+    try{ ctx.filter = 'saturate(1.3) contrast(1.1) brightness(1.03)'; }catch(err){}
     ctx.drawImage(DRT_IMG_BOARD, dx, dy, drawSize, drawSize);
+    ctx.filter = 'none';
     ctx.restore();
   } else {
     ctx.beginPath(); ctx.arc(cx,cy,R*DRT.doubleOut+18,0,Math.PI*2); ctx.fillStyle='#4b3220'; ctx.fill();
@@ -11591,6 +11599,14 @@ function dartsRenderShell(){
   `;
   dartsMountCanvas();
 }
+function dartsBlockPinch(e){ e.preventDefault(); }
+function dartsBlockMultiTouch(e){ if(e.touches && e.touches.length>1) e.preventDefault(); }
+let dartsLastTapTime = 0;
+function dartsBlockDoubleTapZoom(e){
+  const now = Date.now();
+  if(now - dartsLastTapTime <= 300) e.preventDefault();
+  dartsLastTapTime = now;
+}
 function openDartsGame(){
   initDartsGame();
   const old = document.getElementById('drt-overlay'); if(old) old.remove();
@@ -11603,6 +11619,10 @@ function openDartsGame(){
   dartsStartTurnTimer();
   window.addEventListener('resize', dartsOnResize);
   window.addEventListener('orientationchange', dartsOnResize);
+  overlay.addEventListener('gesturestart', dartsBlockPinch);
+  overlay.addEventListener('gesturechange', dartsBlockPinch);
+  overlay.addEventListener('touchmove', dartsBlockMultiTouch, { passive:false });
+  overlay.addEventListener('touchend', dartsBlockDoubleTapZoom, { passive:false });
   SND.click();
 }
 function closeDartsGame(){
