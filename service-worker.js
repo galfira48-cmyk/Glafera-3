@@ -1,4 +1,4 @@
-const CACHE_NAME = 'glavera3-v30';
+const CACHE_NAME = 'glavera3-v31';
 const CORE_ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './xo-logo.png', './connect4-logo.png', './domino-logo.png', './ludo-logo.png', './c4-btn-red.webp', './c4-btn-blue.webp', './c4-btn-yellow.webp', './c4-btn-green.webp', './music.mp3'];
 const NETWORK_TIMEOUT_MS = 3500; // لو النت ضعيف ومردش الرد خلال المدة دي، هنعرض النسخة المحفوظة فورًا
 
