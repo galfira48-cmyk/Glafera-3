@@ -15076,9 +15076,13 @@ async function leaveGameRoom(){
 async function doRoomXoMove(idx){
   GAME_ROOMS = await loadGameRooms();
   const room = GAME_ROOMS[state.roomCode];
-  if(!room || room.status!=='playing' || room.matchOver) return;
+  if(!room || room.status!=='playing' || room.matchOver){ render(); return; }
   const mySymbol = room.hostId===state.pid ? 'X' : 'O';
-  if(room.turn!==mySymbol || room.board[idx] || room.winner) return;
+  if(room.turn!==mySymbol || room.board[idx] || room.winner){
+    showToast('⏳ اللوح اتحدث، جرّب تاني', true);
+    render();
+    return;
+  }
   room.board[idx] = mySymbol;
   SND.click();
   const res = xoCheckWinner(room.board);
@@ -17518,10 +17522,18 @@ async function doRoomC4Color(colorId){
 async function doRoomC4Move(col){
   GAME_ROOMS = await loadGameRooms();
   const room = GAME_ROOMS[state.roomCode];
-  if(!room || room.status!=='playing' || room.winner || !roomC4ColorsReady(room)) return;
+  if(!room || room.status!=='playing' || room.winner || !roomC4ColorsReady(room)){ render(); return; }
   const role = room.hostId===state.pid ? 'host' : 'guest';
-  if(room.turn!==role) return;
-  if(!room.board[col] || room.board[col].length>=6) return;
+  if(room.turn!==role){
+    showToast('⏳ اللوح اتحدث، جرّب تاني', true);
+    render();
+    return;
+  }
+  if(!room.board[col] || room.board[col].length>=6){
+    showToast('⏳ اللوح اتحدث، جرّب تاني', true);
+    render();
+    return;
+  }
   const slot = role==='host' ? 'R' : 'Y';
   room.board[col].push(slot);
   SND.click();
