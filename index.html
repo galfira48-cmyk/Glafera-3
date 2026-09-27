@@ -21768,7 +21768,16 @@ document.addEventListener('click', (e)=>{
     const appEl = document.getElementById('app');
     setTimeout(()=>{ if(appEl) appEl.classList.add('screen-fade-out'); }, 120);
     setTimeout(()=>{
-      el.click();
+      /* لو حصل تحديث/رندر للشاشة في الـ420ms دي (زي نبضة تحديث الغرفة كل ثانيتين)،
+         العنصر الأصلي بيتشال من الصفحة وelement.click() عليه بيبقى ميتة مالهاش تأثير،
+         فالزرار "التالي" كان بيفضل واقف من غير أي استجابة. الحل: لو العنصر الأصلي
+         اتشال، ندور على نفس الزرار في النسخة الحالية من الشاشة وننفذ الحركة عليه هو. */
+      let target = el;
+      if(!document.body.contains(target)){
+        target = document.querySelector('[data-action="'+action+'"]');
+        if(target) target.dataset.animFired = '1';
+      }
+      if(target) target.click();
       if(appEl) requestAnimationFrame(()=>{ appEl.classList.remove('screen-fade-out'); });
     }, 420);
     return;
