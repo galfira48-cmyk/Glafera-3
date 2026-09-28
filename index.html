@@ -21198,14 +21198,9 @@ function tick(vol){
   }catch(e){}
 }
 const SND = {
-  click(){
-    luxTone(520, .09, 'sine', .035, {cutoff:1800, wet:.15});
-  },
-  otpType(idx){
-    const f = 410 + (idx||0)*5;
-    luxTone(f, .16, 'sine', .04, {cutoff:1600, wet:.22});
-  },
-  nav(){ luxTone(460, .11, 'sine', .035, {cutoff:1700, wet:.18}); },
+  click(){ /* صوت النقر اتشال */ },
+  otpType(idx){ /* صوت الكتابة اتشال */ },
+  nav(){ /* صوت التنقل اتشال */ },
   back(){
     luxTone(480, .1, 'sine', .035, {cutoff:1700, wet:.16});
     setTimeout(()=>luxTone(370, .1, 'sine', .032, {cutoff:1600, wet:.18}), 45);
