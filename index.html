@@ -20336,6 +20336,7 @@ function renderAdminTeamsTab(){
       body = `
       <div class="card">
         <label>رسالة لكل أعضاء ${escapeHtml(t.name)}</label>
+        <input type="text" class="field" id="team-broadcast-title-${t.id}" placeholder="عنوان الإشعار (اختياري)" maxlength="60" style="margin-bottom:8px;" />
         <textarea class="field" id="team-broadcast-${t.id}" placeholder="اكتب رسالة لكل أعضاء ${escapeHtml(t.name)}..." style="min-height:80px;"></textarea>
         <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-team-broadcast" data-tid="${t.id}">إرسال للفريق</button>
       </div>`;
@@ -20368,6 +20369,7 @@ function renderAdminTeamsTab(){
         </div>
       ` : `<button type="button" class="btn btn-primary" style="width:100%;" data-action="open-add-team">➕ إضافة فريق جديد</button>`}`;
   const bcastBody = `
+      <input type="text" class="field" id="all-teams-broadcast-title" placeholder="عنوان الإشعار (اختياري) مثال: 🎁 تعويض انسحاب" maxlength="60" style="margin-bottom:8px;" />
       <textarea class="field" id="all-teams-broadcast" placeholder="اكتب رسالة تصل لكل المشاركين في كل الفرق..." style="min-height:70px;"></textarea>
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-all-teams-broadcast">إرسال للجميع</button>`;
   return `
@@ -24154,8 +24156,11 @@ async function doSendTeamBroadcast(tid){
   const members = PARTICIPANTS.filter(p=>p.teamId===tid);
   members.forEach(p=>pushNotification(p.id, text, '📣'));
   await saveProfileExtra(PROFILE_EXTRA);
+  const tEl = document.getElementById('team-broadcast-title-'+tid);
+  await sysNotifySend(tEl ? tEl.value : '', text, members.map(p=>p.id));
   showToast('تم إرسال الرسالة للفريق');
   if(ta) ta.value = '';
+  if(tEl) tEl.value = '';
 }
 async function doSendAllTeamsBroadcast(){
   const ta = document.getElementById('all-teams-broadcast');
@@ -24163,8 +24168,11 @@ async function doSendAllTeamsBroadcast(){
   if(!text){ showToast('اكتب الرسالة الأول', true); return; }
   PARTICIPANTS.forEach(p=>pushNotification(p.id, text, '📣'));
   await saveProfileExtra(PROFILE_EXTRA);
+  const tEl = document.getElementById('all-teams-broadcast-title');
+  await sysNotifySend(tEl ? tEl.value : '', text, null);
   showToast('تم إرسال الرسالة لكل المشاركين');
   if(ta) ta.value = '';
+  if(tEl) tEl.value = '';
 }
 
 /* ============================= ADMIN: ALERTS ============================= */
@@ -24176,6 +24184,7 @@ async function doSubmitAdminAlert(){
   if(immediate){
     PARTICIPANTS.forEach(p=>pushNotification(p.id, text, '📢'));
     await saveProfileExtra(PROFILE_EXTRA);
+    await sysNotifySend('تنبيه من المنظمين 📢', text, null);
     ADMIN_ALERTS.push({ id:'al'+Date.now(), text, sendAt:Date.now(), sent:true, hLabel:'الآن' });
     await saveAdminAlerts(ADMIN_ALERTS);
     showToast('تم إرسال التنبيه لكل المشاركين');
@@ -25976,7 +25985,7 @@ function checkUpcomingSessionAlerts(){
 }
 function startLivePolling(){
   setInterval(async ()=>{
-    try{ ensureVisaTxListener(); }catch(e){}
+    try{ ensureVisaTxListener(); }catch(e){} try{ ensureSysNotifListener(); }catch(e){}
     if(document.hidden) return;
     if(state.pid) checkDeviceSessionKicked();
     if(state.pid) checkVisaExpiry();
@@ -26111,6 +26120,59 @@ async function vtxEnableNotifs(){
 function vtxSeenGet(pid){ try{ const s = localStorage.getItem('glavera-vtx-seen-'+pid); return s===null ? null : JSON.parse(s); }catch(e){ return null; } }
 function vtxSeenSet(pid, ids){ try{ localStorage.setItem('glavera-vtx-seen-'+pid, JSON.stringify(ids.slice(0,80))); }catch(e){} }
 let _vtxListenerPid = null, _vtxRef = null, _vtxFn = null;
+/* ---------- إشعارات النظام من المنظمين: رسالة بعنوان ونص بتظهر على شاشة الموبايل زي إشعارات الفيزا ---------- */
+const _SYSN_KEY = 'glavera-sys-notifs';
+async function sysNotifySend(title, body, pids){
+  try{
+    if(!window.storage || !window.storage.update) return;
+    const entry = { id:'sn'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(),
+      title:(title||'').trim() || 'جلافيرا 3 📣', body:body||'', to:(pids && pids.length) ? pids : 'all' };
+    await window.storage.update(_SYSN_KEY, (curRaw)=>{
+      let cur = []; try{ cur = curRaw ? (JSON.parse(curRaw)||[]) : []; }catch(e){ cur = []; }
+      if(!Array.isArray(cur)) cur = [];
+      cur.unshift(entry);
+      return JSON.stringify(cur.slice(0,30));
+    }, true);
+  }catch(e){}
+}
+function sysnShow(n){
+  try{
+    if(document.hidden){
+      if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
+      const opts = { body:n.body, icon:'icon-192.png', tag:String(n.id||''), lang:'ar', dir:'rtl' };
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.getRegistration().then(reg=>{ if(reg && reg.showNotification) reg.showNotification(n.title, opts); else new Notification(n.title, opts); }).catch(()=>{});
+      } else { new Notification(n.title, opts); }
+    } else {
+      showToast(n.title+' — '+n.body);
+    }
+  }catch(err){}
+}
+function handleSysNotifSnapshot(pid, raw){
+  if(pid !== state.pid) return;
+  let arr = []; try{ arr = raw ? (JSON.parse(raw)||[]) : []; }catch(e){ arr = []; }
+  if(!Array.isArray(arr)) return;
+  const mine = arr.filter(n=>n && n.id && (n.to==='all' || (Array.isArray(n.to) && n.to.indexOf(pid)>-1)));
+  const seenKey = 'glavera-sysn-seen-'+pid;
+  let seen = null; try{ const v = localStorage.getItem(seenKey); seen = v===null ? null : JSON.parse(v); }catch(e){ seen = null; }
+  const saveSeen = (ids)=>{ try{ localStorage.setItem(seenKey, JSON.stringify(ids.slice(0,80))); }catch(e){} };
+  if(seen === null){ saveSeen(mine.map(n=>n.id)); return; } /* أول مرة على الجهاز: منعيدش رسائل قديمة */
+  const seenSet = {}; seen.forEach(id=>{ seenSet[id] = 1; });
+  const fresh = mine.filter(n=>!seenSet[n.id] && (Date.now()-(n.ts||0)) < 30*60*1000);
+  saveSeen(mine.map(n=>n.id).concat(seen));
+  fresh.slice().reverse().forEach((n,i)=> setTimeout(()=>sysnShow(n), i*800));
+}
+let _sysnRef = null, _sysnFn = null, _sysnPid = null;
+function ensureSysNotifListener(){
+  const pid = state.pid || null;
+  if(pid === _sysnPid) return;
+  if(_sysnRef && _sysnFn){ try{ _sysnRef.off('value', _sysnFn); }catch(e){} }
+  _sysnRef = null; _sysnFn = null; _sysnPid = pid;
+  if(!pid || !_fbDb) return;
+  _sysnRef = _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(_SYSN_KEY));
+  _sysnFn = (snap)=>{ try{ handleSysNotifSnapshot(pid, snap && snap.exists() ? snap.val() : null); }catch(e){ console.error('sysn listener', e); } };
+  _sysnRef.on('value', _sysnFn, ()=>{});
+}
 function ensureVisaTxListener(){
   const pid = state.pid || null;
   if(pid === _vtxListenerPid) return;
@@ -26271,7 +26333,7 @@ function loginWaitAndRetry(retry){
   render();
   startLivePolling();
   startPresenceAndInviteLoop();
-  try{ ensureVisaTxListener(); }catch(e){}
+  try{ ensureVisaTxListener(); }catch(e){} try{ ensureSysNotifListener(); }catch(e){}
   checkDailyMessage();
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
