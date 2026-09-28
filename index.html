@@ -717,7 +717,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     display:flex; align-items:center; justify-content:center; }
   .id-photo-fallback{ font-family:'Cairo',sans-serif; font-weight:800; font-size:30px; color:#fff; }
   /* ---------- participant chip (top bar) + personal profile page ---------- */
-  html, body{ overscroll-behavior-y:none; } /* no pull-down-to-refresh */
+  html, body{ overscroll-behavior:none; } /* no pull-down-to-refresh ولا سحب الرجوع من حافة الشاشة */
+  .c4-board, .xo-board, .c4-cell, .xo-cell{ touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
   .tb-me{ display:flex; align-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .15s ease; }
   .tb-me:active{ transform:scale(.93); }
   .tb-av, .me-av{ border-radius:50%; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; flex:0 0 auto; }
@@ -21071,6 +21072,7 @@ function luxTone(freq, duration, type, vol, opts){
   }catch(e){}
 }
 function whooshSweep(reverse, vol){
+  return; /* صوت الووش اتشال */
   try{
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if(!Ctx) return;
@@ -21198,7 +21200,26 @@ function tick(vol){
   }catch(e){}
 }
 const SND = {
-  click(){ /* صوت النقر اتشال */ },
+  click(){
+    /* نقرة جافة قصيرة جدًا وهادية — من غير صدى (بتتوصل مباشرة من غير reverb) */
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return;
+      const ctx = window.__glavCtx || (window.__glavCtx = new Ctx());
+      if(ctx.state==='suspended'){ ctx.resume(); }
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(500, now+0.02);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(0.06, now+0.002);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+0.022);
+      osc.connect(g); g.connect(getMasterOut(ctx));
+      osc.start(now); osc.stop(now+0.03);
+    }catch(e){}
+  },
   otpType(idx){ /* صوت الكتابة اتشال */ },
   nav(){ /* صوت التنقل اتشال */ },
   back(){
