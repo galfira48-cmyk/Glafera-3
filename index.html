@@ -20336,7 +20336,6 @@ function renderAdminTeamsTab(){
       body = `
       <div class="card">
         <label>رسالة لكل أعضاء ${escapeHtml(t.name)}</label>
-        <input type="text" class="field" id="team-broadcast-title-${t.id}" placeholder="عنوان الإشعار (اختياري)" maxlength="60" style="margin-bottom:8px;" />
         <textarea class="field" id="team-broadcast-${t.id}" placeholder="اكتب رسالة لكل أعضاء ${escapeHtml(t.name)}..." style="min-height:80px;"></textarea>
         <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-team-broadcast" data-tid="${t.id}">إرسال للفريق</button>
       </div>`;
@@ -20369,7 +20368,6 @@ function renderAdminTeamsTab(){
         </div>
       ` : `<button type="button" class="btn btn-primary" style="width:100%;" data-action="open-add-team">➕ إضافة فريق جديد</button>`}`;
   const bcastBody = `
-      <input type="text" class="field" id="all-teams-broadcast-title" placeholder="عنوان الإشعار (اختياري) مثال: 🎁 تعويض انسحاب" maxlength="60" style="margin-bottom:8px;" />
       <textarea class="field" id="all-teams-broadcast" placeholder="اكتب رسالة تصل لكل المشاركين في كل الفرق..." style="min-height:70px;"></textarea>
       <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-all-teams-broadcast">إرسال للجميع</button>`;
   return `
@@ -24156,11 +24154,8 @@ async function doSendTeamBroadcast(tid){
   const members = PARTICIPANTS.filter(p=>p.teamId===tid);
   members.forEach(p=>pushNotification(p.id, text, '📣'));
   await saveProfileExtra(PROFILE_EXTRA);
-  const tEl = document.getElementById('team-broadcast-title-'+tid);
-  await sysNotifySend(tEl ? tEl.value : '', text, members.map(p=>p.id));
   showToast('تم إرسال الرسالة للفريق');
   if(ta) ta.value = '';
-  if(tEl) tEl.value = '';
 }
 async function doSendAllTeamsBroadcast(){
   const ta = document.getElementById('all-teams-broadcast');
@@ -24168,11 +24163,8 @@ async function doSendAllTeamsBroadcast(){
   if(!text){ showToast('اكتب الرسالة الأول', true); return; }
   PARTICIPANTS.forEach(p=>pushNotification(p.id, text, '📣'));
   await saveProfileExtra(PROFILE_EXTRA);
-  const tEl = document.getElementById('all-teams-broadcast-title');
-  await sysNotifySend(tEl ? tEl.value : '', text, null);
   showToast('تم إرسال الرسالة لكل المشاركين');
   if(ta) ta.value = '';
-  if(tEl) tEl.value = '';
 }
 
 /* ============================= ADMIN: ALERTS ============================= */
@@ -24184,9 +24176,9 @@ async function doSubmitAdminAlert(){
   if(immediate){
     PARTICIPANTS.forEach(p=>pushNotification(p.id, text, '📢'));
     await saveProfileExtra(PROFILE_EXTRA);
-    await sysNotifySend('تنبيه من المنظمين 📢', text, null);
     ADMIN_ALERTS.push({ id:'al'+Date.now(), text, sendAt:Date.now(), sent:true, hLabel:'الآن' });
     await saveAdminAlerts(ADMIN_ALERTS);
+    try{ await window.storage.set('site-announcement', { id:'a'+Date.now(), icon:'📢', title:'جلافيرا 3', body:text, ts:Date.now() }, true); }catch(e){}
     showToast('تم إرسال التنبيه لكل المشاركين');
   } else {
     const hourEl = document.getElementById('alert-hour');
@@ -25985,7 +25977,7 @@ function checkUpcomingSessionAlerts(){
 }
 function startLivePolling(){
   setInterval(async ()=>{
-    try{ ensureVisaTxListener(); }catch(e){} try{ ensureSysNotifListener(); }catch(e){}
+    try{ ensureVisaTxListener(); }catch(e){}
     if(document.hidden) return;
     if(state.pid) checkDeviceSessionKicked();
     if(state.pid) checkVisaExpiry();
@@ -26120,59 +26112,6 @@ async function vtxEnableNotifs(){
 function vtxSeenGet(pid){ try{ const s = localStorage.getItem('glavera-vtx-seen-'+pid); return s===null ? null : JSON.parse(s); }catch(e){ return null; } }
 function vtxSeenSet(pid, ids){ try{ localStorage.setItem('glavera-vtx-seen-'+pid, JSON.stringify(ids.slice(0,80))); }catch(e){} }
 let _vtxListenerPid = null, _vtxRef = null, _vtxFn = null;
-/* ---------- إشعارات النظام من المنظمين: رسالة بعنوان ونص بتظهر على شاشة الموبايل زي إشعارات الفيزا ---------- */
-const _SYSN_KEY = 'glavera-sys-notifs';
-async function sysNotifySend(title, body, pids){
-  try{
-    if(!window.storage || !window.storage.update) return;
-    const entry = { id:'sn'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(),
-      title:(title||'').trim() || 'جلافيرا 3 📣', body:body||'', to:(pids && pids.length) ? pids : 'all' };
-    await window.storage.update(_SYSN_KEY, (curRaw)=>{
-      let cur = []; try{ cur = curRaw ? (JSON.parse(curRaw)||[]) : []; }catch(e){ cur = []; }
-      if(!Array.isArray(cur)) cur = [];
-      cur.unshift(entry);
-      return JSON.stringify(cur.slice(0,30));
-    }, true);
-  }catch(e){}
-}
-function sysnShow(n){
-  try{
-    if(document.hidden){
-      if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
-      const opts = { body:n.body, icon:'icon-192.png', tag:String(n.id||''), lang:'ar', dir:'rtl' };
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.getRegistration().then(reg=>{ if(reg && reg.showNotification) reg.showNotification(n.title, opts); else new Notification(n.title, opts); }).catch(()=>{});
-      } else { new Notification(n.title, opts); }
-    } else {
-      showToast(n.title+' — '+n.body);
-    }
-  }catch(err){}
-}
-function handleSysNotifSnapshot(pid, raw){
-  if(pid !== state.pid) return;
-  let arr = []; try{ arr = raw ? (JSON.parse(raw)||[]) : []; }catch(e){ arr = []; }
-  if(!Array.isArray(arr)) return;
-  const mine = arr.filter(n=>n && n.id && (n.to==='all' || (Array.isArray(n.to) && n.to.indexOf(pid)>-1)));
-  const seenKey = 'glavera-sysn-seen-'+pid;
-  let seen = null; try{ const v = localStorage.getItem(seenKey); seen = v===null ? null : JSON.parse(v); }catch(e){ seen = null; }
-  const saveSeen = (ids)=>{ try{ localStorage.setItem(seenKey, JSON.stringify(ids.slice(0,80))); }catch(e){} };
-  if(seen === null){ saveSeen(mine.map(n=>n.id)); return; } /* أول مرة على الجهاز: منعيدش رسائل قديمة */
-  const seenSet = {}; seen.forEach(id=>{ seenSet[id] = 1; });
-  const fresh = mine.filter(n=>!seenSet[n.id] && (Date.now()-(n.ts||0)) < 30*60*1000);
-  saveSeen(mine.map(n=>n.id).concat(seen));
-  fresh.slice().reverse().forEach((n,i)=> setTimeout(()=>sysnShow(n), i*800));
-}
-let _sysnRef = null, _sysnFn = null, _sysnPid = null;
-function ensureSysNotifListener(){
-  const pid = state.pid || null;
-  if(pid === _sysnPid) return;
-  if(_sysnRef && _sysnFn){ try{ _sysnRef.off('value', _sysnFn); }catch(e){} }
-  _sysnRef = null; _sysnFn = null; _sysnPid = pid;
-  if(!pid || !_fbDb) return;
-  _sysnRef = _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(_SYSN_KEY));
-  _sysnFn = (snap)=>{ try{ handleSysNotifSnapshot(pid, snap && snap.exists() ? snap.val() : null); }catch(e){ console.error('sysn listener', e); } };
-  _sysnRef.on('value', _sysnFn, ()=>{});
-}
 function ensureVisaTxListener(){
   const pid = state.pid || null;
   if(pid === _vtxListenerPid) return;
@@ -26333,7 +26272,7 @@ function loginWaitAndRetry(retry){
   render();
   startLivePolling();
   startPresenceAndInviteLoop();
-  try{ ensureVisaTxListener(); }catch(e){} try{ ensureSysNotifListener(); }catch(e){}
+  try{ ensureVisaTxListener(); }catch(e){}
   checkDailyMessage();
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
@@ -26427,6 +26366,93 @@ function loginWaitAndRetry(retry){
     if((e.key==='Enter' || e.key===' ') && e.target && e.target.classList && e.target.classList.contains('admin-info-btn')){ e.preventDefault(); toggle(e.target); }
   });
   schedule();
+})();
+</script>
+
+<script>
+/* ============================= SITE ANNOUNCEMENT (رسالة عامة لكل المستخدمين) =============================
+   - بتظهر كإشعار على شاشة الموبايل (زي إشعار "تعويض انسحاب") لو الموقع مفتوح في الخلفية والإذن متفعّل،
+     ولو الموقع مفتوح قدام المستخدم بتظهر كشريط من فوق.
+   - الرسالة بتتقرا لحظيًا من Firebase (المفتاح site-announcement)، وأي "تنبيه عام" بيتبعت من لوحة الأدمن بيتنشر هناك تلقائي.
+   - لو مفيش رسالة في Firebase بتستخدم الرسالة الافتراضية اللي تحت. غيّر الـ id لما تعوز تبعت رسالة جديدة. */
+(function siteAnnouncement(){
+  const DEFAULT_ANN = {
+    id: 'games-update-vs-friend-1',
+    icon: '🎮',
+    title: 'تم تحديث الألعاب!',
+    body: 'تقدر دلوقتي تلعب ضد صديق 🤝 جرّب الآن'
+  };
+  const esc = (t)=> String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const seenKey = (id)=> 'glavera-site-ann-' + id;
+  const seen = (id)=>{ try{ return localStorage.getItem(seenKey(id)) === '1'; }catch(e){ return false; } };
+  const mark = (id)=>{ try{ localStorage.setItem(seenKey(id), '1'); }catch(e){} };
+
+  function dismiss(el){
+    if(!el || el._gone) return; el._gone = true;
+    el.classList.remove('in'); el.classList.add('out');
+    setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 520);
+  }
+  function goGames(){
+    try{ if(typeof state!=='undefined' && state.pid && state.view!=='games' && typeof go==='function') go('games'); }catch(e){}
+  }
+  function systemNotify(a){
+    try{
+      if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
+      const title = a.icon + ' ' + a.title;
+      const opts = { body:a.body, icon:'icon-192.png', tag:'site-ann-'+a.id, lang:'ar', dir:'rtl' };
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.getRegistration().then(reg=>{
+          if(reg && reg.showNotification) reg.showNotification(title, opts); else new Notification(title, opts);
+        }).catch(()=>{});
+      } else { new Notification(title, opts); }
+      return true;
+    }catch(e){ return false; }
+  }
+  function showBanner(a){
+    let host = document.getElementById('vtx-banners');
+    if(!host){ host = document.createElement('div'); host.id = 'vtx-banners'; document.body.appendChild(host); }
+    const el = document.createElement('div');
+    el.className = 'vtx-banner pos';
+    el.innerHTML = '<div class="vtx-b-ico">'+esc(a.icon)+'</div>'
+      + '<div class="vtx-b-mid"><b>'+esc(a.title)+'</b><span style="white-space:normal;">'+esc(a.body)+'</span></div>';
+    el.addEventListener('click', function(){
+      dismiss(el);
+      // الضغطة هنا بتاعة المستخدم، فنطلب إذن الإشعارات عشان الرسايل الجاية توصله على شاشة الموبايل
+      try{ if(typeof Notification!=='undefined' && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+      goGames();
+    });
+    host.appendChild(el);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
+    setTimeout(()=>dismiss(el), 12000);
+  }
+  function deliver(a){
+    if(!a || !a.id || seen(a.id)) return;
+    mark(a.id);
+    if(document.hidden){
+      if(!systemNotify(a)){ /* مفيش إذن: هيشوف الشريط أول ما يرجع للموقع */ try{ localStorage.removeItem(seenKey(a.id)); }catch(e){} }
+    } else {
+      showBanner(a);
+    }
+  }
+  // لو المستخدم رجع للموقع وفيه رسالة لسه ماظهرتلوش (مفيش إذن إشعارات)
+  let current = DEFAULT_ANN;
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) setTimeout(()=>deliver(current), 800); });
+
+  function start(){
+    setTimeout(()=>deliver(current), 2500);
+    try{
+      if(typeof _fbDb !== 'undefined' && _fbDb){
+        _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey('site-announcement')).on('value', function(snap){
+          const v = snap && snap.exists() ? snap.val() : null;
+          if(v && v.id && v.body){
+            current = { id:String(v.id), icon:v.icon||'📢', title:v.title||'جلافيرا 3', body:String(v.body) };
+            deliver(current);
+          }
+        }, function(){});
+      }
+    }catch(e){}
+  }
+  if(document.readyState === 'complete') start(); else window.addEventListener('load', start);
 })();
 </script>
 </body>
