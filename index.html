@@ -27997,7 +27997,7 @@ function loginWaitAndRetry(retry){
   function opGo(){
     var o = CF.op, pid = state.pid, amt = +o.amt; close();
     showPinEntryModal({ title: o.kind === 'transfer' ? 'تأكيد التحويل' : (o.kind === 'deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب'),
-      text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية', summary: OPM[o.kind][0] + ' · ' + amt + ' نقطة',
+      text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
       onSubmit: async function(pin){
         if(!(await verifyVisaPin(pid, pin))) return false;
         if(o.kind === 'transfer') await executeVisaTransfer(pid, o.to, amt, escapeHtml(nm(o.to))); else await executeVisaMove(o.kind, pid, amt);
@@ -28086,87 +28086,5 @@ function loginWaitAndRetry(retry){
 })();
 </script>
 
-<!-- ===== نافذة الرقم السري الاحترافية ===== -->
-<style>
-.cp-ov{position:fixed;inset:0;z-index:9800;background:rgba(5,4,10,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;animation:cp-fade .25s both;font-family:'Tajawal','Cairo',sans-serif}
-.cp-ov.out{animation:cp-fade .2s reverse both}
-.cp-sheet{width:100%;max-width:440px;background:var(--surface);color:var(--text);border-top:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 22px calc(env(safe-area-inset-bottom,0px) + 14px);text-align:center;direction:rtl;animation:cp-up .38s cubic-bezier(.2,.85,.2,1) both}
-.cp-ov.out .cp-sheet{animation:cp-up .2s reverse both}
-.cp-grab{width:40px;height:4px;border-radius:9px;background:var(--border);margin:0 auto 14px}
-.cp-ico{width:54px;height:54px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:rgba(244,183,64,.14);font-size:24px}
-.cp-t{font:800 19px Cairo,sans-serif;margin:0 0 4px}
-.cp-x{font-size:12.5px;color:var(--text-muted);margin:0 auto 10px;max-width:290px;line-height:1.6}
-.cp-sum{display:inline-block;padding:5px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);font:700 12.5px Cairo,sans-serif;margin-bottom:12px}
-.cp-dots{display:flex;justify-content:center;gap:16px;margin:8px 0 6px;direction:ltr}
-.cp-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);transition:.18s}
-.cp-dots i.on{background:var(--gold-2);border-color:var(--gold-2);transform:scale(1.15)}
-.cp-dots.bad i{background:var(--danger);border-color:var(--danger);animation:cp-shake .4s}
-.cp-dots.ok i{background:var(--good);border-color:var(--good)}
-.cp-dots.load i{animation:cp-pulse .8s infinite}.cp-dots.load i:nth-child(2){animation-delay:.12s}.cp-dots.load i:nth-child(3){animation-delay:.24s}
-.cp-err{min-height:20px;font-size:12.5px;color:var(--danger);margin:4px 0 8px}
-.cp-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;direction:ltr;margin-bottom:8px}
-.cp-kp button{height:54px;border:0;border-radius:16px;background:var(--surface-2);color:var(--text);font:700 24px Cairo,sans-serif;cursor:pointer;transition:transform .1s,background .15s}
-.cp-kp button:active{transform:scale(.93);background:var(--border)}.cp-kp button:empty{background:none;pointer-events:none}
-.cp-kp.lock button{opacity:.35;pointer-events:none}
-.cp-cancel{background:none;border:0;color:var(--text-muted);font:700 13.5px Cairo,sans-serif;padding:10px 20px;cursor:pointer}
-@keyframes cp-fade{from{opacity:0}}@keyframes cp-up{from{transform:translateY(100%)}}
-@keyframes cp-shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-@keyframes cp-pulse{50%{transform:scale(.6);opacity:.5}}
-@media (prefers-reduced-motion:reduce){.cp-ov,.cp-sheet,.cp-dots i{animation:none!important;transition:none}}
-</style>
-<script>
-(function(){
-  var LK = 'cf_pin_lock', MAX = 3, LOCK_S = 30;
-  function vib(a){ try{ navigator.vibrate && navigator.vibrate(a); }catch(e){} }
-  function st(){ try{ return JSON.parse(localStorage.getItem(LK)||'{}'); }catch(e){ return {}; } }
-  function sv(o){ try{ localStorage.setItem(LK, JSON.stringify(o)); }catch(e){} }
-  window.showPinEntryModal = function(opts){
-    opts = opts || {};
-    document.querySelectorAll('.cp-ov,.pinmodal-overlay').forEach(function(o){ o.remove(); });
-    var ov = document.createElement('div'); ov.className = 'cp-ov'; ov.id = 'pinmodal-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
-    var keys = ['1','2','3','4','5','6','7','8','9','','0','del'].map(function(k){ return '<button type="button" data-k="'+k+'"'+(k?'':' tabindex="-1"')+' aria-label="'+(k==='del'?'مسح':k)+'">'+(k==='del'?'⌫':k)+'</button>'; }).join('');
-    ov.innerHTML = '<div class="cp-sheet"><div class="cp-grab"></div><div class="cp-ico">🔒</div><h3 class="cp-t">'+(opts.title||'أدخل الرقم السري')+'</h3>'
-      + '<p class="cp-x">'+(opts.text||'اكتب الرقم السري (CVV) المكوّن من 3 أرقام الموجود على ظهر بطاقتك')+'</p>'
-      + (opts.summary ? '<div class="cp-sum">'+opts.summary+'</div>' : '')
-      + '<div class="cp-dots"><i></i><i></i><i></i></div><div class="cp-err" aria-live="polite"></div><div class="cp-kp">'+keys+'</div>'
-      + '<button type="button" class="cp-cancel">إلغاء</button></div>';
-    document.body.appendChild(ov);
-    var dots = ov.querySelector('.cp-dots'), di = dots.querySelectorAll('i'), err = ov.querySelector('.cp-err'), kp = ov.querySelector('.cp-kp');
-    var pin = '', busy = false, closed = false, timer = null;
-    function paint(){ di.forEach(function(d,i){ d.classList.toggle('on', i < pin.length); }); }
-    function close(){ if(closed) return; closed = true; clearInterval(timer); document.removeEventListener('keydown', onKey); ov.classList.add('out'); setTimeout(function(){ ov.remove(); }, 200); }
-    function cancel(){ close(); if(opts.onCancel) opts.onCancel(); }
-    function tick(){
-      var left = Math.ceil(((st().until||0) - Date.now())/1000);
-      if(left <= 0){ clearInterval(timer); timer = null; kp.classList.remove('lock'); err.textContent = ''; var o = st(); o.fails = 0; sv(o); return; }
-      kp.classList.add('lock'); err.textContent = 'محاولات كتير غلط · حاول بعد '+left+' ثانية';
-    }
-    function startLock(){ if(timer) clearInterval(timer); tick(); timer = setInterval(tick, 500); }
-    async function submit(){
-      busy = true; dots.className = 'cp-dots load'; var ok = true;
-      try{ ok = opts.onSubmit ? await opts.onSubmit(pin) : true; }catch(e){ ok = false; }
-      busy = false;
-      if(ok === false){
-        var o = st(); o.fails = (o.fails||0) + 1; dots.className = 'cp-dots bad'; vib([25,15,25]); pin = '';
-        if(o.fails >= MAX){ o.until = Date.now() + LOCK_S*1000; sv(o); startLock(); }
-        else { sv(o); err.textContent = (opts.errorText || 'الرقم السري غير صحيح') + ' · باقي ' + (MAX - o.fails) + ' محاولات'; }
-        setTimeout(function(){ if(!closed){ dots.className = 'cp-dots'; paint(); } }, 450); return;
-      }
-      sv({}); dots.className = 'cp-dots ok'; vib(15); setTimeout(close, 260);
-    }
-    function press(k){
-      if(busy || closed || kp.classList.contains('lock')) return;
-      if(k === 'del') pin = pin.slice(0,-1); else if(pin.length < 3) pin += k; else return;
-      err.textContent = ''; paint(); if(pin.length === 3) submit();
-    }
-    function onKey(e){ if(/^\d$/.test(e.key)) press(e.key); else if(e.key === 'Backspace') press('del'); else if(e.key === 'Escape') cancel(); }
-    kp.addEventListener('click', function(e){ var b = e.target.closest('button[data-k]'); if(b && b.dataset.k){ press(b.dataset.k); vib(8); } });
-    ov.querySelector('.cp-cancel').addEventListener('click', cancel);
-    ov.addEventListener('click', function(e){ if(e.target === ov) cancel(); });
-    document.addEventListener('keydown', onKey);
-    if((st().until||0) > Date.now()) startLock();
-  };
-})();
-</script>
 </body>
 </html>
