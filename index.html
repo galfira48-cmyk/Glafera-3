@@ -27642,7 +27642,53 @@ function loginWaitAndRetry(retry){
 .cf-conf{position:fixed;left:50%;top:34%;width:8px;height:13px;border-radius:2px;pointer-events:none;z-index:9700;animation:cf-conf 1.15s cubic-bezier(.1,.7,.3,1) forwards}
 @keyframes cf-conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rt));opacity:0}}
 .cf-rc-foot{grid-template-columns:1fr 1fr 1fr}.cf-rc-foot .cf-cta{font-size:13px}
-@media (prefers-reduced-motion:reduce){.cf-slot.vip .cf-sheen{animation:none}.cf-card{transition:none}.cf-screen,.cf-drop,.cf-rows div,.cf-swap{animation-duration:.01s!important;animation-delay:0s!important}.cf-paper{animation:none}.cf-stamp{animation:none;opacity:.88}.cf-pos .cf-sw{animation:none;transform:translateY(34px)}.cf-slot{transition:none}}
+.cf-qa{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 10px}
+.cf-qa button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 4px 10px;border-radius:18px;border:1px solid var(--border);background:linear-gradient(180deg,var(--surface),var(--surface-2));color:var(--text);font:700 11.5px Cairo,sans-serif;cursor:pointer;transition:transform .15s}
+.cf-qa button:active{transform:scale(.94)}
+.cf-qa button.on{border-color:var(--gold)}
+.cf-qa i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(244,183,64,.14)}
+.cf-qa svg{width:19px;height:19px;stroke:var(--gold-2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cf-life{margin:0 0 12px;font-size:11.5px;color:var(--text-muted)}
+.cf-life div{display:flex;justify-content:space-between;margin-bottom:5px}
+.cf-life em{display:block;height:5px;border-radius:9px;background:var(--border);overflow:hidden}
+.cf-life em i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--gold),var(--gold-2))}
+.cf-life.low em i{background:linear-gradient(90deg,var(--danger),var(--coral))}
+.cf-rec{margin:0 0 12px;border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,var(--surface),var(--surface-2));padding:6px 14px}
+.cf-rec h4{margin:8px 0 2px;font:800 13.5px Cairo,sans-serif;display:flex;justify-content:space-between;align-items:center}
+.cf-rec h4 button{background:none;border:0;color:var(--gold-2);font:700 12px Cairo,sans-serif;cursor:pointer}
+.cf-rec>button.cf-tx{display:flex;width:100%;align-items:center;gap:10px;padding:10px 0;background:none;border:0;border-bottom:1px solid var(--border);color:var(--text);text-align:right;cursor:pointer}
+.cf-rec>button.cf-tx:last-child{border:0}
+.cf-tx i{font-style:normal;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.06);font-size:16px;flex:none}
+.cf-tx span{flex:1;font:700 12.5px Cairo,sans-serif}.cf-tx small{display:block;font:500 11px Tajawal,sans-serif;color:var(--text-muted)}
+.cf-tx b{font:800 13.5px Cairo,sans-serif;direction:ltr}.cf-tx b.p{color:var(--good)}.cf-tx b.n{color:var(--text)}
+.cf-bal{text-align:center;margin:2px 0 10px}.cf-bal small{display:block;color:var(--text-muted);font-size:12px}.cf-bal b{font:800 40px Cairo,sans-serif;color:var(--gold-2);direction:ltr}
+.cf-frz{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin:0 0 12px;padding:11px;border-radius:14px;border:1px dashed var(--border);background:transparent;color:var(--text-muted);font:700 12.5px Cairo,sans-serif;cursor:pointer}
+.cf-frz.on{border:1px solid #6fb7ff;color:#9fd0ff;background:rgba(111,183,255,.1)}
+.cf-qa.frozen button{opacity:.45}
+.cf-ins{margin:0 0 12px;border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,var(--surface),var(--surface-2));padding:12px 14px}
+.cf-ins h4{margin:0 0 10px;font:800 13.5px Cairo,sans-serif}
+.cf-io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cf-io div{padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.cf-io small{display:block;color:var(--text-muted);font-size:11px}.cf-io b{font:800 17px Cairo,sans-serif;direction:ltr;display:inline-block}.cf-io b.p{color:var(--good)}
+.cf-bars{display:flex;align-items:flex-end;gap:7px;height:78px}
+.cf-bars div{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.cf-bars i{display:block;width:100%;min-height:3px;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--gold-2),var(--gold));transform-origin:bottom;animation:cf-grow .7s cubic-bezier(.2,.8,.2,1) both}
+.cf-bars small{font-size:10px;color:var(--text-muted)}
+@keyframes cf-grow{from{transform:scaleY(0)}}
+.cf-who{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;margin:0 -4px;flex:none;scrollbar-width:none}
+.cf-ct{flex:none;width:62px;background:none;border:0;color:var(--text-muted);cursor:pointer;font:600 11px Cairo,sans-serif;display:flex;flex-direction:column;align-items:center;gap:5px}
+.cf-ct i{font-style:normal;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);border:2px solid transparent;font:800 17px Cairo,sans-serif;color:var(--text)}
+.cf-ct.on{color:var(--text)}.cf-ct.on i{border-color:var(--gold);background:rgba(244,183,64,.16)}
+.cf-ct span{max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-amt{text-align:center;margin:6px 0 4px;flex:none}.cf-amt small{color:var(--text-muted);font-size:12px}
+.cf-amt b{display:block;font:800 54px/1.15 Cairo,sans-serif;direction:ltr;color:var(--text)}.cf-amt b em{font:600 15px Cairo,sans-serif;color:var(--text-muted);font-style:normal;margin-inline-start:6px}
+.cf-amt>span{display:block;min-height:20px;font-size:12.5px;color:var(--text-muted)}.cf-amt>span.bad{color:var(--danger)}.cf-amt>span.ok{color:var(--good)}
+.cf-chips{display:flex;gap:8px;justify-content:center;margin:6px 0 10px;flex:none}
+.cf-chips button{padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text);font:700 12.5px Cairo,sans-serif;cursor:pointer}
+.cf-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;direction:ltr;margin-bottom:12px;flex:none}
+.cf-kp button{height:50px;border:0;border-radius:14px;background:transparent;color:var(--text);font:700 22px Cairo,sans-serif;cursor:pointer}
+.cf-kp button:active{background:var(--surface-2)}
+@media (prefers-reduced-motion:reduce){.cf-bars i{animation:none}.cf-qa button{transition:none}.cf-slot.vip .cf-sheen{animation:none}.cf-card{transition:none}.cf-screen,.cf-drop,.cf-rows div,.cf-swap{animation-duration:.01s!important;animation-delay:0s!important}.cf-paper{animation:none}.cf-stamp{animation:none;opacity:.88}.cf-pos .cf-sw{animation:none;transform:translateY(34px)}.cf-slot{transition:none}}
 </style>
 <script>
 (function(){
@@ -27817,9 +27863,10 @@ function loginWaitAndRetry(retry){
   }
   /* ---------- 4) تم الطلب ---------- */
   function drawDone(){
-    var R = CF.res, op = !!CF.isOp, rows, head, sub, btns;
+    var R = CF.res, op = !!CF.isOp, rows, head, sub, btns, balBlock = '';
     if(op){
       rows = (R.rows||[]).concat([['رقم العملية', R.ref]]);
+      if(R.prev != null) balBlock = '<div class="cf-bal"><small>رصيد الفيزا</small><b id="cf-balnum">'+R.prev+'</b></div>';
       head = R.title; sub = R.text;
       btns = '<button type="button" class="cf-cta" data-cf="receipt"><span>عرض الإيصال</span></button><button type="button" class="cf-cta cf-ghost" data-cf="done"><span>تم</span></button>';
     } else {
@@ -27829,7 +27876,9 @@ function loginWaitAndRetry(retry){
     }
     rows = rows.map(function(x){ return '<div><span>'+escapeHtml(String(x[0]))+'</span><b dir="ltr">'+escapeHtml(String(x[1]))+'</b></div>'; }).join('');
     screen('<div class="cf-h"><i></i><span></span><i></i></div>' + pos(CF.sel.k, true, true)
-      + '<div class="cf-center"><h1>'+escapeHtml(head)+'</h1><p>'+escapeHtml(sub)+'</p></div><div class="cf-rows">'+rows+'</div><div class="cf-btns">'+btns+'</div>');
+      + '<div class="cf-center"><h1>'+escapeHtml(head)+'</h1><p>'+escapeHtml(sub)+'</p></div>'+balBlock+'<div class="cf-rows">'+rows+'</div><div class="cf-btns">'+btns+'</div>');
+    var bn = document.getElementById('cf-balnum');
+    if(bn){ var f = +R.prev, t = +R.bal, t0 = performance.now(); (function step(n){ var k = Math.min(1, (n-t0)/900); bn.textContent = Math.round(f + (t-f)*(1-Math.pow(1-k,3))); if(k < 1 && document.getElementById('cf-balnum')) requestAnimationFrame(step); })(t0); }
   }
   /* ---------- عمليات الفيزا (إيداع / سحب / تحويل / تجديد): نفس تجربة الدفع والإيصال ---------- */
   async function runOp(){
@@ -27843,8 +27892,41 @@ function loginWaitAndRetry(retry){
   function openOp(R){
     var pid = state.pid, k = 'aurora';
     try{ k = effectiveCardTheme(pid, (VISA_CARDS[pid]||{}).theme || defaultCardTheme(pid)); }catch(e){}
-    CF.res = R; CF.sel = {k:k, name:R.kind}; open('op');
+    TXP = false; CF.res = R; CF.sel = {k:k, name:R.kind}; open('op');
   }
+  var _rvp = window.renderVisaPage, TXP = false;
+  var ICO_Q = {
+    deposit:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>', withdraw:'<path d="M12 15V3M7 8l5-5 5 5M4 20h16"/>',
+    transfer:'<path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/>', history:'<path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/>' };
+  window.renderVisaPage = function(){
+    var h = _rvp(), pid = state.pid, mark = '<button type="button" class="vp-history-link"';
+    if(h.indexOf(mark) < 0) return h;
+    if(!TXP){ TXP = true; loadVisaTx().then(function(t){ VISA_TX = t; if(state.view === 'visa') render(); }).catch(function(){}); }
+    var tab = state.visaTab || 'deposit', exp = visaExpired(pid);
+    var qa = exp ? '' : '<div class="cf-qa">' + [['deposit','إيداع'],['withdraw','سحب'],['transfer','تحويل']].map(function(x){
+      return '<button type="button" class="'+(tab===x[0]?'on':'')+'" data-cf-sheet="'+x[0]+'"><i><svg viewBox="0 0 24 24">'+ICO_Q[x[0]]+'</svg></i>'+x[1]+'</button>'; }).join('')
+      + '<button type="button" data-action="open-visa-history"><i><svg viewBox="0 0 24 24">'+ICO_Q.history+'</svg></i>الكشف</button></div>';
+    var life = '', et = visaExpiresAt(pid);
+    if(!exp && et){ var tot = visaValidDays()*VISA_DAY_MS, left = Math.max(0, et - Date.now()), pc = Math.min(100, Math.round(left/tot*100)), d = Math.ceil(left/VISA_DAY_MS);
+      life = '<div class="cf-life'+(pc<25?' low':'')+'"><div><span>صلاحية الفيزا</span><span>باقي '+d+' يوم</span></div><em><i style="width:'+pc+'%"></i></em></div>'; }
+    var list = (VISA_TX[pid]||[]).slice(0,3), rec = '';
+    if(list.length){ rec = '<div class="cf-rec"><h4>آخر العمليات<button type="button" data-action="open-visa-history">عرض الكل</button></h4>' + list.map(function(tx){
+      var m = VISA_TX_META[tx.type] || {label:tx.type, ico:'•', sign:1};
+      return '<button type="button" class="cf-tx" data-cf-tx="'+escapeHtml(tx.id||'')+'"><i>'+m.ico+'</i><span>'+m.label+'<small>'+vtxDayLabel(tx.ts)+' · '+vtxTime(tx.ts)+'</small></span><b class="'+(m.sign>0?'p':'n')+'">'+(m.sign>0?'+':'−')+tx.amount+'</b></button>'; }).join('') + '</div>'; }
+    var frz = !!(VISA_CARDS[pid]||{}).frozen, all = VISA_TX[pid]||[], ins = '';
+    if(all.length){
+      var now = new Date(), inn = 0, out = 0, days = [];
+      all.forEach(function(t){ var d = new Date(t.ts), m = VISA_TX_META[t.type] || {sign:1}; if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){ if(m.sign>0) inn += t.amount; else out += t.amount; } });
+      for(var i=6;i>=0;i--){ var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i), a = d0.getTime(), b = a + 864e5, v = 0;
+        all.forEach(function(t){ if(t.ts>=a && t.ts<b) v += t.amount; }); days.push({v:v, l:d0.toLocaleDateString('ar-EG',{weekday:'narrow'})}); }
+      var mx = Math.max.apply(null, days.map(function(x){ return x.v; })) || 1;
+      ins = '<div class="cf-ins"><h4>ملخص الشهر</h4><div class="cf-io"><div><small>داخل</small><b class="p">+'+inn+'</b></div><div><small>خارج</small><b>−'+out+'</b></div></div><div class="cf-bars">'
+        + days.map(function(x,i){ return '<div><i style="height:'+Math.max(4,Math.round(x.v/mx*100))+'%;animation-delay:'+(i*.05)+'s"></i><small>'+x.l+'</small></div>'; }).join('') + '</div></div>';
+    }
+    var fz = exp ? '' : '<button type="button" class="cf-frz'+(frz?' on':'')+'" data-cf-freeze="1">'+(frz?'🧊 الفيزا مجمّدة · اضغط لفك التجميد':'🔒 تجميد الفيزا مؤقتًا')+'</button>';
+    if(frz) qa = qa.replace('class="cf-qa"','class="cf-qa frozen"');
+    return h.replace(mark, qa + fz + life + ins + rec + mark);
+  };
   var _vm = window.visaMsg;
   window.visaMsg = function(type, title, text, opts){
     if(CF.cap && type === 'success'){ CF.cap.msg = {title:title, text:text, rows:(opts && opts.rows)||[]}; return; }
@@ -27861,12 +27943,72 @@ function loginWaitAndRetry(retry){
       }
     };
   }
+  ['doVisaMove','doVisaTransfer'].forEach(function(n){ var o = window[n]; window[n] = function(){
+    if((VISA_CARDS[state.pid]||{}).frozen){ _vm('warn','الفيزا مجمّدة','فك التجميد الأول من صفحة الفيزا عشان تقدر تعمل عمليات.'); return; }
+    return o.apply(this, arguments); }; });
+  /* ---------- شاشة العملية الاحترافية: مبلغ ← مراجعة ← رقم سري ← دفع ← إيصال ---------- */
+  function nm(id){ return (VISA_CARDS[id]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === id; })||{}).name) || '—'; }
+  function avail(k){ return k === 'deposit' ? participantTotal(state.pid) : (WALLET[state.pid]||0); }
+  var OPM = {deposit:['إيداع في الفيزا','من نقاط الفقرات'], withdraw:['سحب من الفيزا','إلى نقاط الفقرات'], transfer:['تحويل نقاط','من رصيد الفيزا']};
+  function openSheet(kind){
+    var pid = state.pid;
+    if(visaExpired(pid)){ showExpiredDialog(); return; }
+    if((VISA_CARDS[pid]||{}).frozen){ _vm('warn','الفيزا مجمّدة','فك التجميد الأول من صفحة الفيزا عشان تقدر تعمل عمليات.'); return; }
+    close(); CF.isOp = false; CF.op = {kind:kind, amt:'', to:null};
+    var r = document.createElement('div'); r.id = 'cf-root'; r.setAttribute('role','dialog'); r.setAttribute('aria-modal','true'); document.body.appendChild(r);
+    drawAmt();
+  }
+  function drawAmt(){
+    var o = CF.op, pid = state.pid, m = OPM[o.kind], who = '';
+    CF.step = 'amt';
+    if(o.kind === 'transfer'){
+      var cs = PARTICIPANTS.filter(function(x){ return x.id !== pid && visaCreated(x.id) && !visaExpired(x.id); });
+      who = '<div class="cf-who">' + (cs.length ? cs.map(function(c){ var n = nm(c.id);
+        return '<button type="button" class="cf-ct'+(o.to === c.id ? ' on' : '')+'" data-cf-to="'+escapeHtml(c.id)+'"><i>'+escapeHtml(n.trim().charAt(0))+'</i><span>'+escapeHtml(n)+'</span></button>'; }).join('') : '<p class="cf-sub" style="margin:8px auto">مفيش فيزات متاحة للتحويل دلوقتي</p>') + '</div>';
+    }
+    var keys = ['1','2','3','4','5','6','7','8','9','00','0','del'].map(function(k){ return '<button type="button" data-cf-k="'+k+'" aria-label="'+k+'">'+(k === 'del' ? '⌫' : k)+'</button>'; }).join('');
+    screen(header(m[0]) + who + '<div class="cf-amt"><small>'+m[1]+' · المتاح '+avail(o.kind)+' نقطة</small><b id="cf-av">0<em>نقطة</em></b><span id="cf-hint"></span></div>'
+      + '<div class="cf-chips">'+[10,25,50,100].map(function(v){ return '<button type="button" data-cf-add="'+v+'">+'+v+'</button>'; }).join('')+'<button type="button" data-cf-add="max">الكل</button></div>'
+      + '<div class="cf-kp">'+keys+'</div><button type="button" class="cf-cta" id="cf-go" data-cf="op-next" disabled><span>متابعة</span></button>');
+    upd();
+  }
+  function check(){
+    var o = CF.op, amt = +o.amt||0, av = avail(o.kind), bal = WALLET[state.pid]||0, msg = '', ok = false;
+    if(o.kind === 'withdraw' && bal < visaMin()) msg = 'السحب بيتفتح لما رصيد الفيزا يوصل '+visaMin()+' نقطة';
+    else if(o.kind === 'transfer' && !o.to) msg = 'اختر المستلم الأول';
+    else if(amt <= 0) msg = '';
+    else if(amt > av) msg = 'المبلغ أكبر من المتاح';
+    else if(o.kind === 'withdraw' && amt < visaMin()) msg = 'أقل مبلغ للسحب '+visaMin()+' نقطة';
+    else { ok = true; var after = o.kind === 'deposit' ? bal + amt : bal - amt; msg = 'رصيد الفيزا بعد العملية: '+after+' نقطة'; }
+    return {ok:ok, msg:msg, amt:amt};
+  }
+  function upd(){
+    var c = check(), b = document.getElementById('cf-av'), h = document.getElementById('cf-hint'), g = document.getElementById('cf-go');
+    if(!b) return; b.firstChild.nodeValue = c.amt; h.textContent = c.msg; h.className = c.ok ? 'ok' : (c.msg && c.amt > 0 || CF.op.kind === 'withdraw' && c.msg ? 'bad' : ''); g.disabled = !c.ok;
+  }
+  function drawReview(){
+    var o = CF.op, c = check(); if(!c.ok) return; var bal = WALLET[state.pid]||0, m = OPM[o.kind], t = o.to;
+    var rows = [['العملية', m[0]], [o.kind === 'transfer' ? 'المستلم' : 'المصدر', o.kind === 'transfer' ? nm(t) + ' · •••• ' + visaNumber(t).replace(/\s/g,'').slice(-4) : m[1]], ['المبلغ', c.amt+' نقطة'], ['الرسوم', 'بدون رسوم'], ['الرصيد بعد العملية', (o.kind === 'deposit' ? bal + c.amt : bal - c.amt)+' نقطة']]
+      .map(function(x){ return '<div><span>'+x[0]+'</span><b>'+escapeHtml(String(x[1]))+'</b></div>'; }).join('');
+    screen(header('مراجعة العملية', 'op-back') + '<div class="cf-amt" style="margin-top:18px"><small>'+m[0]+'</small><b>'+c.amt+'<em>نقطة</em></b></div><div class="cf-rows">'+rows+'</div>'
+      + (o.kind === 'transfer' ? '<p class="cf-foot" style="margin:0 0 10px">راجع بيانات المستلم كويس، التحويل مش بيتسترجع.</p>' : '')
+      + '<button type="button" class="cf-cta" data-cf="op-go"><span>تأكيد بالرقم السري</span></button>');
+  }
+  function opGo(){
+    var o = CF.op, pid = state.pid, amt = +o.amt; close();
+    showPinEntryModal({ title: o.kind === 'transfer' ? 'تأكيد التحويل' : (o.kind === 'deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب'),
+      text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
+      onSubmit: async function(pin){
+        if(!(await verifyVisaPin(pid, pin))) return false;
+        if(o.kind === 'transfer') await executeVisaTransfer(pid, o.to, amt, escapeHtml(nm(o.to))); else await executeVisaMove(o.kind, pid, amt);
+        return true; } });
+  }
   wrapOp('executeVisaMove', function(kind, pid, amt){ var dep = kind === 'deposit';
-    return {kind:(VISA_TX_META[kind]||{}).label || kind, amount:amt, sign:dep?1:-1, bal:WALLET[pid]||0, note:dep?'من نقاط الفقرات':'إلى نقاط الفقرات', stamp:dep?'مُودَع':'مسحوب'}; });
+    return {kind:(VISA_TX_META[kind]||{}).label || kind, amount:amt, sign:dep?1:-1, bal:WALLET[pid]||0, prev:(WALLET[pid]||0) - (dep?amt:-amt), note:dep?'من نقاط الفقرات':'إلى نقاط الفقرات', stamp:dep?'مُودَع':'مسحوب'}; });
   wrapOp('executeVisaTransfer', function(from, to, amt){
-    return {kind:'تحويل صادر', amount:amt, sign:-1, bal:WALLET[from]||0, note:(VISA_CARDS[to]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === to; })||{}).name) || '', stamp:'مُحوَّل'}; });
+    return {kind:'تحويل صادر', amount:amt, sign:-1, bal:WALLET[from]||0, prev:(WALLET[from]||0) + amt, note:(VISA_CARDS[to]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === to; })||{}).name) || '', stamp:'مُحوَّل'}; });
   wrapOp('executeVisaRenew', function(pid, src, fee){
-    return {kind:'تجديد الفيزا', amount:fee, sign:-1, bal:src === 'wallet' ? (WALLET[pid]||0) : participantTotal(pid), note:src === 'wallet' ? 'من رصيد الفيزا' : 'من نقاط الفقرات', stamp:'مُجدَّد'}; });
+    return {kind:'تجديد الفيزا', amount:fee, sign:-1, bal:src === 'wallet' ? (WALLET[pid]||0) : participantTotal(pid), prev:src === 'wallet' ? (WALLET[pid]||0) + fee : null, note:src === 'wallet' ? 'من رصيد الفيزا' : 'من نقاط الفقرات', stamp:'مُجدَّد'}; });
   /* ---------- 5) الإيصال بيتطبع من الطابعة ---------- */
   function paper(R){
     var pid = state.pid, name = ((PARTICIPANTS||[]).find(function(x){ return x.id === pid; })||{}).name || '';
@@ -27890,12 +28032,25 @@ function loginWaitAndRetry(retry){
   /* ---------- الأحداث ---------- */
   document.addEventListener('click', function(e){
     var o = e.target.closest('[data-cf-open]'); if(o){ open(); return; }
+    var sh = e.target.closest('[data-cf-sheet]'); if(sh){ sfx('click'); openSheet(sh.dataset.cfSheet); return; }
+    var kt = e.target.closest('#cf-root [data-cf-k],#cf-root [data-cf-add],#cf-root [data-cf-to]');
+    if(kt && CF.op){ sfx('click'); var o2 = CF.op;
+      if(kt.dataset.cfTo){ o2.to = kt.dataset.cfTo; document.querySelectorAll('.cf-ct').forEach(function(c){ c.classList.toggle('on', c.dataset.cfTo === o2.to); }); }
+      else if(kt.dataset.cfAdd){ o2.amt = String(kt.dataset.cfAdd === 'max' ? avail(o2.kind) : (+o2.amt||0) + (+kt.dataset.cfAdd)); }
+      else { var kk = kt.dataset.cfK; if(kk === 'del') o2.amt = o2.amt.slice(0,-1); else if(o2.amt.length < 7) o2.amt = (o2.amt + kk).replace(/^0+/,''); }
+      upd(); return; }
+    var fz = e.target.closest('[data-cf-freeze]');
+    if(fz){ sfx('click'); (async function(){ var on = !(VISA_CARDS[state.pid]||{}).frozen; try{ await updateVisaCard(state.pid, {frozen:on}); await visaRefresh(); showToast(on ? '🧊 اتجمّدت الفيزا' : '✅ اتفكّ التجميد'); }catch(err){ showToast('تعذّر التنفيذ', true); } })(); return; }
+    var tx = e.target.closest('[data-cf-tx]'); if(tx){ vtxShowReceipt(tx.dataset.cfTx); return; }
     var b = e.target.closest('#cf-root [data-cf]'); if(!b) return; sfx('click');
     var a = b.dataset.cf;
     if(a === 'close' || a === 'done'){ close(); if(a === 'done' && typeof render === 'function') render(); }
     else if(a === 'pick'){ CF.sel = themes()[CF.i]; if(CF.sel && !CF.sel.owned) drawConfirm(); }
     else if(a === 'back-pick'){ drawPick(); }
     else if(a === 'buy'){ pay(); }
+    else if(a === 'op-next'){ drawReview(); }
+    else if(a === 'op-back'){ drawAmt(); }
+    else if(a === 'op-go'){ opGo(); }
     else if(a === 'use'){ useNow(); }
     else if(a === 'save'){ saveImg(); }
     else if(a === 'receipt'){ drawReceipt(); }
@@ -27905,6 +28060,7 @@ function loginWaitAndRetry(retry){
   document.addEventListener('keydown', function(e){
     if(!root()) return;
     if(e.key === 'Escape') close();
+    else if(CF.op && document.getElementById('cf-av')){ if(/^\d$/.test(e.key) && CF.op.amt.length < 7){ CF.op.amt = (CF.op.amt + e.key).replace(/^0+/,''); upd(); } else if(e.key === 'Backspace'){ CF.op.amt = CF.op.amt.slice(0,-1); upd(); } else if(e.key === 'Enter'){ var g = document.getElementById('cf-go'); if(g && !g.disabled) drawReview(); } }
     else if(CF.step === 'pick' && document.getElementById('cf-stage')){ if(e.key === 'ArrowLeft') go(CF.i + 1); if(e.key === 'ArrowRight') go(CF.i - 1); }
   });
   /* ---------- ربط بالموقع ---------- */
