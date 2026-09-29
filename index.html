@@ -2750,6 +2750,174 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ach-pop-k{ font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; color:var(--c); } .ach-pop-n{ font-family:'Cairo',sans-serif; font-weight:800; font-size:20px; }
   .ach-pop-d{ margin-top:4px; font-size:12.5px; color:rgba(252,249,243,.72); line-height:1.7; } .ach-pop-t{ margin-top:8px; font-size:11px; font-weight:800; color:var(--c); }
 
+
+  /* ---------- لوبي الغرف (تصميم جديد) ---------- */
+  .jr-hero{ display:flex; align-items:center; gap:14px; margin:2px 2px 16px; }
+  .jr-hero-ico{ flex:none; width:52px; height:52px; border-radius:17px; display:grid; place-items:center; color:#1a1633;
+    background:linear-gradient(145deg,#FFE29A,#F1B53F); box-shadow:0 10px 22px -8px rgba(241,181,63,.65),inset 0 1px 0 rgba(255,255,255,.6); }
+  .jr-hero-txt{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .jr-hero-txt b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:16.5px; color:#FCF9F3; }
+  .jr-hero-txt span{ font-size:12px; line-height:1.6; color:rgba(252,249,243,.62); }
+
+  .jr-code{ position:relative; margin-bottom:22px; padding:18px 16px 16px; border-radius:24px; color:#FCF9F3; overflow:hidden;
+    -webkit-backdrop-filter:blur(22px) saturate(150%); backdrop-filter:blur(22px) saturate(150%);
+    background:radial-gradient(120% 90% at 100% 0%,rgba(241,181,63,.14),transparent 55%),linear-gradient(150deg,rgba(24,30,88,.95),rgba(30,32,78,.94) 60%,rgba(50,38,52,.95));
+    border:1px solid rgba(233,219,192,.24); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 22px 40px -18px rgba(4,3,26,.85); }
+  .jr-code-k{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .jr-code-k span{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#F3EAD8; }
+  .jr-code-k em{ font-style:normal; font-size:10.5px; font-weight:800; padding:2px 10px; border-radius:20px; color:#E8C874; background:rgba(232,200,116,.1); border:1px solid rgba(232,200,116,.28); }
+  .jr-code-wrap{ position:relative; display:block; cursor:text; margin-bottom:14px; }
+  .jr-boxes{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; direction:ltr; }
+  .jr-box{ height:64px; display:grid; place-items:center; border-radius:16px; font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; color:#FCF9F3;
+    background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04)); border:1.5px solid rgba(233,219,192,.2); box-shadow:inset 0 2px 6px rgba(0,0,0,.25); transition:border-color .18s,box-shadow .18s,transform .18s,background .18s; }
+  .jr-box i{ width:10px; height:10px; border-radius:50%; background:rgba(252,249,243,.16); }
+  .jr-box.on{ border-color:rgba(232,200,116,.7); background:linear-gradient(180deg,rgba(232,200,116,.16),rgba(232,200,116,.05)); }
+  .jr-code-in:focus ~ .jr-boxes .jr-box.cur, .jr-code-wrap:focus-within .jr-box.cur{ border-color:#F1B53F; box-shadow:0 0 0 4px rgba(241,181,63,.18),inset 0 2px 6px rgba(0,0,0,.25); transform:translateY(-1px); }
+  .jr-code-in{ position:absolute; inset:0; width:100%; height:100%; opacity:0; border:0; background:transparent; color:transparent; font-size:16px; letter-spacing:40px; cursor:text; z-index:2; }
+  @keyframes jrPop{ 0%{ transform:scale(.88); } 100%{ transform:scale(1); } }
+
+  .jr-join{ width:100%; height:54px; display:flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:17px; cursor:pointer; touch-action:manipulation;
+    font-family:'Cairo',sans-serif; font-weight:900; font-size:16px; color:rgba(252,249,243,.5); background:rgba(255,255,255,.08); border:1px solid rgba(233,219,192,.16);
+    transition:background .25s,color .25s,box-shadow .25s,transform .12s; }
+  .jr-join.ready{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border-color:transparent; box-shadow:0 14px 26px -10px rgba(241,181,63,.7),inset 0 1px 0 rgba(255,255,255,.55); }
+  .jr-join:active{ transform:scale(.98); }
+
+  .jr-sec{ display:flex; align-items:center; justify-content:space-between; margin:0 4px 12px; }
+  .jr-sec-t{ display:flex; align-items:center; gap:8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#F3EAD8; }
+  .jr-sec-s{ font-size:10.5px; color:rgba(252,249,243,.45); }
+  .jr-live{ width:8px; height:8px; border-radius:50%; background:#5FE0A4; box-shadow:0 0 0 0 rgba(95,224,164,.6); animation:jrLive 1.8s infinite; }
+  @keyframes jrLive{ 0%{ box-shadow:0 0 0 0 rgba(95,224,164,.55);} 70%{ box-shadow:0 0 0 8px rgba(95,224,164,0);} 100%{ box-shadow:0 0 0 0 rgba(95,224,164,0);} }
+  .jr-count{ display:inline-grid; place-items:center; min-width:22px; height:22px; padding:0 7px; border-radius:11px; font-size:11.5px; font-weight:900; color:#1a1633; background:linear-gradient(145deg,#FFE29A,#F1B53F); }
+
+  .jr-list{ display:flex; flex-direction:column; gap:11px; padding-bottom:24px; }
+  .jr-room{ position:relative; width:100%; display:flex; align-items:center; gap:13px; padding:13px; border-radius:20px; text-align:right; cursor:pointer; color:#FCF9F3; font-family:inherit; touch-action:manipulation;
+    background:linear-gradient(140deg,rgba(255,255,255,.09),rgba(255,255,255,.025)); border:1px solid rgba(233,219,192,.16); box-shadow:0 12px 24px -16px rgba(0,0,0,.7);
+    animation:vdIn .4s ease backwards; transition:transform .15s,border-color .2s,background .2s; }
+  .jr-room:active{ transform:scale(.982); border-color:rgba(232,200,116,.5); }
+  .jr-ico{ flex:none; width:56px; height:56px; display:grid; place-items:center; border-radius:17px; font-size:28px;
+    background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.22),rgba(255,255,255,.05)); border:1px solid rgba(233,219,192,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.2); }
+  .jr-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .jr-name{ font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jr-host{ display:flex; align-items:center; gap:5px; font-size:11.5px; color:rgba(252,249,243,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jr-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:3px; }
+  .jr-tag{ padding:2px 9px; border-radius:20px; font-size:10px; font-weight:800; color:#CFE8DA; background:rgba(95,224,164,.09); border:1px solid rgba(95,224,164,.25); }
+  .jr-tag.lock{ color:#F3C7A6; background:rgba(243,199,166,.09); border-color:rgba(243,199,166,.32); }
+  .jr-tag.gold{ color:#F6DC93; background:rgba(232,200,116,.1); border-color:rgba(232,200,116,.32); }
+  .jr-side{ flex:none; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .jr-dots{ display:flex; gap:3px; direction:ltr; } .jr-dots b{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.14); } .jr-dots b.f{ background:#5FE0A4; box-shadow:0 0 6px rgba(95,224,164,.6); }
+  .jr-cnt{ font-size:10px; font-weight:800; color:rgba(252,249,243,.5); direction:ltr; }
+  .jr-go{ padding:8px 20px; border-radius:13px; font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); box-shadow:0 8px 16px -8px rgba(241,181,63,.75); }
+
+  .jr-empty{ text-align:center; padding:30px 16px 34px; border-radius:22px; border:1.5px dashed rgba(233,219,192,.2); background:rgba(255,255,255,.025); }
+  .jr-empty-art{ position:relative; width:76px; height:76px; margin:0 auto 14px; display:grid; place-items:center; color:#E8C874; }
+  .jr-empty-art span{ position:absolute; inset:0; border-radius:50%; border:1px solid rgba(232,200,116,.3); animation:jrRing 2.6s ease-out infinite; }
+  .jr-empty-art span + span{ animation-delay:1.3s; }
+  .jr-empty-art svg{ position:relative; padding:19px; box-sizing:content-box; width:30px; height:30px; margin:-19px; border-radius:50%; background:rgba(232,200,116,.1); }
+  @keyframes jrRing{ 0%{ transform:scale(.55); opacity:.9; } 100%{ transform:scale(1.25); opacity:0; } }
+  .jr-empty-t{ font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:#F3EAD8; }
+  .jr-empty-s{ margin-top:5px; font-size:12px; line-height:1.7; color:rgba(252,249,243,.5); }
+
+  .jr-skel{ pointer-events:none; } .jr-skel i,.jr-skel b,.jr-skel em{ display:block; border-radius:12px; background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.06) 75%); background-size:200% 100%; animation:jrSk 1.3s infinite; }
+  .jr-skel i{ width:56px; height:56px; border-radius:17px; } .jr-skel div{ flex:1; } .jr-skel b{ height:13px; width:55%; } .jr-skel em{ height:10px; width:35%; margin-top:9px; }
+  @keyframes jrSk{ to{ background-position:-200% 0; } }
+  @media (prefers-reduced-motion:reduce){ .jr-room,.jr-skel i,.jr-skel b,.jr-skel em,.jr-live,.jr-empty-art span,.jr-box.on{ animation:none; } }
+
+
+  /* ---------- حركات لوبي الغرف ---------- */
+  .jr-page{ --ease:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1); }
+  @keyframes jrUp{ from{ opacity:0; transform:translateY(22px) scale(.97); filter:blur(4px);} to{ opacity:1; transform:none; filter:none;} }
+  @keyframes jrRight{ from{ opacity:0; transform:translateX(26px);} to{ opacity:1; transform:none;} }
+  @keyframes jrBack{ from{ opacity:0; transform:translateX(-18px) scale(.8);} to{ opacity:1; transform:none;} }
+  .jr-enter .back-row .icon-btn{ animation:jrBack .55s var(--spring) both; }
+  .jr-enter .back-row .back-title{ animation:jrRight .6s var(--ease) .06s both; }
+  .jr-enter .jr-hero{ animation:jrUp .7s var(--ease) .12s both; }
+  .jr-enter .jr-code{ animation:jrUp .8s var(--ease) .24s both; }
+  .jr-enter .jr-sec{ animation:jrUp .7s var(--ease) .4s both; }
+  .jr-enter .jr-empty{ animation:jrUp .8s var(--ease) .5s both; }
+
+  /* هيرو: مفتاح يتنفّس + لمعة */
+  .jr-hero-ico{ position:relative; overflow:hidden; animation:jrFloat 4.2s ease-in-out infinite; }
+  .jr-hero-ico svg{ position:relative; animation:jrKey 5s ease-in-out infinite; transform-origin:30% 70%; }
+  .jr-hero-ico em{ position:absolute; top:-30%; left:-80%; width:50%; height:160%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent); transform:rotate(18deg); animation:jrShine 3.8s ease-in-out 1s infinite; }
+  @keyframes jrFloat{ 0%,100%{ transform:translateY(0); box-shadow:0 10px 22px -8px rgba(241,181,63,.6),inset 0 1px 0 rgba(255,255,255,.6);} 50%{ transform:translateY(-4px); box-shadow:0 18px 26px -10px rgba(241,181,63,.8),inset 0 1px 0 rgba(255,255,255,.6);} }
+  @keyframes jrKey{ 0%,60%,100%{ transform:rotate(0);} 68%{ transform:rotate(-16deg);} 76%{ transform:rotate(12deg);} 84%{ transform:rotate(-6deg);} 92%{ transform:rotate(0);} }
+  @keyframes jrShine{ 0%,55%{ left:-80%;} 100%{ left:170%;} }
+  .jr-hero-txt b{ background:linear-gradient(90deg,#FCF9F3 30%,#FFE29A 50%,#FCF9F3 70%); background-size:250% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:jrTxt 6s linear infinite; }
+  @keyframes jrTxt{ from{ background-position:100% 0;} to{ background-position:-150% 0;} }
+
+  /* كارت الكود: هالة متحركة + حد لامع */
+  .jr-glow{ position:absolute; width:220px; height:220px; top:-110px; right:-60px; border-radius:50%; pointer-events:none; background:radial-gradient(circle,rgba(241,181,63,.28),transparent 65%); animation:jrGlow 7s ease-in-out infinite alternate; }
+  @keyframes jrGlow{ 0%{ transform:translate(0,0) scale(1);} 100%{ transform:translate(-90px,70px) scale(1.35);} }
+  .jr-code > *:not(.jr-glow){ position:relative; }
+  .jr-code:focus-within{ border-color:rgba(241,181,63,.55); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 22px 44px -16px rgba(241,181,63,.28); transition:border-color .3s,box-shadow .4s; }
+
+  /* الخانات */
+  .jr-box{ transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .3s var(--spring),background .3s; }
+  .jr-enter .jr-box{ animation:jrBox .6s var(--spring) both; animation-delay:calc(.4s + var(--i)*80ms); }
+  @keyframes jrBox{ from{ opacity:0; transform:translateY(16px) rotateX(50deg) scale(.85);} to{ opacity:1; transform:none;} }
+  .jr-box.pop{ animation:jrDigit .38s var(--spring); }
+  @keyframes jrDigit{ 0%{ transform:scale(.7) translateY(6px); } 55%{ transform:scale(1.14); box-shadow:0 0 0 7px rgba(241,181,63,.22);} 100%{ transform:scale(1);} }
+  .jr-code-wrap:focus-within .jr-box.cur:not(.on) i{ width:2.5px; height:28px; border-radius:2px; background:#F1B53F; animation:jrCaret 1s steps(2,jump-none) infinite; }
+  @keyframes jrCaret{ 0%{ opacity:1;} 100%{ opacity:0;} }
+  .jr-code-wrap:focus-within .jr-box.cur{ animation:jrCur 1.8s ease-in-out infinite; }
+  @keyframes jrCur{ 0%,100%{ box-shadow:0 0 0 4px rgba(241,181,63,.14),inset 0 2px 6px rgba(0,0,0,.25);} 50%{ box-shadow:0 0 0 7px rgba(241,181,63,.06),inset 0 2px 6px rgba(0,0,0,.25);} }
+  .jr-code-wrap:focus-within .jr-box.cur.pop{ animation:jrDigit .38s var(--spring); }
+  .jr-boxes.full .jr-box{ animation:jrWave .7s var(--ease) both; animation-delay:calc(var(--i)*70ms); border-color:#F1B53F; }
+  @keyframes jrWave{ 0%{ transform:none;} 35%{ transform:translateY(-9px) scale(1.06); box-shadow:0 12px 20px -6px rgba(241,181,63,.55);} 100%{ transform:none; box-shadow:0 0 14px -2px rgba(241,181,63,.35), inset 0 2px 6px rgba(0,0,0,.2);} }
+  .jr-boxes.shake{ animation:jrShake .5s cubic-bezier(.36,.07,.19,.97); }
+  .jr-boxes.shake .jr-box{ border-color:#FF6B6B; }
+  @keyframes jrShake{ 10%,90%{ transform:translateX(-2px);} 20%,80%{ transform:translateX(4px);} 30%,50%,70%{ transform:translateX(-8px);} 40%,60%{ transform:translateX(8px);} }
+
+  /* زرار الانضمام */
+  .jr-join{ position:relative; overflow:hidden; isolation:isolate; }
+  .jr-join.ready{ animation:jrReady .6s var(--spring), jrBreath 2.4s ease-in-out .6s infinite; }
+  @keyframes jrReady{ 0%{ transform:scale(.94);} 60%{ transform:scale(1.03);} 100%{ transform:scale(1);} }
+  @keyframes jrBreath{ 0%,100%{ box-shadow:0 14px 26px -10px rgba(241,181,63,.65),inset 0 1px 0 rgba(255,255,255,.55);} 50%{ box-shadow:0 18px 34px -8px rgba(241,181,63,.95),inset 0 1px 0 rgba(255,255,255,.55);} }
+  .jr-join.ready::before{ content:""; position:absolute; top:0; bottom:0; width:40%; left:-60%; z-index:-1; background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent); transform:skewX(-20deg); animation:jrSweep 2.6s ease-in-out .8s infinite; }
+  @keyframes jrSweep{ 0%{ left:-60%;} 55%,100%{ left:130%;} }
+  .jr-join .jr-arr{ transition:transform .3s var(--spring); }
+  .jr-join.ready .jr-arr{ animation:jrNudge 1.4s ease-in-out infinite; }
+  @keyframes jrNudge{ 0%,100%{ transform:translateX(0);} 50%{ transform:translateX(-6px);} }
+  .jr-rip{ position:absolute; z-index:-1; border-radius:50%; background:rgba(255,255,255,.55); transform:scale(0); animation:jrRip .65s ease-out forwards; pointer-events:none; }
+  @keyframes jrRip{ to{ transform:scale(1); opacity:0;} }
+
+  /* شريط التحديث */
+  .jr-sec-s{ display:flex; align-items:center; gap:7px; }
+  .jr-sec-s i{ width:26px; height:3px; border-radius:2px; background:rgba(255,255,255,.12); position:relative; overflow:hidden; }
+  .jr-sec-s i::after{ content:""; position:absolute; inset:0; background:#5FE0A4; transform-origin:right; animation:jrTick 4s linear infinite; }
+  @keyframes jrTick{ from{ transform:scaleX(0);} to{ transform:scaleX(1);} }
+  .jr-count{ animation:jrCountIn .6s var(--spring) both; }
+  @keyframes jrCountIn{ from{ transform:scale(0) rotate(-40deg);} to{ transform:none;} }
+
+  /* كروت الغرف */
+  .jr-room{ animation:none; position:relative; overflow:hidden; will-change:transform; }
+  .jr-room.jr-new{ animation:jrRoomIn .7s var(--ease) both; animation-delay:calc(var(--k,0)*90ms + .5s); }
+  @keyframes jrRoomIn{ from{ opacity:0; transform:translateX(42px) scale(.94); } to{ opacity:1; transform:none; } }
+  .jr-room::after{ content:""; position:absolute; top:0; bottom:0; width:35%; left:-50%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent); transform:skewX(-20deg); pointer-events:none; }
+  .jr-room:not(.jr-skel)::after{ animation:jrSweep2 6s ease-in-out calc(var(--k,0)*.7s + 2s) infinite; }
+  @keyframes jrSweep2{ 0%{ left:-50%;} 22%,100%{ left:140%;} }
+  @media (hover:hover){ .jr-room:hover{ transform:translateY(-3px); border-color:rgba(232,200,116,.5); box-shadow:0 18px 30px -14px rgba(0,0,0,.8),0 0 0 1px rgba(232,200,116,.12); } }
+  .jr-ico{ animation:jrIco 3.6s ease-in-out infinite; animation-delay:calc(var(--k,0)*.4s); }
+  @keyframes jrIco{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-3px) rotate(-4deg);} }
+  .jr-dots b{ transition:background .3s; }
+  .jr-dots b.f{ animation:jrDot .5s var(--spring) both; animation-delay:calc(.9s + var(--d)*140ms); }
+  @keyframes jrDot{ from{ transform:scale(0);} to{ transform:scale(1);} }
+  .jr-dots b:not(.f){ animation:jrEmpty 2s ease-in-out infinite; animation-delay:calc(var(--d)*.2s); }
+  @keyframes jrEmpty{ 0%,100%{ background:rgba(255,255,255,.14);} 50%{ background:rgba(255,255,255,.3);} }
+  .jr-go{ position:relative; animation:jrGoPulse 2.6s ease-in-out infinite; animation-delay:calc(var(--k,0)*.3s); }
+  @keyframes jrGoPulse{ 0%,100%{ box-shadow:0 8px 16px -8px rgba(241,181,63,.75);} 50%{ box-shadow:0 10px 22px -6px rgba(241,181,63,1), 0 0 0 5px rgba(241,181,63,.14);} }
+  .jr-room:active .jr-go{ transform:scale(.92); }
+
+  /* الحالة الفاضية */
+  .jr-empty-art u{ position:absolute; text-decoration:none; font-size:15px; opacity:.85; animation:jrOrbit 7s linear infinite; }
+  .jr-empty-art u:nth-of-type(2){ animation-delay:-2.3s; } .jr-empty-art u:nth-of-type(3){ animation-delay:-4.6s; }
+  @keyframes jrOrbit{ from{ transform:rotate(0) translateX(46px) rotate(0);} to{ transform:rotate(360deg) translateX(46px) rotate(-360deg);} }
+  .jr-empty-art svg{ animation:jrFloat2 3.2s ease-in-out infinite; }
+  @keyframes jrFloat2{ 0%,100%{ transform:translateY(0) scale(1);} 50%{ transform:translateY(-5px) scale(1.06);} }
+  .jr-empty-s::after{ content:""; display:inline-block; width:14px; text-align:start; animation:jrDots 1.6s steps(4) infinite; }
+  @keyframes jrDots{ 0%{ content:""; } 25%{ content:"."; } 50%{ content:".."; } 75%{ content:"..."; } }
+  @media (prefers-reduced-motion:reduce){ .jr-page *,.jr-page *::before,.jr-page *::after{ animation:none !important; transition:none !important; } }
+
   /* ---------- لوبي الغرف ---------- */
   .rl-code{ margin-bottom:14px; padding:18px 16px 16px; border-radius:20px; text-align:center; color:#FCF9F3; -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
     background:linear-gradient(140deg,rgba(20,26,78,.94),rgba(31,33,76,.93) 55%,rgba(56,41,43,.95)); border:1px solid rgba(233,219,192,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 16px 30px -14px rgba(4,3,26,.75); }
@@ -9398,29 +9566,81 @@ function lobbyRooms(){
     return !r.guestId;
   }).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
 }
+let JR_LAST=0, JR_SEEN={}, JR_PREV=0;
+function jrBoxes(v,pop){
+  v = String(v||'');
+  let h=''; for(let i=0;i<4;i++){ const c=v[i]; h+=`<span style="--i:${i}" class="jr-box${c?' on':''}${i===Math.min(v.length,3)?' cur':''}${pop===i?' pop':''}">${c?c:'<i></i>'}</span>`; }
+  return h;
+}
+function jrSyncCode(v){
+  v = String(v||'');
+  const w=document.getElementById('jr-boxes');
+  if(w){ w.innerHTML=jrBoxes(v, v.length>JR_PREV ? v.length-1 : -1); w.classList.toggle('full', v.length===4); }
+  JR_PREV=v.length;
+  const btn=document.getElementById('jr-join-btn'); if(btn) btn.classList.toggle('ready', v.length===4);
+}
+if(!window.__jrFx){
+  window.__jrFx=1;
+  document.addEventListener('pointerdown',e=>{
+    const btn=e.target.closest && e.target.closest('#jr-join-btn'); if(!btn) return;
+    const r=btn.getBoundingClientRect(), z=parseFloat(document.documentElement.style.zoom)||1, d=Math.max(r.width,r.height)*1.6;
+    const sp=document.createElement('span'); sp.className='jr-rip';
+    sp.style.cssText=`width:${d/z}px;height:${d/z}px;left:${(e.clientX-r.left)/z-d/z/2}px;top:${(e.clientY-r.top)/z-d/z/2}px`;
+    btn.appendChild(sp); setTimeout(()=>sp.remove(),650);
+    const inp=document.getElementById('room-join-code');
+    if(inp && inp.value.length<4){
+      const w=document.getElementById('jr-boxes'); if(w){ w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake'); }
+      if(navigator.vibrate) try{navigator.vibrate(30)}catch(_){}
+    }
+  },true);
+}
 function renderRoomLobby(){
   const rooms = lobbyRooms();
-  const cards = !ROOM_LOBBY.ready ? [1,2,3].map(()=>`<div class="rl-room rl-skel"><i></i><div><b></b><em></em></div></div>`).join('')
-  : rooms.length ? rooms.map(r=>{
+  const cur = String(state.roomJoinInput||'');
+  const fresh = (Date.now()-JR_LAST) > 6000; JR_LAST = Date.now();
+  if(fresh) JR_SEEN = {};
+  JR_PREV = cur.length;
+  const cards = !ROOM_LOBBY.ready ? [1,2,3].map(()=>`<div class="jr-room jr-skel jr-new"><i></i><div><b></b><em></em></div></div>`).join('')
+  : rooms.length ? rooms.map((r,idx)=>{
       const g = GAMES_CATALOG.find(x=>x.id===r.game) || {icon:'🎮', title:'لعبة'};
       const n = r.players ? r.players.length : 1, max = r.players ? 4 : 2;
-      return `<button type="button" class="rl-room" data-action="lobby-join" data-code="${escapeHtml(r.code)}">
-        <span class="rl-ico">${g.icon}</span>
-        <span class="rl-info"><span class="rl-name">${escapeHtml(g.title)}</span><span class="rl-host">مع ${escapeHtml(r.hostName||'لاعب')} · ${n}/${max} لاعب</span>
-          <span class="rl-tags"><span class="rl-tag${r.pw?' lock':''}">${r.pw?'🔒 محمية':'🔓 مفتوحة'}</span><span class="rl-tag">${r.paid?'🪙 بكوين':'🆓 مجاني'}</span></span></span>
-        <span class="rl-go">انضم</span></button>`;
+      let dots=''; for(let i=0;i<max;i++) dots+=`<b style="--d:${i}" class="${i<n?'f':''}"></b>`;
+      const isNew = !JR_SEEN[r.code]; JR_SEEN[r.code]=1;
+      return `<button type="button" class="jr-room${isNew?' jr-new':''}" style="--k:${Math.min(idx,7)}" data-action="lobby-join" data-code="${escapeHtml(r.code)}">
+        <span class="jr-ico">${g.icon}</span>
+        <span class="jr-info">
+          <span class="jr-name">${escapeHtml(g.title)}</span>
+          <span class="jr-host"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>${escapeHtml(r.hostName||'لاعب')}</span>
+          <span class="jr-tags"><span class="jr-tag${r.pw?' lock':''}">${r.pw?'🔒 محمية':'🔓 مفتوحة'}</span><span class="jr-tag${r.paid?' gold':''}">${r.paid?'🪙 بكوين':'🆓 مجاني'}</span></span>
+        </span>
+        <span class="jr-side"><span class="jr-dots" title="${n}/${max}">${dots}</span><span class="jr-cnt">${n}/${max}</span><span class="jr-go">انضم</span></span></button>`;
     }).join('')
-  : `<div class="empty-note">مفيش غرف مفتوحة دلوقتي<br><small>لما صحابك يعملوا غرف هتظهر هنا لحظيًا</small></div>`;
+  : `<div class="jr-empty">
+      <div class="jr-empty-art"><span></span><span></span><u>🎲</u><u>🃏</u><u>🎯</u><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="3"/><path d="M8 12.5v0M7 10.5v4M6 12.5h2M15.5 11.5h.01M17.5 13.5h.01"/></svg></div>
+      <div class="jr-empty-t">مفيش غرف مفتوحة دلوقتي</div>
+      <div class="jr-empty-s">أول ما صحابك يعملوا غرف هتظهر هنا لحظيًا</div>
+    </div>`;
   return `
+    <div class="jr-page${fresh?' jr-enter':''}">
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">انضمام لغرفة</div></div>
-    <div class="rl-code">
-      <div class="rl-code-k">عندك كود غرفة؟</div>
-      <input type="text" inputmode="numeric" maxlength="4" autocomplete="off" class="rl-code-in" id="room-join-code" placeholder="0000" value="${state.roomJoinInput||''}">
-      <button type="button" class="btn btn-primary" style="width:100%;" data-action="join-room">انضم بالكود</button>
+    <div class="jr-hero">
+      <div class="jr-hero-ico"><em></em><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M16 7l3 3M14 9l2 2"/></svg></div>
+      <div class="jr-hero-txt"><b>ادخل اللعب مع صحابك</b><span>اكتب كود الغرفة أو اختار غرفة مفتوحة من القايمة</span></div>
     </div>
-    <div class="gx-label">غرف متاحة للانضمام${ROOM_LOBBY.ready&&rooms.length?` <span class="rl-count">${rooms.length}</span>`:''}</div>
-    <div class="rl-list">${cards}</div>
-    <div class="hint" style="text-align:center;margin:12px 0;">القايمة بتتحدّث تلقائيًا كل ثواني</div>`;
+    <div class="jr-code"><div class="jr-glow"></div>
+      <div class="jr-code-k"><span>عندك كود غرفة؟</span><em>٤ أرقام</em></div>
+      <label class="jr-code-wrap" for="room-join-code">
+        <span class="jr-boxes" id="jr-boxes" dir="ltr">${jrBoxes(cur)}</span>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" class="jr-code-in" id="room-join-code" placeholder="0000" aria-label="كود الغرفة" value="${escapeHtml(cur)}">
+      </label>
+      <button type="button" id="jr-join-btn" class="jr-join${cur.length===4?' ready':''}" data-action="join-room"><span>انضم بالكود</span><svg class="jr-arr" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    </div>
+    <div class="jr-sec">
+      <div class="jr-sec-t"><span class="jr-live"></span>غرف متاحة للانضمام${ROOM_LOBBY.ready&&rooms.length?` <span class="jr-count">${rooms.length}</span>`:''}</div>
+      <div class="jr-sec-s"><i></i>تحديث تلقائي</div>
+    </div>
+    <div class="jr-list">${cards}</div>
+    </div>`;
 }
 /* ============================= GAMES: HUB ============================= */
 const GAME_CATEGORIES = [
@@ -23332,6 +23552,7 @@ document.addEventListener('input', (e)=>{
     const v = ghNormalizeDigits(e.target.value);
     if(e.target.value!==v) e.target.value = v;
     state.roomJoinInput = v;
+    if(typeof jrSyncCode==='function') jrSyncCode(v);
     return;
   }
   if(e.target.classList && e.target.classList.contains('admin-search-input')){
