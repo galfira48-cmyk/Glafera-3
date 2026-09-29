@@ -2662,30 +2662,27 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .att-glass.is-open .att-glass-go{ background:linear-gradient(145deg,#BFF5DC,#5FE0A4); border-color:transparent; color:#0B2A1E; box-shadow:0 6px 16px rgba(95,224,164,.38); }
   .att-glass.is-closed .att-glass-go{ opacity:.6; }
 
-  /* ---------- صفحة "جاري التحديث" ---------- */
-  .maint-page{ position:relative; overflow:hidden; margin-top:10px; padding:34px 22px 26px; border-radius:28px; text-align:center; color:#fff;
-    background:linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04) 60%, rgba(255,255,255,.08)); border:1px solid rgba(255,255,255,.2);
-    backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%);
-    box-shadow:0 18px 40px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.3); animation:maintIn .6s cubic-bezier(.22,1,.36,1) backwards; }
-  .maint-glow{ position:absolute; top:-70px; left:50%; width:260px; height:260px; margin-left:-130px; border-radius:50%; pointer-events:none; z-index:0;
-    background:radial-gradient(circle, rgba(244,183,64,.32), transparent 68%); animation:maintGlow 4s ease-in-out infinite alternate; }
+  /* ---------- صفحة "جاري التحديث" (زجاجي راقي) ---------- */
+  .maint-page{ position:relative; overflow:hidden; isolation:isolate; margin-top:10px; padding:32px 22px 24px; border-radius:20px; text-align:center; color:#FCF9F3;
+    background:linear-gradient(140deg,rgba(20,26,78,.94) 0%,rgba(31,33,76,.93) 55%,rgba(56,41,43,.95) 100%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 18px 34px -14px rgba(4,3,26,.75); animation:maintIn .6s cubic-bezier(.22,1,.36,1) backwards; }
+  .maint-page::before{ content:""; position:absolute; inset:0; z-index:2; border-radius:inherit; padding:1px; pointer-events:none;
+    background:linear-gradient(160deg,rgba(235,222,200,.5),rgba(235,222,200,.08) 42%,rgba(235,222,200,.22));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
   .maint-page > *{ position:relative; z-index:1; }
-  .maint-ico{ position:relative; width:92px; height:92px; margin:0 auto 18px; border-radius:28px; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(145deg,#FFF3D2,#F4B740 60%,#FF7A59); box-shadow:0 14px 30px rgba(244,183,64,.4), inset 0 1px 0 rgba(255,255,255,.7); }
-  .maint-gear{ display:flex; animation:maintSpin 9s linear infinite; }
-  .maint-gear svg{ width:46px; height:46px; fill:none; stroke:#3A2A00; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
-  .maint-badge{ position:absolute; bottom:-8px; left:-8px; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px;
-    background:#16204A; border:2px solid rgba(255,255,255,.25); box-shadow:0 6px 14px rgba(0,0,0,.4); }
-  .maint-kicker{ display:inline-flex; align-items:center; gap:7px; padding:5px 13px; border-radius:20px; font-size:11px; font-weight:800; color:#FFDE94;
-    background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.34); }
-  .maint-kicker i{ width:7px; height:7px; border-radius:50%; background:#F4B740; animation:maintBlink 1.3s ease-in-out infinite; }
-  .maint-title{ margin-top:12px; font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; line-height:1.4;
-    background:linear-gradient(90deg,#FFF3D2,#FFDE94 60%,#F4B740); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
-  .maint-msg{ margin:10px auto 0; max-width:320px; font-size:13.5px; font-weight:600; line-height:1.9; color:rgba(255,255,255,.82); white-space:pre-line; }
-  .maint-bar{ height:6px; margin:22px auto 0; max-width:240px; border-radius:6px; overflow:hidden; background:rgba(255,255,255,.12); }
-  .maint-bar b{ display:block; width:38%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#F4B740,#5FE0A4); animation:maintBar 1.8s ease-in-out infinite; }
-  .maint-foot{ margin-top:12px; font-size:11px; font-weight:700; color:rgba(255,255,255,.55); }
-  .maint-back{ width:auto; margin:18px auto 0; padding:10px 32px; }
+  .maint-ico{ width:76px; height:76px; margin:0 auto 16px; border-radius:22px; display:grid; place-items:center; background:linear-gradient(150deg,rgba(255,255,255,.15),rgba(255,255,255,.04)); border:1px solid rgba(233,219,192,.28); box-shadow:0 10px 22px -8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2); }
+  .maint-gear{ display:flex; animation:maintSpin 12s linear infinite; }
+  .maint-gear svg{ width:38px; height:38px; fill:none; stroke:#E3D8C6; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .maint-kicker{ display:inline-flex; align-items:center; gap:7px; padding:5px 13px; border-radius:20px; font-family:'Cairo',sans-serif; font-size:11px; font-weight:800; color:#E3D8C6; background:rgba(255,255,255,.06); border:1px solid rgba(233,219,192,.24); }
+  .maint-kicker i{ width:6px; height:6px; border-radius:50%; background:#E3D8C6; animation:maintBlink 1.6s ease-in-out infinite; }
+  .maint-title{ margin-top:14px; font-family:'Cairo',sans-serif; font-weight:800; font-size:22px; line-height:1.4; color:#FCF9F3; }
+  .maint-sub{ margin-top:2px; font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px; color:#E3D8C6; }
+  .maint-msg{ margin:14px auto 0; max-width:330px; font-size:13.5px; font-weight:600; line-height:1.95; color:rgba(252,249,243,.82); white-space:pre-line; text-wrap:pretty; }
+  .maint-bar{ height:4px; margin:22px auto 0; max-width:220px; border-radius:4px; overflow:hidden; background:rgba(255,255,255,.1); }
+  .maint-bar b{ display:block; width:38%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#9C7658,#E3D8C6); animation:maintBar 1.8s ease-in-out infinite; }
+  .maint-foot{ max-width:300px; margin:12px auto 0; font-size:11.5px; font-weight:700; line-height:1.8; color:rgba(252,249,243,.55); }
+  .maint-page .maint-back{ width:auto; margin:18px auto 0; padding:10px 36px; border-radius:12px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:#E3D8C6; background:rgba(255,255,255,.05); border:1px solid rgba(233,219,192,.4); }
   .home-retreat.is-locked .hr-ico{ filter:grayscale(.85) opacity(.7); }
 
 
@@ -7440,7 +7437,7 @@ function showDeviceKickedOverlay(){
 }
 
 const GAMES_LOCK_REVIEWER_ID = '6666'; /* المشارك المسموح له بدخول Games وهي مقفولة عشان يراجع التعديل */
-const MAINT_DEFAULT_MSG = 'بنجهّز تحديثًا جديدًا للخانة دي عشان نقدّملك تجربة أفضل. هترجع تشتغل بعد وقت قصير — شكرًا على صبرك 💙';
+const MAINT_DEFAULT_MSG = 'نعمل حاليًا على تحديث هذه الخدمة لنقدّم لك تجربة أفضل وأكثر سلاسة. ستعود للعمل خلال وقت قصير، ونشكرك على تفهّمك وصبرك.';
 function featureLockedForMe(key){
   const f = key==='attendance' ? 'attendanceLocked' : key==='retreat' ? 'retreatLocked' : null;
   return !!(f && CONF_SETTINGS && CONF_SETTINGS[f] && state.pid!==GAMES_LOCK_REVIEWER_ID);
@@ -7453,17 +7450,16 @@ function renderMaintenancePage(title, icon){
       <div class="back-title">${title}</div>
     </div>
     <div class="maint-page">
-      <div class="maint-glow" aria-hidden="true"></div>
       <div class="maint-ico" aria-hidden="true">
         <span class="maint-gear"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg></span>
-        <span class="maint-badge">${icon}</span>
       </div>
-      <div class="maint-kicker"><i></i> تحديث جاري</div>
-      <div class="maint-title">${title} — جاري التحديث</div>
+      <div class="maint-kicker"><i></i> تحديث مجدول</div>
+      <div class="maint-title">${title}</div>
+      <div class="maint-sub">قيد التحديث حاليًا</div>
       <div class="maint-msg">${escapeHtml(maintMessage())}</div>
       <div class="maint-bar" aria-hidden="true"><b></b></div>
-      <div class="maint-foot">هتتفتح تلقائيًا أول ما نخلّص — مش محتاج تعمل حاجة</div>
-      <button type="button" class="btn btn-outline maint-back" data-action="back">رجوع</button>
+      <div class="maint-foot">ستُتاح الخدمة تلقائيًا فور اكتمال التحديث، ولا يلزمك أي إجراء.</div>
+      <button type="button" class="btn btn-outline maint-back" data-action="back">العودة</button>
     </div>`;
 }
 function go(view, extra={}){
