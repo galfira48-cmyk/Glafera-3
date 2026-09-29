@@ -847,18 +847,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .roster-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 
   /* ============================= TEAM MESSAGES ============================= */
-  .team-msg-list{ display:flex; flex-direction:column; gap:10px; }
-  .team-msg{ background:linear-gradient(160deg,var(--surface),var(--surface-2)); border:1px solid var(--border); border-radius:16px;
-    padding:12px 14px; animation:fadeInUp .35s ease; }
   .team-msg.mine{ border-color:rgba(244,183,64,.4); background:linear-gradient(160deg, rgba(244,183,64,.08), var(--surface-2)); }
-  .team-msg-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-  .team-msg-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--gold-2); }
-  .team-msg-time{ font-size:10px; color:var(--text-muted); }
-  .team-msg-text{ font-size:13px; line-height:1.6; color:var(--text); }
-  .team-msg-love{ margin-top:8px; display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; color:var(--text-muted);
-    background:var(--bg-2); border:1px solid var(--border); border-radius:999px; padding:4px 11px; transition:all .25s cubic-bezier(.34,1.56,.64,1); }
   .team-msg-love.on{ color:#fff; background:linear-gradient(95deg,var(--coral),#ff9a7d); border-color:transparent; animation:loveBeat .5s ease; }
-  .team-msg-love:active{ transform:scale(.88); }
   @keyframes loveBeat{ 0%{ transform:scale(1);} 30%{ transform:scale(1.3);} 55%{ transform:scale(.92);} 100%{ transform:scale(1);} }
   .member-card{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px;
     padding:18px 10px; aspect-ratio:1; justify-content:center; overflow:hidden; border-radius:22px;
@@ -938,9 +928,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .lb-rank{width:26px; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; color:var(--text-muted); flex:0 0 auto;}
   .lb-rank.top1{color:var(--gold);} .lb-rank.top2{color:#D8D8E8;} .lb-rank.top3{color:var(--coral);}
   .lb-row.top1 .avatar{box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--gold), 0 0 14px rgba(244,183,64,.5);}
-  .lb-crown{font-size:13px; margin-inline-end:2px; display:inline-block; animation:top3IcoWobble 1.8s ease-in-out infinite;}
   .lb-name{flex:1; font-size:13.5px; font-weight:600;}
-  .lb-sub{font-size:11px; color:var(--text-muted);}
   .lb-pts{font-family:'Cairo',sans-serif; font-weight:800; color:var(--gold); font-size:13px;}
   .tabs{display:flex; gap:8px; margin-bottom:14px; position:relative;}
   .tab{flex:1; text-align:center; padding:10px; border-radius:12px; font-size:13px; font-weight:700; background:var(--surface); border:1px solid var(--border); color:var(--text-muted);
@@ -1380,9 +1368,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .tp-actions button{ flex:1; padding:12px; border-radius:13px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; }
   .tp-cancel-btn{ background:var(--bg-2); color:var(--text-muted); border:1px solid var(--border); }
   .tp-done-btn{ background:linear-gradient(150deg,#9B8CFF,#7C6AE8); color:#fff; }
-  .rank-mini-row{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--border); font-size:12.5px;}
-  .rank-mini-row:last-child{border-bottom:none;}
-  .rank-mini-num{width:20px; text-align:center; color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:800;}
 
   /* ---------- scan modal ---------- */
   .modal-overlay{position:fixed; inset:0; background:rgba(6,5,20,.92); z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;}
@@ -1898,7 +1883,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .live-wall-item{flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:var(--surface); border:1px solid var(--border); font-size:11.5px; white-space:nowrap; animation:fadeInUp .35s ease;}
 
   /* ---------- rank gap ---------- */
-  .lb-gap{font-size:10.5px; color:var(--text-muted); margin-top:1px;}
 
   /* ---------- compare ---------- */
   .compare-pick-row{display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid var(--border);}
@@ -2714,6 +2698,88 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes vdIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion:reduce){ .vd-card,.vd-card::after{ animation:none; transition:none; } }
 
+  /* ---------- مركز الألعاب ---------- */
+  .gx-hero{ position:relative; overflow:hidden; isolation:isolate; margin-bottom:12px; padding:22px 18px 16px; border-radius:20px; text-align:center; color:#FCF9F3;
+    background:linear-gradient(140deg,rgba(20,26,78,.94) 0%,rgba(31,33,76,.93) 55%,rgba(56,41,43,.95) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 16px 30px -14px rgba(4,3,26,.75); animation:vdIn .5s ease backwards; }
+  .gx-hero::before{ content:""; position:absolute; inset:0; z-index:2; border-radius:inherit; padding:1px; pointer-events:none;
+    background:linear-gradient(160deg,rgba(235,222,200,.5),rgba(235,222,200,.08) 42%,rgba(235,222,200,.22));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+  .gx-hero > *{ position:relative; z-index:1; }
+  .gx-logo{ width:76px; height:76px; object-fit:contain; display:block; margin:0 auto 8px; border-radius:20px; }
+  .gx-kicker{ display:inline-block; padding:3px 12px; border-radius:20px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; color:#E3D8C6; background:rgba(255,255,255,.06); border:1px solid rgba(233,219,192,.24); }
+  .gx-title{ margin-top:8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:20px; color:#FCF9F3; }
+  .gx-sub{ margin:4px auto 0; max-width:290px; font-size:12.5px; line-height:1.8; color:rgba(252,249,243,.72); }
+  .gx-stats{ display:flex; gap:8px; margin-top:16px; }
+  .gx-stat{ flex:1; padding:9px 4px; border-radius:12px; font-family:inherit; color:#FCF9F3; cursor:default; background:rgba(255,255,255,.06); border:1px solid rgba(233,219,192,.16); }
+  button.gx-stat{ cursor:pointer; touch-action:manipulation; } button.gx-stat:active{ transform:scale(.97); }
+  .gx-stat b{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:18px; line-height:1.3; }
+  .gx-stat span{ display:block; margin-top:1px; font-size:10.5px; font-weight:700; color:#E3D8C6; }
+  .gx-stat.is-live{ border-color:rgba(255,120,120,.4); } .gx-stat.is-live b{ color:#FFB4B4; }
+  .gx-live{ width:100%; display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:11px 14px; border-radius:14px; cursor:pointer; text-align:right; font-family:inherit; font-size:12.5px; font-weight:800; color:#FCF9F3;
+    background:linear-gradient(120deg,rgba(120,40,52,.55),rgba(31,33,76,.7)); border:1px solid rgba(255,140,140,.3); }
+  .gx-live span{ flex:1; } .gx-live svg{ width:16px; height:16px; opacity:.7; }
+  .gx-live i{ width:8px; height:8px; border-radius:50%; background:#FF6B6B; box-shadow:0 0 0 0 rgba(255,107,107,.6); animation:gxPulse 1.6s ease-out infinite; }
+  .gx-label{ margin:4px 4px 10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#E3D8C6; display:flex; align-items:center; gap:10px; }
+  .gx-label::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(233,219,192,.3),transparent); }
+  @keyframes gxPulse{ 70%{ box-shadow:0 0 0 8px rgba(255,107,107,0); } 100%{ box-shadow:0 0 0 0 rgba(255,107,107,0); } }
+  @media (prefers-reduced-motion:reduce){ .gx-hero,.gx-live i{ animation:none; } }
+
+  /* ---------- الإنجازات والشارات ---------- */
+  .ach-hero{ padding-top:20px; }
+  .ach-ring{ position:relative; width:84px; height:84px; margin:0 auto 10px; }
+  .ach-ring svg{ width:100%; height:100%; transform:rotate(-90deg); } .ach-ring circle{ fill:none; stroke-width:5; }
+  .ach-ring .bg{ stroke:rgba(255,255,255,.1); } .ach-ring .fg{ stroke:#E3D8C6; stroke-linecap:round; transition:stroke-dashoffset .9s cubic-bezier(.22,1,.36,1); }
+  .ach-ring b{ position:absolute; inset:0; display:grid; place-items:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:26px; color:#FCF9F3; }
+  .gx-stat small{ font-size:11px; opacity:.6; font-weight:700; }
+  .ach-chips{ display:flex; gap:8px; margin:0 0 6px; }
+  .ach-chip{ flex:1; padding:8px 4px; border-radius:11px; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:#E3D8C6; background:rgba(255,255,255,.05); border:1px solid rgba(233,219,192,.18); touch-action:manipulation; }
+  .ach-chip.on{ color:#1a1633; background:#E3D8C6; border-color:transparent; }
+  .ach-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .ach-card{ position:relative; padding:14px 10px 12px; border-radius:16px; text-align:center; color:#FCF9F3; background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); border:1px solid rgba(233,219,192,.14); }
+  .ach-card.is-open{ border-color:color-mix(in srgb,var(--c) 45%,transparent); background:linear-gradient(160deg,color-mix(in srgb,var(--c2) 26%,transparent),rgba(255,255,255,.03)); box-shadow:0 10px 22px -14px rgba(0,0,0,.7); }
+  .ach-hex{ width:58px; height:64px; margin:0 auto 8px; display:grid; place-items:center; font-size:25px; clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); background:linear-gradient(150deg,var(--c),var(--c2)); }
+  .ach-hex span{ display:grid; place-items:center; width:calc(100% - 6px); height:calc(100% - 6px); clip-path:inherit; background:linear-gradient(160deg,color-mix(in srgb,var(--c2) 55%,#141a4e),#141a4e); }
+  .ach-card:not(.is-open) .ach-hex{ background:rgba(255,255,255,.14); } .ach-card:not(.is-open) .ach-hex span{ background:#1a1d4d; font-size:20px; opacity:.85; }
+  .ach-hex.big{ width:96px; height:106px; font-size:42px; margin:8px auto 12px; }
+  .ach-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; } .ach-desc{ margin-top:3px; font-size:10.8px; line-height:1.6; color:rgba(252,249,243,.62); min-height:34px; }
+  .ach-tier{ margin-top:8px; display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; font-weight:800; color:var(--c); border:1px solid color-mix(in srgb,var(--c) 45%,transparent); }
+  .ach-bar{ height:4px; margin:9px 6px 0; border-radius:4px; background:rgba(255,255,255,.1); overflow:hidden; } .ach-bar i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--c2),var(--c)); }
+  .ach-prog{ margin-top:4px; font-size:10.5px; font-weight:800; color:#E3D8C6; }
+  .ach-pop{ width:min(86vw,320px); padding:20px 20px 18px; border-radius:22px; text-align:center; color:#FCF9F3; background:linear-gradient(150deg,#1a2060,#2a2540 60%,#3a2a2c); border:1px solid color-mix(in srgb,var(--c) 50%,transparent); box-shadow:0 30px 60px -20px rgba(0,0,0,.8); animation:vdIn .45s cubic-bezier(.22,1,.36,1) backwards; }
+  .ach-pop-k{ font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; color:var(--c); } .ach-pop-n{ font-family:'Cairo',sans-serif; font-weight:800; font-size:20px; }
+  .ach-pop-d{ margin-top:4px; font-size:12.5px; color:rgba(252,249,243,.72); line-height:1.7; } .ach-pop-t{ margin-top:8px; font-size:11px; font-weight:800; color:var(--c); }
+
+  /* ---------- لوبي الغرف ---------- */
+  .rl-code{ margin-bottom:14px; padding:18px 16px 16px; border-radius:20px; text-align:center; color:#FCF9F3; -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+    background:linear-gradient(140deg,rgba(20,26,78,.94),rgba(31,33,76,.93) 55%,rgba(56,41,43,.95)); border:1px solid rgba(233,219,192,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 16px 30px -14px rgba(4,3,26,.75); }
+  .rl-code-k{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#E3D8C6; }
+  .rl-code-in{ width:100%; margin:12px 0; padding:12px; border-radius:14px; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:30px; letter-spacing:12px; color:#FCF9F3; background:rgba(255,255,255,.07); border:1px solid rgba(233,219,192,.28); outline:none; }
+  .rl-code-in:focus{ border-color:#E3D8C6; background:rgba(255,255,255,.1); } .rl-code-in::placeholder{ color:rgba(252,249,243,.25); }
+  .rl-count{ display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px; border-radius:10px; font-size:11px; color:#1a1633; background:#E3D8C6; }
+  .rl-list{ display:flex; flex-direction:column; gap:10px; }
+  .rl-room{ width:100%; display:flex; align-items:center; gap:12px; padding:12px; border-radius:16px; text-align:right; cursor:pointer; color:#FCF9F3; font-family:inherit; touch-action:manipulation;
+    background:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); border:1px solid rgba(233,219,192,.16); animation:vdIn .4s ease backwards; transition:transform .15s,border-color .2s; }
+  .rl-room:active{ transform:scale(.98); border-color:rgba(233,219,192,.45); }
+  .rl-ico{ flex:none; width:46px; height:46px; display:grid; place-items:center; border-radius:14px; font-size:23px; background:rgba(255,255,255,.08); border:1px solid rgba(233,219,192,.18); }
+  .rl-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; } .rl-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; } .rl-host{ font-size:11.5px; color:rgba(252,249,243,.6); }
+  .rl-tags{ display:flex; gap:6px; margin-top:4px; } .rl-tag{ padding:1px 9px; border-radius:20px; font-size:10px; font-weight:800; color:#E3D8C6; background:rgba(255,255,255,.06); border:1px solid rgba(233,219,192,.2); }
+  .rl-tag.lock{ color:#F3C7A6; border-color:rgba(243,199,166,.4); }
+  .rl-go{ flex:none; padding:8px 16px; border-radius:11px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:#1a1633; background:#E3D8C6; }
+  .rl-skel{ pointer-events:none; } .rl-skel i,.rl-skel b,.rl-skel em{ display:block; border-radius:10px; background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.06) 75%); background-size:200% 100%; animation:rlShim 1.3s linear infinite; }
+  .rl-skel i{ width:46px; height:46px; } .rl-skel div{ flex:1; } .rl-skel b{ height:12px; width:55%; } .rl-skel em{ height:9px; width:35%; margin-top:8px; }
+  @keyframes rlShim{ to{ background-position:-200% 0; } }
+  @media (prefers-reduced-motion:reduce){ .rl-room,.rl-skel i,.rl-skel b,.rl-skel em{ animation:none; } }
+
+  /* ---------- بحث ومفضلة الألعاب ---------- */
+  .gs-search{ position:relative; margin:0 0 14px; }
+  .gs-search svg{ position:absolute; top:50%; inset-inline-start:14px; width:18px; height:18px; margin-top:-9px; fill:none; stroke:#E3D8C6; stroke-width:2; stroke-linecap:round; opacity:.8; pointer-events:none; }
+  .gs-search input{ width:100%; padding:13px 44px; border-radius:14px; font-family:inherit; font-size:14px; font-weight:700; color:#FCF9F3; outline:none; -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    background:linear-gradient(140deg,rgba(255,255,255,.1),rgba(255,255,255,.03)); border:1px solid rgba(233,219,192,.24); }
+  .gs-search input:focus{ border-color:#E3D8C6; } .gs-search input::placeholder{ color:rgba(252,249,243,.4); }
+  .gh-fav{ position:absolute; top:10px; inset-inline-start:10px; z-index:2; width:24px; height:24px; display:grid; place-items:center; border-radius:50%; font-size:14px; line-height:1; color:rgba(255,255,255,.75); background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.2); cursor:pointer; transition:transform .15s,color .2s; }
+  .gh-fav:active{ transform:scale(.85); } .gh-fav.on{ color:#1a1633; background:#E3D8C6; border-color:transparent; }
+
   /* ---------- كارت كلمة اليوم (صورة الإنجيل) ---------- */
   .wd-card{ position:relative; overflow:hidden; isolation:isolate; margin:16px 0 8px; min-height:200px; border-radius:30px; direction:rtl; color:#FFF4DC;
     background:#2B1A10; border:1px solid rgba(255,225,170,.28);
@@ -2807,11 +2873,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes giftPop{ 0%{ transform:scale(1);} 40%{ transform:scale(1.35) rotate(-6deg);} 70%{ transform:scale(.92) rotate(4deg);} 100%{ transform:scale(1.1);} }
 
   /* ============================= DIGITAL PASS ============================= */
-  .pass-card{ position:relative; overflow:hidden; text-align:center; }
-  .pass-qr{ background:#fff; border-radius:16px; padding:12px; width:164px; height:164px; margin:0 auto;
-    display:flex; align-items:center; justify-content:center; box-shadow:0 12px 28px rgba(0,0,0,.35); }
-  .pass-code{ margin-top:14px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; letter-spacing:2px;
-    color:var(--gold-2); background:var(--bg-2); border:1px dashed var(--border); border-radius:10px; padding:8px; }
 
   /* ============================= INFO ROWS (STAY / TRANSPORT) ============================= */
   .info-row{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
@@ -2838,12 +2899,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ts-status{ font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:var(--gold-2); margin-top:4px; }
 
   /* ============================= CERTIFICATE ============================= */
-  .cert-preview{ text-align:center; background:linear-gradient(160deg,var(--surface),var(--surface-2));
-    border:1px solid var(--gold-2); position:relative; overflow:hidden; }
-  .cert-badge-ico{ font-size:36px; margin-bottom:6px; }
-  .cert-title{ font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:var(--gold-2); margin-bottom:10px; }
-  .cert-name{ font-size:19px; font-weight:800; border-bottom:2px solid var(--gold-2); display:inline-block; padding-bottom:6px; margin-bottom:10px; }
-  .cert-sub{ font-size:12px; color:var(--text-muted); line-height:1.6; }
 
   /* ---------- brand signature / social ---------- */
   .brand-signature{font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600; font-size:22px; letter-spacing:1.5px;
@@ -5353,7 +5408,7 @@ async function logVisaTx(entries){
     }catch(err){}
   }));
 }
-function vtxLogSafe(entries){ try{ logVisaTx(entries).catch(()=>{}); }catch(e){} }
+function vtxLogSafe(entries){ try{ logVisaTx(entries).then(()=>{ if((entries||[]).some(e=>e && e.pid===state.pid && e.type==='game_win')){ ACH.loading=false; achRefresh(true); } }).catch(()=>{}); }catch(e){} }
 const VISA_THEMES = {
   aurora:{name:'أورورا', base:'#2a1b5e', a:'#c04fd6', b:'#2ec5c0', c:'#ff7eb6'},
   gold:{name:'ذهبي', base:'#3b2a0a', a:'#f4b740', b:'#fff0b8', c:'#a86a12'},
@@ -6961,8 +7016,7 @@ function myExtra(pid){ return PROFILE_EXTRA[pid] || (PROFILE_EXTRA[pid] = {}); }
 /* ---------- i18n (Phase 1: navigation & core UI chrome) ---------- */
 const TRANSLATIONS = {
   ar: {
-    nav_badges:'الأوسمة', nav_team:'الفريق', nav_leaderboard:'الترتيب',
-    nav_quests:'التحديات', nav_quests_sub:'مهام يومية بمكافآت فورية',
+    nav_badges:'الأوسمة', nav_quests:'التحديات', nav_quests_sub:'مهام يومية بمكافآت فورية',
     nav_wall:'حائط جلافيرا 3', nav_wall_sub:'شارك رأيك عن المؤتمر',
     nav_opinion:'رأيك', nav_opinion_sub:'إيجابيات، سلبيات، واقتراحاتك',
     opinion_title:'رأيك', opinion_hint:'رأيك بيهمنا فعلاً — اكتب اللي حابب تقوله وهيوصل للمنظمين مباشرة',
@@ -6975,8 +7029,6 @@ const TRANSLATIONS = {
     nav_myphotos:'Photo', nav_myphotos_sub:'صورك الخاصة — بس إنت اللي تشوفها',
     myphotos_hint:'الصور دي خاصة بيك بس، ومش بتظهر لأي مشارك تاني ولا في معرض الصور العام', myphotos_empty:'لسه مفيش صور اتضافتلك',
     nav_chat:'شات المشاركين', nav_chat_sub:'كلم كل المشاركين — نص، صور، صوت، فيديو',
-    nav_pass:'بطاقتي الرقمية', nav_pass_sub:'كود QR الخاص بك للتحقق',
-    nav_certificate:'الشهادة', nav_certificate_sub:'حمّل شهادة مشاركتك',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
     nav_gallery:'معرض الصور', nav_gallery_sub:'أجمل لحظات المؤتمر',
     nav_games:'Games', nav_games_sub:'العب وأنت مستني الفقرة الجاية 🎮',
@@ -7002,12 +7054,12 @@ const TRANSLATIONS = {
     badges_title:'أوسمتك', badges_earned_of:'وسام محقق من', badges_earned_title:'الأوسمة المحققة',
     badges_locked_title:'أوسمة لسه هتيجي', badges_locked_sub:'اضغط لمعرفة الطريقة',
     badges_empty:'🚀 ابدأ رحلتك! سجّل حضورك في أول فقرة عشان تجمع أول أوسمتك',
-    team_pts:'نقطة', team_pts_total:'مجموع نقاط الفريق', team_rank_of:'ترتيب الفريق من',
-    team_members_title:'أعضاء الفريق', team_members_sub:'اضغط على عضو للمقارنة',
-    team_msg_title:'رسائل الفريق', team_msg_sub:'شارك زملاءك 💬', team_msg_placeholder:'اكتب رسالة لفريقك...',
-    team_msg_send:'إرسال للفريق 📤', team_activity_title:'آخر نشاط الفريق',
-    lb_title:'لوحة الترتيب', lb_solo:'الترتيب الفردي', lb_team:'ترتيب الفرق', lb_members:'أعضاء',
-    lb_gap_tpl:'ناقص {n} نقطة تتخطى اللي فوقك', lb_pts:'نقطة', lb_you:'(أنت)',
+    
+    
+    
+    
+    
+    lb_you:'(أنت)',
 
 
 
@@ -7018,8 +7070,7 @@ const TRANSLATIONS = {
 
 },
   en: {
-    nav_badges:'Badges', nav_team:'Team', nav_leaderboard:'Leaderboard',
-    nav_quests:'Quests', nav_quests_sub:'Daily tasks with instant rewards',
+    nav_badges:'Badges', nav_quests:'Quests', nav_quests_sub:'Daily tasks with instant rewards',
     nav_wall:'Glavera 3 Wall', nav_wall_sub:'Share your thoughts about the conference',
     nav_opinion:'Feedback', nav_opinion_sub:'Positives, negatives, and your suggestions',
     nav_chefs:'Chef Ratings', nav_chefs_sub:'Our chefs and their dishes, rated in stars ⭐',
@@ -7033,8 +7084,6 @@ const TRANSLATIONS = {
     nav_myphotos:'Photo', nav_myphotos_sub:'Your private photos — only you can see them',
     myphotos_hint:'These photos are private to you and won\u2019t be shown to any other participant or in the public gallery', myphotos_empty:'No photos added for you yet',
     nav_chat:'Group Chat', nav_chat_sub:'Chat with everyone — text, photos, voice, video',
-    nav_pass:'My Digital Pass', nav_pass_sub:'Your verification QR code',
-    nav_certificate:'Certificate', nav_certificate_sub:'Download your participation certificate',
     nav_settings:'Settings', nav_settings_sub:'Identity, sound, and export',
     nav_gallery:'Photo Gallery', nav_gallery_sub:'Best moments of the conference',
     gallery_title:'Conference Photo Gallery', gallery_sub:'Swipe or drag to browse the photos',
@@ -7057,12 +7106,12 @@ const TRANSLATIONS = {
     badges_title:'Your Badges', badges_earned_of:'earned out of', badges_earned_title:'Earned Badges',
     badges_locked_title:'Badges to Unlock', badges_locked_sub:'Tap to see how',
     badges_empty:'🚀 Start your journey! Check in to your first session to earn your first badge',
-    team_pts:'pts', team_pts_total:'Total team points', team_rank_of:'Team rank out of',
-    team_members_title:'Team Members', team_members_sub:'Tap a member to compare',
-    team_msg_title:'Team Messages', team_msg_sub:'Chat with your teammates 💬', team_msg_placeholder:'Write a message to your team...',
-    team_msg_send:'Send to team 📤', team_activity_title:'Recent Team Activity',
-    lb_title:'Leaderboard', lb_solo:'Individual Ranking', lb_team:'Team Ranking', lb_members:'members',
-    lb_gap_tpl:'{n} pts to pass the one above', lb_pts:'pts', lb_you:'(You)',
+    
+    
+    
+    
+    
+    lb_you:'(You)',
 
 
 
@@ -7462,7 +7511,7 @@ function renderMaintenancePage(title, icon){
       <button type="button" class="btn btn-outline maint-back" data-action="back">العودة</button>
     </div>`;
 }
-function go(view, extra={}){
+function go(view, extra={}){ if(['certificate','pass','leaderboard','team'].includes(view)) return; /* الخانات دي اتشالت من الموقع */
   if(view==='games' && CONF_SETTINGS.gamesLocked && state.pid!==GAMES_LOCK_REVIEWER_ID){
     showToast('خانة Games مقفولة مؤقتًا لحد ما نخلص تعديل، هترجع تفتح قريب 🔧', true);
     return;
@@ -7677,8 +7726,6 @@ function buildLiveWallHTML(){
 
 /* ============================= RENDER: PROFILE (HOME) ============================= */
 const NAV_DOCK_ITEMS = [
-  {page:'team',     icon:'👥', labelKey:'nav_team',     color:'#3FDCC9'},
-  {page:'leaderboard', icon:'🏆', labelKey:'nav_leaderboard', color:'#FF7A59'},
 ];
 const NAV_TILE_ITEMS = [
   {page:'gallery', icon:ICO.gallery, labelKey:'nav_gallery', subKey:'nav_gallery_sub', color:'transparent'},
@@ -7686,8 +7733,6 @@ const NAV_TILE_ITEMS = [
   {page:'chefs',   icon:'👨‍🍳', labelKey:'nav_chefs',   subKey:'nav_chefs_sub',   color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {page:'opinion', icon:'📝', labelKey:'nav_opinion', subKey:'nav_opinion_sub', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {page:'myphotos', icon:'📷', labelKey:'nav_myphotos', subKey:'nav_myphotos_sub', color:'linear-gradient(145deg,#FF9A8B,#FF6A88)'},
-  {page:'pass',    icon:'🪪', labelKey:'nav_pass',    subKey:'nav_pass_sub',    color:'linear-gradient(145deg,#FFDE94,#3FDCC9)'},
-  {page:'certificate',icon:'🎓', labelKey:'nav_certificate', subKey:'nav_certificate_sub', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'},
   {page:'settings',icon:'⚙️', labelKey:'nav_settings', subKey:'nav_settings_sub', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
 ];
 function renderNavDock(){
@@ -7866,8 +7911,6 @@ function renderMePage(){
     </div>
     <div class="me-stats">
       ${st('⭐',total,'مجموع النقاط')}
-      ${st('🏆','#'+rank,'ترتيبك من '+ranked.length)}
-      ${st('👥','#'+tRank,'ترتيب فريقك')}
       ${st('🔥',streak.current,'فقرات متتالية')}
     </div>
     <div class="me-tier">
@@ -7877,8 +7920,6 @@ function renderMePage(){
     <div class="me-links">
       ${link('🎯','quests','التحديات')}
       ${link('📿','timeline','رحلتك',attended+' / '+flat.length+' فقرة')}
-      ${link('👥','team','فريقي')}
-      ${link('📊','leaderboard','لوحة المتصدرين')}
       ${link('⚙️','settings','الإعدادات')}
     </div>
     <button type="button" class="btn btn-ghost me-logout" data-action="logout">${ICO.logout} تسجيل الخروج</button>
@@ -8113,74 +8154,6 @@ function renderQuestsPage(){
 }
 
 /* ============================= RENDER: TEAM PAGE ============================= */
-function renderTeamPage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
-  const teams = rankedTeams();
-  const myTeamRank = teams.findIndex(t=>t.id===team.id)+1;
-  const myTeamData = teams.find(t=>t.id===team.id);
-  const members = PARTICIPANTS.filter(m=>m.teamId===team.id).sort((a,b)=>participantTotal(b.id)-participantTotal(a.id));
-  const roster = members.map(m=>{
-    const mt = teamOf(m.teamId);
-    const isMe = m.id===p.id;
-    const cheerCount = CHEERS[m.id]||0;
-    return `<div class="card card-sm member-card ${isMe?'me':''}" ${isMe?'':`data-action="open-compare" data-member="${m.id}"`}>
-      <div class="avatar" style="width:46px;height:46px;font-size:15px;background:${mt.color}">${initials(m.name)}</div>
-      <div class="mname">${escapeHtml(m.name)}</div>
-      <div class="mpts">${participantTotal(m.id)} ${tr('team_pts')}</div>
-      ${isMe ? '' : `<button type="button" class="cheer-btn" data-action="cheer-member" data-member="${m.id}">👏 <span>${cheerCount}</span></button>`}
-    </div>`;
-  }).join('');
-
-  const recentCheckins = Object.entries(CHECKINS).map(([k,v])=>{
-    const [pid, sid] = k.split('__');
-    const mem = PARTICIPANTS.find(x=>x.id===pid);
-    if(!mem || mem.teamId!==team.id) return null;
-    const sess = findSessionById(sid);
-    return { name:mem.name, sessionName: sess?sess.session.name:'', ts:v.ts };
-  }).filter(Boolean).sort((a,b)=>b.ts-a.ts).slice(0,8);
-  const activityHtml = recentCheckins.length ? recentCheckins.map(e=>`
-    <div class="agenda-row">
-      <span class="agenda-time">${timeAgoAr(e.ts)}</span>
-      <div class="agenda-name">${escapeHtml(e.name)} سجّل حضوره في ${escapeHtml(e.sessionName)}</div>
-    </div>`).join('') : `<div class="empty-note">لسه محدش من فريقك سجل حضوره</div>`;
-
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">${team.name}</div>
-    </div>
-    <div class="kpi-grid" style="margin-bottom:16px;">
-      <div class="card card-sm kpi-card"><div class="kpi-num">${myTeamData.total}</div><div class="kpi-lab">${tr('team_pts_total')}</div></div>
-      <div class="card card-sm kpi-card"><div class="kpi-num">#${myTeamRank}</div><div class="kpi-lab">${tr('team_rank_of')} ${teams.length}</div></div>
-    </div>
-    <div class="section-title">${tr('team_members_title')} <span class="sub">${tr('team_members_sub')}</span></div>
-    <div class="roster-grid">${roster}</div>
-    <div class="section-title">${tr('team_msg_title')} <span class="sub">${tr('team_msg_sub')}</span></div>
-    <div class="card" style="margin-bottom:10px;">
-      <textarea id="team-msg-input" class="field" placeholder="${tr('team_msg_placeholder')}" style="min-height:56px;resize:vertical;font-family:inherit;"></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="send-team-message" data-team="${team.id}">${tr('team_msg_send')}</button>
-    </div>
-    <div class="team-msg-list">${renderTeamMessagesHTML(team.id, p.id)}</div>
-    <div class="section-title">${tr('team_activity_title')}</div>
-    <div class="card">${activityHtml}</div>
-  `;
-}
-function renderTeamMessagesHTML(teamId, myPid){
-  const msgs = (TEAM_MESSAGES[teamId]||[]).slice(-30).reverse();
-  if(!msgs.length) return `<div class="empty-note">لسه مفيش رسائل في فريقك، ابدأ المحادثة! 💬</div>`;
-  return msgs.map(m=>{
-    const loved = (m.loves||[]).includes(myPid);
-    const loveCount = (m.loves||[]).length;
-    const mine = m.pid===myPid;
-    return `<div class="team-msg ${mine?'mine':''}">
-      <div class="team-msg-head"><span class="team-msg-name">${escapeHtml(m.name)}</span><span class="team-msg-time">${timeAgoAr(m.ts)}</span></div>
-      <div class="team-msg-text">${escapeHtml(m.text)}</div>
-      <button type="button" class="team-msg-love ${loved?'on':''}" data-action="love-message" data-team="${teamId}" data-msg="${m.id}">❤️ <span>${loveCount}</span></button>
-    </div>`;
-  }).join('');
-}
-
 /* ============================= RENDER: DNA PAGE ============================= */
 function renderDnaPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -9304,6 +9277,151 @@ function showGameWinModal(pts, title){
   setTimeout(close, 4500);
 }
 
+/* ============================= GAMES: ACHIEVEMENTS (الإنجازات والشارات) ============================= */
+const ACH_TIERS = {b:{n:'برونزي',c:'#B48A63',c2:'#6E4E36',xp:10}, s:{n:'فضي',c:'#DDE1EA',c2:'#8A93A6',xp:25}, g:{n:'ذهبي',c:'#E9D6A3',c2:'#A78447',xp:50}, p:{n:'بلاتيني',c:'#C6EAF5',c2:'#5F9DB8',xp:100}};
+const ACH_GROUPS = [
+  {cat:'الانتصارات', m:'wins', d:n=>`حقق ${n} ${n===1?'فوز':'انتصارات'} في الألعاب`, items:[[1,'b','أول فوز','🥇'],[10,'s','محارب','⚔️'],[25,'g','بطل','🏆'],[60,'p','أسطورة','👑']]},
+  {cat:'النقاط', m:'earned', d:n=>`اكسب ${n} نقطة من جوائز الألعاب`, items:[[100,'b','جامع النقاط','💰'],[500,'s','صاحب ثروة','💎'],[1500,'g','ملك الغنائم','🪙'],[5000,'p','إمبراطور','🏛️']]},
+  {cat:'التنوع', m:'variety', d:n=>`افز في ${n} ألعاب مختلفة`, items:[[2,'b','مستكشف','🧭'],[4,'s','متعدد المواهب','🎯'],[6,'g','سيد الألعاب','🎮'],[8,'p','موسوعة','🌟']]},
+  {cat:'الالتزام', m:'days', d:n=>`العب في ${n} أيام مختلفة`, items:[[2,'b','عائد','🔁'],[4,'s','مواظب','📅'],[7,'g','مدمن ألعاب','🔥']]},
+  {cat:'تحديات خاصة', m:null, items:[['played',1,'b','بداية الرحلة','🚀','خض أول مباراة لك'],['comp',1,'s','الصامد','🛡️','كمّلت المباراة بعد انسحاب خصمك'],['dayWins',3,'s','ليلة الحظ','🌙','حقق 3 انتصارات في يوم واحد'],['bigwin',100,'g','الضربة الكبرى','💥','اكسب 100 نقطة أو أكثر في فوز واحد']]}
+];
+const ACH_LEVELS = [[0,'مبتدئ'],[30,'لاعب'],[90,'محترف'],[180,'خبير'],[300,'أسطورة']];
+const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['darts',/النشان/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
+function achDefs(){
+  const out=[];
+  ACH_GROUPS.forEach(g=>{
+    if(g.m){ g.items.forEach(it=>out.push({id:g.m+'_'+it[0],cat:g.cat,m:g.m,goal:it[0],tier:it[1],name:it[2],ico:it[3],desc:g.d(it[0])})); }
+    else { g.items.forEach(it=>out.push({id:it[0]+'_'+it[1],cat:g.cat,m:it[0],goal:it[1],tier:it[2],name:it[3],ico:it[4],desc:it[5]})); }
+  });
+  return out;
+}
+function achMetrics(tx){
+  const g = (tx||[]).filter(t=>['game_win','game_fee','game_penalty','game_comp'].includes(t.type));
+  const wins = g.filter(t=>t.type==='game_win');
+  const keys = new Set(); wins.forEach(t=>{ const n=String(t.note||''); const k=(ACH_KEYS.find(x=>x[1].test(n))||[])[0] || n.slice(0,12); if(k) keys.add(k); });
+  const days = new Set(g.map(t=>new Date(t.ts).toDateString()));
+  const perDay = {}; wins.forEach(t=>{ const d=new Date(t.ts).toDateString(); perDay[d]=(perDay[d]||0)+1; });
+  return { wins:wins.length, earned:wins.reduce((a,t)=>a+(t.amount||0),0), variety:keys.size, days:days.size, played:g.length,
+    comp:g.filter(t=>t.type==='game_comp').length, dayWins:Math.max(0,...Object.values(perDay)), bigwin:Math.max(0,...wins.map(t=>t.amount||0)) };
+}
+const ACH = {ready:false, loading:false, m:{}, unlocked:{}};
+function achLocalKey(){ return 'glv_ach_'+state.pid; }
+function achStored(){ try{ return JSON.parse(localStorage.getItem(achLocalKey())||'null'); }catch(e){ return null; } }
+async function achRefresh(popup){
+  if(!state.pid || ACH.loading) return; ACH.loading = true;
+  try{
+    const tx = (await loadVisaTx())[state.pid] || [];
+    ACH.m = achMetrics(tx);
+    const stored = achStored(); let saved = stored || {};
+    try{ const r = await window.storage.get('glavera-ach-'+state.pid, true); if(r && r.value){ const o = JSON.parse(r.value); Object.keys(o).forEach(k=>{ if(!saved[k]) saved[k]=o[k]; }); } }catch(e){}
+    const fresh = achDefs().filter(d=>(ACH.m[d.m]||0)>=d.goal && !saved[d.id]);
+    fresh.forEach(d=>{ saved[d.id]=Date.now(); });
+    ACH.unlocked = saved; ACH.ready = true;
+    if(fresh.length || !stored){
+      try{ localStorage.setItem(achLocalKey(), JSON.stringify(saved)); }catch(e){}
+      try{ await window.storage.set('glavera-ach-'+state.pid, JSON.stringify(saved), true); }catch(e){}
+    }
+    if(stored && popup && fresh.length) achPopQueue(fresh.slice(0,3));
+  }catch(e){}
+  ACH.loading = false; ACH.ready = true;
+  if(state.view==='game-achievements' || state.view==='games') render();
+}
+function achPopQueue(list){ list.forEach((d,i)=> setTimeout(()=>achPop(d), i*5200)); }
+function achPop(d){
+  const t = ACH_TIERS[d.tier], old = document.getElementById('ach-pop'); if(old) old.remove();
+  const o = document.createElement('div'); o.id='ach-pop'; o.className='modal-overlay';
+  o.innerHTML = `<div class="ach-pop" style="--c:${t.c};--c2:${t.c2}"><div class="ach-pop-k">إنجاز جديد</div><div class="ach-hex big"><span>${d.ico}</span></div><div class="ach-pop-n">${escapeHtml(d.name)}</div><div class="ach-pop-d">${escapeHtml(d.desc)}</div><div class="ach-pop-t">وسام ${t.n} · +${t.xp} XP</div><button type="button" class="btn btn-primary" id="ach-pop-x" style="width:100%;margin-top:10px;">تمام</button></div>`;
+  document.body.appendChild(o);
+  try{ launchConfetti(); SND.coinChime(); vibrate([20,30,40]); }catch(e){}
+  const close=()=>{ o.classList.add('leaving'); setTimeout(()=>{ if(o.parentNode) o.remove(); },250); };
+  o.querySelector('#ach-pop-x').addEventListener('click',close); o.addEventListener('click',e=>{ if(e.target===o) close(); }); setTimeout(close,4800);
+}
+function achLevel(xp){ let i=0; ACH_LEVELS.forEach((l,k)=>{ if(xp>=l[0]) i=k; }); const cur=ACH_LEVELS[i], nx=ACH_LEVELS[i+1]; return {i, name:cur[1], cur:cur[0], next:nx?nx[0]:null, pct:nx?Math.min(100,Math.round((xp-cur[0])/(nx[0]-cur[0])*100)):100}; }
+function achCount(){ const d=achDefs(); return {open:d.filter(x=>ACH.unlocked[x.id]).length, total:d.length}; }
+function renderGameAchievements(){
+  const defs = achDefs(), f = state.achFilter||'all';
+  const xp = defs.filter(d=>ACH.unlocked[d.id]).reduce((a,d)=>a+ACH_TIERS[d.tier].xp,0);
+  const lv = achLevel(xp), c = achCount(), m = ACH.m||{};
+  const R=34, C=2*Math.PI*R;
+  const chips = [['all','الكل'],['open','المفتوحة'],['locked','المقفولة']].map(x=>`<button type="button" class="ach-chip${f===x[0]?' on':''}" data-action="ach-filter" data-f="${x[0]}">${x[1]}</button>`).join('');
+  const groups = ACH_GROUPS.map(g=>{
+    const items = defs.filter(d=>d.cat===g.cat).filter(d=> f==='all' || (f==='open'?!!ACH.unlocked[d.id]:!ACH.unlocked[d.id]));
+    if(!items.length) return '';
+    const cards = items.map(d=>{
+      const t=ACH_TIERS[d.tier], ok=!!ACH.unlocked[d.id], v=Math.min(m[d.m]||0,d.goal), pct=Math.round(v/d.goal*100);
+      return `<div class="ach-card${ok?' is-open':''}" style="--c:${t.c};--c2:${t.c2}"><div class="ach-hex"><span>${ok?d.ico:'🔒'}</span></div><div class="ach-name">${escapeHtml(d.name)}</div><div class="ach-desc">${escapeHtml(d.desc)}</div>${ok?`<div class="ach-tier">وسام ${t.n}</div>`:`<div class="ach-bar"><i style="width:${pct}%"></i></div><div class="ach-prog">${v} / ${d.goal}</div>`}</div>`;
+    }).join('');
+    return `<div class="gx-label">${g.cat}</div><div class="ach-grid">${cards}</div>`;
+  }).join('') || `<div class="empty-note">مفيش أوسمة هنا لسه</div>`;
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">الإنجازات</div></div>
+    <div class="gx-hero ach-hero">
+      <div class="ach-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="bg"/><circle cx="40" cy="40" r="${R}" class="fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-lv.pct/100)).toFixed(1)}"/></svg><b>${lv.i+1}</b></div>
+      <div class="gx-kicker">المستوى ${lv.i+1}</div>
+      <div class="gx-title">${lv.name}</div>
+      <div class="gx-sub">${lv.next!==null?`${xp} / ${lv.next} XP للمستوى الجاي`:'وصلت لأعلى مستوى 👑'}</div>
+      <div class="gx-stats">
+        <div class="gx-stat"><b>${c.open}<small>/${c.total}</small></b><span>وسام مفتوح</span></div>
+        <div class="gx-stat"><b>${m.wins||0}</b><span>انتصار</span></div>
+        <div class="gx-stat"><b>${m.earned||0}</b><span>نقطة مكسوبة</span></div>
+      </div>
+    </div>
+    ${ACH.ready?'':`<div class="empty-note">جاري تحميل إنجازاتك…</div>`}
+    <div class="ach-chips">${chips}</div>
+    ${groups}
+    <div class="hint" style="text-align:center;margin:14px 0 4px;">الأوسمة بتتحسب من جوائز الألعاب في كشف حساب الفيزا</div>
+  `;
+}
+/* ============================= GAMES: ROOM LOBBY (انضمام بكود + الغرف المتاحة) ============================= */
+let ROOM_PW = '';
+const ROOM_LOBBY = {ready:false};
+function roomPwHash(t){ let h=5381; t=String(t).trim(); for(let i=0;i<t.length;i++){ h=((h<<5)+h+t.charCodeAt(i))>>>0; } return 'p'+h.toString(36); }
+function askRoomPw(room){
+  return new Promise(res=>{
+    const g = GAMES_CATALOG.find(x=>x.id===room.game) || {icon:'🎮', title:'غرفة'};
+    const o = document.createElement('div'); o.className='modal-overlay confirm-overlay'; o.id='room-pw-overlay';
+    o.innerHTML = `<div class="confirm-card"><div class="confirm-icon">🔒</div><div class="confirm-msg">غرفة محمية</div><div class="confirm-sub">${escapeHtml(g.title)} — ${escapeHtml(room.hostName||'')}<br>اكتب كلمة السر عشان تدخل</div><input type="text" id="room-pw-in" class="field" maxlength="12" autocomplete="off" placeholder="كلمة السر" style="margin:6px 0 14px;text-align:center;"><div class="confirm-actions"><button type="button" class="btn btn-primary" id="room-pw-ok" style="flex:1;">دخول</button><button type="button" class="btn btn-ghost" id="room-pw-no" style="flex:1;">إلغاء</button></div></div>`;
+    document.body.appendChild(o);
+    const done=v=>{ o.remove(); res(v); }, inp=o.querySelector('#room-pw-in'); setTimeout(()=>inp.focus(),120);
+    o.querySelector('#room-pw-ok').onclick=()=>done(inp.value); o.querySelector('#room-pw-no').onclick=()=>done(null);
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter') done(inp.value); });
+  });
+}
+async function lobbyRefresh(){ try{ GAME_ROOMS = await loadGameRooms(); }catch(e){} ROOM_LOBBY.ready = true; if(state.view==='room-lobby') render(); }
+setInterval(()=>{ if(state.view==='room-lobby' && document.activeElement && document.activeElement.id!=='room-join-code' && !document.querySelector('.modal-overlay')) lobbyRefresh(); }, 4000);
+function lobbyRooms(){
+  return Object.values(GAME_ROOMS||{}).filter(r=>{
+    if(!r || r.status!=='waiting' || r.hostId===state.pid || isGameDisabled(r.game)) return false;
+    if(Date.now()-(r.updatedAt||0) > ROOM_STALE_MS*2) return false;
+    if(r.players) return r.players.length<4 && !r.players.some(x=>x.id===state.pid);
+    return !r.guestId;
+  }).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+}
+function renderRoomLobby(){
+  const rooms = lobbyRooms();
+  const cards = !ROOM_LOBBY.ready ? [1,2,3].map(()=>`<div class="rl-room rl-skel"><i></i><div><b></b><em></em></div></div>`).join('')
+  : rooms.length ? rooms.map(r=>{
+      const g = GAMES_CATALOG.find(x=>x.id===r.game) || {icon:'🎮', title:'لعبة'};
+      const n = r.players ? r.players.length : 1, max = r.players ? 4 : 2;
+      return `<button type="button" class="rl-room" data-action="lobby-join" data-code="${escapeHtml(r.code)}">
+        <span class="rl-ico">${g.icon}</span>
+        <span class="rl-info"><span class="rl-name">${escapeHtml(g.title)}</span><span class="rl-host">مع ${escapeHtml(r.hostName||'لاعب')} · ${n}/${max} لاعب</span>
+          <span class="rl-tags"><span class="rl-tag${r.pw?' lock':''}">${r.pw?'🔒 محمية':'🔓 مفتوحة'}</span><span class="rl-tag">${r.paid?'🪙 بكوين':'🆓 مجاني'}</span></span></span>
+        <span class="rl-go">انضم</span></button>`;
+    }).join('')
+  : `<div class="empty-note">مفيش غرف مفتوحة دلوقتي<br><small>لما صحابك يعملوا غرف هتظهر هنا لحظيًا</small></div>`;
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">انضمام لغرفة</div></div>
+    <div class="rl-code">
+      <div class="rl-code-k">عندك كود غرفة؟</div>
+      <input type="text" inputmode="numeric" maxlength="4" autocomplete="off" class="rl-code-in" id="room-join-code" placeholder="0000" value="${state.roomJoinInput||''}">
+      <button type="button" class="btn btn-primary" style="width:100%;" data-action="join-room">انضم بالكود</button>
+    </div>
+    <div class="gx-label">غرف متاحة للانضمام${ROOM_LOBBY.ready&&rooms.length?` <span class="rl-count">${rooms.length}</span>`:''}</div>
+    <div class="rl-list">${cards}</div>
+    <div class="hint" style="text-align:center;margin:12px 0;">القايمة بتتحدّث تلقائيًا كل ثواني</div>`;
+}
 /* ============================= GAMES: HUB ============================= */
 const GAME_CATEGORIES = [
   {key:'board', label:'ألعاب الطاولة الكلاسيكية', icon:'🎲', color:'linear-gradient(145deg,#7C4A2A,#2b1608)'},
@@ -9391,11 +9509,14 @@ const GH_SOLO_SUB = {
 };
 function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
 const GH_INFO_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 5.5v8" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" fill="none"/><circle cx="12" cy="18.2" r="1.7" fill="currentColor"/></svg>';
+function favGames(){ try{ return JSON.parse(localStorage.getItem('glv_fav_games_'+state.pid)||'[]'); }catch(e){ return []; } }
+function toggleFavGame(id){ const a=favGames(), k=a.indexOf(id); if(k>-1) a.splice(k,1); else a.push(id); try{ localStorage.setItem('glv_fav_games_'+state.pid, JSON.stringify(a)); }catch(e){} return k<0; }
 function ghGameTile(g, sub, action, i){
   const info = sub ? `<span class="gh-info no-ripple" role="button" tabindex="0" aria-label="عن ${escapeHtml(g.title)}" data-action="game-info" data-game="${g.id}" data-info="${escapeHtml(sub)}">${GH_INFO_SVG}</span>` : '';
   return `
     <button type="button" class="gh-tile" style="--g:${g.color}; --i:${i}" data-action="${action}" data-game="${g.id}">
       ${info}
+      <span class="gh-fav no-ripple${favGames().includes(g.id)?' on':''}" role="button" tabindex="0" aria-label="مفضلة ${escapeHtml(g.title)}" data-action="fav-game" data-game="${g.id}">★</span>
       <span class="gh-ico${g.logo?' has-logo':''}">${gameIconHtml(g)}</span>
       <span class="gh-title">${g.title}</span>
     </button>`;
@@ -9436,52 +9557,6 @@ document.addEventListener('keydown', (e)=>{
   }
 }, true);
 /* ============================= GAMES: FRIENDS LEADERBOARD (ترتيب وتصنيف الأصدقاء) ============================= */
-function renderGamesFriendsLeaderboard(){
-  const list = rankedParticipants();
-  if(!list.length) return '';
-  const top3 = list.slice(0,3);
-  const rest = list.slice(3,8);
-  const podiumOrder = [1,0,2]; // نعرض التاني ثم الأول ثم التالت زي منصة التتويج
-  const podium = top3.length ? `
-    <div class="gh-lb-podium">
-      ${podiumOrder.filter(i=>top3[i]).map(i=>{
-        const p = top3[i]; const t = teamOf(p.teamId);
-        const medal = ['🥇','🥈','🥉'][i];
-        return `<div class="gh-lb-podium-item p${i+1}">
-          <div class="gh-lb-podium-bar"></div>
-          <div class="gh-lb-podium-medal">${medal}</div>
-          <div class="avatar" style="background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
-          <div class="gh-lb-podium-name">${escapeHtml(p.name)}${p.id===state.pid?' '+tr('lb_you'):''}</div>
-          <div class="gh-lb-podium-pts">${p.total} ${tr('lb_pts')}</div>
-        </div>`;
-      }).join('')}
-    </div>` : '';
-  const restRows = rest.map((p,idx)=>{
-    const i = idx+3, t = teamOf(p.teamId);
-    return `<div class="lb-row">
-      <div class="lb-rank">${i+1}</div>
-      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
-      <div class="lb-name">${escapeHtml(p.name)}${p.id===state.pid?' '+tr('lb_you'):''}</div>
-      <div class="lb-pts">${p.total} ${tr('lb_pts')}</div>
-    </div>`;
-  }).join('');
-  const myIdx = list.findIndex(p=>p.id===state.pid);
-  let meRow = '';
-  if(myIdx > 7){
-    const p = list[myIdx], t = teamOf(p.teamId);
-    meRow = `<div class="lb-row gh-lb-me">
-      <div class="lb-rank">${myIdx+1}</div>
-      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(p.name)}</div>
-      <div class="lb-name">${escapeHtml(p.name)} ${tr('lb_you')}</div>
-      <div class="lb-pts">${p.total} ${tr('lb_pts')}</div>
-    </div>`;
-  }
-  return `
-    <div class="section-title">🏆 ترتيب وتصنيف الأصدقاء<span class="sub" data-action="open-leaderboard" style="cursor:pointer;">عرض الكل ${ICO.chev}</span></div>
-    ${podium}
-    ${(restRows||meRow) ? `<div class="card">${restRows}${meRow}</div>` : ''}
-  `;
-}
 function isFriendModeLockedForMe(){ return !!(CONF_SETTINGS.friendModeLocked) && state.pid!==GAMES_LOCK_REVIEWER_ID; }
 function renderGamesHub(){
   const ft = state.friendTile || null;
@@ -9538,18 +9613,33 @@ function renderGamesHub(){
       <span class="gh-title">Shop</span>
       <span class="gh-sub">استيكرات، تصاميم كروت، وطلب كارد مخصص</span>
     </button>`;
+  if(!ACH.ready && !ACH.loading) achRefresh(false);
+  const achC = achCount();
+  const achTile = `
+    <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#3B3F8F,#6E4E36); --i:5" data-action="open-achievements">
+      <span class="gh-ico">🏅</span>
+      <span class="gh-title">إنجازاتي</span>
+      <span class="gh-sub">${ACH.ready?`${achC.open} من ${achC.total} وسام — تابع مستواك`:'أوسمة ومستويات وتحديات'}</span>
+    </button>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">Games</div>
     </div>
-    <div class="opinion-hero">
-      <img class="gh-hero-logo" src="${GAMES_LOGO}" alt="" draggable="false">
-      <div class="opinion-hero-title">استراحة تفاعلية</div>
-      <div class="opinion-hero-sub">العب وأنت مستني الفقرة الجاية</div>
+    <div class="gx-hero">
+      <img class="gx-logo" src="${GAMES_LOGO}" alt="" draggable="false">
+      <div class="gx-kicker">مركز الألعاب</div>
+      <div class="gx-title">استراحة تفاعلية</div>
+      <div class="gx-sub">العب مع أصحابك أو ضد الجهاز وأنت مستني الفقرة الجاية</div>
+      <div class="gx-stats">
+        <div class="gx-stat"><b>${enabledGamesCatalog().length}</b><span>لعبة متاحة</span></div>
+        <button type="button" class="gx-stat${liveCount?' is-live':''}" data-action="open-watch"><b>${liveCount}</b><span>غرفة لايف</span></button>
+        ${(hasVisa(state.pid) && visaCreated(state.pid)) ? `<button type="button" class="gx-stat" data-action="open-visa"><b>${WALLET[state.pid]||0}</b><span>رصيد الفيزا</span></button>` : ''}
+      </div>
     </div>
-    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${hasVisa(state.pid) ? visaTile : ''}</div>
-    ${renderGamesFriendsLeaderboard()}
+    ${liveCount ? `<button type="button" class="gx-live" data-action="open-watch"><i></i><span>${liveCount} ${liveCount===1?'مباراة':'مباريات'} مباشرة الآن — انضم للمشاهدة</span>${ICO.chev}</button>` : ''}
+    <div class="gx-label">اختر طريقة اللعب</div>
+    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${hasVisa(state.pid) ? visaTile : ''}${achTile}</div>
   `;
 }
 /* ============================= SHOP (المتجر) — استيكرات / كروت / مخصص ============================= */
@@ -9820,7 +9910,12 @@ function renderSoloGames(){
       <div class="gh-lobby-title">اختار نوع اللعبة 🎮</div>
       <div class="gh-lobby-sub">ألعاب سريعة تلعبها لوحدك</div>
     </div>
-    ${ghCatListHtml(enabledGamesCatalog(), 'open-solo-cat')}
+    <div class="gs-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="game-search" placeholder="دوّر على لعبة…" autocomplete="off"></div>
+    <div class="gh-grid" id="game-search-res" hidden></div>
+    <div id="game-cat-wrap">
+      ${(()=>{ const fv = enabledGamesCatalog().filter(g=>favGames().includes(g.id)); return fv.length ? `<div class="gx-label">⭐ مفضلتي</div><div class="gh-grid" style="margin-bottom:14px;">${fv.map((g,i)=>ghGameTile(g, GH_SOLO_SUB[g.id], 'open-game', i)).join('')}</div>` : ''; })()}
+      ${ghCatListHtml(enabledGamesCatalog(), 'open-solo-cat')}
+    </div>
   `;
 }
 function renderSoloGamesInCategory(){
@@ -9838,6 +9933,14 @@ function renderSoloGamesInCategory(){
     ${html}
   `;
 }
+document.addEventListener('input', e=>{
+  const t = e.target; if(!t || t.id!=='game-search') return;
+  const q = t.value.trim().toLowerCase(), res = document.getElementById('game-search-res'), wrap = document.getElementById('game-cat-wrap'); if(!res||!wrap) return;
+  if(!q){ res.hidden = true; wrap.hidden = false; return; }
+  const hit = enabledGamesCatalog().filter(g=>{ const c = GAME_CATEGORIES.find(x=>x.key===GAME_CATEGORY_OF[g.id]); return (g.title+' '+g.id+' '+(c?c.label:'')).toLowerCase().includes(q); });
+  res.innerHTML = hit.length ? hit.map((g,i)=>ghGameTile(g, GH_SOLO_SUB[g.id], 'open-game', i)).join('') : '<div class="empty-note" style="grid-column:1/-1;">مفيش لعبة بالاسم ده</div>';
+  res.hidden = false; wrap.hidden = true;
+});
 function setFriendTile(mode){
   state.friendTile = mode;
   const t = document.getElementById('gh-friend');
@@ -15298,6 +15401,7 @@ function showChallengeTypeModal(gameType){
       <div class="confirm-icon">⚔️</div>
       <div class="confirm-msg">اختار نوع التحدي</div>
       <div class="confirm-sub">تحدي بكوين هتدفع فيه ${fee} نقطة وهتاخد مكافآت، وتحدي مجاني تلعبه من غير أي نقط</div>
+      <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="🔒 كلمة سر للغرفة (اختياري)" style="margin:2px 0 14px;text-align:center;">
       <div class="confirm-actions" style="flex-direction:column;">
         <button type="button" class="btn btn-primary" id="challenge-coin-btn" style="width:100%;">🪙 تحدي بكوين</button>
         <button type="button" class="btn btn-ghost" id="challenge-free-btn" style="width:100%;">🆓 تحدي مجاني</button>
@@ -15306,10 +15410,12 @@ function showChallengeTypeModal(gameType){
   `;
   document.body.appendChild(overlay);
   document.getElementById('challenge-coin-btn').addEventListener('click', ()=>{
+    ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
     showRoomFeeModal('create', ()=>createGameRoom(gameType, true));
   });
   document.getElementById('challenge-free-btn').addEventListener('click', ()=>{
+    ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
     createGameRoom(gameType, false);
   });
@@ -15332,6 +15438,7 @@ async function createGameRoom(gameType, paid){
     guestId:null, guestName:null,
     updatedAt: Date.now()
   };
+  if(ROOM_PW){ room.pw = roomPwHash(ROOM_PW); } ROOM_PW = '';
   if(gameType==='xo'){
     Object.assign(room, {board:newXoBoard(), turn:'X', round:0, winner:null, line:null, scoreX:0, scoreO:0, scoreD:0,
       matchOver:false, entryFeeCharged:false, stakes:null, matchWinnerSymbol:null});
@@ -15388,6 +15495,7 @@ async function attemptJoinRoom(rawCode){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const alreadyIn = room.hostId===state.pid || room.guestId===state.pid || (room.players && room.players.some(x=>x.id===state.pid));
+  if(room.pw && !alreadyIn){ const pw = await askRoomPw(room); if(pw===null) return; if(roomPwHash(pw)!==room.pw){ showToast('كلمة السر غلط', true); return; } }
   if(alreadyIn || !room.paid){ joinGameRoom(code); return; }
   showRoomFeeModal('join', ()=>joinGameRoom(code));
 }
@@ -19128,31 +19236,6 @@ function renderOpinionPage(){
 }
 
 /* ============================= RENDER: DIGITAL PASS PAGE ============================= */
-function renderPassPage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
-  const total = participantTotal(p.id);
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">${tr('pass_title')}</div>
-    </div>
-    <div class="card pass-card">
-      <div class="shimmer-sweep"></div>
-      <div class="avatar" style="width:96px;height:96px;font-size:32px;margin:0 auto 10px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}box-shadow:0 10px 26px rgba(0,0,0,.3);">${p.photo?'':initials(p.name)}</div>
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;">${escapeHtml(p.name)}</div>
-      <div class="hint" style="margin:2px 0 16px;">${team.name} · ${total} ${tr('pass_points')}</div>
-      <div id="pass-qr" class="pass-qr"></div>
-      <div class="hint" style="margin-top:12px;">${tr('pass_hint')}</div>
-      <div class="pass-code">${p.id}</div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:14px;">
-      <button type="button" class="btn btn-outline" style="flex:1;" data-action="share-card">${tr('pass_share')}</button>
-      <button type="button" class="btn btn-primary" style="flex:1;" data-action="invite-friend">${ICO.invite} ${tr('pass_invite')}</button>
-    </div>
-  `;
-}
-
 /* ============================= RENDER: STAY / FOOD PAGE ============================= */
 function renderStayPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -19239,28 +19322,6 @@ function renderTransportPage(){
 }
 
 /* ============================= RENDER: CERTIFICATE PAGE ============================= */
-function renderCertificatePage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const total = participantTotal(p.id);
-  const ended = !!CONF_SETTINGS.ended;
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">الشهادة</div>
-    </div>
-    ${ended ? `
-      <div class="card cert-preview">
-        <div class="cert-badge-ico">🎓</div>
-        <div class="cert-title">شهادة جلافيرا 3</div>
-        <div class="cert-name">${escapeHtml(p.name)}</div>
-        <div class="cert-sub">شارك بفاعلية في مؤتمر جلافيرا 3 وحقق ${total} نقطة</div>
-      </div>
-      <button type="button" class="btn btn-primary" style="margin-top:16px;" data-action="download-cert">${ICO.download} تحميل الشهادة</button>
-      <div class="hint" style="margin-top:10px;">الشهادة مربوطة تلقائيًا باسمك وبكود QR للتحقق من صحتها</div>
-    ` : `<div class="empty-note">🎓 هتقدر تحمّل شهادتك بعد انتهاء المؤتمر رسميًا</div>`}
-  `;
-}
-
 /* ============================= RENDER: SESSION ============================= */
 function renderSession(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -19352,51 +19413,6 @@ function renderSession(){
 }
 
 /* ============================= RENDER: LEADERBOARD ============================= */
-function renderLeaderboard(){
-  const isTeam = state.lbTab==='team';
-  const tabs = `
-    <div class="tabs" id="lb-tabs">
-      <div class="tab-slide-pill" id="lb-tab-pill"></div>
-      <button class="tab ${!isTeam?'active':''}" data-action="lb-tab" data-tab="solo">${tr('lb_solo')}</button>
-      <button class="tab ${isTeam?'active':''}" data-action="lb-tab" data-tab="team">${tr('lb_team')}</button>
-    </div>`;
-
-  let rows;
-  if(isTeam){
-    const teamList = rankedTeams();
-    rows = teamList.map((t,i)=>{
-      const gap = i>0 ? teamList[i-1].total - t.total : 0;
-      return `
-      <div class="lb-row ${i===0?'top1':''}">
-        <div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
-        <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t.color}">${t.name[0]}</div>
-        <div class="lb-name">${i===0?'<span class="lb-crown">👑</span>':''}${t.name}<div class="lb-sub">${t.count} ${tr('lb_members')}</div>${i>0?`<div class="lb-gap">${trFmt('lb_gap_tpl',{n:gap})}</div>`:''}</div>
-        <div class="lb-pts">${t.total} ${tr('lb_pts')}</div>
-      </div>`;}).join('');
-  } else {
-    const list = rankedParticipants();
-    rows = list.map((p,i)=>{
-      const t = teamOf(p.teamId);
-      const gap = i>0 ? list[i-1].total - p.total : 0;
-      return `<div class="lb-row ${i===0?'top1':''}">
-        <div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
-        <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t.color}">${initials(p.name)}</div>
-        <div class="lb-name">${i===0?'<span class="lb-crown">👑</span>':''}${escapeHtml(p.name)}${p.id===state.pid?' '+tr('lb_you'):''}<div class="lb-sub">${t.name}</div>${i>0?`<div class="lb-gap">${trFmt('lb_gap_tpl',{n:gap})}</div>`:''}</div>
-        <div class="lb-pts">${p.total} ${tr('lb_pts')}</div>
-      </div>`;
-    }).join('');
-  }
-
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">${tr('lb_title')}</div>
-    </div>
-    ${tabs}
-    <div class="card">${rows}</div>
-  `;
-}
-
 /* ============================= RENDER: COMPARE ============================= */
 function renderCompare(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -19802,66 +19818,6 @@ function renderAdminSessionDetail(sessionId){
       </div>
     </div>` : ''}
   `;
-}
-
-function renderAdminRankingsTab(){
-  const solo = rankedParticipants();
-  const teams = rankedTeams();
-  const sub = adminSubGet('rankings','solo');
-  const totalPts = solo.reduce((a,p)=>a+p.total,0);
-  const kpis = adminKpis([
-    {num:solo[0]?escapeHtml(solo[0].name.split(' ')[0]):'—', lab:'المتصدر فرديًا'},
-    {num:teams[0]?escapeHtml(teams[0].name):'—', lab:'المتصدر جماعيًا'},
-    {num:totalPts, lab:'إجمالي النقاط'},
-    {num:solo.length?Math.round(totalPts/solo.length):0, lab:'متوسط الفرد'},
-  ]);
-  const tabs = adminSubTabs('rankings', [
-    {id:'solo', label:'🏅 الأفراد'},
-    {id:'teams', label:'👥 الفرق'},
-    {id:'charts', label:'📈 رسوم'},
-  ], sub);
-  const exportBtn = `<button class="btn btn-outline" data-action="export-results" style="margin-bottom:var(--a-pad);width:100%;">${ICO.download} تصدير النتائج (CSV)</button>`;
-  let body = '';
-  if(sub==='solo'){
-    const podCol = (p,i,cls)=> p ? `<div class="ap-col ${cls}"><div class="avatar" style="background:${teamOf(p.teamId).color};width:44px;height:44px;font-size:14px;">${initials(p.name)}</div><div class="ap-name">${escapeHtml(p.name)}</div><div class="ap-pts">${p.total}</div><div class="ap-bar">${i+1}</div></div>` : `<div class="ap-col"></div>`;
-    const podium = solo.length>=3 ? `<div class="admin-podium">${podCol(solo[1],1,'ap-2')}${podCol(solo[0],0,'ap-1')}${podCol(solo[2],2,'ap-3')}</div>` : '';
-    const LIMIT = 15;
-    const all = !!state.adminRankAll;
-    const rows = solo.map((p,i)=>`<div class="admin-rank-row admin-rank-item" data-search="${escapeHtml((p.name+' '+p.id+' '+teamOf(p.teamId).name).toLowerCase())}" ${(!all && i>=LIMIT)?'style="display:none;"':''}>
-      <div class="arr-num">${i+1}</div>
-      <div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">${escapeHtml(teamOf(p.teamId).name)} · #${escapeHtml(p.id)}</div></div>
-      <div class="arr-pts">${p.total}</div>
-    </div>`).join('');
-    body = `${podium}
-      <input type="text" class="field admin-search-input" data-filter-target=".admin-rank-item" placeholder="🔍 دور على مشارك في الترتيب..." style="margin-bottom:10px;" />
-      <div class="card">${rows || adminEmptyState('🏅','لا يوجد مشاركون','')}</div>
-      ${solo.length>LIMIT ? `<button type="button" class="btn btn-ghost" style="width:100%;margin-top:10px;" data-action="admin-rank-all">${all?'عرض أقل ▲':`عرض كل المشاركين (${solo.length}) ▼`}</button>` : ''}`;
-  } else if(sub==='teams'){
-    const rows = teams.map((t,i)=>`<div class="admin-rank-row">
-      <div class="arr-num">${i+1}</div>
-      <div class="arr-body">${escapeHtml(t.name)}<div class="arr-sub">${t.count} أعضاء</div></div>
-      <div class="arr-pts">${t.total}</div>
-    </div>`).join('');
-    body = `<div class="card">${rows || adminEmptyState('👥','لا توجد فرق','')}</div>`;
-  } else {
-    const maxTeam = Math.max(1,...teams.map(t=>t.total));
-    const barRows = teams.map(t=>`<div class="admin-bar-row"><div class="abr-name">${escapeHtml(t.name)}</div><div class="abr-track"><div class="abr-fill" style="width:${(t.total/maxTeam)*100}%;background:${t.color};"></div></div><div class="abr-val">${t.total}</div></div>`).join('');
-    const hours = new Array(24).fill(0);
-    Object.values(CHECKINS).forEach(v=>{ hours[new Date(v.ts).getHours()]++; });
-    const maxHour = Math.max(1,...hours);
-    const peak = hours.indexOf(Math.max(...hours));
-    const heatBars = hours.map((c,h)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;">
-        <div style="width:100%;max-width:8px;height:${Math.max(2,(c/maxHour)*58)}px;background:${c>0?'var(--teal)':'var(--bg-2)'};border-radius:3px 3px 0 0;"></div>
-        ${h%4===0?`<div style="font-size:8px;color:var(--text-muted);">${h}</div>`:''}
-      </div>`).join('');
-    body = `
-      ${adminSectionTitle('📊','توزيع النقاط بين الفرق')}
-      <div class="card">${barRows}</div>
-      ${adminSectionTitle('⏱️','أوقات الذروة')}
-      <div class="hint" style="margin:0 2px 8px;">تسجيل الحضور حسب الساعة${Object.keys(CHECKINS).length?` — الذروة عند الساعة ${peak}:00`:''}</div>
-      <div class="card" style="display:flex;align-items:flex-end;gap:2px;height:96px;padding:14px 10px 6px;">${heatBars}</div>`;
-  }
-  return kpis + tabs + body + (sub==='solo' ? adminSectionTitle('📤','تصدير') + exportBtn : '');
 }
 
 function renderAdminPulseTab(){
@@ -20307,12 +20263,10 @@ const ADMIN_HUB_ITEMS = [
   {group:'live',   tab:'questions', short:"أسئلة للمتحدثين", desc:"أسئلة المشاركين للمتحدثين",   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
   {group:'live',   tab:'reports', short:"مشاكل من المشاركين", desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {group:'people', tab:'participants', short:"الأسماء والنقاط والأكواد", desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {group:'people', tab:'teams', short:"الفرق وأعضاؤها", desc:"إدارة الفرق وأعضائها",       icon:'👥', label:'الفرق',               color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {group:'people', tab:'logistics', short:"الغرف والمواصلات والكيت", desc:"الغرف والمواصلات واستلام الكيت",   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
   {group:'people', tab:'audit', short:"تسجيلات الحضور", desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
   {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
   {group:'points', tab:'pointcodes', short:"توليد ومتابعة الأكواد", desc:"توليد ومتابعة أكواد النقاط",  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
-  {group:'points', tab:'rankings', short:"ترتيب الأفراد والفرق", desc:"ترتيب الأفراد والفرق",    icon:'🏆', label:'الترتيب',             color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
   {group:'points', tab:'chefs', short:"تقييمات الوجبات", desc:"تقييمات الوجبات والشيفات",       icon:'👨‍🍳', label:'تقييم الشيف',         color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {group:'points', tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
   {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
@@ -20413,13 +20367,11 @@ function renderAdmin(){
   else if(tab==='gallery') body = renderAdminGalleryTab();
   else if(tab==='chefs') body = renderAdminChefsTab();
   else if(tab==='pointcodes') body = renderAdminPointCodesTab();
-  else if(tab==='rankings') body = renderAdminRankingsTab();
   else if(tab==='audit') body = renderAdminAuditTab();
   else if(tab==='pulse') body = renderAdminPulseTab();
   else if(tab==='analytics') body = renderAdminAnalyticsTab();
   else if(tab==='logistics') body = renderAdminLogisticsTab();
   else if(tab==='participants') body = renderAdminParticipantsTab();
-  else if(tab==='teams') body = renderAdminTeamsTab();
   else if(tab==='alerts') body = renderAdminAlertsTab();
   else if(tab==='questions') body = renderAdminQuestionsTab();
   else if(tab==='opinions') body = renderAdminOpinionsTab();
@@ -20825,111 +20777,6 @@ function renderParticipantPrivatePhotosBlock(pid){
 }
 
 /* ============================= ADMIN: TEAMS TAB ============================= */
-function renderAdminTeamsTab(){
-  const isEditing = !!state.editingTeamId;
-  if(isEditing){
-    const t = TEAMS.find(x=>x.id===state.editingTeamId);
-    if(!t){ state.editingTeamId = null; return renderAdminTeamsTab(); }
-    const members = PARTICIPANTS.filter(p=>p.teamId===t.id).slice().sort((a,b)=>participantTotal(b.id)-participantTotal(a.id));
-    const otherTeams = TEAMS.filter(x=>x.id!==t.id);
-    const rt = rankedTeams();
-    const total = (rt.find(x=>x.id===t.id)||{}).total || 0;
-    const rank = rt.findIndex(x=>x.id===t.id)+1;
-    const leader = members.find(m=>m.id===t.leaderId);
-    const sub = adminSubGet('team:'+t.id,'info');
-    const leaderOptions = `<option value="">— بدون قائد —</option>` + members.map(m=>`<option value="${m.id}" ${t.leaderId===m.id?'selected':''}>${escapeHtml(m.name)}</option>`).join('');
-    const membersHtml = members.map(m=>`<div class="admin-member-tile ${t.leaderId===m.id?'is-leader':''}" data-search="${escapeHtml((m.name+' '+m.id).toLowerCase())}">
-        ${t.leaderId===m.id?'<span class="amt-crown">👑</span>':''}
-        <div class="avatar" style="background:${t.color};">${initials(m.name)}</div>
-        <div class="amt-name">${escapeHtml(m.name)}</div>
-        <div class="amt-pts">${participantTotal(m.id)} نقطة</div>
-        <select class="amt-move" data-action="move-participant-team" data-pid="${m.id}">
-          <option value="">نقل لفريق آخر...</option>
-          ${otherTeams.map(ot=>`<option value="${ot.id}">${escapeHtml(ot.name)}</option>`).join('')}
-        </select>
-      </div>`).join('');
-    const hero = `
-      <div class="admin-hero">
-        <div class="avatar" style="width:52px;height:52px;${t.logo?`background-image:url('${t.logo}');background-size:cover;background-position:center;`:`background:${t.color};`}">${t.logo?'':'👥'}</div>
-        <div class="admin-hero-body">
-          <div class="admin-hero-name">${escapeHtml(t.name)}</div>
-          <div class="admin-hero-meta">
-            <span class="admin-meta-chip">🏆 المركز #${rank}</span>
-            ${leader?`<span class="admin-meta-chip">👑 ${escapeHtml(leader.name)}</span>`:''}
-          </div>
-        </div>
-      </div>
-      ${adminKpis([{num:members.length,lab:'عضو'},{num:total,lab:'نقطة'},{num:TEAM_BONUS[t.id]||0,lab:'بونص الفريق'}])}
-      ${adminSubTabs('team:'+t.id, [{id:'info',label:'⚙️ البيانات'},{id:'members',label:'👥 الأعضاء ('+members.length+')'},{id:'msg',label:'💬 رسالة'}], sub)}`;
-    let body = '';
-    if(sub==='info'){
-      body = `
-      <div class="card">
-        <label>اسم الفريق</label>
-        <input class="field" id="edit-tname-${t.id}" value="${escapeHtml(t.name)}" placeholder="اسم الفريق" />
-        <label style="margin-top:10px;">شعار الفريق</label>
-        <input type="file" accept="image/*" id="edit-tlogo-${t.id}" style="font-size:11px;" />
-        <label style="margin-top:10px;">قائد الفريق</label>
-        <select class="field" id="edit-tleader-${t.id}">${leaderOptions}</select>
-        <label style="margin-top:10px;">إضافة / خصم نقاط للفريق ككل (الرصيد الحالي: ${TEAM_BONUS[t.id]||0})</label>
-        <div class="point-stepper">
-          <button type="button" class="ps-btn ps-minus" data-action="apply-team-bonus" data-tid="${t.id}" data-sign="-1">−</button>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" class="ps-input" id="edit-tbonus-${t.id}" placeholder="0" />
-          <button type="button" class="ps-btn ps-plus" data-action="apply-team-bonus" data-tid="${t.id}" data-sign="1">+</button>
-        </div>
-        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="save-team" data-tid="${t.id}">حفظ التغييرات</button>
-      </div>`;
-    } else if(sub==='members'){
-      const search = members.length>6 ? `<input type="text" class="field admin-search-input" data-filter-target=".admin-member-tile" placeholder="🔍 دور على عضو..." style="margin-bottom:10px;" />` : '';
-      body = members.length ? `${search}<div class="admin-member-grid">${membersHtml}</div>` : adminEmptyState('👥','لا يوجد أعضاء في هذا الفريق','انقل مشاركين إليه من صفحة المشارك أو من فريق آخر');
-    } else {
-      body = `
-      <div class="card">
-        <label>رسالة لكل أعضاء ${escapeHtml(t.name)}</label>
-        <textarea class="field" id="team-broadcast-${t.id}" placeholder="اكتب رسالة لكل أعضاء ${escapeHtml(t.name)}..." style="min-height:80px;"></textarea>
-        <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-team-broadcast" data-tid="${t.id}">إرسال للفريق</button>
-      </div>`;
-    }
-    return hero + body;
-  }
-  const rt = rankedTeams();
-  const teamsSorted = TEAMS.slice().sort((a,b)=> rt.find(x=>x.id===b.id).total - rt.find(x=>x.id===a.id).total);
-  const rankClass = i => i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
-  const teamCards = teamsSorted.map((t,i)=>{
-    const members = PARTICIPANTS.filter(p=>p.teamId===t.id);
-    const total = rt.find(x=>x.id===t.id).total;
-    return `<div class="admin-team-tile" data-action="open-edit-team" data-tid="${t.id}">
-      <span class="att-chev">${ICO.chev}</span>
-      <span class="att-rank ${rankClass(i)}">#${i+1}</span>
-      <div class="avatar" style="${t.logo?`background-image:url('${t.logo}');background-size:cover;background-position:center;`:`background:${t.color};`}">${t.logo?'':'👥'}</div>
-      <div class="att-name">${escapeHtml(t.name)}</div>
-      <div class="att-pts">${total} نقطة</div>
-      <div class="att-meta">${members.length} عضو${t.leaderId?` · قائد: ${escapeHtml((members.find(m=>m.id===t.leaderId)||{}).name||'')}`:''}</div>
-    </div>`;
-  }).join('');
-  const top = teamsSorted[0];
-  const totalPts = rt.reduce((a,t)=>a+t.total,0);
-  const addBody = `
-      ${state.addingTeam ? `
-        <input class="field" id="new-team-name" placeholder="اسم الفريق الجديد" />
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button type="button" class="btn btn-primary" style="flex:1;" data-action="submit-add-team">إضافة</button>
-          <button type="button" class="btn btn-ghost" style="flex:1;" data-action="cancel-add-team">إلغاء</button>
-        </div>
-      ` : `<button type="button" class="btn btn-primary" style="width:100%;" data-action="open-add-team">➕ إضافة فريق جديد</button>`}`;
-  const bcastBody = `
-      <textarea class="field" id="all-teams-broadcast" placeholder="اكتب رسالة تصل لكل المشاركين في كل الفرق..." style="min-height:70px;"></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="send-all-teams-broadcast">إرسال للجميع</button>`;
-  return `
-    ${adminKpis([{num:TEAMS.length,lab:'فريق'},{num:PARTICIPANTS.length,lab:'مشارك'},{num:top?escapeHtml(top.name):'—',lab:'المتصدر'},{num:totalPts,lab:'إجمالي النقاط'}])}
-    ${adminSectionTitle('🏆','ترتيب الفرق')}
-    <div class="admin-team-grid">${teamCards}</div>
-    ${adminSectionTitle('🛠️','إدارة')}
-    <div class="admin-glass-box"><div class="admin-glass-title">➕ فريق جديد</div>${addBody}</div>
-    ${adminCollapse('teams-bcast','📣','رسالة لكل الفرق','إرسال رسالة لكل المشاركين دفعة واحدة', bcastBody)}
-  `;
-}
-
 /* ============================= ADMIN: ALERTS / NOTIFICATIONS TAB ============================= */
 function renderAdminAlertsTab(){
   const pending = ADMIN_ALERTS.filter(a=>!a.sent).sort((a,b)=>a.sendAt-b.sendAt);
@@ -21061,7 +20908,6 @@ function render(){
   else if(state.view==='me') html = renderMePage();
   else if(state.view==='badges') html = renderBadgesPage();
   else if(state.view==='quests') html = renderQuestsPage();
-  else if(state.view==='team') html = renderTeamPage();
   else if(state.view==='dna') html = renderDnaPage();
   else if(state.view==='share') html = renderSharePage();
   else if(state.view==='wall') html = renderWallPage();
@@ -21071,6 +20917,8 @@ function render(){
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
+  else if(state.view==='game-achievements') html = renderGameAchievements();
+  else if(state.view==='room-lobby') html = renderRoomLobby();
   else if(state.view==='visa') html = renderVisaPage();
   else if(state.view==='visa-history') html = renderVisaHistoryPage();
   else if(state.view==='games-solo') html = renderSoloGames();
@@ -21112,14 +20960,11 @@ function render(){
   else if(state.view==='room-proverb') html = renderRoomPv();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='attendance' || state.view==='attendance-scan') html = featureLockedForMe('attendance') ? renderMaintenancePage('الحضور','✅') : (state.view==='attendance' ? renderAttendancePage() : renderAttendanceScanPage());
-  else if(state.view==='pass') html = renderPassPage();
   else if(state.view==='stay') html = renderStayPage();
   else if(state.view==='kit') html = renderKitPage();
   else if(state.view==='transport') html = renderTransportPage();
-  else if(state.view==='certificate') html = renderCertificatePage();
   else if(state.view==='retreat') html = featureLockedForMe('retreat') ? renderMaintenancePage('خلوة فردية','✝️') : renderRetreatPage();
   else if(state.view==='session') html = renderSession();
-  else if(state.view==='leaderboard') html = renderLeaderboard();
   else if(state.view==='compare') html = renderCompare();
   else if(state.view==='timeline') html = renderTimeline();
   else if(state.view==='admin') html = renderAdmin();
@@ -21157,13 +21002,6 @@ function render(){
     });
   }
 
-  if(state.view==='pass' && state.pid){
-    const passEl = document.getElementById('pass-qr');
-    if(passEl && window.QRCode){
-      passEl.innerHTML='';
-      createQR(passEl, {text:state.pid, width:140, height:140, colorDark:'#12112E', colorLight:'#ffffff'});
-    }
-  }
   if(state.view==='admin' && state.justAddedParticipantId){
     const jaEl = document.getElementById('just-added-qr');
     if(jaEl && window.QRCode){
@@ -21217,14 +21055,6 @@ function render(){
     updatePulseWidget();
   }
 
-  if(state.view==='leaderboard'){
-    const instant = !state._lbEnteredOnce;
-    state._lbEnteredOnce = true;
-    requestAnimationFrame(()=>positionTabPill(instant));
-  } else {
-    state._lbEnteredOnce = false;
-  }
-
   updateAmbientForView();
 }
 
@@ -21265,21 +21095,6 @@ function staggerRevealChildren(app){
     el.addEventListener('animationend', ()=>{ el.style.animationDelay=''; el.classList.remove('reveal-stagger'); }, {once:true});
   });
 }
-function positionTabPill(instant){
-  const wrap = document.getElementById('lb-tabs');
-  const pill = document.getElementById('lb-tab-pill');
-  if(!wrap || !pill) return;
-  const activeBtn = wrap.querySelector('.tab.active');
-  if(!activeBtn) return;
-  const wrapRect = wrap.getBoundingClientRect();
-  const btnRect = activeBtn.getBoundingClientRect();
-  const x = btnRect.left - wrapRect.left;
-  if(instant){ pill.style.transition = 'none'; }
-  pill.style.width = btnRect.width+'px';
-  pill.style.transform = `translateX(${x}px)`;
-  if(instant){ requestAnimationFrame(()=>{ pill.style.transition=''; }); }
-}
-window.addEventListener('resize', ()=>{ if(state.view==='leaderboard') positionTabPill(true); });
 /* ---------- global tap ripple for a tactile, premium feel ---------- */
 document.addEventListener('pointerdown', (e)=>{
   const saver = state.pid ? (myExtra(state.pid)||{}).dataSaver : false;
@@ -21309,7 +21124,7 @@ function updateTeamTint(){
   let bg = document.getElementById('team-tint-bg');
   if(!bg){ bg = document.createElement('div'); bg.id='team-tint-bg'; document.body.appendChild(bg); }
   const p = state.pid ? PARTICIPANTS.find(x=>x.id===state.pid) : null;
-  if(p && ['profile','me','session','leaderboard','compare','timeline','badges','quests','team','dna','share','settings','pass','stay','kit','transport','certificate','retreat'].includes(state.view)){
+  if(p && ['profile','me','session','compare','timeline','badges','quests','dna','share','settings','stay','kit','transport','retreat'].includes(state.view)){
     const t = teamOf(p.teamId);
     bg.style.background = `radial-gradient(circle at 20% 0%, ${t.color}22, transparent 55%), radial-gradient(circle at 90% 100%, ${t.color}18, transparent 55%)`;
   } else {
@@ -21950,9 +21765,9 @@ function stopAmbient(){
 function updateAmbientForView(){
   const extra = state.pid ? myExtra(state.pid) : {};
   if(!state.pid || !extra.ambient || extra.dataSaver){ stopAmbient(); return; }
-  if(!['profile','me','session','leaderboard','compare','timeline','badges','quests','team','dna','share','settings','pass','stay','kit','transport','certificate','retreat'].includes(state.view)){ stopAmbient(); return; }
-  startAmbient(state.view==='leaderboard' ? 'energetic' : 'calm');
-  setAmbientMood(state.view==='leaderboard' ? 'energetic' : 'calm');
+  if(!['profile','me','session','compare','timeline','badges','quests','dna','share','settings','stay','kit','transport','retreat'].includes(state.view)){ stopAmbient(); return; }
+  startAmbient('calm');
+  setAmbientMood('calm');
 }
 
 /* ============================= TOAST ============================= */
@@ -23025,8 +22840,6 @@ document.addEventListener('click', (e)=>{
     if(!alreadyDone && (dayLocked || sessionLocked)){ shakeLockedEl(el); showLockedToast('session'); }
     else{ go('session', {sessionId: sid}); }
   }
-  else if(action==='open-leaderboard'){ go('leaderboard', {lbTab: el.dataset.tab}); }
-  else if(action==='lb-tab'){ state.lbTab = el.dataset.tab; render(); }
   else if(action==='open-scan'){ openScanModal(el.dataset.mode || 'checkin', el.dataset.session); }
   else if(action.indexOf('att-')===0){ attHandleAction(action, el); }
   else if(action==='close-scan'){ closeScanModal(); }
@@ -23050,7 +22863,6 @@ document.addEventListener('click', (e)=>{
   }
   else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
   else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
-  else if(action==='admin-rank-all'){ state.adminRankAll = !state.adminRankAll; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
   else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.editingTeamId = null; state.addingTeam = false; state.editingChefId = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
@@ -23089,16 +22901,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='delete-participant'){ confirmDeleteParticipant(el.dataset.pid); }
   else if(action==='apply-participant-bonus'){ doApplyParticipantBonus(el.dataset.pid, parseInt(el.dataset.sign,10)); }
   else if(action==='apply-participant-game-points'){ doApplyParticipantGamePoints(el.dataset.pid, parseInt(el.dataset.sign,10)); }
-  else if(action==='open-edit-team'){ state.editingTeamId = el.dataset.tid; render(); }
-  else if(action==='cancel-edit-team'){ state.editingTeamId = null; render(); }
-  else if(action==='open-add-team'){ state.addingTeam = true; render(); }
-  else if(action==='cancel-add-team'){ state.addingTeam = false; render(); }
-  else if(action==='submit-add-team'){ doAddTeam(); }
-  else if(action==='save-team'){ doSaveTeam(el.dataset.tid); }
-  else if(action==='apply-team-bonus'){ doApplyTeamBonus(el.dataset.tid, parseInt(el.dataset.sign,10)); }
-  else if(action==='move-participant-team'){ /* handled on change event */ }
-  else if(action==='send-team-broadcast'){ doSendTeamBroadcast(el.dataset.tid); }
-  else if(action==='send-all-teams-broadcast'){ doSendAllTeamsBroadcast(); }
   else if(action==='toggle-alert-immediate'){ state.alertImmediate = !(state.alertImmediate!==false); render(); }
   else if(action==='submit-admin-alert'){ doSubmitAdminAlert(); }
   else if(action==='cancel-admin-alert'){ confirmCancelAdminAlert(el.dataset.id); }
@@ -23137,11 +22939,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='invite-friend'){ doInviteFriend(); }
   else if(action==='claim-quest'){ doClaimQuest(el, el.dataset.claim, parseInt(el.dataset.reward,10)||0); }
   else if(action==='toggle-reminder'){ doToggleReminder(el, el.dataset.session); }
-  else if(action==='send-team-message'){ doSendTeamMessage(el.dataset.team); }
   else if(action==='love-message'){ doLoveMessage(el.dataset.team, el.dataset.msg); }
   else if(action==='save-daily-message'){ doSaveDailyMessage(); }
   else if(action==='send-participant-alert'){ doSendParticipantAlert(); }
-  else if(action==='send-team-alert'){ doSendTeamAlert(); }
   else if(action==='generate-point-codes'){ doGeneratePointCodes(); }
   else if(action==='print-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10)); }
   else if(action==='generate-session-point-codes'){ doGenerateSessionPointCodes(el.dataset.session); }
@@ -23153,7 +22953,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='print-session-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10), el.dataset.session); }
   else if(action==='rate-session'){ doRateSession(el.dataset.session, parseInt(el.dataset.star,10)); }
   else if(action==='open-gift'){ openGiftBox(); }
-  else if(action==='download-cert'){ doDownloadCertificate(); }
   else if(action==='retreat-save'){ saveRetreatNote(); }
   else if(action==='edit-logistics'){ state.editingLogisticsId = el.dataset.pid; render(); }
   else if(action==='cancel-edit-logistics'){ state.editingLogisticsId = null; render(); }
@@ -23176,6 +22975,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='save-daily-task'){ doSaveDailyTask(el.dataset.day); }
   else if(action==='save-conf-logo'){ doSaveConfLogo(); }
   else if(action==='remove-conf-logo'){ confirmRemoveConfLogo(); }
+  else if(action==='fav-game'){ e.preventDefault(); const on = toggleFavGame(el.dataset.game); showToast(on?'⭐ اتضافت للمفضلة':'اتشالت من المفضلة'); render(); }
   else if(action==='game-info'){ e.preventDefault(); showGameInfoSheet(el.dataset.game, el.dataset.info); }
   else if(action==='open-game'){
     const gid = el.dataset.game;
@@ -23261,6 +23061,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
   else if(action==='open-solo-cat'){ go('games-solo-cat', {soloCatKey: el.dataset.cat}); }
+  else if(action==='open-achievements'){ state.friendTile = null; state.achFilter='all'; go('game-achievements'); achRefresh(false); }
+  else if(action==='ach-filter'){ state.achFilter = el.dataset.f; render(); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
   else if(action==='open-sticker-store'){
@@ -23282,7 +23084,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-locked-tap'){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا، هنرجعه قريب بعد التحديث'); }
   else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); }
-  else if(action==='friend-join-show'){ setFriendTile('join'); }
+  else if(action==='friend-join-show'){ state.friendTile = null; ROOM_LOBBY.ready = false; go('room-lobby'); lobbyRefresh(); }
+  else if(action==='lobby-join'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } attemptJoinRoom(el.dataset.code); }
   else if(action==='friend-tile-close'){ setFriendTile(state.friendTile==='join' ? 'menu' : null); }
   else if(action==='create-room'){ const gt = el.dataset.game; if(isGameDisabled(gt)){ showToast('🔒 اللعبة دي مقفولة دلوقتي من المنظمين'); return; } showChallengeTypeModal(gt); }
   else if(action==='join-room'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
@@ -23486,9 +23289,6 @@ document.addEventListener('change', (e)=>{
   if(e.target.id==='pulse-session-select'){
     state.pulseSessionId = e.target.value || null;
     render();
-  }
-  if(e.target.dataset && e.target.dataset.action==='move-participant-team' && e.target.value){
-    doMoveParticipantTeam(e.target.dataset.pid, e.target.value);
   }
 });
 /* الفيزا: الأرقام بس، وتحديث البطاقة لحظيًا وهو بيكتب (من غير ما نعيد رسم الصفحة) */
@@ -25296,80 +25096,7 @@ async function doAdminResetVisaPin(pid){
   pushNotification(pid, '🔑 المنظمين أعادوا تعيين الرقم السري لفيزتك — اكتب رقم جديد من صفحة فيزتي', '🔑');
   showToast('✅ تمت إعادة تعيين الرقم السري');
 }
-async function doMoveParticipantTeam(pid, newTeamId){
-  PARTICIPANT_OVERRIDES[pid] = Object.assign({}, PARTICIPANT_OVERRIDES[pid], {teamId:newTeamId});
-  showToast('تم نقل المشارك للفريق الجديد');
-  const p = PARTICIPANTS.find(x=>x.id===pid);
-  if(p) p.teamId = newTeamId;
-  render();
-  await saveParticipantOverrides(PARTICIPANT_OVERRIDES);
-}
-
 /* ============================= ADMIN: TEAMS ============================= */
-async function doAddTeam(){
-  const input = document.getElementById('new-team-name');
-  const name = input ? input.value.trim() : '';
-  if(!name){ showToast('اكتب اسم الفريق الأول', true); return; }
-  const palette = ['#F4B740','#3FDCC9','#FF7A59','#9B8CFF','#5FE0A4','#FF6B6B','#FFDE94'];
-  const color = palette[TEAMS.length % palette.length];
-  const id = 'ct'+Date.now();
-  const newTeam = {id, name, color};
-  TEAMS.push(newTeam);
-  CUSTOM_TEAMS.push({id, name, color});
-  await saveCustomTeams(CUSTOM_TEAMS);
-  state.addingTeam = false;
-  showToast('تم إضافة الفريق');
-  render();
-}
-async function doSaveTeam(tid){
-  const t = TEAMS.find(x=>x.id===tid);
-  if(!t) return;
-  const ov = TEAM_OVERRIDES[tid] || (TEAM_OVERRIDES[tid] = {});
-  const leaderEl = document.getElementById('edit-tleader-'+tid);
-  const logoEl = document.getElementById('edit-tlogo-'+tid);
-  const nameEl = document.getElementById('edit-tname-'+tid);
-  if(leaderEl) ov.leaderId = leaderEl.value || null;
-  if(nameEl && nameEl.value.trim()) ov.name = nameEl.value.trim();
-  const logo = await readImageFileToDataUrl(logoEl, 200);
-  if(logo) ov.logo = logo;
-  t.leaderId = ov.leaderId;
-  if(ov.name) t.name = ov.name;
-  if(logo) t.logo = logo;
-  showToast('تم حفظ بيانات الفريق');
-  render();
-  await saveTeamOverrides(TEAM_OVERRIDES);
-}
-async function doApplyTeamBonus(tid, sign){
-  const input = document.getElementById('edit-tbonus-'+tid);
-  const magnitude = input ? Math.abs(parseInt(normalizeDigits(input.value),10)||0) : 0;
-  if(!magnitude){ showToast('اكتب قيمة النقاط الأول', true); return; }
-  const val = magnitude * (sign||1);
-  TEAM_BONUS[tid] = (TEAM_BONUS[tid]||0) + val;
-  await saveTeamBonus(TEAM_BONUS);
-  showToast(val>0 ? `تمت إضافة ${val} نقطة للفريق` : `تم خصم ${Math.abs(val)} نقطة من الفريق`);
-  if(input) input.value = '';
-  render();
-}
-async function doSendTeamBroadcast(tid){
-  const ta = document.getElementById('team-broadcast-'+tid);
-  const text = ta ? ta.value.trim() : '';
-  if(!text){ showToast('اكتب الرسالة الأول', true); return; }
-  const members = PARTICIPANTS.filter(p=>p.teamId===tid);
-  members.forEach(p=>pushNotification(p.id, text, '📣'));
-  await saveProfileExtra(PROFILE_EXTRA);
-  showToast('تم إرسال الرسالة للفريق');
-  if(ta) ta.value = '';
-}
-async function doSendAllTeamsBroadcast(){
-  const ta = document.getElementById('all-teams-broadcast');
-  const text = ta ? ta.value.trim() : '';
-  if(!text){ showToast('اكتب الرسالة الأول', true); return; }
-  PARTICIPANTS.forEach(p=>pushNotification(p.id, text, '📣'));
-  await saveProfileExtra(PROFILE_EXTRA);
-  showToast('تم إرسال الرسالة لكل المشاركين');
-  if(ta) ta.value = '';
-}
-
 /* ============================= ADMIN: ALERTS ============================= */
 async function doSubmitAdminAlert(){
   const ta = document.getElementById('alert-text');
@@ -25765,86 +25492,7 @@ function doExportJourneyPdf(){
   setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 400);
 }
 
-function doDownloadCertificate(){
-  if(!state.pid) return;
-  if(!CONF_SETTINGS.ended){ showToast('الشهادة هتتاح بعد انتهاء المؤتمر', true); return; }
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const total = participantTotal(p.id);
-  const rank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
-  const team = teamOf(p.teamId);
-  const w = window.open('', '_blank');
-  if(!w){ showToast('يرجى السماح بالنوافذ المنبثقة لتصدير الشهادة', true); return; }
-  const qrHolder = document.createElement('div');
-  qrHolder.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
-  document.body.appendChild(qrHolder);
-  new QRCode(qrHolder, {text:p.id, width:130, height:130, colorDark:'#12112E', colorLight:'#ffffff'});
-  setTimeout(()=>{
-    const img = qrHolder.querySelector('img') || qrHolder.querySelector('canvas');
-    const qrSrc = img && img.tagName==='CANVAS' ? img.toDataURL('image/png') : (img ? img.src : '');
-    document.body.removeChild(qrHolder);
-    w.document.write(`
-      <html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>شهادة جلافيرا 3 — ${escapeHtml(p.name)}</title>
-      <style>
-        body{ font-family:'Tajawal',Arial,sans-serif; background:#0e0d2b; margin:0; padding:40px; display:flex; align-items:center; justify-content:center; min-height:100vh; }
-        .cert{ width:100%; max-width:820px; border:3px solid #F4B740; border-radius:18px; padding:52px 40px; text-align:center;
-          background:linear-gradient(160deg,#181341,#0e0d2b); color:#fff; position:relative; }
-        .cert::before{ content:''; position:absolute; inset:10px; border:1px solid rgba(244,183,64,.4); border-radius:12px; pointer-events:none; }
-        h1{ color:#F4B740; font-size:34px; margin:0 0 10px; letter-spacing:1px; }
-        .sub1{ color:#cfcbe8; font-size:15px; margin-bottom:6px; }
-        .name{ font-size:30px; font-weight:800; color:#fff; margin:10px 0 14px; border-bottom:2px solid #F4B740; display:inline-block; padding-bottom:8px; }
-        .sub2{ color:#e6e2ff; font-size:14px; line-height:1.8; max-width:520px; margin:0 auto 18px; }
-        .stat-row{ display:flex; justify-content:center; gap:12px; margin:0 auto 26px; flex-wrap:wrap; }
-        .stat-chip{ background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.4); border-radius:999px;
-          padding:6px 16px; font-size:12.5px; color:#FFDE94; }
-        .foot{ display:flex; align-items:center; justify-content:space-between; margin-top:30px; padding-top:20px; border-top:1px dashed rgba(255,255,255,.2); }
-        .code{ color:#9b98c9; font-size:11px; }
-        .sign{ text-align:center; }
-        .sign-name{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:17px; color:#FFDE94;
-          border-bottom:1.5px solid rgba(244,183,64,.5); padding-bottom:4px; margin-bottom:4px; }
-        .sign-label{ font-size:10.5px; color:#9b98c9; }
-        @media print{ body{ background:#fff; } .cert{ background:#fff; color:#111; border-color:#c98a1f; } h1{ color:#c98a1f;} .name{color:#111;border-color:#c98a1f;} .sub1,.sub2{color:#333;} .code{color:#666;}
-          .stat-chip{ background:#fff7e6; border-color:#c98a1f; color:#6b4c0f; } .sign-name{ color:#111; border-color:#c98a1f; } .sign-label{ color:#666; } }
-      </style></head><body>
-        <div class="cert">
-          <div style="font-size:38px;">🎓</div>
-          <h1>شهادة جلافيرا 3</h1>
-          <div class="sub1">تُمنح هذه الشهادة إلى</div>
-          <div class="name">${escapeHtml(p.name)}</div>
-          <div class="sub2">تقديرًا لمشاركته الفعّالة في فعاليات مؤتمر جلافيرا 3، وقد حقق ${total} نقطة خلال رحلته بالمؤتمر</div>
-          <div class="stat-row">
-            <div class="stat-chip">الفريق: ${escapeHtml(team?.name||'—')}</div>
-            <div class="stat-chip">الترتيب الفردي: #${rank}</div>
-          </div>
-          <div class="foot">
-            ${qrSrc?`<img src="${qrSrc}" width="90" height="90" style="border-radius:8px;" alt="رمز QR"/>`:''}
-            <div class="code">كود التحقق: <span dir="ltr" style="unicode-bidi:isolate;">${p.id}</span><br/>جلافيرا 3 — تم الإصدار تلقائيًا</div>
-            <div class="sign">
-              <div class="sign-name">تي إبستولى</div>
-              <div class="sign-label">الجهة المنظمة</div>
-            </div>
-          </div>
-        </div>
-      </body></html>
-    `);
-    w.document.close();
-    setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 500);
-  }, 200);
-}
-
 /* ============================= TEAM MESSAGES ============================= */
-async function doSendTeamMessage(teamId){
-  const input = document.getElementById('team-msg-input');
-  if(!input) return;
-  const text = input.value.trim();
-  if(!text){ showToast('اكتب رسالة الأول', true); return; }
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(!p) return;
-  TEAM_MESSAGES[teamId] = TEAM_MESSAGES[teamId] || [];
-  TEAM_MESSAGES[teamId].push({ id:'tm'+Date.now(), pid:p.id, name:p.name, text, ts:Date.now(), loves:[] });
-  await saveTeamMessages(TEAM_MESSAGES);
-  SND.click();
-  render();
-}
 async function doLoveMessage(teamId, msgId){
   const list = TEAM_MESSAGES[teamId]||[];
   const msg = list.find(m=>m.id===msgId);
@@ -25882,18 +25530,6 @@ async function doSendParticipantAlert(){
   pushNotification(sel.value, text, '💬');
   await saveProfileExtra(PROFILE_EXTRA);
   showToast('تم إرسال الرسالة للمشارك');
-  if(ta) ta.value = '';
-}
-async function doSendTeamAlert(){
-  const sel = document.getElementById('alert-team-select');
-  const ta = document.getElementById('alert-team-msg');
-  const text = ta ? ta.value.trim() : '';
-  if(!sel || !sel.value){ showToast('اختار الفريق الأول', true); return; }
-  if(!text){ showToast('اكتب الرسالة الأول', true); return; }
-  const members = PARTICIPANTS.filter(p=>p.teamId===sel.value);
-  members.forEach(p=>pushNotification(p.id, text, '📣'));
-  await saveProfileExtra(PROFILE_EXTRA);
-  showToast('تم إرسال الرسالة للفريق');
   if(ta) ta.value = '';
 }
 function checkDailyMessage(){
