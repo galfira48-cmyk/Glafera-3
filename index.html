@@ -27548,5 +27548,387 @@ function loginWaitAndRetry(retry){
   if(document.readyState === 'complete') start(); else window.addEventListener('load', start);
 })();
 </script>
+<!-- ===== Card Studio: اختيار الكارد ← تأكيد الطلب ← الدفع ← تم ← إيصال مطبوع ===== -->
+<style>
+#cf-root{position:fixed;inset:0;z-index:9600;background:var(--bg);color:var(--text);font-family:'Tajawal','Cairo',sans-serif;direction:rtl;overflow:hidden;transition:background .5s}
+#cf-root.dark{background:#0a0912}
+.cf-screen{position:absolute;inset:0;max-width:480px;margin:auto;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 10px) 20px calc(env(safe-area-inset-bottom,0px) + 18px);animation:cf-in .5s cubic-bezier(.2,.7,.2,1) both;overflow-y:auto}
+@keyframes cf-in{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+.cf-h{display:flex;align-items:center;justify-content:space-between;height:48px;flex:none;font:700 14px Cairo,sans-serif;color:var(--text-muted)}
+.cf-h button{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text);display:grid;place-items:center;cursor:pointer}
+.cf-h svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cf-h i{width:38px}
+.cf-titlebox{text-align:center;margin:14px 0 4px;min-height:96px}
+.cf-tier{font:600 12px Cairo,sans-serif;color:var(--text-muted)}
+.cf-titlebox h2{margin:2px 0;font:800 30px Cairo,sans-serif}
+.cf-price{font:600 14px Cairo,sans-serif;color:var(--text-muted)}
+.cf-swap{animation:cf-swap .38s ease both}
+@keyframes cf-swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.cf-stage{position:relative;height:250px;margin:6px -20px 0;perspective:900px;touch-action:pan-y;direction:ltr;user-select:none;flex:none}
+.cf-slot{position:absolute;left:50%;top:50%;width:230px;margin:-72px 0 0 -115px;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .4s;cursor:pointer}
+.cf-card{position:relative;width:100%;aspect-ratio:1.586;border-radius:16px;overflow:hidden;color:#fff;box-shadow:0 22px 40px -18px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.18);direction:ltr}
+.cf-sheen{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 48%,transparent 62%)}
+.cf-logo{position:absolute;top:12%;left:7%;font:700 11px Cinzel,serif;letter-spacing:.22em;opacity:.9}
+.cf-chip{position:absolute;top:38%;left:7%;width:30px;height:23px;border-radius:5px;background:linear-gradient(135deg,#f3dd9b,#b98b2f)}
+.cf-nfc{position:absolute;top:36%;right:7%;width:22px;height:22px;opacity:.85}
+.cf-visa{position:absolute;bottom:10%;right:7%;font:italic 800 13px Montserrat,sans-serif;line-height:1;text-align:right;letter-spacing:.04em}
+.cf-dots{display:flex;justify-content:center;gap:6px;margin:4px 0 16px;flex:none}
+.cf-dots i{width:6px;height:6px;border-radius:9px;background:var(--border);transition:.3s}
+.cf-dots i.on{width:18px;background:var(--gold)}
+.cf-cta{position:relative;flex:none;align-self:center;width:100%;height:54px;border:0;border-radius:999px;background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#2a1c00;font:800 16px Cairo,sans-serif;cursor:pointer;transition:width .45s cubic-bezier(.2,.8,.2,1),opacity .3s,transform .15s;margin-top:auto}
+.cf-cta:active{transform:scale(.97)}
+.cf-cta:disabled{opacity:.4;cursor:not-allowed}
+.cf-cta .cf-ld{display:none;gap:6px;justify-content:center}
+.cf-cta .cf-ld i{width:9px;height:9px;border-radius:50%;background:#2a1c00;animation:cf-dot 1s infinite}
+.cf-cta .cf-ld i:nth-child(2){animation-delay:.15s}
+.cf-cta.load{width:72px}.cf-cta.load span{display:none}.cf-cta.load .cf-ld{display:flex}
+@keyframes cf-dot{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1);opacity:1}}
+.cf-ghost{background:transparent;color:var(--text);border:1px solid var(--border);margin-top:0}
+.cf-foot{text-align:center;font:500 12px Tajawal,sans-serif;color:var(--text-muted);margin:12px 0 0;flex:none}
+.cf-big{font:800 28px Cairo,sans-serif;margin:8px 0 2px}
+.cf-sub{color:var(--text-muted);font-size:13px;margin:0 0 14px}
+.cf-drop{width:78%;margin:6px auto 18px;animation:cf-drop .8s cubic-bezier(.2,.9,.25,1) both}
+@keyframes cf-drop{0%{opacity:0;transform:translateY(-46px) rotate(-16deg) scale(.86)}60%{opacity:1}100%{transform:none}}
+.cf-rows{margin-bottom:14px}
+.cf-rows div{display:flex;justify-content:space-between;padding:11px 2px;border-bottom:1px solid var(--border);font-size:14px;opacity:0;animation:cf-swap .4s both}
+.cf-rows div span{color:var(--text-muted)}.cf-rows div b{font-family:Cairo,sans-serif}
+.cf-rows div:nth-child(2){animation-delay:.08s}.cf-rows div:nth-child(3){animation-delay:.16s}.cf-rows div:nth-child(4){animation-delay:.24s}.cf-rows div:nth-child(5){animation-delay:.32s}.cf-rows div:nth-child(6){animation-delay:.4s}
+.cf-rows .tot{border:0;font-size:16px}.cf-rows .tot b{color:var(--gold-2);font-size:18px}
+.cf-err{color:var(--danger);font-size:12.5px;text-align:center;margin:0 0 10px}
+.cf-pos{width:210px;height:210px;margin:8vh auto 0;display:block;flex:none}
+.cf-pos.sm{width:150px;height:150px;margin:4vh auto 0}
+.cf-pos .cf-sw{animation:cf-swipe 1.5s cubic-bezier(.5,0,.3,1) infinite}
+@keyframes cf-swipe{0%{transform:translateY(-70px)}55%,100%{transform:translateY(34px)}}
+.cf-pos.ok .cf-sw{animation:none;transform:translateY(34px)}
+.cf-pos .cf-tick{stroke-dasharray:40;stroke-dashoffset:40;opacity:0}
+.cf-pos.ok .cf-tick{opacity:1;animation:cf-draw .55s .05s ease forwards}
+.cf-pos.ok .cf-scr{fill:#bff0d4}
+@keyframes cf-draw{to{stroke-dashoffset:0}}
+.cf-center{text-align:center}
+.cf-center h1{font:800 26px Cairo,sans-serif;margin:16px 0 4px}
+.cf-center p{color:var(--text-muted);font-size:13px;margin:0 0 16px}
+.cf-btns{margin-top:auto;display:grid;gap:10px}.cf-btns .cf-cta{margin:0}
+.cf-printer{flex:none;width:84%;height:30px;margin:6px auto 0;border-radius:10px;background:linear-gradient(180deg,#d9dbe0,#8f929b);position:relative;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.cf-printer::after{content:'';position:absolute;left:8%;right:8%;top:11px;height:6px;border-radius:5px;background:#0a0a0d;box-shadow:inset 0 2px 3px #000}
+.cf-feed{flex:1;overflow:hidden;width:72%;margin:0 auto;padding-bottom:16px;min-height:0}
+.cf-paper{position:relative;background:#f6f3ea;color:#1b1a1f;padding:16px 15px 14px;animation:cf-print 3.2s steps(40,end) both;font-family:'Tajawal',sans-serif;font-size:11.5px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.cf-paper::after{content:'';position:absolute;left:0;right:0;bottom:-11px;height:12px;background:linear-gradient(135deg,#f6f3ea 6px,transparent 0),linear-gradient(225deg,#f6f3ea 6px,transparent 0);background-size:12px 12px}
+@keyframes cf-print{from{transform:translateY(-101%)}to{transform:none}}
+.cf-paper h3{margin:0;text-align:center;font:700 19px Cinzel,serif;letter-spacing:.32em;padding-inline-start:.32em}
+.cf-paper .cf-tag{text-align:center;font-size:10px;color:#6d6a72;margin:2px 0 10px}
+.cf-paper .cf-ln{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.cf-paper .cf-ln span{color:#6d6a72}.cf-paper .cf-ln b{font-weight:700;text-align:left}
+.cf-paper hr{border:0;border-top:1px dashed #b9b5aa;margin:8px 0}
+.cf-paper .cf-total{display:flex;justify-content:space-between;align-items:baseline;font:800 15px Cairo,sans-serif;padding:4px 0}
+.cf-bar{display:block;width:100%;height:44px;margin:10px 0 3px;fill:#1b1a1f}
+.cf-paper .cf-refn{text-align:center;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;direction:ltr}
+.cf-paper .cf-thx{text-align:center;font-size:11px;margin-top:8px;color:#444}
+.cf-stamp{position:absolute;left:12px;bottom:78px;border:2px solid #1f8f5f;color:#1f8f5f;border-radius:50%;width:62px;height:62px;display:grid;place-items:center;text-align:center;font:800 12px Cairo,sans-serif;line-height:1.2;transform:rotate(-14deg);opacity:0;animation:cf-stamp .35s 3.2s cubic-bezier(.3,1.6,.5,1) forwards;box-shadow:inset 0 0 0 3px #f6f3ea,inset 0 0 0 4px #1f8f5f}
+@keyframes cf-stamp{from{opacity:0;transform:rotate(-14deg) scale(2.4)}to{opacity:.88;transform:rotate(-14deg) scale(1)}}
+.cf-rc-foot{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:10px}.cf-rc-foot .cf-cta{margin:0;height:50px;font-size:14px}
+.cf-rc-foot .cf-ghost{color:#f2f0f7;border-color:rgba(255,255,255,.22)}
+.cf-print-note{text-align:center;font-size:11px;color:#8a8794;margin:8px 0 0;flex:none}
+.cf-launch{margin-top:14px;text-align:center;padding:22px 16px;border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,var(--surface),var(--surface-2))}
+.cf-fan{position:relative;height:118px;margin-bottom:8px}
+.cf-fanc{position:absolute;left:50%;top:6px;width:150px;margin-left:-75px;transform:translateX(var(--x)) rotate(var(--r))}
+.cf-fanc:nth-child(2){z-index:2;top:0}
+.cf-lt{font:800 17px Cairo,sans-serif;margin-bottom:4px}
+.cf-launch .btn{margin-top:12px}
+.cf-card{transition:transform .18s ease-out;will-change:transform}
+.cf-slot.owned .cf-card::after{content:'عندك';position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);padding:2px 9px;border-radius:9px;font:700 10px Cairo,sans-serif}
+.cf-slot.vip .cf-card{box-shadow:0 22px 40px -18px rgba(0,0,0,.65),0 0 0 1.5px rgba(255,222,148,.75),0 0 26px rgba(244,183,64,.35)}
+.cf-slot.vip .cf-sheen{animation:cf-shine 3.6s ease-in-out infinite}
+@keyframes cf-shine{0%,55%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.cf-conf{position:fixed;left:50%;top:34%;width:8px;height:13px;border-radius:2px;pointer-events:none;z-index:9700;animation:cf-conf 1.15s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes cf-conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rt));opacity:0}}
+.cf-rc-foot{grid-template-columns:1fr 1fr 1fr}.cf-rc-foot .cf-cta{font-size:13px}
+@media (prefers-reduced-motion:reduce){.cf-slot.vip .cf-sheen{animation:none}.cf-card{transition:none}.cf-screen,.cf-drop,.cf-rows div,.cf-swap{animation-duration:.01s!important;animation-delay:0s!important}.cf-paper{animation:none}.cf-stamp{animation:none;opacity:.88}.cf-pos .cf-sw{animation:none;transform:translateY(34px)}.cf-slot{transition:none}}
+</style>
+<script>
+(function(){
+  var CF = {i:0, step:'pick', sel:null, res:null, err:'', busy:false};
+  var SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  var SVG_BACK = '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+  var _ctp = window.cardTierPrice;
+  window.cardTierPrice = function(t){ return t==='simple' ? 0 : _ctp(t); };
+  function pts(n){ return n>0 ? n+' نقطة' : 'مجاني'; }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function root(){ return document.getElementById('cf-root'); }
+  function themeName(k){ var v = VISA_THEMES[k]; if(v && v.name) return v.name; var c = (CUSTOM_CARD_THEMES||[]).find(function(x){ return x.id===k; }); return (c && c.name) || 'تصميم مميز'; }
+  function themes(){
+    var out = [];
+    ['simple','vip'].forEach(function(tier){ themeKeysForTier(tier).forEach(function(k){
+      out.push({k:k, tier:tier, name:themeName(k), price:cardTierPrice(tier), owned:ownsCardTheme(state.pid,k)});
+    }); });
+    return out;
+  }
+  function face(k){
+    var img = cardThemeImg(k), t = VISA_THEMES[k];
+    var bg = img ? "background-image:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.5)),url('"+img+"');background-size:cover;background-position:center"
+      : (t ? 'background:linear-gradient(135deg,'+t.a+' 0%,'+t.base+' 52%,'+t.c+' 100%)' : 'background:linear-gradient(135deg,#c9a24a,#4a3510)');
+    return '<div class="cf-card" style="'+bg+'"><i class="cf-sheen"></i><b class="cf-logo">GLAFIRA</b><span class="cf-chip"></span>'
+      + '<svg class="cf-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.5 0 20"/></svg>'
+      + '<span class="cf-visa">GAME<br>CARD</span></div>';
+  }
+  function mkRef(){ var s=''; for(var i=0;i<8;i++) s += '0123456789ABCDEF'[Math.floor(Math.random()*16)]; return 'GF-'+s; }
+  function bars(ref){
+    var h = 7, i; for(i=0;i<ref.length;i++) h = (h*31 + ref.charCodeAt(i))>>>0;
+    var x = 0, s = '';
+    while(x < 190){ h = (Math.imul(h,1103515245)+12345)>>>0; var w = 1+((h>>>16)%3), g = 1+((h>>>20)%2); s += '<rect x="'+x+'" width="'+w+'" height="46"/>'; x += w+g; }
+    return '<svg class="cf-bar" viewBox="0 0 '+x+' 46" preserveAspectRatio="none" aria-hidden="true">'+s+'</svg>';
+  }
+  function pos(selTheme, ok, small){
+    var t = VISA_THEMES[selTheme] || {a:'#e9c46a', base:'#5b4210'};
+    return '<svg class="cf-pos'+(ok?' ok':'')+(small?' sm':'')+'" id="cf-pos" viewBox="0 0 200 200" aria-hidden="true">'
+      + '<defs><linearGradient id="cfg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+t.a+'"/><stop offset="1" stop-color="'+t.base+'"/></linearGradient></defs>'
+      + '<g class="cf-sw"><rect x="52" y="6" width="96" height="60" rx="8" fill="url(#cfg)"/><rect x="60" y="20" width="16" height="12" rx="2" fill="#f3dd9b"/></g>'
+      + '<rect x="34" y="66" width="132" height="124" rx="16" fill="#1c1c22"/><rect x="46" y="60" width="108" height="10" rx="4" fill="#0a0a0d"/>'
+      + '<rect class="cf-scr" x="48" y="80" width="104" height="38" rx="7" fill="#7f8a94"/>'
+      + '<path class="cf-tick" d="M84 99l11 11 21-22" fill="none" stroke="#1f8f5f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>'
+      + [0,1,2].map(function(r){ return [0,1,2,3].map(function(c){ return '<circle cx="'+(60+c*27)+'" cy="'+(138+r*17)+'" r="4.5" fill="#3b3b45"/>'; }).join(''); }).join('')
+      + '</svg>';
+  }
+  function header(title, back){
+    return '<div class="cf-h"><button type="button" data-cf="'+(back||'close')+'" aria-label="'+(back?'رجوع':'إغلاق')+'">'+(back?SVG_BACK:SVG_X)+'</button><span>'+title+'</span><i></i></div>';
+  }
+  function bal(){ return WALLET[state.pid]||0; }
+  function screen(html, dark){
+    var r = root(); r.classList.toggle('dark', !!dark);
+    var s = document.createElement('div'); s.className = 'cf-screen'; s.innerHTML = html;
+    r.innerHTML = ''; r.appendChild(s); return s;
+  }
+  function open(startAt){
+    close(); CF.isOp = (startAt === 'op');
+    var r = document.createElement('div'); r.id = 'cf-root'; r.setAttribute('role','dialog'); r.setAttribute('aria-modal','true'); r.setAttribute('aria-label','اختيار الكارد');
+    document.body.appendChild(r);
+    if(startAt === 'op'){ runOp(); return; }
+    if(startAt === 'receipt'){ drawReceipt(); return; }
+    CF.step = 'pick'; CF.err = ''; CF.busy = false;
+    var list = themes(), first = list.findIndex(function(o){ return !o.owned; });
+    CF.i = first > -1 ? first : 0;
+    drawPick();
+  }
+  function close(){ var r = root(); if(r) r.remove(); }
+  /* ---------- 1) اختيار الكارد: كاروسيل ثلاثي الأبعاد ---------- */
+  function drawPick(){
+    var list = themes();
+    if(!list.length){ screen(header('اختر كارتك') + '<div class="cf-center"><p style="margin-top:30vh">مفيش تصاميم متاحة دلوقتي</p></div>'); return; }
+    var slots = list.map(function(o,i){ return '<div class="cf-slot'+(o.owned?' owned':'')+(o.tier==='vip'?' vip':'')+'" data-i="'+i+'">'+face(o.k)+'</div>'; }).join('');
+    var dots = list.map(function(){ return '<i></i>'; }).join('');
+    var s = screen(header('اختر كارتك')
+      + '<div class="cf-titlebox"><div class="cf-tier" id="cf-tier"></div><h2 id="cf-name"></h2><div class="cf-price" id="cf-price"></div></div>'
+      + '<div class="cf-stage" id="cf-stage">'+slots+'</div><div class="cf-dots" id="cf-dots">'+dots+'</div>'
+      + '<button type="button" class="cf-cta" id="cf-pick" data-cf="pick"></button>'
+      + '<p class="cf-foot">رصيد الفيزا: '+bal()+' نقطة · اسحب يمين أو شمال لتغيير التصميم</p>');
+    var st = s.querySelector('#cf-stage'), x0 = null;
+    st.addEventListener('pointerdown', function(e){ x0 = e.clientX; });
+    st.addEventListener('pointerup', function(e){
+      if(x0 === null) return; var dx = e.clientX - x0; x0 = null;
+      if(Math.abs(dx) > 35) go(CF.i + (dx < 0 ? 1 : -1));
+    });
+    st.addEventListener('click', function(e){ var sl = e.target.closest('.cf-slot'); if(sl) go(+sl.dataset.i); });
+    st.addEventListener('pointermove', function(e){
+      if(x0 !== null) return; var sl = document.querySelectorAll('.cf-slot')[CF.i]; if(!sl) return;
+      var r = sl.getBoundingClientRect(), px = (e.clientX-r.left)/r.width-.5, py = (e.clientY-r.top)/r.height-.5;
+      if(Math.abs(px) > .8) return; sl.firstChild.style.transform = 'rotateY('+(px*18)+'deg) rotateX('+(-py*18)+'deg)';
+    });
+    st.addEventListener('pointerleave', function(){ document.querySelectorAll('.cf-slot .cf-card').forEach(function(c){ c.style.transform = ''; }); });
+    layout(true);
+  }
+  function sfx(n){ try{ if(typeof SND !== 'undefined' && SND[n]) SND[n](); }catch(e){} }
+  function burst(){
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var cols = ['#FFDE94','#F4B740','#3FDCC9','#FF7A59','#9B8CFF'];
+    for(var i=0;i<30;i++){
+      var d = document.createElement('i'), a = Math.random()*Math.PI*2, v = 90+Math.random()*150;
+      d.className = 'cf-conf'; d.style.background = cols[i%5];
+      d.style.setProperty('--dx', Math.cos(a)*v+'px'); d.style.setProperty('--dy', (Math.sin(a)*v+110)+'px'); d.style.setProperty('--rt', (Math.random()*720-360)+'deg');
+      document.body.appendChild(d); setTimeout(function(x){ x.remove(); }.bind(null,d), 1300);
+    }
+  }
+  function saveImg(){
+    var el = document.querySelector('.cf-paper'); if(!el || typeof html2canvas === 'undefined'){ showToast('تعذّر حفظ الصورة', true); return; }
+    var name = (CF.res.ref||'receipt') + '.png';
+    html2canvas(el, {backgroundColor:'#0a0912', scale:2}).then(function(c){ c.toBlob(function(b){
+      var f = new File([b], name, {type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f]}).catch(function(){}); return; }
+      var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click(); showToast('✅ اتحفظ الإيصال كصورة');
+    }); }).catch(function(){ showToast('تعذّر حفظ الصورة', true); });
+  }
+  async function useNow(){
+    try{ await updateVisaCard(state.pid, {theme:CF.sel.k}); }catch(e){}
+    close(); openVisaPage();
+  }
+  function go(n){ var len = themes().length; n = Math.max(0, Math.min(len-1, n)); if(n === CF.i) return; CF.i = n; layout(); }
+  function layout(first){
+    var list = themes(), o = list[CF.i]; if(!o) return;
+    document.querySelectorAll('.cf-slot').forEach(function(el, i){
+      var d = i - CF.i, a = Math.abs(d);
+      el.style.transform = 'translateX('+(d*62)+'%) translateZ('+(-a*130)+'px) rotateY('+(d*-42)+'deg) scale('+(a ? .86 : 1)+')';
+      el.style.opacity = a > 2 ? 0 : 1 - a*.3; el.style.zIndex = 10 - a; el.style.pointerEvents = a > 2 ? 'none' : 'auto';
+    });
+    document.querySelectorAll('#cf-dots i').forEach(function(el, i){ el.classList.toggle('on', i === CF.i); });
+    var t = document.getElementById('cf-tier'), n = document.getElementById('cf-name'), p = document.getElementById('cf-price'), b = document.getElementById('cf-pick');
+    t.textContent = o.tier === 'vip' ? 'تصميم VIP 👑' : 'تصميم بسيط';
+    n.textContent = o.name; p.textContent = o.owned ? 'موجود في كروتك' : pts(o.price);
+    if(!first) [t,n,p].forEach(function(el){ el.classList.remove('cf-swap'); void el.offsetWidth; el.classList.add('cf-swap'); });
+    b.textContent = o.owned ? 'عندك التصميم ده' : (o.price>0 ? 'اختر ' : 'خذ ') + o.name; b.disabled = o.owned;
+  }
+  /* ---------- 2) تأكيد الطلب ---------- */
+  function drawConfirm(){
+    var o = CF.sel, b = bal(), after = b - o.price, short = after < 0;
+    var rows = [['التصميم', o.name], ['الفئة', o.tier === 'vip' ? 'VIP' : 'بسيط'], ['السعر', pts(o.price)], ['رصيد الفيزا الحالي', b + ' نقطة'], ['الرصيد بعد الشراء', short ? '—' : after + ' نقطة']]
+      .map(function(r){ return '<div><span>'+r[0]+'</span><b>'+escapeHtml(String(r[1]))+'</b></div>'; }).join('');
+    screen(header(CF.sel.price>0 ? 'الدفع' : 'تأكيد', 'back-pick')
+      + '<div class="cf-big">تأكيد الطلب</div><p class="cf-sub">راجع التفاصيل قبل ما يتخصم من فيزتك</p>'
+      + '<div class="cf-drop">'+face(o.k)+'</div><div class="cf-rows">'+rows+'<div class="tot"><span>الإجمالي</span><b>'+pts(o.price)+'</b></div></div>'
+      + (short ? '<p class="cf-err">محتاج '+(-after)+' نقطة كمان في الفيزا. اشحنها الأول من صفحة «فيزتي».</p>' : (CF.err ? '<p class="cf-err">'+escapeHtml(CF.err)+'</p>' : ''))
+      + '<button type="button" class="cf-cta" id="cf-buy" data-cf="buy" '+(short?'disabled':'')+'><span>'+(o.price>0 ? 'اشتري · '+o.price+' نقطة' : 'احصل عليه مجانًا')+'</span><em class="cf-ld"><i></i><i></i><i></i></em></button>'
+      + '<p class="cf-foot">الدفع بيتم من رصيد فيزا Games فقط</p>');
+  }
+  /* ---------- 3) الدفع على جهاز الدفع ---------- */
+  async function commit(){
+    if(!requireVisaValid()) return 'expired';
+    var o = CF.sel, pid = state.pid;
+    WALLET = await loadWallet(); var b = WALLET[pid]||0;
+    if(b < o.price){ CF.err = 'محتاج ' + (o.price-b) + ' نقطة كمان في الفيزا'; return false; }
+    OWNED_CARD_THEMES = await loadOwnedCardThemes(); var owned = OWNED_CARD_THEMES[pid] || [];
+    if(owned.indexOf(o.k) > -1){ CF.err = 'التصميم ده عندك بالفعل'; return false; }
+    WALLET[pid] = b - o.price; owned.push(o.k); OWNED_CARD_THEMES[pid] = owned;
+    await saveWallet(WALLET); await saveOwnedCardThemes(OWNED_CARD_THEMES);
+    try{ await updateVisaCard(pid, {editOpen:true}); }catch(e){}
+    if(o.price>0) vtxLogSafe([{pid:pid, type:'shop_card', amount:o.price, balAfter:WALLET[pid]||0, note:o.name}]);
+    CF.res = {ref:mkRef(), ts:Date.now(), kind:'شراء تصميم كارد', note:o.name, amount:o.price, sign:-1, bal:WALLET[pid]||0};
+    return true;
+  }
+  async function pay(){
+    if(CF.busy) return; CF.busy = true; CF.err = ''; sfx('click');
+    var btn = document.getElementById('cf-buy'); if(btn) btn.classList.add('load');
+    await sleep(520);
+    screen('<div class="cf-h"><i></i><span>جاري الدفع</span><i></i></div>' + pos(CF.sel.k, false) + '<div class="cf-center"><h1>بنعالج الدفع…</h1><p>متقفلش الصفحة لحظات</p></div>');
+    var t0 = Date.now(), r = false;
+    try{ r = await commit(); }catch(e){ console.error(e); CF.err = 'حصلت مشكلة في الاتصال، حاول تاني'; }
+    await sleep(Math.max(0, 1900 - (Date.now()-t0)));
+    if(r === 'expired'){ CF.busy = false; close(); return; }
+    if(!r){ CF.busy = false; drawConfirm(); showToast(CF.err || 'تعذّر إتمام الشراء', true); return; }
+    var p = document.getElementById('cf-pos'); if(p) p.classList.add('ok'); sfx('success'); burst();
+    try{ navigator.vibrate && navigator.vibrate([20,40,30]); }catch(e){}
+    await sleep(1250); CF.busy = false; drawDone();
+  }
+  /* ---------- 4) تم الطلب ---------- */
+  function drawDone(){
+    var R = CF.res, op = !!CF.isOp, rows, head, sub, btns;
+    if(op){
+      rows = (R.rows||[]).concat([['رقم العملية', R.ref]]);
+      head = R.title; sub = R.text;
+      btns = '<button type="button" class="cf-cta" data-cf="receipt"><span>عرض الإيصال</span></button><button type="button" class="cf-cta cf-ghost" data-cf="done"><span>تم</span></button>';
+    } else {
+      rows = [[R.amount>0 ? 'المدفوع' : 'السعر', pts(R.amount)], ['الرصيد المتبقي', R.bal + ' نقطة'], ['رقم العملية', R.ref]];
+      head = R.amount>0 ? 'تم الشراء' : 'الكارد بقى معاك'; sub = 'تصميم «'+R.note+'» اتضاف لكروتك. اختاره من صفحة فيزتي.';
+      btns = '<button type="button" class="cf-cta" data-cf="use"><span>استخدمه الآن على فيزتي</span></button><button type="button" class="cf-cta cf-ghost" data-cf="receipt"><span>عرض الإيصال</span></button><button type="button" class="cf-cta cf-ghost" data-cf="done"><span>تم</span></button>';
+    }
+    rows = rows.map(function(x){ return '<div><span>'+escapeHtml(String(x[0]))+'</span><b dir="ltr">'+escapeHtml(String(x[1]))+'</b></div>'; }).join('');
+    screen('<div class="cf-h"><i></i><span></span><i></i></div>' + pos(CF.sel.k, true, true)
+      + '<div class="cf-center"><h1>'+escapeHtml(head)+'</h1><p>'+escapeHtml(sub)+'</p></div><div class="cf-rows">'+rows+'</div><div class="cf-btns">'+btns+'</div>');
+  }
+  /* ---------- عمليات الفيزا (إيداع / سحب / تحويل / تجديد): نفس تجربة الدفع والإيصال ---------- */
+  async function runOp(){
+    CF.busy = true;
+    screen('<div class="cf-h"><i></i><span>'+escapeHtml(CF.res.kind)+'</span><i></i></div>' + pos(CF.sel.k, false) + '<div class="cf-center"><h1>بنعالج العملية…</h1><p>متقفلش الصفحة لحظات</p></div>');
+    await sleep(1500); if(!root()){ CF.busy = false; return; }
+    var pz = document.getElementById('cf-pos'); if(pz) pz.classList.add('ok');
+    sfx('success'); burst(); try{ navigator.vibrate && navigator.vibrate([20,40,30]); }catch(e){}
+    await sleep(1150); CF.busy = false; if(root()) drawDone();
+  }
+  function openOp(R){
+    var pid = state.pid, k = 'aurora';
+    try{ k = effectiveCardTheme(pid, (VISA_CARDS[pid]||{}).theme || defaultCardTheme(pid)); }catch(e){}
+    CF.res = R; CF.sel = {k:k, name:R.kind}; open('op');
+  }
+  var _vm = window.visaMsg;
+  window.visaMsg = function(type, title, text, opts){
+    if(CF.cap && type === 'success'){ CF.cap.msg = {title:title, text:text, rows:(opts && opts.rows)||[]}; return; }
+    return _vm.apply(this, arguments);
+  };
+  function wrapOp(name, build){
+    var orig = window[name];
+    window[name] = async function(){
+      var a = arguments, cap = CF.cap = {};
+      try{ return await orig.apply(this, a); }
+      finally {
+        CF.cap = null;
+        if(cap.msg){ try{ var R = build.apply(null, a); R.title = cap.msg.title; R.text = cap.msg.text; R.rows = cap.msg.rows; R.ref = mkRef(); R.ts = Date.now(); openOp(R); }catch(e){ console.error(e); _vm('success', cap.msg.title, cap.msg.text, {rows:cap.msg.rows}); } }
+      }
+    };
+  }
+  wrapOp('executeVisaMove', function(kind, pid, amt){ var dep = kind === 'deposit';
+    return {kind:(VISA_TX_META[kind]||{}).label || kind, amount:amt, sign:dep?1:-1, bal:WALLET[pid]||0, note:dep?'من نقاط الفقرات':'إلى نقاط الفقرات', stamp:dep?'مُودَع':'مسحوب'}; });
+  wrapOp('executeVisaTransfer', function(from, to, amt){
+    return {kind:'تحويل صادر', amount:amt, sign:-1, bal:WALLET[from]||0, note:(VISA_CARDS[to]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === to; })||{}).name) || '', stamp:'مُحوَّل'}; });
+  wrapOp('executeVisaRenew', function(pid, src, fee){
+    return {kind:'تجديد الفيزا', amount:fee, sign:-1, bal:src === 'wallet' ? (WALLET[pid]||0) : participantTotal(pid), note:src === 'wallet' ? 'من رصيد الفيزا' : 'من نقاط الفقرات', stamp:'مُجدَّد'}; });
+  /* ---------- 5) الإيصال بيتطبع من الطابعة ---------- */
+  function paper(R){
+    var pid = state.pid, name = ((PARTICIPANTS||[]).find(function(x){ return x.id === pid; })||{}).name || '';
+    var card = ''; try{ card = maskCardNumber(visaNumber(pid)).split(' ').pop(); }catch(e){}
+    var neg = R.sign < 0, ln = function(a,b){ return '<div class="cf-ln"><span>'+a+'</span><b>'+b+'</b></div>'; };
+    return '<div class="cf-paper"><h3>GLAFIRA</h3><div class="cf-tag">إيصال عملية · فيزا Games</div>'
+      + ln('رقم العملية','<bdi dir="ltr">'+escapeHtml(R.ref)+'</bdi>') + ln('التاريخ', vtxDate(R.ts)) + ln('الوقت', vtxTime(R.ts))
+      + (name ? ln('المشارك', escapeHtml(name)) : '') + (card ? ln('البطاقة','•••• <bdi dir="ltr">'+escapeHtml(card)+'</bdi>') : '')
+      + '<hr>' + ln('العملية', escapeHtml(R.kind)) + (R.note ? ln('التفاصيل', escapeHtml(R.note)) : '') + ln('الرصيد بعد العملية', R.bal + ' نقطة')
+      + '<hr><div class="cf-total"><span>الإجمالي</span><span dir="ltr">'+(R.amount>0 ? (neg?'−':'+')+R.amount+' نقطة' : 'مجاني')+'</span></div>'
+      + bars(R.ref) + '<div class="cf-refn">'+escapeHtml(R.ref)+'</div><div class="cf-thx">شكرًا لاستخدامك جلافيرا</div>'
+      + '<div class="cf-stamp">'+(R.stamp || (R.amount<=0 ? 'مجاني' : (neg?'مدفوع':'مُستلم')))+'</div></div>';
+  }
+  function drawReceipt(){
+    var s = screen(header('الإيصال', 'back-recv') + '<div class="cf-printer"></div><div class="cf-feed" id="cf-feed">'+paper(CF.res)+'</div>'
+      + '<p class="cf-print-note">جاري طباعة الإيصال…</p>'
+      + '<div class="cf-rc-foot"><button type="button" class="cf-cta cf-ghost" data-cf="again"><span>اطبع تاني</span></button><button type="button" class="cf-cta cf-ghost" data-cf="save"><span>حفظ صورة</span></button><button type="button" class="cf-cta" data-cf="done"><span>تم</span></button></div>', true);
+    setTimeout(function(){ var n = s.querySelector('.cf-print-note'); if(n) n.textContent = 'اتطبع الإيصال'; }, 3400);
+    try{ navigator.vibrate && navigator.vibrate(60); }catch(e){}
+  }
+  /* ---------- الأحداث ---------- */
+  document.addEventListener('click', function(e){
+    var o = e.target.closest('[data-cf-open]'); if(o){ open(); return; }
+    var b = e.target.closest('#cf-root [data-cf]'); if(!b) return; sfx('click');
+    var a = b.dataset.cf;
+    if(a === 'close' || a === 'done'){ close(); if(a === 'done' && typeof render === 'function') render(); }
+    else if(a === 'pick'){ CF.sel = themes()[CF.i]; if(CF.sel && !CF.sel.owned) drawConfirm(); }
+    else if(a === 'back-pick'){ drawPick(); }
+    else if(a === 'buy'){ pay(); }
+    else if(a === 'use'){ useNow(); }
+    else if(a === 'save'){ saveImg(); }
+    else if(a === 'receipt'){ drawReceipt(); }
+    else if(a === 'back-recv'){ if(CF.sel && CF.res && CF.fromPurchase){ drawDone(); } else close(); }
+    else if(a === 'again'){ var f = document.getElementById('cf-feed'); if(f){ f.innerHTML = ''; void f.offsetWidth; f.innerHTML = paper(CF.res); var n = document.querySelector('.cf-print-note'); if(n){ n.textContent = 'جاري طباعة الإيصال…'; setTimeout(function(){ n.textContent = 'اتطبع الإيصال'; }, 3400); } } }
+  });
+  document.addEventListener('keydown', function(e){
+    if(!root()) return;
+    if(e.key === 'Escape') close();
+    else if(CF.step === 'pick' && document.getElementById('cf-stage')){ if(e.key === 'ArrowLeft') go(CF.i + 1); if(e.key === 'ArrowRight') go(CF.i - 1); }
+  });
+  /* ---------- ربط بالموقع ---------- */
+  CF.fromPurchase = false;
+  var _drawDone = drawDone; drawDone = function(){ CF.fromPurchase = true; CF.step = 'done'; _drawDone(); };
+  var _drawPick = drawPick; drawPick = function(){ CF.fromPurchase = false; CF.step = 'pick'; _drawPick(); };
+  window.renderShopCardTab = function(){
+    var t = themes(), owned = t.filter(function(o){ return o.owned; }).length;
+    var fan = t.slice(0,3).map(function(o,i){ return '<div class="cf-fanc" style="--r:'+((i-1)*9)+'deg;--x:'+((i-1)*46)+'px">'+face(o.k)+'</div>'; }).join('');
+    return '<div class="cf-launch"><div class="cf-fan">'+fan+'</div><div class="cf-lt">اختر تصميم كارتك</div>'
+      + '<div class="hint">'+t.length+' تصميم · بسيط مجاني · VIP '+cardTierPrice('vip')+' 🌟'+(owned ? ' · عندك '+owned : '')+'</div>'
+      + '<button type="button" class="btn btn-primary" data-cf-open="1">تصفّح التصاميم</button>'
+      + '<div class="hint" style="margin-top:10px">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزتي</div></div>';
+  };
+  var _ocs = window.openCardShop;
+  window.openCardShop = function(){ _ocs(); setTimeout(function(){ open(); }, 140); };
+  window.vtxShowReceipt = function(id){
+    var tx = (VISA_TX[state.pid]||[]).find(function(t){ return t.id === id; }); if(!tx) return;
+    var m = VISA_TX_META[tx.type] || {label:tx.type, sign:1};
+    CF.res = {ref:vtxRef(tx), ts:tx.ts, kind:m.label, note:tx.note||'', amount:tx.amount, sign:m.sign, bal:tx.balAfter};
+    CF.fromPurchase = false; open('receipt');
+  };
+})();
+</script>
+
 </body>
 </html>
