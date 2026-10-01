@@ -1773,6 +1773,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ===== الشريحة الذهبية = مشاركة رقم البطاقة + آخر المستلمين ===== */
   .vc-chip[data-action]{cursor:pointer; animation:vchHint 4.2s ease-in-out infinite;}
   .vc-expired .vc-chip[data-action]{animation:none;}
+  .vc-chip.vc-chip-code{width:74px; height:59px; border-radius:9px; background:#e6bd5a; z-index:4; box-shadow:0 0 0 1px rgba(0,0,0,.3); animation:none;}
+  .vc-chip.vc-chip-code::before,.vc-chip.vc-chip-code::after{display:none;}
+  .vc-chip.vc-chip-code img{display:block; width:100%; height:100%; pointer-events:none; -webkit-user-drag:none; user-select:none;}
   @keyframes vchHint{0%,72%,100%{filter:drop-shadow(0 0 0 rgba(255,222,140,0)); transform:scale(1)} 86%{filter:drop-shadow(0 0 9px rgba(255,222,140,.95)); transform:scale(1.07)}}
   .vch-stage{position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin:2px 0 6px;}
   .vch-ring{position:absolute; left:50%; top:50%; width:96px; height:96px; margin:-48px 0 0 -48px; border-radius:26px; border:2px solid var(--vc-a,#f4b740); opacity:0; animation:vchRing 2.6s ease-out infinite;}
@@ -6403,7 +6406,7 @@ function visaCardHtml(pid, draft, isNew){
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
       <div class="vc-top"><span class="vc-brand">Glafira</span><span class="vc-tag">GAME CARD</span></div>
-      <div class="vc-mid"><span class="vc-chip" ${isNew ? '' : 'data-action="visa-chip" role="button" tabindex="0" aria-label="مشاركة رقم بطاقتي"'}></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
+      <div class="vc-mid">${isNew ? '<span class="vc-chip"></span>' : `<span class="vc-chip vc-chip-code" data-action="visa-chip" role="button" tabindex="0" aria-label="الشريحة الصفراء — صاحبك يمسحها عشان يستلم منك"><img alt="" src="${chipStaticSrc(pid)}"></span>`}<svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
         <span class="vc-num">${String(numDisplay).split(' ').map(g=>`<i>${g}</i>`).join('')}</span>
       </div>
@@ -6534,9 +6537,9 @@ function renderVisaPage(){
       <div class="vp-amt-wrap"><input id="visa-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
       <div class="vp-chips">${tChips}</div>
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-transfer">تحويل الآن</button>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-chip-send">📲 تحويل بالشريحة — قرّبها من كاميرا صاحبك</button>
+      
       <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-copy-number">📋 نسخ رقم بطاقتي</button>
-      <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة. وتقدر تحوّل أو تستلم من غير ما تكتب أي رقم: اضغط على الشريحة الذهبية في بطاقتك.</div>
+      <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة. وتقدر تستلم من غير ما تكتب أي رقم: اضغط «استلام» وامسح الشريحة الصفراء في كارت صاحبك. ولو عايز تحوّل بالشريحة سيب كارتك مفتوح قدام صاحبك، وهيجيلك طلب تأكيد.</div>
     </div>`;
   const opsPanel = `
     <div class="vp-panel vp-pro">
@@ -7139,7 +7142,7 @@ function visaChipOpen(mode){
   const th = vposThemeOf(pid), ov = document.createElement('div');
   ov.className = 'vpos-overlay'; ov.id = 'vcs-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
   ov.innerHTML = `<div class="vpos-sheet vcs-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
-    <div class="vcs-tabs"><button type="button" data-m="recv">📥 استلام</button><button type="button" data-m="send">📤 إرسال</button></div>
+    <div class="vcs-tabs" style="display:none"><button type="button" data-m="recv">📥 استلام</button><button type="button" data-m="send">📤 إرسال</button></div>
     <div class="vcs-body"></div>
     <button type="button" class="vcs-foot" id="vcs-num">أو شارك رقم بطاقتي بدل المسح</button>
     <div class="vpos-actions" style="margin-top:6px"><button type="button" id="vcs-close">إغلاق</button></div>
@@ -7154,11 +7157,12 @@ function visaChipOpen(mode){
 }
 function visaChipSetMode(mode){
   const v = _vcs; if(!v) return;
+  mode = 'recv';
   visaChipStopWork(); v.mode = mode;
   v.ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.m === mode));
   const body = v.ov.querySelector('.vcs-body');
   if(mode === 'recv'){
-    body.innerHTML = `<div class="vcs-title">استلام</div><div class="vcs-sub">وجّه الكاميرا على الشريحة الصفراء في كارت صاحبك، والنقط بتوصلك لوحدها.</div>
+    body.innerHTML = `<div class="vcs-title">استلام</div><div class="vcs-sub">وجّه الكاميرا على الشريحة الصفراء في كارت صاحبك (وهو فاتح صفحة الفيزا)، واكتب المبلغ وهو يأكّد من موبايله.</div>
       <div class="vcs-vf" id="vcs-vf"><i class="vcs-br tl"></i><i class="vcs-br tr"></i><i class="vcs-br bl"></i><i class="vcs-br brr"></i><span class="vcs-ghost"></span><span class="vcs-line"></span><button type="button" class="vcs-flip" id="vcs-flip" aria-label="تبديل الكاميرا">🔄</button><div class="vcs-cap">ضع الشريحة الصفراء جوه الإطار</div><div class="vcs-vfmsg" id="vcs-vfmsg"></div></div>
       <div class="vcs-status" id="vcs-status">بفتح الكاميرا…</div>
       <button type="button" class="vcs-mic" id="vcs-mic"><span class="ic">🎧</span><span class="tx">استماع بالصوت</span></button>`;
@@ -7178,7 +7182,7 @@ function visaChipSetMode(mode){
     };
     body.querySelector('#vcs-flip').addEventListener('click', ()=>{ facing = facing === 'environment' ? 'user' : 'environment'; try{ localStorage.setItem('glv-chip-facing', facing); }catch(e){} camStart(); });
     camStart();
-    const mic = body.querySelector('#vcs-mic'), mtx = mic.querySelector('.tx');
+    const mic = body.querySelector('#vcs-mic'), mtx = mic.querySelector('.tx'); mic.style.display = 'none';
     const micSay = (st)=>{
       mic.classList.toggle('on', st === 'on' || st === 'hear'); mic.classList.toggle('hear', st === 'hear');
       mtx.textContent = st === 'on' ? 'بسمع النغمة…' : st === 'hear' ? 'سامع النغمة — ثبّت الموبايلين' : st === 'denied' ? 'محتاج إذن الميكروفون' : st === 'nomic' ? 'الميكروفون مش متاح' : 'استماع بالصوت';
@@ -7189,7 +7193,7 @@ function visaChipSetMode(mode){
       if(v.listener){ v.listener.stop(); v.listener = null; micSay('off'); try{ localStorage.removeItem('glv-chip-mic'); }catch(e){} }
       else { micStart(); try{ localStorage.setItem('glv-chip-mic', '1'); }catch(e){} }
     });
-    try{ if(localStorage.getItem('glv-chip-mic') === '1') micStart(); }catch(e){}
+    
   } else {
     const pid = state.pid, bal = WALLET[pid] || 0;
     const chips = [25,50,100,bal].filter((x,i,a)=>x>0 && a.indexOf(x)===i).map(x=>`<button type="button" class="vp-chip" data-v="${x}">${x===bal?'الكل':x}</button>`).join('');
@@ -7310,49 +7314,251 @@ function visaChipSenderFailed(key, r){
   visaPosAbort(()=>visaMsg(short ? 'warn' : 'error', short ? 'رصيد الفيزا غير كافٍ' : 'تعذّر إتمام التحويل', short ? 'رصيدك اتغيّر ومبقاش يكفي، لم يتم خصم أي نقاط.' : 'حصلت مشكلة أثناء التحويل، لم يتم خصم أي نقاط.'));
   window.storage.delete(key, true).catch(()=>{});
 }
-/* المستلم: بعد قراءة الشريحة بيتحقق، يحجز الشريحة (ذرّيًا)، وبعدين ينفّذ التحويل */
-async function visaChipReceive(token){
-  const me = state.pid, key = chipKey(token);
-  const rd = async ()=>{ const cur = await window.storage.get(key, true); let r = cur && cur.value; if(typeof r === 'string'){ try{ r = JSON.parse(r); }catch(e){ r = null; } } return r; };
-  let rec = null; try{ rec = await rd(); }catch(e){}
-  if(!rec){ visaMsg('warn','الشريحة مش صالحة','الشريحة دي منتهية أو اتلغت. اطلب من صاحبك يعمل شريحة جديدة.'); return; }
-  if(rec.status !== 'open'){ visaMsg('warn','الشريحة اتستخدمت قبل كده','كل شريحة بتشتغل مرة واحدة بس. اطلب من صاحبك شريحة جديدة.'); return; }
-  if(Date.now() > rec.exp + CHIPC.GRACE){ visaMsg('warn','انتهت مدة الشريحة','اطلب من صاحبك يعمل شريحة جديدة.'); return; }
-  if(rec.from === me){ visaMsg('warn','دي شريحتك أنت','قرّب شريحة صاحبك، مش شريحتك.'); return; }
-  if(!visaCreated(me) || visaExpired(me)){ if(visaExpired(me)) showExpiredDialog(); else visaMsg('warn','اعمل فيزتك الأول','لازم تفعّل فيزتك عشان تستلم التحويل.'); return; }
-  const amt = Math.floor(Number(rec.amt) || 0);
-  if(amt <= 0){ visaMsg('error','بيانات الشريحة غير صحيحة','اطلب من صاحبك يعمل شريحة جديدة.'); return; }
-  visaPosBegin({ amount: amt+' نقطة', kind:'receive', amt });
-  try{
-    const fresh = await loadVisaCards(); if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh;
-    const fromCard = VISA_CARDS[rec.from];
-    if(!fromCard || !visaCreated(rec.from) || visaExpired(rec.from)){ visaPosAbort(()=>visaMsg('warn','بطاقة صاحبك غير صالحة','فيزا المرسل منتهية أو غير مفعّلة.')); return; }
-    const meName = (VISA_CARDS[me]||{}).holder || (PARTICIPANTS.find(x=>x.id===me)||{}).name || '';
-    const claimed = await window.storage.update(key, c=>{
-      if(!c || c.status !== 'open' || Date.now() > c.exp + CHIPC.GRACE) return;
-      return Object.assign({}, c, { status:'claimed', to: me, toName: meName });
-    }, true);
-    if(!claimed){ visaPosAbort(()=>visaMsg('warn','الشريحة اتستخدمت أو انتهت','اطلب من صاحبك شريحة جديدة.')); return; }
-    const r = await transferWallet(rec.from, me, amt);
-    if(r !== 'ok'){
-      await window.storage.update(key, c=>c ? Object.assign({}, c, { status:'failed', reason: r }) : undefined, true);
-      visaPosAbort(()=>visaMsg(r==='short' ? 'warn' : 'error', r==='short' ? 'رصيد صاحبك مش كفاية' : 'تعذّر إتمام التحويل', r==='short' ? 'رصيد المرسل أقل من المبلغ، لم يتم تحويل أي نقاط.' : 'حصلت مشكلة في الاتصال، لم يتم تحويل أي نقاط.'));
-      return;
-    }
-    WALLET = await loadWallet();
-    const senderName = fromCard.holder || rec.name || (PARTICIPANTS.find(x=>x.id===rec.from)||{}).name || '';
-    await logVisaTx([
-      { pid:rec.from, type:'transfer_out', amount:amt, balAfter:(WALLET[rec.from]||0), note:meName },
-      { pid:me, type:'transfer_in', amount:amt, balAfter:(WALLET[me]||0), note:senderName }
-    ]);
-    pushNotification(rec.from, `📤 تم تحويل ${amt} نقطة إلى ${meName}`, '📤');
-    pushNotification(me, `📥 وصلك ${amt} نقطة في فيزتك من ${senderName}`, '📥');
-    await window.storage.update(key, c=>c ? Object.assign({}, c, { status:'done' }) : undefined, true);
-    render();
-    const sn = escapeHtml(senderName || '—');
-    visaMsg('success','تم استلام التحويل',`وصلك ${amt} نقطة من ${sn}.`,{ pos:true, rows:[['من', sn], ['المبلغ', amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
-  }catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة، حاول مرة أخرى.')); }
+/* =====================================================================
+   تحويل بالشريحة — الطريقة الجديدة (v2)
+   - الشريحة الصفراء على كارت الفيزا هي كود ثابت لصاحب الكارت
+   - المستلم يمسحها، يكتب المبلغ → المرسل يوصله طلب تأكيد لحظي (Realtime)
+   - المرسل يأكّد بالسحب (و CVV للمبالغ الكبيرة) → التحويل يتم فورًا + إيصال برقم عملية
+   ===================================================================== */
+const CHIPQ = { TTL:60000, PIN_OVER:100, MAX:100000, COOLDOWN:8000 };
+function chipPidToken(pid){ let h = 0x811C9DC5; const t = 'glv-card:' + String(pid); for(let i=0;i<t.length;i++){ h ^= t.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
+function chipPidFromToken(token){
+  token = token >>> 0;
+  for(const p of (PARTICIPANTS || [])){ if(chipPidToken(p.id) === token) return p.id; }
+  for(const k of Object.keys(VISA_CARDS || {})){ if(chipPidToken(k) === token) return k; }
+  return null;
 }
+function chipStaticSrc(pid){
+  const c = window.__chipSrc || (window.__chipSrc = {}), k = String(pid);
+  if(!c[k]){ try{ c[k] = chipCodeCanvas(chipPidToken(pid), 150).toDataURL('image/png'); }catch(e){ c[k] = ''; } }
+  return c[k];
+}
+function chipReqKey(pid){ return 'glavera-creq-' + pid; }
+function chipParse(v){ if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ v = null; } } return v || null; }
+async function chipReadReq(key){ const cur = await window.storage.get(key, true); return chipParse(cur && cur.value); }
+function chipNameOf(pid){ return String((VISA_CARDS[pid]||{}).holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || '').trim(); }
+function chipAvatar(pid, size){
+  const p = PARTICIPANTS.find(x=>String(x.id)===String(pid)) || {}, nm = chipNameOf(pid) || '?', sz = size || 64;
+  const base = `width:${sz}px;height:${sz}px;border-radius:50%;flex:0 0 auto;border:2px solid rgba(255,255,255,.22);box-shadow:0 6px 18px rgba(0,0,0,.35);`;
+  if(p.photo) return `<div class="cq-av" style="${base}background:url('${p.photo}') center/cover"></div>`;
+  return `<div class="cq-av" style="${base}display:flex;align-items:center;justify-content:center;font-weight:900;font-size:${Math.round(sz*.42)}px;color:#221900;background:linear-gradient(145deg,var(--gold),var(--gold-2))">${escapeHtml(nm.trim().charAt(0).toUpperCase())}</div>`;
+}
+function chipSheet(id, inner){
+  const old = document.getElementById(id); if(old) old.remove();
+  const th = vposThemeOf(state.pid), ov = document.createElement('div');
+  ov.className = 'vpos-overlay'; ov.id = id; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `<div class="vpos-sheet vcs-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">${inner}</div>`;
+  document.body.appendChild(ov);
+  return ov;
+}
+function chipRing(sec){
+  return `<div class="cq-ring" style="position:relative;width:96px;height:96px;margin:6px auto 2px">
+    <svg viewBox="0 0 100 100" width="96" height="96" style="transform:rotate(-90deg)"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle class="cq-arc" cx="50" cy="50" r="44" fill="none" stroke="var(--gold)" stroke-width="6" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0" style="transition:stroke-dashoffset .3s linear"/></svg>
+    <div class="cq-sec" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;color:var(--gold-2)" dir="ltr">${sec}</div></div>`;
+}
+function chipRingSet(root, left){
+  const a = root.querySelector('.cq-arc'), t = root.querySelector('.cq-sec'); if(!a || !t) return;
+  const f = Math.max(0, Math.min(1, left / CHIPQ.TTL)); a.style.strokeDashoffset = String(276.5 * (1 - f)); t.textContent = Math.ceil(left/1000);
+  a.style.stroke = left < 12000 ? '#ff7a6b' : 'var(--gold)';
+}
+
+/* ---- المستلم: بعد المسح بيكتب المبلغ ---- */
+function chipAskAmount(from, name){
+  return new Promise(resolve=>{
+    const chips = [10,25,50,100].map(x=>`<button type="button" class="vp-chip" data-v="${x}">${x}</button>`).join('');
+    const ov = chipSheet('vca-overlay', `<div class="vcs-send">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px">${chipAvatar(from, 68)}
+        <div class="vcs-title" style="margin:0">${escapeHtml(name || '—')}</div>
+        <div class="vcs-sub" style="margin:0">✓ اتعرّفت على كارته • •••• ${String(visaNumber(from)||'').replace(/\D/g,'').slice(-4)}</div></div>
+      <div class="vcs-sub">اكتب النقط اللي عايز تستلمها. هيوصله طلب تأكيد لحظي على موبايله.</div>
+      <div class="vp-amt-wrap"><input id="vca-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" max="${CHIPQ.MAX}" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
+      <div class="vp-chips">${chips}</div>
+      <div class="vpos-actions"><button type="button" class="primary" id="vca-go">إرسال طلب التحويل</button><button type="button" id="vca-no">إلغاء</button></div></div>`);
+    const inp = ov.querySelector('#vca-amt'); let done = false;
+    const fin = (v)=>{ if(done) return; done = true; ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 200); resolve(v); };
+    ov.querySelectorAll('.vp-chip').forEach(b=>b.addEventListener('click', ()=>{ inp.value = b.dataset.v; vibrate(8); }));
+    ov.querySelector('#vca-go').addEventListener('click', ()=>{
+      const a = Math.floor(Number(inp.value) || 0);
+      if(a <= 0){ showToast('اكتب عدد النقاط الأول', true); inp.focus(); return; }
+      if(a > CHIPQ.MAX){ showToast('المبلغ أكبر من الحد المسموح', true); return; }
+      fin(a);
+    });
+    ov.querySelector('#vca-no').addEventListener('click', ()=>fin(0));
+    ov.addEventListener('click', e=>{ if(e.target === ov) fin(0); });
+    setTimeout(()=>{ try{ inp.focus(); }catch(e){} }, 250);
+  });
+}
+
+/* ---- المستلم: بعد قراءة الشريحة يبعت الطلب ويتابع حالته لحظيًا ---- */
+async function visaChipReceive(token){
+  const me = state.pid;
+  vibrate([30,20,30]);
+  if(!visaCreated(me)){ visaMsg('warn','اعمل فيزتك الأول','لازم تفعّل فيزتك عشان تستلم التحويل.'); return; }
+  if(visaExpired(me)){ showExpiredDialog(); return; }
+  const wait = (window.__chipCool || 0) - Date.now();
+  if(wait > 0){ showToast('استنى ' + Math.ceil(wait/1000) + ' ثواني قبل طلب جديد', true); return; }
+  try{ const fresh = await loadVisaCards(); if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh; }catch(e){}
+  const from = chipPidFromToken(token);
+  if(from == null){ visaMsg('warn','الشريحة مش معروفة','مقدرناش نعرف صاحب الشريحة دي. اتأكد إنك بتمسح الشريحة الصفراء في كارت فيزا صاحبك.'); return; }
+  if(String(from) === String(me)){ visaMsg('warn','دي شريحتك أنت','امسح شريحة صاحبك، مش شريحتك.'); return; }
+  if(!visaCreated(from) || visaExpired(from)){ visaMsg('warn','بطاقة صاحبك غير صالحة','فيزا صاحبك منتهية أو غير مفعّلة.'); return; }
+  const fromName = chipNameOf(from), meName = chipNameOf(me);
+  const amt = await chipAskAmount(from, fromName); if(!amt) return;
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const rec = { id, from, to: me, toName: meName, amt, exp: Date.now() + CHIPQ.TTL, status: 'pending', at: Date.now() };
+  const key = chipReqKey(from);
+  const put = await window.storage.update(key, c=>{ if(c && (c.status === 'pending' || c.status === 'seen' || c.status === 'approved') && Date.now() < c.exp + 5000) return; return rec; }, true);
+  if(!put){ visaMsg('warn','تعذّر إرسال الطلب','صاحبك عنده طلب تاني شغال دلوقتي أو الاتصال ضعيف. جرّب بعد ثواني.'); return; }
+  chipWaitForSender(key, rec, from, fromName);
+}
+function chipWaitForSender(key, rec, from, fromName){
+  const me = state.pid, sn = escapeHtml(fromName || '—');
+  const ov = chipSheet('vcw-overlay', `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">${chipAvatar(from, 60)}
+    <div class="vcs-title" style="margin:0">طلب تحويل لـ ${sn}</div></div>
+    <div class="vcs-amt-tag" dir="ltr">${rec.amt}<small>نقطة</small></div>
+    ${chipRing(Math.ceil(CHIPQ.TTL/1000))}
+    <div class="vcs-hint" id="vcw-steps" style="line-height:1.9"></div>
+    <div class="vpos-actions"><button type="button" id="vcw-cancel">إلغاء الطلب</button></div>`);
+  const steps = ov.querySelector('#vcw-steps');
+  let finished = false, busy = false, iv = 0, tk = 0, off = null, last = null;
+  const paintSteps = (st)=>{
+    const seen = st === 'seen' || st === 'approved';
+    steps.innerHTML = `<div>✓ تم إرسال الطلب</div><div style="opacity:${seen?1:.45}">${seen ? '✓ ' + sn + ' شاف الطلب' : '○ لسه مشافش الطلب'}</div><div style="opacity:${st==='approved'?1:.45}">${st==='approved' ? '⏳ بيتم تنفيذ التحويل…' : '○ في انتظار التأكيد'}</div>`;
+  };
+  paintSteps('pending');
+  const stop = ()=>{ finished = true; clearInterval(iv); clearInterval(tk); if(off){ try{ off(); }catch(e){} } ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 200); };
+  const cleanup = ()=>{ window.storage.delete(key, true).catch(()=>{}); };
+  const cool = ()=>{ window.__chipCool = Date.now() + CHIPQ.COOLDOWN; };
+  tk = setInterval(()=>chipRingSet(ov, rec.exp - Date.now()), 250);
+  ov.querySelector('#vcw-cancel').addEventListener('click', async ()=>{
+    const res = await window.storage.update(key, c=>(c && c.id === rec.id && (c.status === 'pending' || c.status === 'seen')) ? Object.assign({}, c, { status:'cancelled' }) : undefined, true);
+    if(res){ stop(); cleanup(); cool(); } else showToast('الطلب اتأكد خلاص، استنى النتيجة');
+  });
+  const handle = async (r)=>{
+    if(finished) return;
+    const left = rec.exp - Date.now();
+    if(!r || r.id !== rec.id){ stop(); visaMsg('warn','الطلب اتلغى','الطلب مبقاش موجود. لم يتم تحويل أي نقاط.'); return; }
+    if(r.status !== last){ last = r.status; paintSteps(r.status); }
+    if(r.status === 'done'){
+      stop(); try{ WALLET = await loadWallet(); }catch(e){}
+      if(r.ref) window.__lastTx = { ref: r.ref, at: Date.now() };
+      render(); cleanup();
+      const nm = escapeHtml(r.fromName || fromName || '—');
+      visaPosBegin({ amount: rec.amt+' نقطة', kind:'receive', amt: rec.amt });
+      visaMsg('success','تم استلام التحويل', `وصلك ${rec.amt} نقطة من ${nm}.`, { pos:true, rows:[['من', nm], ['المبلغ', rec.amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
+    } else if(r.status === 'declined'){ stop(); cleanup(); cool(); visaMsg('warn','صاحبك رفض التحويل','لم يتم تحويل أي نقاط.'); }
+    else if(r.status === 'failed'){ stop(); cleanup(); cool(); const sh = r.reason === 'short'; visaMsg(sh ? 'warn' : 'error', sh ? 'رصيد صاحبك مش كفاية' : 'تعذّر إتمام التحويل', 'لم يتم تحويل أي نقاط.'); }
+    else if(r.status === 'expired' || r.status === 'cancelled'){ stop(); cleanup(); cool(); visaMsg('info','انتهت مدة الطلب','صاحبك مأكّدش في الوقت. لم يتم تحويل أي نقاط.'); }
+    else if(r.status === 'approved'){ if(left < -30000){ stop(); visaMsg('error','التحويل اتأخر','مقدرناش نتأكد من النتيجة. راجع كشف الحساب قبل ما تعيد المحاولة.'); } }
+    else if((r.status === 'pending' || r.status === 'seen') && left < -3000){
+      const res = await window.storage.update(key, c=>(c && c.id === rec.id && (c.status === 'pending' || c.status === 'seen')) ? Object.assign({}, c, { status:'expired' }) : undefined, true);
+      if(res){ stop(); cleanup(); cool(); visaMsg('info','انتهت مدة الطلب','صاحبك مأكّدش في الوقت. لم يتم تحويل أي نقاط.'); }
+    }
+  };
+  off = chipWatch(key, handle);
+  iv = setInterval(async ()=>{ if(busy || finished) return; busy = true; try{ await handle(await chipReadReq(key)); }catch(e){} finally { busy = false; } }, 2500);
+}
+
+/* ---- Realtime: لو Firebase متاح بنسمع للتغيير فورًا، وإلا بنعمل polling ---- */
+function chipWatch(key, cb){
+  try{
+    if(typeof _fbDb !== 'undefined' && _fbDb){
+      const ref = _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key));
+      const fn = (snap)=>{ try{ cb(snap && snap.exists() ? chipParse(snap.val()) : null); }catch(e){} };
+      ref.on('value', fn);
+      return ()=>{ try{ ref.off('value', fn); }catch(e){} };
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ---- المرسل: الطلب بيظهر لحظيًا في أي صفحة وهو داخل بحسابه ---- */
+function chipInboxAttach(){
+  const pid = (typeof state !== 'undefined' && state) ? state.pid : null;
+  const cur = window.__chipInbox;
+  if(cur && String(cur.pid) === String(pid)) return;
+  if(cur && cur.off){ try{ cur.off(); }catch(e){} }
+  window.__chipInbox = null; if(!pid) return;
+  const key = chipReqKey(pid), onReq = (r)=>chipInboxCheck(r);
+  const off = chipWatch(key, onReq);
+  window.__chipInbox = { pid, off };
+}
+async function chipInboxPoll(){
+  chipInboxAttach();
+  const ib = window.__chipInbox; if(!ib || ib.off || document.hidden) return;
+  try{ chipInboxCheck(await chipReadReq(chipReqKey(ib.pid))); }catch(e){}
+}
+function chipInboxCheck(r){
+  const pid = state.pid;
+  if(!r || r.status !== 'pending' || String(r.from) !== String(pid) || Date.now() >= r.exp) return;
+  const seen = window.__chipSeen || (window.__chipSeen = {});
+  if(seen[r.id]) return;
+  if(!visaCreated(pid)) return;
+  seen[r.id] = 1; chipHandleIncoming(r);
+}
+async function chipHandleIncoming(r){
+  const me = state.pid, key = chipReqKey(me), amt = Math.floor(Number(r.amt) || 0), toName = String(r.toName || '—');
+  const setStatus = (st, extra)=>window.storage.update(key, c=>(c && c.id === r.id && (c.status === 'pending' || c.status === 'seen' || c.status === 'approved')) ? Object.assign({}, c, { status: st }, extra || {}) : undefined, true);
+  /* قبل ما نعرض: نقفل أي شاشات تانية مفتوحة عشان الطلب يظهر قدامه فورًا */
+  ['vcs-overlay','vca-overlay','vcw-overlay','vch-overlay'].forEach(i=>{ const o = document.getElementById(i); if(o) o.remove(); });
+  try{ if(typeof visaChipStopWork === 'function') visaChipStopWork(); if(typeof visaChipClose === 'function') visaChipClose(); }catch(e){}
+  vibrate([60,40,60,40,60]); try{ vposBeep('ok'); }catch(e){}
+  await setStatus('seen');
+  try{ WALLET = await loadWallet(); }catch(e){}
+  if(amt <= 0 || amt > CHIPQ.MAX){ await setStatus('failed', { reason:'fail' }); return; }
+  if(visaExpired(me)){ await setStatus('failed', { reason:'fail' }); showExpiredDialog(); return; }
+  const bal = WALLET[me] || 0;
+  if(amt > bal){ await setStatus('failed', { reason:'short' }); visaMsg('warn','رصيدك مش كفاية', `${escapeHtml(toName)} طلب ${amt} نقطة ورصيدك ${bal} نقطة.`); return; }
+  let tmr = 0, tk = 0;
+  const gone = new Promise(res=>{ tmr = setTimeout(()=>{ const o = document.getElementById('vpc-overlay'); if(o) o.remove(); res(false); }, Math.max(500, r.exp - Date.now())); });
+  const pending = visaPayConfirm({ title:'طلب تحويل', subtitle:`<div style="display:flex;justify-content:center;margin:4px 0 6px">${chipAvatar(r.to, 52)}</div><b>${escapeHtml(toName)}</b> مسح شريحة كارتك وطالب تحويل`, amount: amt,
+    rows:[['المستلم', escapeHtml(toName)], ['رصيدك الآن', bal+' نقطة'], ['رصيدك بعد التحويل', (bal-amt)+' نقطة']], label:'اسحب للتأكيد' });
+  setTimeout(()=>{
+    const ov = document.getElementById('vpc-overlay'); if(!ov) return;
+    const slot = ov.querySelector('.vpc-amount') || ov.querySelector('.vpc-title'); if(!slot) return;
+    const holder = document.createElement('div'); holder.innerHTML = chipRing(Math.ceil(Math.max(0, r.exp - Date.now())/1000)); holder.style.transform = 'scale(.62)'; holder.style.margin = '-18px 0 -18px';
+    slot.insertAdjacentElement('afterend', holder);
+    tk = setInterval(()=>{ if(!document.body.contains(holder)){ clearInterval(tk); return; } chipRingSet(holder, r.exp - Date.now()); }, 250);
+  }, 60);
+  const ok = await Promise.race([ pending, gone ]); clearTimeout(tmr); clearInterval(tk);
+  if(!ok){ await setStatus(Date.now() >= r.exp ? 'expired' : 'declined'); if(Date.now() < r.exp) showToast('تم رفض الطلب'); return; }
+  /* المبالغ الكبيرة: لازم CVV إضافي */
+  if(amt >= CHIPQ.PIN_OVER){
+    const pinOk = await new Promise(res=>{
+      showPinEntryModal({ title:'تأكيد إضافي', text:`مبلغ ${amt} نقطة — اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك`,
+        onSubmit: async (pin)=>{ if(Date.now() > r.exp + 2500){ res(false); return true; } if(!(await verifyVisaPin(me, pin))) return false; res(true); return true; },
+        onCancel: ()=>res(false) });
+      const pm = document.getElementById('pinmodal-overlay'); if(pm) pm.style.zIndex = '100050';
+    });
+    if(!pinOk){ await setStatus(Date.now() > r.exp + 2500 ? 'expired' : 'declined'); if(Date.now() > r.exp + 2500) visaMsg('info','انتهت مدة الطلب','لم يتم خصم أي نقاط.'); return; }
+  }
+  const claimed = await window.storage.update(key, c=>(c && c.id === r.id && (c.status === 'pending' || c.status === 'seen') && Date.now() < r.exp + 2500) ? Object.assign({}, c, { status:'approved' }) : undefined, true);
+  if(!claimed){ visaMsg('warn','الطلب انتهى','مدة الطلب خلصت قبل التأكيد. لم يتم خصم أي نقاط.'); return; }
+  visaPosBegin({ amount: amt+' نقطة', kind:'transfer', amt });
+  const res = await transferWallet(me, r.to, amt);
+  if(res !== 'ok'){
+    await setStatus('failed', { reason: res });
+    visaPosAbort(()=>visaMsg(res === 'short' ? 'warn' : 'error', res === 'short' ? 'رصيدك مش كفاية' : 'تعذّر إتمام التحويل', 'لم يتم خصم أي نقاط.'));
+    return;
+  }
+  try{ WALLET = await loadWallet(); }catch(e){}
+  const myName = chipNameOf(me);
+  try{
+    await logVisaTx([
+      { pid: me, type:'transfer_out', amount: amt, balAfter: (WALLET[me]||0), note: toName },
+      { pid: r.to, type:'transfer_in', amount: amt, balAfter: (WALLET[r.to]||0), note: myName }
+    ]);
+    pushNotification(me, `📤 تم تحويل ${amt} نقطة إلى ${toName}`, '📤');
+    pushNotification(r.to, `📥 وصلك ${amt} نقطة في فيزتك من ${myName}`, '📥');
+  }catch(e){}
+  const ref = window.__lastTx ? window.__lastTx.ref : '';
+  await window.storage.update(key, c=>(c && c.id === r.id) ? Object.assign({}, c, { status:'done', fromName: myName, ref }) : undefined, true);
+  render();
+  const tn = escapeHtml(toName);
+  visaMsg('success','تم التحويل بنجاح', `تم تحويل ${amt} نقطة إلى ${tn}.`, { pos:true, rows:[['المستلم', tn], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[me]||0)+' نقطة']] });
+}
+if(!window.__chipInboxTimer){ window.__chipInboxTimer = setInterval(chipInboxPoll, 2000); }
+
 
 /* =====================================================================
    نغمة الشريحة: نفس رقم العملية بيتبعت كنغمة قصيرة (FSK بـ 16 نغمة)
@@ -24406,9 +24612,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-renew'){ doVisaRenew(el.dataset.src); }
   else if(action==='visa-transfer'){ doVisaTransfer(); }
   else if(action==='visa-copy-number'){ copyMyVisaNumber(el); }
-  else if(action==='visa-chip'){ visaChipOpen('send'); }
+  else if(action==='visa-chip'){ visaChipOpen('recv'); }
   else if(action==='visa-chip-recv'){ visaChipOpen('recv'); }
-  else if(action==='visa-chip-send'){ visaChipOpen('send'); }
+  else if(action==='visa-chip-send'){ visaChipOpen('recv'); }
   else if(action==='visa-recent'){ visaPickRecent(el); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
