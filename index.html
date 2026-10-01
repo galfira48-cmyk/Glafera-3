@@ -3173,6 +3173,62 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-page-head{ padding:14px 0 12px; border-bottom:1px solid var(--border); margin-bottom:12px; }
   .admin-siblings{ padding-bottom:2px; }
 
+
+  /* ===== كشف الحضور الاحترافي (الأدمن) ===== */
+  .att-tools{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+  .att-tool{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:12px; border-radius:16px; text-align:right; font-family:inherit; color:inherit;
+    background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); border:1px solid var(--border); -webkit-tap-highlight-color:transparent; }
+  .att-tool span{ font-size:20px; } .att-tool b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; } .att-tool small{ font-size:10.5px; color:var(--text-muted); max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .att-tool:active{ transform:scale(.97); } .att-tool[disabled]{ opacity:.45; pointer-events:none; }
+  .att-tbars{ display:flex; flex-direction:column; gap:6px; padding:10px; }
+  .att-tbar{ display:flex; align-items:center; gap:10px; padding:7px 8px; border-radius:12px; font-family:inherit; color:inherit; background:transparent; border:1px solid transparent; text-align:right; }
+  .att-tbar.on{ background:rgba(244,183,64,.1); border-color:rgba(244,183,64,.45); }
+  .atb-name{ flex:0 0 84px; font-weight:700; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .atb-track{ flex:1; height:8px; border-radius:6px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .atb-track i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#5FE0A4,#F4B740); transition:width .4s ease; }
+  .atb-n{ flex:0 0 46px; text-align:left; font-size:11.5px; font-weight:800; color:var(--gold-2); font-variant-numeric:tabular-nums; direction:ltr; }
+  .att-roster{ margin-bottom:6px; }
+  .att-chips{ display:flex; gap:6px; margin-bottom:8px; }
+  .att-chips-scroll{ overflow-x:auto; scrollbar-width:none; padding-bottom:2px; } .att-chips-scroll::-webkit-scrollbar{ display:none; }
+  .att-chip{ flex:1 1 0; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 10px; border-radius:20px; font-family:inherit; font-size:12px; font-weight:800; white-space:nowrap; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); }
+  .att-chip b{ font-size:11px; padding:1px 7px; border-radius:10px; background:rgba(255,255,255,.1); font-variant-numeric:tabular-nums; }
+  .att-chip-t{ flex:0 0 auto; padding:7px 13px; font-size:11.5px; }
+  .att-chip.on{ color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); border-color:transparent; } .att-chip.on b{ background:rgba(0,0,0,.14); }
+  .att-bulk{ width:100%; margin-bottom:10px; }
+  .att-roster-list{ border-radius:18px; overflow:hidden; border:1px solid var(--border); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); }
+  .att-roster-row{ display:flex; align-items:center; gap:11px; padding:10px 12px; }
+  .att-roster-row + .att-roster-row{ border-top:1px solid var(--border); }
+  .att-roster-row.is-in{ background:rgba(95,224,164,.06); }
+  .arr-av{ flex:0 0 auto; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:#fff; background:linear-gradient(145deg,#845EC2,#3FDCC9); }
+  .att-roster-row.is-in .arr-av{ background:linear-gradient(145deg,#2BAE78,#5FE0A4); }
+  .arr-txt{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .arr-txt b{ font-size:13.5px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .arr-txt small{ font-size:10.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .arr-btn{ flex:0 0 auto; min-width:70px; height:38px; padding:0 14px; border-radius:12px; font-family:inherit; font-weight:900; font-size:12.5px; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); border:0; -webkit-tap-highlight-color:transparent; }
+  .arr-btn:active{ transform:scale(.94); }
+  .arr-btn.in{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; line-height:1.1; color:#BFF5DC; background:rgba(95,224,164,.14); border:1px solid rgba(95,224,164,.45); }
+  .arr-btn.in span{ font-size:14px; } .arr-btn.in small{ font-size:9px; font-weight:700; opacity:.85; }
+
+
+  /* ===== إنشاء جلسة جاهزة بتاريخ اليوم ===== */
+  .att-stale{ display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:12px 14px; border-radius:18px; background:linear-gradient(160deg,rgba(244,183,64,.16),rgba(244,183,64,.04)); border:1px solid rgba(244,183,64,.5); }
+  .att-stale-txt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; } .att-stale-txt b{ font-family:'Cairo',sans-serif; font-size:13px; font-weight:800; color:#FFDE94; }
+  .att-stale-txt small{ font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .att-stale .btn{ width:auto; flex:0 0 auto; padding:9px 14px; font-size:12px; margin:0; }
+  .att-newsess{ display:flex; flex-direction:column; gap:10px; background:linear-gradient(160deg,rgba(95,224,164,.09),rgba(255,255,255,.02)); border-color:rgba(95,224,164,.3); }
+  .att-ns-top{ display:flex; align-items:center; gap:11px; }
+  .att-ns-ico{ width:44px; height:44px; border-radius:14px; display:grid; place-items:center; font-size:22px; background:rgba(255,255,255,.1); border:1px solid var(--border); }
+  .att-ns-top div{ display:flex; flex-direction:column; } .att-ns-top b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; } .att-ns-top small{ font-size:11px; color:var(--text-muted); }
+  .att-ns-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:8px; }
+  .att-ns-f{ display:flex; flex-direction:column; gap:5px; } .att-ns-f > span{ font-size:11.5px; font-weight:700; color:var(--text-muted); }
+  .att-ns-open{ display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; } .att-ns-open input{ width:18px; height:18px; accent-color:#5FE0A4; }
+
+
+  /* ===== تثبيت حجم كود QR في الأدمن (بيمنع التضخّم والخروج عن الشاشة) ===== */
+  #att-admin-qr{ display:inline-block; box-sizing:content-box; width:180px; height:180px; max-width:100%; padding:10px; line-height:0; overflow:hidden; }
+  #att-admin-qr img, #att-admin-qr canvas{ width:180px !important; height:180px !important; max-width:none !important; min-width:0 !important; padding:0 !important; margin:0 !important; border-radius:0 !important; object-fit:contain; display:block; }
+  #att-admin-qr canvas:not(:only-child){ display:none !important; }
+
   /* ---------- صفحة "جاري التحديث" (زجاجي راقي) ---------- */
   .maint-page{ position:relative; overflow:hidden; isolation:isolate; margin-top:10px; padding:32px 22px 24px; border-radius:20px; text-align:center; color:#FCF9F3;
     background:linear-gradient(140deg,rgba(20,26,78,.94) 0%,rgba(31,33,76,.93) 55%,rgba(56,41,43,.95) 100%);
@@ -23303,14 +23359,17 @@ function attGenCode(type){
   return 'ATT-' + ATT_TYPES[type].pre + '-' + s;
 }
 function attNormCode(c){ return String(c||'').trim().toUpperCase().replace(/[^A-Z0-9-]/g,''); }
-function attDefaultName(type){
+function attParseDay(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(); }
+function attTodayISO(){ const d = new Date(), z = n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
+function attDefaultName(type, day){
   let d = '';
-  try{ d = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}); }catch(e){}
+  try{ d = (day ? attParseDay(day) : new Date()).toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}); }catch(e){}
   return ATT_TYPES[type].label + ' ' + d;
 }
-function attNewCfg(type){
-  const t = Date.now();
-  return { open:false, code:attGenCode(type), sessionId:'s'+t.toString(36), name:attDefaultName(type), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
+function attNewCfg(type, day){
+  let t = Date.now();
+  if(day && day!==attTodayISO()){ const d = attParseDay(day); d.setHours(12,0,0,0); t = d.getTime(); }
+  return { open:false, code:attGenCode(type), sessionId:'s'+t.toString(36)+Math.random().toString(36).slice(2,5), name:attDefaultName(type, day), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
 }
 function attFmtTime(ts){
   try{ return new Date(ts).toLocaleString('ar-EG', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}); }catch(e){ return ''; }
@@ -23759,9 +23818,45 @@ function renderAdminAttendanceTab(){
     const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===h.sessionId).length;
     return `<div class="audit-row"><div class="audit-left">${escapeHtml(h.name||'')}<div class="audit-sub">${attFmtTime(h.startedAt)}</div></div><div class="audit-time">${n} حضور</div></div>`;
   }).join('');
+  const todayISO = attTodayISO();
+  const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
+  const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ الجلسة الحالية من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ جلسة النهارده</button></div>` : '';
+  const R = state.attRoster || (state.attRoster = {f:'absent', team:'all'});
+  const here = new Set(recs.map(r=>r.pid));
+  const recOf = {}; recs.forEach(r=>{ recOf[r.pid] = r; });
+  const teamStats = TEAMS.map(tm=>{ const m = PARTICIPANTS.filter(p=>p.teamId===tm.id); const a = m.filter(p=>here.has(p.id)).length; return {tm, n:m.length, a, pc:m.length?Math.round(a/m.length*100):0}; }).filter(x=>x.n);
+  const inScope = PARTICIPANTS.filter(p=>R.team==='all' || p.teamId===R.team);
+  const cntAll = inScope.length, cntIn = inScope.filter(p=>here.has(p.id)).length, cntOut = cntAll - cntIn;
+  const rosterList = inScope.filter(p=> R.f==='all' || (R.f==='present') === here.has(p.id));
+  const RLIM = 250;
+  const rosterRows = rosterList.slice(0,RLIM).map(p=>{
+    const r = recOf[p.id]; const tmn = teamOf(p.teamId) ? teamOf(p.teamId).name : '';
+    const btn = r
+      ? `<button type="button" class="arr-btn in" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}" aria-label="إلغاء حضور ${escapeHtml(p.name)}"><span>✓</span><small>${attFmtTime(r.ts)}</small></button>`
+      : `<button type="button" class="arr-btn" data-action="att-admin-quick" data-type="${type}" data-pid="${escapeHtml(String(p.id))}">سجّل</button>`;
+    return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id+' '+tmn).toLowerCase())}">
+      <span class="arr-av">${escapeHtml((p.name||'?').trim().charAt(0))}</span>
+      <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(tmn)} · ${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
+      ${btn}
+    </div>`;
+  }).join('');
+  const chipF = (id,lab,n)=>`<button type="button" class="att-chip ${R.f===id?'on':''}" data-action="att-admin-rf" data-f="${id}">${lab}<b>${n}</b></button>`;
+  const chipT = (id,lab)=>`<button type="button" class="att-chip att-chip-t ${R.team===id?'on':''}" data-action="att-admin-rteam" data-team="${escapeHtml(String(id))}">${escapeHtml(lab)}</button>`;
+  const teamBars = teamStats.map(x=>`<button type="button" class="att-tbar ${R.team===x.tm.id?'on':''}" data-action="att-admin-rteam" data-team="${escapeHtml(String(x.tm.id))}">
+      <span class="atb-name">${escapeHtml(x.tm.name)}</span>
+      <span class="atb-track"><i style="width:${x.pc}%"></i></span>
+      <span class="atb-n">${x.a}/${x.n}</span></button>`).join('');
+  const lastRec = recs[0];
+  const toolsHtml = `<div class="att-tools">
+      <button type="button" class="att-tool" data-action="att-admin-undo" data-type="${type}" ${lastRec?'':'disabled'}><span>↩️</span><b>تراجع عن آخر تسجيل</b><small>${lastRec?escapeHtml((PARTICIPANTS.find(x=>x.id===lastRec.pid)||{}).name||''):'—'}</small></button>
+      <button type="button" class="att-tool" data-action="att-admin-export" data-type="${type}"><span>⬇️</span><b>تصدير كشف الحضور</b><small>Excel / CSV (حاضر + غائب)</small></button>
+    </div>`;
   return `
     ${tabs}
     ${kpis}
+    ${toolsHtml}
+    ${adminSectionTitle('📊','حضور الفرق')}
+    <div class="card att-tbars">${teamBars || '<div class="empty-note">لا توجد فرق</div>'}</div>
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div>
         <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">${CONF_SETTINGS.attendanceLocked?'🔧':'🛠️'} وضع "جاري التحديث" للحضور</div>
@@ -23785,6 +23880,7 @@ function renderAdminAttendanceTab(){
         <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
       </div>
     </div>
+    ${staleBanner}
     ${adminSectionTitle('🗓️','الجلسة الحالية')}
     <div class="card">
       <div class="admin-session-name" style="margin-bottom:6px;">اسم الجلسة</div>
@@ -23798,9 +23894,19 @@ function renderAdminAttendanceTab(){
         <button type="button" class="btn btn-outline" style="width:auto;padding:0 16px;" data-action="att-admin-save-points" data-type="${type}">حفظ</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">${[0,10,20,50,100].map(v=>`<button type="button" class="btn btn-ghost" style="width:auto;padding:6px 14px;font-size:12px;margin:0;" onclick="var i=document.getElementById('att-pts-input');if(i){i.value=${v};i.focus();}">${v===0?'بدون نقاط':v}</button>`).join('')}</div>
-      <div class="hint">القيمة دي بتتطبّق على أي كود جديد: عدّلها هنا وبعدين دوس "ابدأ جلسة جديدة" (أو "حفظ" لو الجلسة الحالية). اللي سجّلوا قبل كده نقاطهم مش بتتغير.</div>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-new" data-type="${type}">➕ ابدأ جلسة جديدة</button>
-      <div class="hint">الجلسة الجديدة بتعمل كود جديد وبتبدأ عدّاد حضور من صفر، والقديمة بتتحفظ في السجل.</div>
+      <div class="hint">التعديل هنا بيخص الجلسة الحالية. اللي سجّلوا قبل كده نقاطهم مش بتتغير.</div>
+    </div>
+    ${adminSectionTitle('➕','إنشاء جلسة جديدة')}
+    <div class="card att-newsess">
+      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>جلسة ${t.label} جديدة</b><small>جاهزة بتاريخ النهارده — عدّل لو محتاج</small></div></div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${todayISO}" dir="ltr" onchange="(function(d){var n=document.getElementById('att-new-name');if(n&&!n.dataset.t){n.value=attDefaultName('${type}',d.value);}})(this)" /></label>
+        <label class="att-ns-f"><span>🪙 النقاط</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
+      </div>
+      <label class="att-ns-f"><span>✏️ اسم الجلسة</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
+      <label class="att-ns-open"><input type="checkbox" id="att-new-open" checked /><span>فتح الحضور فورًا بعد الإنشاء</span></label>
+      <button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">🚀 إنشاء جلسة ${t.label}</button>
+      <div class="hint">بيعمل كود QR جديد وعدّاد من صفر، والجلسة الحالية بتتحفظ في «الجلسات السابقة».</div>
     </div>
     ${adminSectionTitle('➕','تسجيل حضور يدوي')}
     <div class="card">
@@ -23809,8 +23915,15 @@ function renderAdminAttendanceTab(){
         <button type="button" class="btn btn-outline" style="width:auto;padding:0 16px;" data-action="att-admin-add" data-type="${type}">سجّل</button>
       </div>
     </div>
-    ${adminSectionTitle('👥','الحاضرين ('+recs.length+')')}
-    ${recs.length ? `<input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" /><div class="card">${rows}</div>` : `<div class="card"><div class="empty-note">لسه محدش سجل حضوره في الجلسة دي</div></div>`}
+    ${adminSectionTitle('📋','كشف الحضور')}
+    <div class="att-roster">
+      <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('all','الكل',cntAll)}</div>
+      <div class="att-chips att-chips-scroll">${chipT('all','كل الفرق')}${TEAMS.filter(tm=>PARTICIPANTS.some(p=>p.teamId===tm.id)).map(tm=>chipT(tm.id,tm.name)).join('')}</div>
+      <input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دور بالاسم أو الكود أو الفريق..." style="margin:2px 0 10px;" />
+      ${(R.team!=='all' && cntOut>0) ? `<button type="button" class="btn btn-outline att-bulk" data-action="att-admin-team-all" data-type="${type}">✅ سجّل ${escapeHtml((teamOf(R.team)||{}).name||'الفريق')} كله (${cntOut})</button>` : ''}
+      <div class="att-roster-list">${rosterRows || `<div class="empty-note">${R.f==='absent'?'🎉 كل المشاركين في النطاق ده سجّلوا حضورهم':'مفيش أسماء في الفلتر ده'}</div>`}</div>
+      ${rosterList.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${rosterList.length} — استخدم البحث أو فلتر الفريق</div>` : ''}
+    </div>
     ${hist ? adminSectionTitle('🕓','الجلسات السابقة') + `<div class="card">${hist}</div>` : ''}
     <button type="button" class="btn btn-ghost" style="margin-top:14px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">🗑️ مسح كل سجلات ${t.label}</button>
   `;
@@ -23913,6 +24026,66 @@ async function attAdminAction(action, el){
     const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, pts:attPtsOfCfg(type,c)}; });
     if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); return; }
     saveToast(ok, 'تم تسجيل حضور '+p.name);
+  }
+  else if(action==='att-admin-rf'){ (state.attRoster = state.attRoster || {f:'absent',team:'all'}).f = el.dataset.f; render(); }
+  else if(action==='att-admin-rteam'){ const R0 = (state.attRoster = state.attRoster || {f:'absent',team:'all'}); R0.team = (R0.team===el.dataset.team) ? 'all' : el.dataset.team; render(); }
+  else if(action==='att-admin-quick'){
+    const p = PARTICIPANTS.find(x=>String(x.id)===el.dataset.pid); const c = attCfg(type); if(!p || !c) return;
+    const rkey = attRecKey(p.id, type, c.sessionId); let dup = false;
+    const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, pts:attPtsOfCfg(type,c)}; });
+    if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); render(); return; }
+    saveToast(ok, '✓ '+p.name);
+  }
+  else if(action==='att-admin-team-all'){
+    const c = attCfg(type); const R0 = state.attRoster || {team:'all'}; if(!c || R0.team==='all') return;
+    const todo = PARTICIPANTS.filter(p=>p.teamId===R0.team && !ATT_RECORDS[attRecKey(p.id,type,c.sessionId)]);
+    if(!todo.length) return;
+    showConfirmDialog('تسجّل حضور '+todo.length+' من '+((teamOf(R0.team)||{}).name||'الفريق')+' دفعة واحدة؟', async ()=>{
+      const ts = Date.now(); const pts = attPtsOfCfg(type,c);
+      const ok = await attRecUpdate(o=>{ todo.forEach(p=>{ const k = attRecKey(p.id,type,c.sessionId); if(!o[k]) o[k] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts, manual:true, pts}; }); });
+      saveToast(ok, 'تم تسجيل '+todo.length+' مشارك');
+    }, {confirmLabel:'سجّل الكل'});
+  }
+  else if(action==='att-admin-undo'){
+    const c = attCfg(type); if(!c) return;
+    const last = Object.entries(ATT_RECORDS||{}).filter(([k,r])=>r && r.type===type && r.sid===c.sessionId).sort((a,b)=>b[1].ts-a[1].ts)[0];
+    if(!last){ showToast('مفيش تسجيلات للتراجع عنها', true); return; }
+    const pn = (PARTICIPANTS.find(x=>x.id===last[1].pid)||{}).name || last[1].pid;
+    showConfirmDialog('تتراجع عن تسجيل حضور '+pn+'؟', async ()=>{
+      const ok = await attRecUpdate(o=>{ delete o[last[0]]; });
+      saveToast(ok, 'تم التراجع');
+    }, {confirmLabel:'تراجع'});
+  }
+  else if(action==='att-admin-export'){
+    const c = attCfg(type); if(!c) return;
+    const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const rows = [['الاسم','الكود','الفريق','الحالة','وقت الحضور','طريقة التسجيل','النقاط']];
+    PARTICIPANTS.forEach(p=>{ const r = ATT_RECORDS[attRecKey(p.id,type,c.sessionId)];
+      rows.push([p.name, p.id, (teamOf(p.teamId)||{}).name||'', r?'حاضر':'غائب', r?attFmtTime(r.ts):'', r?(r.manual?'يدوي':'QR'):'', r?(r.pts||0):'']); });
+    const csv = '\ufeff' + rows.map(r=>r.map(q).join(',')).join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+    a.download = 'حضور-'+t.label+'-'+(c.name||'الجلسة')+'.csv'; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    showToast('تم تجهيز الملف');
+  }
+  else if(action==='att-admin-create' || action==='att-admin-today'){
+    const quick = action==='att-admin-today';
+    const gv = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+    const day = quick ? attTodayISO() : (gv('att-new-date') || attTodayISO());
+    let pts = quick ? attPtsOfCfg(type, attCfg(type)) : Math.round(+normalizeDigits(gv('att-new-pts')||'0'));
+    if(!Number.isFinite(pts) || pts<0 || pts>1000){ showToast('اكتب نقاط من 0 لحد 1000', true); return; }
+    const nm = quick ? '' : gv('att-new-name').trim();
+    const openNow = quick ? true : !!(document.getElementById('att-new-open') || {}).checked;
+    const finalName = nm || attDefaultName(type, day);
+    showConfirmDialog('هتبدأ «'+finalName+'» بكود جديد وعدّاد من صفر'+(pts>0?' ('+pts+' نقطة)':' (بدون نقاط)')+(openNow?' والحضور هيتفتح فورًا':'')+'. الجلسة الحالية هتتحفظ في السجل.', async ()=>{
+      const ok = await attCfgUpdate(o=>{
+        const prev = o[type]; const n = attNewCfg(type, day);
+        n.name = finalName; n.points = pts; n.open = openNow;
+        n.history = (prev.history||[]).concat([{sessionId:prev.sessionId, name:prev.name, startedAt:prev.startedAt}]).slice(-30);
+        o[type] = n;
+      });
+      saveToast(ok, '🚀 '+finalName+(openNow?' — الحضور مفتوح':''));
+    }, {icon:'🚀', confirmLabel:'ابدأ'});
   }
   else if(action==='att-admin-reset'){
     showConfirmDialog('هتمسح كل سجلات حضور '+t.label+' (كل الجلسات). الخطوة دي مش بترجع.', async ()=>{
