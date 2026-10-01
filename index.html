@@ -440,6 +440,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .bnav-qc{ flex:none; width:18px; height:18px; fill:none; stroke:var(--text-muted); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; opacity:.6; }
   html[dir="rtl"] .bnav-qc{ transform:scaleX(-1); }
   #bnav-scrim{ position:fixed; inset:0; z-index:89; background:rgba(6,5,20,.45); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); animation:bnavIn .2s both; }
+  /* إصلاح تمدّد الكارت: دائرة اللمس (ripple) كانت بتتحول لعنصر داخل الكارت بسبب قاعدة .att-glass > *{position:relative} فتزوّد طول الكارت */
+  .tap-ripple, .ripple-fx{ position:absolute !important; }
+  /* منع تحديد النص وقائمة النسخ بالضغط الطويل في كل التطبيق (حقول الكتابة مستثناة) */
+  html, body{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  input, textarea, select, [contenteditable=""], [contenteditable="true"], .selectable, .selectable *{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
   #app.has-bnav{ padding-bottom:120px; }
   body.has-bnav .toast{ bottom:calc(104px + env(safe-area-inset-bottom,0px)); }
   @media (prefers-reduced-motion: reduce){ #bnav, #bnav.show, .bnav-orb::after, .bnav-orb svg, .bnav-ico, .bnav-quick, .bnav-quick button{ animation:none !important; transition:none !important; } }
@@ -3001,42 +3006,120 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .att-hero .att-live{ margin-top:9px; }
 
   .att-page-list{ display:flex; flex-direction:column; gap:14px; margin-top:4px; }
-  .att-glass{ --rx:0deg; --ry:0deg; --sc:1; --mx:85%; --my:0%;
-    position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; width:100%; padding:16px 16px;
+  /* ---------- كروت الحضور: شكل "تذكرة" بحافة تثقيب وجزء جانبي للحالة ---------- */
+  .att-glass{ --rx:0deg; --ry:0deg; --sc:1; --mx:85%; --my:0%; --stub:85px; --nr:10px;
+    position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; width:100%; padding:16px 14px;
     border-radius:26px; text-align:right; cursor:pointer; font-family:inherit; color:#fff; -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-    background:linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.04) 60%, rgba(255,255,255,.09));
-    border:1px solid rgba(255,255,255,.2);
-    backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%);
-    box-shadow:0 14px 32px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.32);
+    background:none; border:0;
+    box-shadow:0 14px 30px -6px rgba(0,0,0,.45);
     transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--sc));
-    transition:transform .28s cubic-bezier(.22,.9,.28,1), box-shadow .3s ease, border-color .3s ease; will-change:transform; }
-  .att-glass::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.2; background:var(--cap-color); }
-  .att-glass::after{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(220px circle at var(--mx) var(--my), rgba(255,255,255,.2), transparent 62%); transition:background .1s linear; }
+    transition:transform .28s cubic-bezier(.22,.9,.28,1), box-shadow .3s ease; will-change:transform; }
+  /* سطح الكارت: زجاج + لمسة لون النشاط + لمعة تتبع الإصبع + حلقتا النتوء، وبه قصّ نصف دائري أعلى وأسفل خط التثقيب */
+  .att-glass::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit; border:1px solid rgba(255,255,255,.2);
+    background:
+      radial-gradient(calc(var(--nr) + 1px) circle at var(--stub) 0, transparent calc(var(--nr) - .5px), rgba(255,255,255,.26) var(--nr), transparent calc(var(--nr) + 1.2px)),
+      radial-gradient(calc(var(--nr) + 1px) circle at var(--stub) 100%, transparent calc(var(--nr) - .5px), rgba(255,255,255,.26) var(--nr), transparent calc(var(--nr) + 1.2px)),
+      radial-gradient(220px circle at var(--mx) var(--my), rgba(255,255,255,.16), transparent 62%),
+      linear-gradient(135deg, color-mix(in srgb,var(--c1,#F4B740) 26%,transparent), color-mix(in srgb,var(--c2,#FF7A59) 10%,transparent) 70%),
+      linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.03) 60%, rgba(255,255,255,.08));
+    -webkit-backdrop-filter:blur(22px) saturate(170%); backdrop-filter:blur(22px) saturate(170%);
+    -webkit-mask:radial-gradient(circle var(--nr) at var(--stub) 0,#0000 98%,#000) top/100% 51% no-repeat, radial-gradient(circle var(--nr) at var(--stub) 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+            mask:radial-gradient(circle var(--nr) at var(--stub) 0,#0000 98%,#000) top/100% 51% no-repeat, radial-gradient(circle var(--nr) at var(--stub) 100%,#0000 98%,#000) bottom/100% 51% no-repeat; }
+  /* خط التثقيب المنقّط */
+  .att-glass::after{ content:""; position:absolute; top:calc(var(--nr) + 7px); bottom:calc(var(--nr) + 7px); left:var(--stub); width:2px; margin-left:-1px; z-index:0; pointer-events:none;
+    background:repeating-linear-gradient(to bottom, rgba(255,255,255,.3) 0 5px, transparent 5px 11px); border-radius:2px; }
   .att-glass > *{ position:relative; z-index:1; }
-  .att-glass.is-open{ border-color:rgba(95,224,164,.6); box-shadow:0 14px 32px rgba(0,0,0,.32), 0 0 0 1px rgba(95,224,164,.22), 0 0 28px rgba(95,224,164,.22), inset 0 1px 0 rgba(255,255,255,.32); }
-  .att-glass.is-done{ border-color:rgba(255,222,148,.55); box-shadow:0 14px 32px rgba(0,0,0,.32), 0 0 22px rgba(244,183,64,.16), inset 0 1px 0 rgba(255,255,255,.32); }
+  .att-glass.is-open{ box-shadow:0 14px 30px -6px rgba(0,0,0,.45), 0 0 26px rgba(95,224,164,.2); }
+  .att-glass.is-open::before{ border-color:rgba(95,224,164,.6); }
+  .att-glass.is-done{ box-shadow:0 14px 30px -6px rgba(0,0,0,.45), 0 0 22px rgba(244,183,64,.14); }
+  .att-glass.is-done::before{ border-color:rgba(255,222,148,.55); }
   .att-glass.is-closed .att-glass-ico{ filter:saturate(.6) brightness(.92); }
-  .att-glass-ico{ position:relative; flex:0 0 auto; width:64px; height:64px; border-radius:20px; display:flex; align-items:center; justify-content:center;
-    background:var(--cap-color); box-shadow:0 10px 22px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.4); }
-  .att-glass-ico svg{ width:34px; height:34px; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+  .att-glass-ico{ position:relative; flex:0 0 auto; width:62px; height:62px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+    background:var(--cap-color); box-shadow:0 10px 22px rgba(0,0,0,.34), inset 0 1.5px 0 rgba(255,255,255,.45), inset 0 -3px 6px rgba(0,0,0,.14); }
+  .att-glass-ico svg{ width:33px; height:33px; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
   .att-glass.is-open .att-glass-ico::after{ content:""; position:absolute; inset:0; border-radius:inherit; animation:attRingPulse 2s ease-out infinite; }
   .att-tick{ position:absolute; top:-7px; right:-7px; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(145deg,#FFF3D2,#F4B740); border:2px solid #16204A; box-shadow:0 4px 10px rgba(0,0,0,.4); }
   .att-tick svg{ width:12px; height:12px; fill:none; stroke:#3A2A00; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; filter:none; }
   .att-glass-body{ flex:1; min-width:0; }
-  .att-glass-lab{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; line-height:1.25; }
-  .att-glass-name{ font-size:11.5px; color:rgba(255,255,255,.68); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .att-glass-lab{ font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; line-height:1.25; }
+  .att-glass-name{ font-size:12px; font-weight:600; color:rgba(255,255,255,.66); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .att-glass-meta{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
-  .att-glass .att-state{ padding:4px 10px; border-radius:20px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); }
-  .att-glass .att-state.open{ background:rgba(95,224,164,.16); border-color:rgba(95,224,164,.4); color:#BFF5DC; }
-  .att-glass .att-state.done{ background:rgba(95,224,164,.22); border-color:rgba(95,224,164,.5); }
-  .att-count{ display:inline-flex; align-items:center; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:800; color:#FFDE94; background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.32); }
-  .att-glass-go{ flex:0 0 auto; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.85); }
-  .att-glass-go svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
-  .att-glass.is-open .att-glass-go{ background:linear-gradient(145deg,#BFF5DC,#5FE0A4); border-color:transparent; color:#0B2A1E; box-shadow:0 6px 16px rgba(95,224,164,.38); }
-  .att-glass.is-closed .att-glass-go{ opacity:.6; }
+  .att-count{ display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:20px; font-size:10.5px; font-weight:800; color:rgba(255,255,255,.82); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); }
+  .att-count.att-pts{ color:#FFDE94; background:rgba(244,183,64,.14); border-color:rgba(244,183,64,.36); }
+  /* الجزء الجانبي (الحالة) */
+  .att-glass-go{ flex:0 0 64px; width:64px; align-self:stretch; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:rgba(255,255,255,.78); }
+  .att-go-ico{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); }
+  .att-go-ico svg{ width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  .att-go-txt{ font-size:11px; font-weight:800; line-height:1.2; text-align:center; white-space:nowrap; }
+  .att-glass.is-closed .att-glass-go{ opacity:.72; }
+  .att-glass.is-open .att-glass-go{ color:#BFF5DC; }
+  .att-glass.is-open .att-go-ico{ background:linear-gradient(145deg,#BFF5DC,#5FE0A4); border-color:transparent; color:#0B2A1E; box-shadow:0 6px 16px rgba(95,224,164,.4); }
+  .att-glass.is-done .att-glass-go{ color:#FFDE94; }
+  .att-glass.is-done .att-go-ico{ background:linear-gradient(145deg,#FFF3D2,#F4B740); border-color:transparent; color:#3A2A00; box-shadow:0 6px 16px rgba(244,183,64,.3); }
+
+
+  /* ===== تذكرة الحضور (v2 + v3): QR جانبي + ليزر + ختم ===== */
+  .att-page-list{ gap:16px; }
+  .att-glass{ padding:18px 16px 18px 12px; gap:15px; min-height:118px; }
+  .att-glass::before{ border-color:color-mix(in srgb,var(--c1,#F4B740) 38%,rgba(255,255,255,.14)); box-shadow:inset 0 3px 0 -0.5px color-mix(in srgb,var(--c1,#F4B740) 85%,transparent), inset 0 14px 22px -14px var(--c1,#F4B740); }
+  .att-wm{ position:absolute !important; z-index:0 !important; left:-14px; bottom:-26px; width:130px; height:130px; opacity:.07; transform:rotate(-14deg); pointer-events:none; }
+  .att-wm svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.1; stroke-linecap:round; stroke-linejoin:round; }
+  .att-glass-ico{ width:70px; height:70px; border-radius:23px; }
+  .att-glass-ico::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(155deg,rgba(255,255,255,.38),rgba(255,255,255,0) 46%); }
+  .att-glass-ico svg{ width:37px; height:37px; }
+  .att-glass-lab{ font-size:21px; letter-spacing:.2px; }
+  .att-glass-name{ font-size:12.5px; margin-top:3px; }
+  .att-glass-meta{ margin-top:11px; gap:7px; align-items:center; }
+  .att-pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:20px; font-size:11px; font-weight:800; color:rgba(255,255,255,.8); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.2); }
+  .att-pill i{ width:7px; height:7px; border-radius:50%; background:#9A9AB0; }
+  .att-pill.st-open{ color:#BFF5DC; background:rgba(95,224,164,.14); border-color:rgba(95,224,164,.5); }
+  .att-pill.st-open i{ background:#5FE0A4; animation:attDot 1.6s ease-out infinite; }
+  .att-pill.st-done{ color:#FFDE94; background:rgba(244,183,64,.14); border-color:rgba(244,183,64,.5); }
+  .att-pill.st-done i{ background:#F4B740; }
+  @keyframes attDot{ 0%{ box-shadow:0 0 0 0 rgba(95,224,164,.7); } 70%,100%{ box-shadow:0 0 0 7px rgba(95,224,164,0); } }
+  .att-count.att-pts{ gap:5px; }
+  .att-count.att-pts::before{ content:""; width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#FFF3D2,#F4B740 60%,#B9801C); box-shadow:0 0 6px rgba(244,183,64,.6); }
+  .att-count.att-pts b{ font-weight:900; font-size:12px; }
+  .att-glass:active{ --sc:.975; }
+  .att-kick{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:700; font-size:10.5px; letter-spacing:2.4px; color:color-mix(in srgb,var(--c1,#F4B740) 80%,#fff); opacity:.85; direction:ltr; text-align:right; margin-bottom:2px; }
+  .att-glass-go{ position:relative; flex:0 0 78px; width:78px; gap:5px; }
+  .att-qr{ position:relative; width:60px; height:60px; padding:6px; border-radius:14px; overflow:hidden; background:rgba(255,255,255,.92); box-shadow:0 8px 18px rgba(0,0,0,.35); transition:filter .3s, opacity .3s; }
+  .att-qr svg{ width:100%; height:100%; display:block; fill:#14183A; }
+  .att-qr svg .hole{ fill:#fff; }
+  .att-glass.is-closed .att-qr{ filter:blur(2.2px) saturate(.3); opacity:.42; }
+  .att-glass.is-open .att-qr{ box-shadow:0 0 0 2px #5FE0A4, 0 0 22px rgba(95,224,164,.55), 0 8px 18px rgba(0,0,0,.35); }
+  .att-glass.is-done .att-qr{ filter:grayscale(1) contrast(.9); opacity:.28; }
+  .att-laser2{ position:absolute; left:0; right:0; top:0; height:3px; background:linear-gradient(90deg,transparent,#2BE39A,transparent); box-shadow:0 0 12px 3px rgba(43,227,154,.85); animation:attLaser2 2s ease-in-out infinite alternate; text-decoration:none; }
+  @keyframes attLaser2{ from{ transform:translateY(2px); } to{ transform:translateY(54px); } }
+  .att-glass-go .att-go-ico{ position:absolute; top:19px; left:50%; width:36px; height:36px; margin-left:-18px; background:rgba(14,18,52,.78); border-color:rgba(255,255,255,.3); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+  .att-no{ font-style:normal; font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:10px; letter-spacing:1.6px; color:rgba(255,255,255,.5); direction:ltr; }
+  .att-stamp{ position:absolute; top:12px; left:50%; width:66px; height:66px; margin-left:-33px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:50%;
+    color:#FFDE94; border:2.5px solid #F4B740; box-shadow:0 0 0 3px rgba(244,183,64,.22) inset, 0 0 16px rgba(244,183,64,.45); background:rgba(40,28,0,.35);
+    transform:rotate(-14deg); animation:attStamp .55s cubic-bezier(.3,1.6,.5,1) backwards; font-family:'Cairo',sans-serif; line-height:1.05; text-shadow:0 0 8px rgba(244,183,64,.6); }
+  .att-stamp b{ font-size:19px; font-weight:900; } .att-stamp small{ font-size:9.5px; font-weight:800; letter-spacing:.3px; }
+  @keyframes attStamp{ from{ opacity:0; transform:rotate(-40deg) scale(2.6); } 60%{ opacity:1; } }
+  .att-glass.is-open > .att-glass-body::after{ content:""; position:absolute; inset:-18px -40px; background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.12) 50%,transparent 60%); background-size:250% 100%; animation:attSheen2 3.6s ease-in-out infinite; pointer-events:none; }
+  @keyframes attSheen2{ from{ background-position:150% 0; } to{ background-position:-50% 0; } }
+  @media (prefers-reduced-motion:reduce){ .att-laser2,.att-stamp,.att-glass.is-open > .att-glass-body::after{ animation:none !important; } }
+
+
+  /* ===== تطوير v4: لون لكل نشاط + اسم المشارك + قصّ الكعب + هيرو متناسق ===== */
+  .att-glass.is-open .att-qr{ box-shadow:0 0 0 2px var(--c1), 0 0 22px color-mix(in srgb,var(--c1) 60%,transparent), 0 8px 18px rgba(0,0,0,.35); }
+  .att-glass.is-open::before{ border-color:color-mix(in srgb,var(--c1) 75%,#fff 0%); }
+  .att-glass.is-open{ box-shadow:0 14px 30px -6px rgba(0,0,0,.45), 0 0 28px color-mix(in srgb,var(--c1) 30%,transparent); }
+  .att-laser2{ background:linear-gradient(90deg,transparent,var(--c1),transparent); box-shadow:0 0 12px 3px color-mix(in srgb,var(--c1) 80%,transparent); }
+  .att-pill.st-open{ color:#fff; background:color-mix(in srgb,var(--c1) 22%,transparent); border-color:color-mix(in srgb,var(--c1) 70%,transparent); }
+  .att-pill.st-open i{ background:var(--c1); }
+  /* الكعب ينفصل بميلة خفيفة بعد التسجيل */
+  .att-glass.is-done .att-glass-go{ transform-origin:50% 0; animation:attTear 1s .15s cubic-bezier(.3,1.4,.5,1) backwards; transform:rotate(2.5deg) translateY(2px); }
+  @keyframes attTear{ 0%{ transform:rotate(0) translateY(0); } 35%{ transform:rotate(-5deg) translateY(-3px); } }
+  .att-ring-seg.open{ stroke:var(--sc,#5FE0A4); filter:drop-shadow(0 0 5px var(--sc,#5FE0A4)); }
+  .att-hero-no{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; letter-spacing:1.6px; opacity:.75; direction:ltr; display:inline-block; }
+  .att-hero{ border-radius:26px; }
+  .att-hero::after{ content:""; position:absolute; left:18px; right:18px; bottom:0; border-bottom:1.5px dashed rgba(255,255,255,.14); }
+  @media (prefers-reduced-motion:reduce){ .att-glass.is-done .att-glass-go{ animation:none; } }
+
 
   /* ---------- صفحة "جاري التحديث" (زجاجي راقي) ---------- */
   .maint-page{ position:relative; overflow:hidden; isolation:isolate; margin-top:10px; padding:32px 22px 24px; border-radius:20px; text-align:center; color:#FCF9F3;
@@ -23717,6 +23800,16 @@ function apChime(){ try{
 }catch(e){} }
 function apShake(){ const el = document.getElementById('att-manual-input'); if(!el) return; el.classList.remove('ap-shake'); void el.offsetWidth; el.classList.add('ap-shake'); vibrate([30,30,30]); }
 function attTimesWord(n){ return n===1 ? 'مرة' : n===2 ? 'مرتين' : 'مرات'; }
+function attQrSvg(seed){
+  let x = (seed+3)*2654435761 >>> 0; const rnd = () => (x = (x*1664525 + 1013904223) >>> 0) / 4294967296;
+  const N = 11; let r = '';
+  const finder = (ox,oy) => `<rect x="${ox}" y="${oy}" width="4" height="4" rx=".6"/><rect x="${ox+1}" y="${oy+1}" width="2" height="2" rx=".3" class="hole"/><rect x="${ox+1.4}" y="${oy+1.4}" width="1.2" height="1.2"/>`;
+  for(let i=0;i<N;i++) for(let j=0;j<N;j++){
+    const inF = (i<5&&j<5)||(i>N-6&&j<5)||(i<5&&j>N-6);
+    if(!inF && rnd()>.52) r += `<rect x="${i}" y="${j}" width="1" height="1" rx=".2"/>`;
+  }
+  return `<svg viewBox="-.5 -.5 ${N+1} ${N+1}" aria-hidden="true">${finder(0,0)}${finder(N-4,0)}${finder(0,N-4)}${r}</svg>`;
+}
 function attGlassTilesHtml(anim){
   return `<div class="att-page-list">${ATT_KEYS.map((k,i)=>{
     const t = ATT_TYPES[k]; const st = attStateOf(state.pid, k); const c = attCfg(k);
@@ -23724,25 +23817,27 @@ function attGlassTilesHtml(anim){
     const cls = st.cls==='open' ? 'is-open' : st.cls==='done' ? 'is-done' : 'is-closed';
     let line = c && c.name ? escapeHtml(c.name) : 'في انتظار المنظمين';
     if(st.cls==='done' && c){ const rec = ATT_RECORDS[attRecKey(state.pid,k,c.sessionId)]; if(rec) line = 'تم التسجيل ' + attFmtTime(rec.ts); }
-    const go = st.cls==='closed' || st.cls==='' ? ATT_LOCK_SVG : ATT_CHEV_SVG;
+    const go = st.cls==='done' ? ATT_TICK_SVG : st.cls==='open' ? ATT_CHEV_SVG : ATT_LOCK_SVG;
+    const cc = (t.color.match(/#[0-9A-Fa-f]{6}/g)||[]);
     const ptsN = attPtsOfCfg(k,c);
     const canScan = st.cls==='open';
     const scanBtn = canScan ? `<button type="button" class="att-scan-btn" data-action="open-scan" data-mode="attendance" data-session="${k}" aria-label="امسح كود حضور ${t.label}">
         <span class="att-scan-ico">${ATT_SCAN_SVG}</span>
         <span class="att-scan-txt"><span>امسح كود الحضور</span><small>${ptsN>0 ? 'اكسب '+ptsN+' نقطة بمسح الكود' : 'وجّه الكاميرا نحو كود QR'}</small></span>
       </button>` : '';
-    return `<div role="button" tabindex="0" class="att-glass ${cls}" style="--cap-color:${t.color};--i:${i}" data-action="att-open" data-type="${k}">
+    return `<div role="button" tabindex="0" class="att-glass ${cls}" style="--cap-color:${t.color};--c1:${cc[0]||'#F4B740'};--c2:${cc[1]||cc[0]||'#FF7A59'};--i:${i}" data-action="att-open" data-type="${k}">
+      <span class="att-wm" aria-hidden="true">${ATT_ICO_SVG[k]}</span>
       <span class="att-glass-ico">${ATT_ICO_SVG[k]}${st.cls==='done'?`<span class="att-tick">${ATT_TICK_SVG}</span>`:''}</span>
       <span class="att-glass-body">
-        <div class="att-glass-lab">${t.label}</div>
+        <div class="att-kick">ADMIT ONE · 0${i+1}</div><div class="att-glass-lab">${t.label}</div>
         <div class="att-glass-name">${line}</div>
         <div class="att-glass-meta">
-          <span class="att-state ${st.cls}"><i></i>${st.txt}</span>
-          ${ptsN>0?`<span class="att-count">🪙 ${ptsN} نقطة</span>`:''}
+          <span class="att-pill st-${st.cls}"><i></i>${st.txt.replace(/^✓\s*/,'')}</span>
+          ${ptsN>0?`<span class="att-count att-pts"><b>${ptsN}</b> نقطة</span>`:''}
           ${n>0?`<span class="att-count">حضرت ${n} ${attTimesWord(n)}</span>`:''}
         </div>
       </span>
-      <span class="att-glass-go">${go}</span>
+      <span class="att-glass-go"><span class="att-qr">${attQrSvg(i)}${st.cls==='open'?'<u class="att-laser2"></u>':''}</span>${cls==='is-closed'?`<i class="att-go-ico">${go}</i>`:''}${st.cls==='done'?'<span class="att-stamp"><b>تم</b><small>الحضور</small></span>':''}<em class="att-no">No.0${i+1}</em></span>
       ${scanBtn}
     </div>`;
   }).join('')}</div>`;
@@ -23756,13 +23851,13 @@ function attHeroHtml(){
   else if(doneN)     live = {cls:'done', txt:'تم تسجيل حضورك'};
   else               live = {cls:'',     txt:'لا يوجد تسجيل مفتوح حاليًا'};
   const C = 2*Math.PI*38, L = C/N - 12;
-  const segs = states.map((c,i)=>`<circle class="att-ring-seg ${c}" style="--i:${i}" cx="50" cy="50" r="38" stroke-dasharray="${L.toFixed(2)} ${(C-L).toFixed(2)}" transform="rotate(${(i*360/N+6).toFixed(1)} 50 50)"/>`).join('');
+  const segs = states.map((c,i)=>`<circle class="att-ring-seg ${c}" style="--i:${i};--sc:${((ATT_TYPES[ATT_KEYS[i]].color.match(/#[0-9A-Fa-f]{6}/g)||[])[0]||'#5FE0A4')}" cx="50" cy="50" r="38" stroke-dasharray="${L.toFixed(2)} ${(C-L).toFixed(2)}" transform="rotate(${(i*360/N+6).toFixed(1)} 50 50)"/>`).join('');
   return `<div class="att-hero">
     <div class="att-ring"><svg viewBox="0 0 100 100" aria-hidden="true">${segs}</svg>
       <div class="att-ring-c"><div class="att-ring-num">${doneN}/${N}</div><div class="att-ring-lab">حضورك</div></div>
     </div>
     <div class="att-hero-txt">
-      <div class="att-hero-kicker">بطاقة الحضور</div>
+      <div class="att-hero-kicker">بطاقة الحضور <span class="att-hero-no">· PASS ${doneN}/${N}</span></div>
       <div class="att-hero-title">الحضور</div>
       <div class="att-hero-sub">اختار النشاط وامسح كود QR اللي مع المنظمين</div>
       <div class="att-live ${live.cls}"><i></i><span>${live.txt}</span></div>
