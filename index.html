@@ -1798,7 +1798,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vcs-tabs button.on{background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:#1b1405; box-shadow:0 8px 16px -10px var(--gold);}
   .vcs-title{font:800 20px 'Cairo',sans-serif; margin:2px 0 2px;} .vcs-sub{font-size:12.5px; line-height:1.7; color:var(--text-muted); padding:0 6px;}
   .vcs-vf{position:relative; width:236px; height:236px; margin:14px auto 10px; border-radius:30px; overflow:hidden; background:#05060c; border:1px solid var(--border); box-shadow:0 20px 40px -20px rgba(0,0,0,.8);}
-  .vcs-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+  .vcs-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
   .vcs-br{position:absolute; width:34px; height:34px; border:3px solid var(--gold); transition:border-color .25s ease; z-index:2;}
   .vcs-br.tl{top:14px; left:14px; border-right:0; border-bottom:0; border-top-left-radius:14px;} .vcs-br.tr{top:14px; right:14px; border-left:0; border-bottom:0; border-top-right-radius:14px;}
   .vcs-br.bl{bottom:14px; left:14px; border-right:0; border-top:0; border-bottom-left-radius:14px;} .vcs-br.brr{bottom:14px; right:14px; border-left:0; border-top:0; border-bottom-right-radius:14px;}
@@ -1830,6 +1830,26 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vcs-mic.on .ic{display:inline-block; animation:vcsBeat 1.2s ease-in-out infinite;}
   @keyframes vcsBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
   @media (prefers-reduced-motion:reduce){ .vcs-mic.on .ic{animation:none;} }
+
+  /* ===== الكارت الكامل للتحويل + خانة الاستلام ===== */
+  .vcs-cardbox{width:100%; padding:0; border:0; background:none; margin:12px auto 4px;}
+  .vcp-wrap{width:100%;}
+  .vcp-scene{animation:none !important; perspective:none; margin:0 auto; cursor:default; pointer-events:none; max-width:330px;}
+  .vcp-scene .vc-tilt{transform:none !important; transition:none !important; animation:none !important;}
+  .vcp-scene .vc-back,.vcp-scene .vc-ground,.vcp-scene .vc-glare{display:none !important;}
+  .vc-front > .vcp-socket{position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); z-index:3; padding:7px; border-radius:17px; background:#0a0c14; box-shadow:0 10px 24px -8px rgba(0,0,0,.75), 0 0 0 1.5px rgba(255,222,140,.28);}
+  .vcp-socket canvas{display:block; border-radius:11px;}
+  .vcs-video.mir{transform:scaleX(-1);}
+  .vcs-flip{position:absolute; top:10px; right:10px; z-index:4; width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,.45); color:#fff; font-size:15px; cursor:pointer; display:grid; place-items:center; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);}
+  .vcs-flip:active{transform:scale(.9);}
+  .vcs-cap{position:absolute; left:0; right:0; bottom:12px; z-index:3; font:700 11px 'Cairo',sans-serif; color:rgba(255,255,255,.85); text-shadow:0 1px 3px rgba(0,0,0,.8);}
+  .vcs-vf.lock .vcs-cap{display:none;}
+  .vp-recv{display:flex; align-items:center; gap:12px; width:100%; margin:0 0 10px; padding:13px 14px; border-radius:18px; border:1px solid color-mix(in srgb,var(--gold) 45%,var(--border)); background:linear-gradient(135deg,rgba(244,183,64,.13),rgba(244,183,64,.03)); color:var(--text); cursor:pointer; text-align:right; font-family:'Cairo',sans-serif; transition:transform .15s ease;}
+  .vp-recv:active{transform:scale(.98);}
+  .vp-recv-ico{flex:none; width:44px; height:44px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg,var(--gold-2),var(--gold)); box-shadow:0 8px 16px -8px var(--gold);}
+  .vp-recv-ico svg{width:24px; height:24px; stroke:#1b1405; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .vp-recv-txt{flex:1; display:flex; flex-direction:column; gap:2px;} .vp-recv-txt b{font:800 15px 'Cairo',sans-serif;} .vp-recv-txt small{font-size:11.5px; color:var(--text-muted);}
+  .vp-recv-go{flex:none; opacity:.55; font-size:20px; line-height:1;}
 
   /* ===== Visa ops panel — premium look ===== */
   .vp-pro{position:relative; overflow:hidden; border-radius:26px; padding:18px 16px 16px; border:1px solid color-mix(in srgb,var(--gold) 24%,var(--border));
@@ -6666,6 +6686,7 @@ function renderVisaHistoryPage(){
         <div><small>العمليات</small><b>${list.length}</b></div>
       </div>
     </div>
+    ${window.visaMonthInsightsHtml ? window.visaMonthInsightsHtml(pid) : ''}
     <div class="vst-chips">${periods}</div>
     <div class="vst-chips">${types}</div>
     <div class="vst-actions">
@@ -7033,9 +7054,10 @@ function chipScanFrame(img){
     }
     if(area >= 300 && (maxx-minx) >= 40 && (maxy-miny) >= 30) comps.push({ id, area, minx, maxx, miny, maxy });
   }
-  comps.sort((a,b)=>b.area-a.area);
+  const pref = (cp)=>{ const r = (cp.maxx-cp.minx+1) / (cp.maxy-cp.miny+1); return (r < 0.7 || r > 1.9) ? 9 : Math.abs(Math.log(r/1.25)); };
+  comps.sort((a,b)=>(pref(a)-pref(b)) || (b.area-a.area));
   let cand = null;
-  for(const cp of comps.slice(0,4)){
+  for(const cp of comps.slice(0,8)){
     const xs = [], ys = [];
     for(let y=cp.miny; y<=cp.maxy; y+=2) for(let x=cp.minx; x<=cp.maxx; x+=2) if(lab[y*w+x] === cp.id){ xs.push(x); ys.push(y); }
     if(xs.length < 60) continue;
@@ -7049,7 +7071,7 @@ function chipScanFrame(img){
   }
   return { token: null, cand };
 }
-function visaChipScannerStart(vf, statusFn, onToken){
+function visaChipScannerStart(vf, statusFn, onToken, facing){
   const ctl = { stopped:false, stream:null, timer:0 };
   const video = document.createElement('video');
   video.className = 'vcs-video'; video.muted = true; video.autoplay = true; video.playsInline = true; video.setAttribute('playsinline',''); video.setAttribute('muted','');
@@ -7059,9 +7081,11 @@ function visaChipScannerStart(vf, statusFn, onToken){
   ctl.stop = ()=>{ ctl.stopped = true; clearTimeout(ctl.timer); try{ if(ctl.stream) ctl.stream.getTracks().forEach(t=>t.stop()); }catch(e){} try{ video.srcObject = null; }catch(e){} };
   (async ()=>{
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ statusFn('nocam'); return; }
-    try{ ctl.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ ideal:640 }, height:{ ideal:480 } }, audio:false }); }
+    try{ ctl.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal: facing || 'environment' }, width:{ ideal:960 }, height:{ ideal:720 } }, audio:false }); }
     catch(e){ statusFn(e && e.name === 'NotAllowedError' ? 'denied' : 'nocam'); return; }
     if(ctl.stopped){ ctl.stop(); return; }
+    video.classList.toggle('mir', (facing || 'environment') === 'user');
+    try{ const tr = ctl.stream.getVideoTracks()[0], caps = tr.getCapabilities ? tr.getCapabilities() : null; if(caps && caps.focusMode && caps.focusMode.indexOf('continuous') >= 0) tr.applyConstraints({ advanced:[{ focusMode:'continuous' }] }).catch(()=>{}); }catch(e){}
     video.srcObject = ctl.stream; try{ await video.play(); }catch(e){}
     statusFn('search');
     const tick = ()=>{
@@ -7070,7 +7094,8 @@ function visaChipScannerStart(vf, statusFn, onToken){
         const W = 480, H = Math.round(480 * video.videoHeight / video.videoWidth);
         if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
         cx.drawImage(video, 0, 0, W, H);
-        let res = null; try{ res = chipScanFrame(cx.getImageData(0, 0, W, H)); }catch(e){}
+        const t0 = performance.now(); let res = null; try{ res = chipScanFrame(cx.getImageData(0, 0, W, H)); }catch(e){}
+        ctl.lastMs = performance.now() - t0;
         if(res && res.token !== null){
           const now = Date.now();
           if(last.token === res.token && now - last.t < 1500) last.n++; else last.n = 1;
@@ -7078,7 +7103,7 @@ function visaChipScannerStart(vf, statusFn, onToken){
           if(last.n >= 2){ ctl.stop(); onToken(res.token); return; }
         } else statusFn(res && res.cand ? 'near' : 'search');
       }
-      ctl.timer = setTimeout(tick, 110);
+      ctl.timer = setTimeout(tick, Math.max(110, Math.min(600, (ctl.lastMs || 0) * 3)));   /* بيهدّي نفسه لو الموبايل تقيل عشان الصوت ميتأثرش */
     };
     tick();
   })();
@@ -7114,7 +7139,7 @@ function visaChipOpen(mode){
   const th = vposThemeOf(pid), ov = document.createElement('div');
   ov.className = 'vpos-overlay'; ov.id = 'vcs-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
   ov.innerHTML = `<div class="vpos-sheet vcs-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
-    <div class="vcs-tabs"><button type="button" data-m="recv">📷 استلام</button><button type="button" data-m="send">✨ إرسال</button></div>
+    <div class="vcs-tabs"><button type="button" data-m="recv">📥 استلام</button><button type="button" data-m="send">📤 إرسال</button></div>
     <div class="vcs-body"></div>
     <button type="button" class="vcs-foot" id="vcs-num">أو شارك رقم بطاقتي بدل المسح</button>
     <div class="vpos-actions" style="margin-top:6px"><button type="button" id="vcs-close">إغلاق</button></div>
@@ -7133,8 +7158,8 @@ function visaChipSetMode(mode){
   v.ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.m === mode));
   const body = v.ov.querySelector('.vcs-body');
   if(mode === 'recv'){
-    body.innerHTML = `<div class="vcs-title">استلم بالشريحة</div><div class="vcs-sub">خلّي صاحبك يقرّب شريحته الذهبية من الكاميرا الأمامية.</div>
-      <div class="vcs-vf" id="vcs-vf"><i class="vcs-br tl"></i><i class="vcs-br tr"></i><i class="vcs-br bl"></i><i class="vcs-br brr"></i><span class="vcs-ghost"></span><span class="vcs-line"></span><div class="vcs-vfmsg" id="vcs-vfmsg"></div></div>
+    body.innerHTML = `<div class="vcs-title">استلام</div><div class="vcs-sub">وجّه الكاميرا على الشريحة الصفراء في كارت صاحبك، والنقط بتوصلك لوحدها.</div>
+      <div class="vcs-vf" id="vcs-vf"><i class="vcs-br tl"></i><i class="vcs-br tr"></i><i class="vcs-br bl"></i><i class="vcs-br brr"></i><span class="vcs-ghost"></span><span class="vcs-line"></span><button type="button" class="vcs-flip" id="vcs-flip" aria-label="تبديل الكاميرا">🔄</button><div class="vcs-cap">ضع الشريحة الصفراء جوه الإطار</div><div class="vcs-vfmsg" id="vcs-vfmsg"></div></div>
       <div class="vcs-status" id="vcs-status">بفتح الكاميرا…</div>
       <button type="button" class="vcs-mic" id="vcs-mic"><span class="ic">🎧</span><span class="tx">استماع بالصوت</span></button>`;
     const vf = body.querySelector('#vcs-vf'), st = body.querySelector('#vcs-status'), msg = body.querySelector('#vcs-vfmsg');
@@ -7145,7 +7170,14 @@ function visaChipSetMode(mode){
       else if(state === 'lock'){ vf.classList.add('lock'); st.classList.add('ok'); st.textContent = '✓ اتعرّفت على الشريحة'; }
       else { vf.classList.add('bad'); st.textContent = ''; msg.textContent = state === 'denied' ? 'محتاج تسمح للتطبيق بالكاميرا من إعدادات المتصفح، وبعدها افتح الشاشة دي تاني.' : 'الكاميرا مش متاحة. اتأكد إن الموقع مفتوح بـ https وإن مفيش تطبيق تاني شاغلها.'; }
     };
-    v.scanner = visaChipScannerStart(vf, say, (token)=>{ visaChipClose(); visaChipReceive(token); });
+    let facing = 'environment'; try{ if(localStorage.getItem('glv-chip-facing') === 'user') facing = 'user'; }catch(e){}
+    const camStart = ()=>{
+      if(v.scanner){ try{ v.scanner.stop(); }catch(e){} v.scanner = null; }
+      vf.querySelectorAll('video').forEach(x=>x.remove()); say('search'); st.textContent = 'بفتح الكاميرا…';
+      v.scanner = visaChipScannerStart(vf, say, (token)=>{ visaChipClose(); visaChipReceive(token); }, facing);
+    };
+    body.querySelector('#vcs-flip').addEventListener('click', ()=>{ facing = facing === 'environment' ? 'user' : 'environment'; try{ localStorage.setItem('glv-chip-facing', facing); }catch(e){} camStart(); });
+    camStart();
     const mic = body.querySelector('#vcs-mic'), mtx = mic.querySelector('.tx');
     const micSay = (st)=>{
       mic.classList.toggle('on', st === 'on' || st === 'hear'); mic.classList.toggle('hear', st === 'hear');
@@ -7161,7 +7193,7 @@ function visaChipSetMode(mode){
   } else {
     const pid = state.pid, bal = WALLET[pid] || 0;
     const chips = [25,50,100,bal].filter((x,i,a)=>x>0 && a.indexOf(x)===i).map(x=>`<button type="button" class="vp-chip" data-v="${x}">${x===bal?'الكل':x}</button>`).join('');
-    body.innerHTML = `<div class="vcs-send"><div class="vcs-title">حوّل بالشريحة</div><div class="vcs-sub">اكتب المبلغ، وبعدها قرّب شريحتك من الكاميرا الأمامية لصاحبك.</div>
+    body.innerHTML = `<div class="vcs-send"><div class="vcs-title">تحويل بالكارت</div><div class="vcs-sub">اكتب النقط اللي هتحوّلها، وبعدها هيظهر كارتك كامل وتقرّب شريحته الصفراء من كاميرا صاحبك.</div>
       <div class="vcs-bal">رصيد فيزتك: <b>${bal}</b> نقطة</div>
       <div class="vp-amt-wrap"><input id="vcs-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
       <div class="vp-chips">${chips}</div>
@@ -7204,15 +7236,14 @@ function visaChipShowCode(made){
   const v = _vcs; if(!v) return;
   const { token, key, rec } = made, body = v.ov.querySelector('.vcs-body');
   v.ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.classList.remove('on'));
-  const cssW = Math.min(260, Math.max(200, window.innerWidth - 110));
-  body.innerHTML = `<div class="vcs-title">قرّب الشريحة</div><div class="vcs-sub">قرّبها من الكاميرا الأمامية لصاحبك، أو قرّب الموبايلين من بعض والنغمة هتوصله. التحويل بيتم أوتوماتيك.</div>
-    <div class="vcs-codebox"><span class="vcs-glow"></span></div>
+  body.innerHTML = `<div class="vcs-title">قرّب الكارت</div><div class="vcs-sub">قرّب الشريحة الصفراء من كاميرا صاحبك (أو قرّب الموبايلين والنغمة هتوصله). التحويل بيتم أوتوماتيك.</div>
+    <div class="vcs-codebox vcs-cardbox"><span class="vcs-glow"></span></div>
     <div class="vcs-amt-tag" dir="ltr">${rec.amt}<small>نقطة</small></div>
     <div class="vcs-timer"><i id="vcs-tfill"></i></div>
     <div class="vcs-hint" id="vcs-thint"></div>
     <button type="button" class="vcs-mic on" id="vcs-snd"><span class="ic">🔊</span><span class="tx">النغمة شغالة</span></button>
     <div class="vpos-actions"><button type="button" id="vcs-cancel">إلغاء التحويل</button></div>`;
-  body.querySelector('.vcs-codebox').appendChild(chipCodeCanvas(token, cssW));
+  body.querySelector('.vcs-codebox').appendChild(visaPayCardEl(pid0(), token));
   v.pending = { key };
   const snd = body.querySelector('#vcs-snd'), sndTx = snd.querySelector('.tx');
   const sndSay = (on, label)=>{ snd.classList.toggle('on', on); sndTx.textContent = label; };
@@ -7400,7 +7431,7 @@ function visaChipListenStart(statusFn, onToken){
     catch(e){ statusFn(e && e.name === 'NotAllowedError' ? 'denied' : 'nomic'); return; }
     if(ctl.stopped){ try{ ctl.stream.getTracks().forEach(t=>t.stop()); }catch(e){} return; }
     const Ctx = window.AudioContext || window.webkitAudioContext; ctl.ctx = new Ctx(); try{ await ctl.ctx.resume(); }catch(e){}
-    const fs = ctl.ctx.sampleRate, RING = Math.ceil(fs*3.2), ring = new Float32Array(RING); let w = 0, total = 0;
+    const fs = ctl.ctx.sampleRate, RING = Math.ceil(fs*3.8), ring = new Float32Array(RING); let w = 0, total = 0;
     ctl.src = ctl.ctx.createMediaStreamSource(ctl.stream);
     ctl.proc = ctl.ctx.createScriptProcessor(4096, 1, 1);
     ctl.proc.onaudioprocess = (e)=>{ const inp = e.inputBuffer.getChannelData(0); for(let i=0;i<inp.length;i++){ ring[w] = inp[i]; w = (w+1) % RING; } total += inp.length; };
@@ -7411,13 +7442,25 @@ function visaChipListenStart(statusFn, onToken){
       if(ctl.stopped || total < fs*1.3) return;
       const tail = snap(0.3); let e2 = 0; for(let i=0;i<tail.length;i++) e2 += tail[i]*tail[i];
       statusFn(Math.sqrt(e2 / Math.max(1, tail.length)) > 0.02 ? 'hear' : 'on');
-      let tok = null; try{ tok = chipAudioDecode(snap(2.8), fs); }catch(e){}
+      let tok = null; try{ tok = chipAudioDecode(snap(3.4), fs); }catch(e){}
       if(tok !== null){ ctl.stop(); onToken(tok); }
     }, 350);
   })();
   return ctl;
 }
 
+/* الكارت الكامل (بنفس تصميمه وصورته) والشريحة الصفراء الكبيرة عليه هي الكود */
+function visaPayCardEl(pid, token){
+  const wrap = document.createElement('div'); wrap.className = 'vcp-wrap';
+  wrap.innerHTML = visaCardHtml(pid);
+  const scene = wrap.querySelector('.vc-scene'); if(!scene) return wrap;
+  scene.removeAttribute('data-action'); scene.classList.remove('vc-enter'); scene.classList.add('vcp-scene');
+  const front = wrap.querySelector('.vc-front'), mid = wrap.querySelector('.vc-mid'), numRow = wrap.querySelector('.vc-num-row');
+  if(mid) mid.remove(); if(numRow) numRow.remove();
+  const sock = document.createElement('div'); sock.className = 'vcp-socket'; sock.appendChild(chipCodeCanvas(token, 118));
+  if(front) front.appendChild(sock);
+  return wrap;
+}
 async function doVisaTransfer(){
   const pid = state.pid;
   if(visaExpired(pid)){ showExpiredDialog(); return; }
@@ -24363,7 +24406,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-renew'){ doVisaRenew(el.dataset.src); }
   else if(action==='visa-transfer'){ doVisaTransfer(); }
   else if(action==='visa-copy-number'){ copyMyVisaNumber(el); }
-  else if(action==='visa-chip'){ visaChipOpen('recv'); }
+  else if(action==='visa-chip'){ visaChipOpen('send'); }
+  else if(action==='visa-chip-recv'){ visaChipOpen('recv'); }
   else if(action==='visa-chip-send'){ visaChipOpen('send'); }
   else if(action==='visa-recent'){ visaPickRecent(el); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
@@ -28987,34 +29031,27 @@ function loginWaitAndRetry(retry){
   var ICO_Q = {
     deposit:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>', withdraw:'<path d="M12 15V3M7 8l5-5 5 5M4 20h16"/>',
     transfer:'<path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/>', history:'<path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/>' };
+  /* ملخص الشهر (داخل/خارج + آخر 7 أيام): بقى جوه كشف الحساب بدل صفحة الفيزا */
+  window.visaMonthInsightsHtml = function(pid){
+    var all = VISA_TX[pid] || [];
+    if(!all.length) return '';
+    var now = new Date(), inn = 0, out = 0, days = [];
+    all.forEach(function(t){ var d = new Date(t.ts), m = VISA_TX_META[t.type] || {sign:1}; if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){ if(m.sign>0) inn += t.amount; else out += t.amount; } });
+    for(var i=6;i>=0;i--){ var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i), a = d0.getTime(), b = a + 864e5, v = 0;
+      all.forEach(function(t){ if(t.ts>=a && t.ts<b) v += t.amount; }); days.push({v:v, l:d0.toLocaleDateString('ar-EG',{weekday:'narrow'})}); }
+    var mx = Math.max.apply(null, days.map(function(x){ return x.v; })) || 1;
+    return '<div class="cf-ins"><h4>ملخص الشهر</h4><div class="cf-io"><div><small>داخل</small><b class="p">+'+inn+'</b></div><div><small>خارج</small><b>−'+out+'</b></div></div><div class="cf-bars">'
+      + days.map(function(x,i){ return '<div><i style="height:'+Math.max(4,Math.round(x.v/mx*100))+'%;animation-delay:'+(i*.05)+'s"></i><small>'+x.l+'</small></div>'; }).join('') + '</div></div>';
+  };
+  /* صفحة الفيزا رجعت نظيفة: الكارد + زر الكشف + لوحة العمليات الأصلية.
+     الاستثناء الوحيد: لو الفيزا مجمّدة بيظهر شريط فك التجميد عشان محدش يتقفل عليه. */
   window.renderVisaPage = function(){
     var h = _rvp(), pid = state.pid, mark = '<button type="button" class="vp-history-link"';
     if(h.indexOf(mark) < 0) return h;
-    if(!TXP){ TXP = true; loadVisaTx().then(function(t){ VISA_TX = t; if(state.view === 'visa') render(); }).catch(function(){}); }
-    var tab = state.visaTab || 'deposit', exp = visaExpired(pid);
-    var qa = exp ? '' : '<div class="cf-qa">' + [['deposit','إيداع'],['withdraw','سحب'],['transfer','تحويل']].map(function(x){
-      return '<button type="button" class="'+(tab===x[0]?'on':'')+'" data-cf-sheet="'+x[0]+'"><i><svg viewBox="0 0 24 24">'+ICO_Q[x[0]]+'</svg></i>'+x[1]+'</button>'; }).join('')
-      + '<button type="button" data-action="open-visa-history"><i><svg viewBox="0 0 24 24">'+ICO_Q.history+'</svg></i>الكشف</button></div>';
-    var life = '', et = visaExpiresAt(pid);
-    if(!exp && et){ var tot = visaValidDays()*VISA_DAY_MS, left = Math.max(0, et - Date.now()), pc = Math.min(100, Math.round(left/tot*100)), d = Math.ceil(left/VISA_DAY_MS);
-      life = '<div class="cf-life'+(pc<25?' low':'')+'"><div><span>صلاحية الفيزا</span><span>باقي '+d+' يوم</span></div><em><i style="width:'+pc+'%"></i></em></div>'; }
-    var list = (VISA_TX[pid]||[]).slice(0,3), rec = '';
-    if(list.length){ rec = '<div class="cf-rec"><h4>آخر العمليات<button type="button" data-action="open-visa-history">عرض الكل</button></h4>' + list.map(function(tx){
-      var m = VISA_TX_META[tx.type] || {label:tx.type, ico:'•', sign:1};
-      return '<button type="button" class="cf-tx" data-cf-tx="'+escapeHtml(tx.id||'')+'"><i>'+m.ico+'</i><span>'+m.label+'<small>'+vtxDayLabel(tx.ts)+' · '+vtxTime(tx.ts)+'</small></span><b class="'+(m.sign>0?'p':'n')+'">'+(m.sign>0?'+':'−')+tx.amount+'</b></button>'; }).join('') + '</div>'; }
-    var frz = !!(VISA_CARDS[pid]||{}).frozen, all = VISA_TX[pid]||[], ins = '';
-    if(all.length){
-      var now = new Date(), inn = 0, out = 0, days = [];
-      all.forEach(function(t){ var d = new Date(t.ts), m = VISA_TX_META[t.type] || {sign:1}; if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){ if(m.sign>0) inn += t.amount; else out += t.amount; } });
-      for(var i=6;i>=0;i--){ var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i), a = d0.getTime(), b = a + 864e5, v = 0;
-        all.forEach(function(t){ if(t.ts>=a && t.ts<b) v += t.amount; }); days.push({v:v, l:d0.toLocaleDateString('ar-EG',{weekday:'narrow'})}); }
-      var mx = Math.max.apply(null, days.map(function(x){ return x.v; })) || 1;
-      ins = '<div class="cf-ins"><h4>ملخص الشهر</h4><div class="cf-io"><div><small>داخل</small><b class="p">+'+inn+'</b></div><div><small>خارج</small><b>−'+out+'</b></div></div><div class="cf-bars">'
-        + days.map(function(x,i){ return '<div><i style="height:'+Math.max(4,Math.round(x.v/mx*100))+'%;animation-delay:'+(i*.05)+'s"></i><small>'+x.l+'</small></div>'; }).join('') + '</div></div>';
-    }
-    var fz = exp ? '' : '<button type="button" class="cf-frz'+(frz?' on':'')+'" data-cf-freeze="1">'+(frz?'🧊 الفيزا مجمّدة · اضغط لفك التجميد':'🔒 تجميد الفيزا مؤقتًا')+'</button>';
-    if(frz) qa = qa.replace('class="cf-qa"','class="cf-qa frozen"');
-    return h.replace(mark, qa + fz + life + ins + rec + mark);
+    var frz = !!(VISA_CARDS[pid]||{}).frozen, exp = visaExpired(pid);
+    var fz = (frz && !exp) ? '<button type="button" class="cf-frz on" data-cf-freeze="1">🧊 الفيزا مجمّدة · اضغط لفك التجميد</button>' : '';
+    var recv = exp ? '' : '<button type="button" class="vp-recv" data-action="visa-chip-recv"><span class="vp-recv-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><rect x="8" y="9" width="8" height="6" rx="1.5"/></svg></span><span class="vp-recv-txt"><b>استلام</b><small>امسح الشريحة الصفراء في كارت صاحبك لاستلام النقط</small></span><span class="vp-recv-go">‹</span></button>';
+    return h.replace(mark, fz + recv + mark);
   };
   var _vm = window.visaMsg;
   window.visaMsg = function(type, title, text, opts){
