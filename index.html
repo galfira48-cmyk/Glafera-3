@@ -2898,6 +2898,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ap-stat{ padding:14px 8px; border-radius:20px; text-align:center; background:var(--card, rgba(255,255,255,.06)); border:1px solid var(--border); }
   .ap-stat-n{ font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; line-height:1.1; background:linear-gradient(180deg,#FFF3D2,#F4B740); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
   .ap-stat-l{ margin-top:4px; font-size:10.5px; font-weight:700; color:var(--text-muted); line-height:1.4; }
+  .aa-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  .aa-tile{ position:relative; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; padding:14px 10px; text-align:center; font-family:inherit; color:var(--text); cursor:pointer; border-radius:26px;
+    background:linear-gradient(160deg, rgba(255,255,255,.13), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.16);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 12px 30px -16px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.18); transition:transform .15s ease; }
+  .aa-tile:active{ transform:scale(.96); }
+  .aa-tile-ico{ width:58px; height:58px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 8px 18px -8px rgba(0,0,0,.6); }
+  .aa-tile b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; line-height:1.3; }
+  .aa-tile small{ font-size:11px; font-weight:600; color:var(--text-muted); line-height:1.4; }
+  .aa-tile.add{ border-style:dashed; background:rgba(255,255,255,.04); }
+  .aa-tile.add .aa-tile-ico{ background:rgba(255,255,255,.08); box-shadow:none; font-size:30px; color:var(--text-muted); }
+  .aa-newday{ width:100%; margin-bottom:14px; }
+  .aa-qr-box{ display:flex; justify-content:center; margin:18px 0 6px; }
+  .aa-hero .aa-qr-box #att-admin-qr{ background:#fff; border-radius:16px; }
+  .aa-icons{ display:flex; flex-wrap:wrap; gap:8px; }
+  .aa-ic{ width:46px; height:46px; border-radius:14px; border:1px solid var(--border); background:rgba(255,255,255,.06); font-size:22px; cursor:pointer; }
+  .aa-ic.on{ border-color:#5FE0A4; background:rgba(95,224,164,.14); }
   .aa-hero{ padding:16px; border-radius:22px; background:var(--card, rgba(255,255,255,.06)); border:1px solid var(--border); margin-bottom:6px; }
   .aa-hero-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .aa-hero-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; line-height:1.3; }
@@ -21493,7 +21509,8 @@ function adminInDetailView(){
   const t = state.adminTab;
   return (t==='sessions' && (state.editingSessionId || state.adminDayId))
     || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
-    || (t==='opinions' && state.viewingOpinionId);
+    || (t==='opinions' && state.viewingOpinionId)
+    || (t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype'));
 }
 function adminPendingBadge(tab){
   if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
@@ -21545,6 +21562,12 @@ function renderAdmin(){
     else if(state.editingParticipantId){
       const p = PARTICIPANTS.find(x=>x.id===state.editingParticipantId);
       if(p) pageTitle = p.name;
+    }
+  } else if(tab==='attendance'){
+    const an = state.attNav;
+    if(an && an.page==='addtype') pageTitle = 'نشاط جديد';
+    else if(an && an.type && ATT_TYPES[an.type]){
+      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : ATT_TYPES[an.type].label;
     }
   } else if(tab==='opinions'){
     if(state.viewingOpinionId){
@@ -23258,7 +23281,18 @@ const ATT_TYPES = {
   meeting: { label:'الاجتماع', full:'حضور الاجتماع', icon:'👥', pre:'MEET', pts:50, color:'linear-gradient(145deg,#3FDCC9,#845EC2)' },
   praise:  { label:'التسبحة',  full:'حضور التسبحة',  icon:'🎶', pre:'PRSE', pts:0, color:'linear-gradient(145deg,#9B8CFF,#FF6B9D)' }
 };
-const ATT_CONFIG_KEY = 'glavera-att-config', ATT_RECORDS_KEY = 'glavera-att-records';
+const ATT_CONFIG_KEY = 'glavera-att-config', ATT_RECORDS_KEY = 'glavera-att-records', ATT_TYPES_KEY = 'glavera-att-types';
+const ATT_ICONS = ['⛪','👥','🎶','📖','🙏','✝️','🕊️','🎓','🍽️','⚽','🎭','⭐'];
+const ATT_COLORS = ['linear-gradient(145deg,#5FE0A4,#2A9D78)','linear-gradient(145deg,#7C9CFF,#5A67D8)','linear-gradient(145deg,#FF9EC7,#D6618F)','linear-gradient(145deg,#C9A27A,#8A6A4A)'];
+function attApplyTypes(arr){
+  let added = false;
+  (Array.isArray(arr)?arr:[]).forEach(ct=>{
+    if(!ct || !ct.key || ATT_TYPES[ct.key]) return;
+    ATT_TYPES[ct.key] = { label:ct.label, full:'حضور '+ct.label, icon:ct.icon||'⭐', pre:ct.pre||'CST', pts:0, color:ct.color||ATT_COLORS[0], custom:true };
+    ATT_KEYS.push(ct.key); added = true;
+  });
+  return added;
+}
 let ATT_CONFIG = {}, ATT_RECORDS = {}, _attLoading = false, _attLastLoad = 0, _attVer = 0, _attLoadedOnce = false, _attInitBusy = false, _attInitFailedAt = 0;
 
 function attGenCode(type){
@@ -23325,10 +23359,11 @@ async function attRefresh(force){
   _attLoading = true;
   const ver = _attVer;
   try{
-    const [c, r] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY)]);
+    const [c, r, tl] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY)]);
+    const typesAdded = attApplyTypes(tl);
     _attLastLoad = Date.now(); _attLoadedOnce = true;
     if(ver !== _attVer) return; // فيه كتابة حصلت أثناء القراءة، القراءة دي قديمة
-    const changed = JSON.stringify(c)!==JSON.stringify(ATT_CONFIG) || JSON.stringify(r)!==JSON.stringify(ATT_RECORDS);
+    const changed = typesAdded || JSON.stringify(c)!==JSON.stringify(ATT_CONFIG) || JSON.stringify(r)!==JSON.stringify(ATT_RECORDS);
     ATT_CONFIG = c; ATT_RECORDS = r;
     if(changed && attViewActive()){
       const ae = document.activeElement;
@@ -23704,64 +23739,109 @@ async function tryAttendance(codeRaw, typeArg){
 }
 
 /* ---------- لوحة الأدمن ---------- */
-function attAdminType(){ const v = (state.adminSub||{}).att; return ATT_TYPES[v] ? v : 'mass'; }
+function attAdminType(){ const v = state.attNav && state.attNav.type; return ATT_TYPES[v] ? v : 'mass'; }
 function renderAdminAttendanceTab(){
-  const type = attAdminType(), t = ATT_TYPES[type], c = attCfg(type);
-  const tabs = adminSubTabs('att', ATT_KEYS.map(k=>({id:k, label:ATT_TYPES[k].icon+' '+ATT_TYPES[k].label})), type);
-  if(!_attLoadedOnce) return tabs + `<div class="empty-note">جارٍ التحميل...</div>`;
+  const nav = state.attNav || (state.attNav = {type:null, page:'home'});
+  if(!_attLoadedOnce) return `<div class="empty-note">جارٍ التحميل...</div>`;
+  const cntOf = (k,c)=> c ? Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===k && r.sid===c.sessionId).length : 0;
+  /* ---------- صفحة نشاط جديد ---------- */
+  if(nav.page==='addtype'){
+    const ic = state.attNewIcon || ATT_ICONS[0];
+    return `<div class="card">
+      <div class="admin-session-name" style="margin-bottom:6px;">اسم النشاط</div>
+      <input class="field" id="att-type-name" value="${escapeHtml(state.attNewName||'')}" placeholder="مثال: مدارس الأحد" />
+      <div class="admin-session-name" style="margin:16px 0 8px;">الأيقونة</div>
+      <div class="aa-icons">${ATT_ICONS.map(i=>`<button type="button" class="aa-ic ${i===ic?'on':''}" data-action="att-admin-pick-icon" data-icon="${i}">${i}</button>`).join('')}</div>
+      <button type="button" class="btn btn-primary" style="margin-top:18px;width:100%;" data-action="att-admin-addtype-save">إضافة النشاط</button>
+    </div>`;
+  }
+  /* ---------- الصفحة الرئيسية: مربعات الأنشطة ---------- */
+  const type = nav.type, t = ATT_TYPES[type];
+  if(!type || !t){
+    const tiles = ATT_KEYS.map(k=>{
+      const tt = ATT_TYPES[k], cc = attCfg(k);
+      const sub = cc ? `${cc.open?'🟢 مفتوح':'مقفول'} · ${cntOf(k,cc)} حضروا` : 'جاهز';
+      return `<button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico" style="background:${tt.color}">${tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button>`;
+    }).join('');
+    return `<div class="aa-grid">${tiles}<button type="button" class="aa-tile add" data-action="att-admin-addtype"><span class="aa-tile-ico">＋</span><b>نشاط جديد</b><small>أضف نوع حضور</small></button></div>`;
+  }
+  const c = attCfg(type);
   if(!c){
     const failed = _attInitFailedAt>0 && !_attInitBusy;
-    return tabs + `<div class="card" style="text-align:center;"><div class="empty-note">${failed?'تعذر تجهيز كود الحضور — اتأكد من الإنترنت وجرّب تاني':'جارٍ تجهيز كود الحضور...'}</div>${failed && typeof _fbLastError!=='undefined' && _fbLastError ? `<div class="hint" style="direction:ltr;word-break:break-all;">${escapeHtml(_fbLastError)}</div>`:''}<button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-init">🔄 تجهيز الكود الآن</button></div>`;
+    return `<div class="card" style="text-align:center;"><div class="empty-note">${failed?'تعذر تجهيز كود الحضور — اتأكد من الإنترنت وجرّب تاني':'جارٍ تجهيز كود الحضور...'}</div><button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-init" data-type="${type}">🔄 تجهيز الكود الآن</button></div>`;
   }
   const recs = Object.entries(ATT_RECORDS||{}).filter(([k,r])=>r && r.type===type && r.sid===c.sessionId)
     .map(([k,r])=>Object.assign({key:k}, r)).sort((a,b)=>b.ts-a.ts);
   const total = PARTICIPANTS.length;
   const pct = total ? Math.round(recs.length/total*100) : 0;
-  const kpis = adminKpis([{num:recs.length, lab:'حضروا'},{num:total, lab:'إجمالي المشاركين'},{num:pct+'%', lab:'نسبة الحضور'}]);
-  const rows = recs.map(r=>{
-    const p = PARTICIPANTS.find(x=>x.id===r.pid);
-    return `<div class="audit-row" data-search="${escapeHtml(((p?p.name:'')+' '+r.pid).toLowerCase())}">
-      <div class="audit-left">${escapeHtml(p?p.name:r.pid)}<div class="audit-sub">${attFmtTime(r.ts)}</div></div>
-      <button type="button" class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:10.5px;color:var(--danger);margin:0;" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}">حذف</button>
+  const R = state.attRoster || (state.attRoster = {f:'absent'});
+  const here = new Set(recs.map(r=>r.pid));
+  /* ---------- إضافة يوم جديد ---------- */
+  if(nav.page==='new'){
+    return `<div class="card att-newsess">
+      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>بتاريخ النهارده — تقدر تغيّره</small></div></div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="(function(d){var n=document.getElementById('att-new-name');if(n&&!n.dataset.t){n.value=attDefaultName('${type}',d.value);}})(this)" /></label>
+        <label class="att-ns-f"><span>🪙 قيمة الاسكان (نقاط)</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">${[0,10,20,50,100].map(v=>`<button type="button" class="btn btn-ghost" style="width:auto;padding:6px 14px;font-size:12px;margin:0;" onclick="var i=document.getElementById('att-new-pts');if(i){i.value=${v};}">${v===0?'بدون نقاط':v}</button>`).join('')}</div>
+      <label class="att-ns-f"><span>✏️ اسم اليوم</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
+      <input type="checkbox" id="att-new-open" checked style="display:none" />
+      <button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">إنشاء</button>
+      <div class="hint">بيتولّد كود QR جديد وعدّاد من صفر، واليوم القديم بيتحفظ في السجل.</div>
     </div>`;
-  }).join('');
+  }
+  /* ---------- تسجيل يدوي ---------- */
+  if(nav.page==='manual'){
+    const cntIn = here.size, cntOut = total - cntIn;
+    const list = PARTICIPANTS.filter(p=> R.f==='all' || (R.f==='present') === here.has(p.id));
+    const RLIM = 250, recOf = {}; recs.forEach(r=>{ recOf[r.pid] = r; });
+    const rows = list.slice(0,RLIM).map(p=>{
+      const r = recOf[p.id];
+      const btn = r
+        ? `<button type="button" class="arr-btn in" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}" aria-label="إلغاء حضور ${escapeHtml(p.name)}"><span>✓</span><small>${attFmtTime(r.ts)}</small></button>`
+        : `<button type="button" class="arr-btn" data-action="att-admin-quick" data-type="${type}" data-pid="${escapeHtml(String(p.id))}">سجّل</button>`;
+      return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id).toLowerCase())}">
+        <span class="arr-av">${escapeHtml((p.name||'?').trim().charAt(0))}</span>
+        <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
+        ${btn}
+      </div>`;
+    }).join('');
+    const chipF = (id,lab,n)=>`<button type="button" class="att-chip ${R.f===id?'on':''}" data-action="att-admin-rf" data-f="${id}">${lab}<b>${n}</b></button>`;
+    return `<input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دوّر بالاسم أو الكود..." style="margin:0 0 12px;" />
+      <div class="att-roster">
+        <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('all','الكل',total)}</div>
+        <div class="att-roster-list">${rows || `<div class="empty-note">${R.f==='absent'?'🎉 كل المخدومين سجّلوا حضورهم':'مفيش أسماء في الفلتر ده'}</div>`}</div>
+        ${list.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${list.length} — استخدم البحث</div>` : ''}
+      </div>`;
+  }
+  /* ---------- شوف مين حضر ---------- */
+  if(nav.page==='who'){
+    const rows = recs.map(r=>{
+      const pp = PARTICIPANTS.find(x=>x.id===r.pid);
+      return `<div class="audit-row" data-search="${escapeHtml(((pp?pp.name:'')+' '+r.pid).toLowerCase())}">
+        <div class="audit-left">${escapeHtml(pp?pp.name:r.pid)}<div class="audit-sub">${attFmtTime(r.ts)}${r.manual?' · يدوي':''}</div></div>
+        <button type="button" class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:10.5px;color:var(--danger);margin:0;" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}">حذف</button>
+      </div>`;
+    }).join('');
+    return `${adminKpis([{num:recs.length, lab:'حضروا'},{num:total-recs.length, lab:'لم يحضروا'},{num:pct+'%', lab:'نسبة الحضور'}])}
+      <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دوّر بالاسم أو الكود..." style="margin:0 0 12px;" />
+      <div class="card">${rows || '<div class="empty-note">لسه محدش سجّل حضوره</div>'}</div>
+      <button type="button" class="btn btn-outline" style="margin-top:12px;width:100%;" data-action="att-admin-export" data-type="${type}">⬇️ تصدير كشف الحضور (Excel / CSV)</button>`;
+  }
+  /* ---------- صفحة النشاط ---------- */
   const hist = (c.history||[]).slice().reverse().slice(0,10).map(h=>{
     const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===h.sessionId).length;
     return `<div class="audit-row"><div class="audit-left">${escapeHtml(h.name||'')}<div class="audit-sub">${attFmtTime(h.startedAt)}</div></div><div class="audit-time">${n} حضور</div></div>`;
   }).join('');
-  const todayISO = attTodayISO();
   const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
-  const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ الجلسة الحالية من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ جلسة النهارده</button></div>` : '';
-  const R = state.attRoster || (state.attRoster = {f:'absent'});
-  const here = new Set(recs.map(r=>r.pid));
-  const recOf = {}; recs.forEach(r=>{ recOf[r.pid] = r; });
-  const inScope = PARTICIPANTS.slice();
-  const cntAll = inScope.length, cntIn = inScope.filter(p=>here.has(p.id)).length, cntOut = cntAll - cntIn;
-  const rosterList = inScope.filter(p=> R.f==='all' || (R.f==='present') === here.has(p.id));
-  const RLIM = 250;
-  const rosterRows = rosterList.slice(0,RLIM).map(p=>{
-    const r = recOf[p.id];
-    const btn = r
-      ? `<button type="button" class="arr-btn in" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}" aria-label="إلغاء حضور ${escapeHtml(p.name)}"><span>✓</span><small>${attFmtTime(r.ts)}</small></button>`
-      : `<button type="button" class="arr-btn" data-action="att-admin-quick" data-type="${type}" data-pid="${escapeHtml(String(p.id))}">سجّل</button>`;
-    return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id).toLowerCase())}">
-      <span class="arr-av">${escapeHtml((p.name||'?').trim().charAt(0))}</span>
-      <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
-      ${btn}
-    </div>`;
-  }).join('');
-  const chipF = (id,lab,n)=>`<button type="button" class="att-chip ${R.f===id?'on':''}" data-action="att-admin-rf" data-f="${id}">${lab}<b>${n}</b></button>`;
-  const lastRec = recs[0];
-  const toolsHtml = `<div class="att-tools">
-      <button type="button" class="att-tool" data-action="att-admin-undo" data-type="${type}" ${lastRec?'':'disabled'}><span>↩️</span><b>تراجع عن آخر تسجيل</b><small>${lastRec?escapeHtml((PARTICIPANTS.find(x=>x.id===lastRec.pid)||{}).name||''):'—'}</small></button>
-      <button type="button" class="att-tool" data-action="att-admin-export" data-type="${type}"><span>⬇️</span><b>تصدير كشف الحضور</b><small>Excel / CSV (حاضر + غائب)</small></button>
-    </div>`;
-  const view = adminSubGet('att-view','overview');
-  const vtabs = adminSubTabs('att-view', [{id:'overview',label:'نظرة عامة'},{id:'roster',label:'كشف الحضور'},{id:'session',label:'الجلسة'}], view);
-  const sec = (title, sub)=>`<div class="aa-sec"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>`;
-  const hero = `<div class="aa-hero">
+  const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>` : '';
+  return `
+    <button type="button" class="btn btn-primary aa-newday" data-action="att-admin-page" data-page="new" data-type="${type}">＋ إضافة يوم جديد</button>
+    ${staleBanner}
+    <div class="aa-hero">
       <div class="aa-hero-top">
-        <div><div class="aa-hero-name">${escapeHtml(c.name||t.label)}</div><div class="aa-hero-sub">${t.icon} ${t.label} · ${attFmtTime(c.startedAt)}</div></div>
+        <div><div class="aa-hero-name">${escapeHtml(c.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(c.startedAt)} · ${attPtsOfCfg(type,c)>0?attPtsOfCfg(type,c)+' نقطة':'بدون نقاط'}</div></div>
         <span class="aa-pill ${c.open?'':'off'}"><i></i>${c.open?'مفتوح':'مقفول'}</span>
       </div>
       <div class="aa-hero-prog">
@@ -23769,84 +23849,28 @@ function renderAdminAttendanceTab(){
         <div class="aa-bar"><i style="width:${pct}%"></i></div>
       </div>
       <div class="aa-set-row">
-        <div><b>استقبال الحضور</b><small>${c.open?'المشاركون يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div>
+        <div><b>استقبال الحضور</b><small>${c.open?'المخدومين يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div>
         <button type="button" class="switch ${c.open?'on':''}" data-action="att-admin-toggle" data-type="${type}"></button>
       </div>
-    </div>`;
-  const overviewHtml = `${hero}${staleBanner}
-    ${sec('كود الحضور','يمسحه المشاركون لتسجيل حضورهم')}
-    <div class="card" style="text-align:center;">
-      <div class="att-qr-reveal${_attQrShown?' is-open':''}" id="att-qr-reveal">
-        <button type="button" class="att-qr-toggle" data-action="att-admin-toggle-qr" data-type="${type}" aria-expanded="${_attQrShown?'true':'false'}" aria-controls="att-qr-panel">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>
-          <span class="att-qr-toggle-txt">${_attQrShown?'إخفاء الكيو آر':'إظهار الكيو آر'}</span>
-          <svg class="att-qr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="att-qr-panel" id="att-qr-panel" aria-hidden="${_attQrShown?'false':'true'}">
-          <div class="att-qr-frame"><div id="att-admin-qr"></div></div>
-        </div>
-      </div>
-      <div class="hint" style="word-break:break-all;direction:ltr;">${escapeHtml(c.code)}</div>
-      <div class="admin-actions-row" style="display:flex;gap:8px;margin-top:10px;">
+      <div class="aa-qr-box"><div id="att-admin-qr"></div></div>
+      <div class="hint" style="word-break:break-all;direction:ltr;text-align:center;">${escapeHtml(c.code)}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
         <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
         <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
       </div>
-    </div>`;
-  const rosterHtml = `${toolsHtml}
-    ${sec('تسجيل يدوي','بالكود أو الاسم')}
-    <div class="card">
-      <div style="display:flex;gap:8px;">
-        <input class="field" id="att-add-input" placeholder="كود المشارك أو اسمه" autocomplete="off" />
-        <button type="button" class="btn btn-outline" style="width:auto;padding:0 16px;" data-action="att-admin-add" data-type="${type}">سجّل</button>
-      </div>
     </div>
-    ${sec('كشف المشاركين')}
-    <div class="att-roster">
-      <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('all','الكل',cntAll)}</div>
-      <input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دور بالاسم أو الكود..." style="margin:2px 0 10px;" />
-      <div class="att-roster-list">${rosterRows || `<div class="empty-note">${R.f==='absent'?'🎉 كل المشاركين في النطاق ده سجّلوا حضورهم':'مفيش أسماء في الفلتر ده'}</div>`}</div>
-      ${rosterList.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${rosterList.length} — استخدم البحث</div>` : ''}
-    </div>`;
-  const sessionHtml = `${sec('الجلسة الحالية')}
-    <div class="card">
-      <div class="admin-session-name" style="margin-bottom:6px;">اسم الجلسة</div>
-      <div style="display:flex;gap:8px;">
-        <input class="field" id="att-name-input" value="${escapeHtml(c.name||'')}" placeholder="مثال: قداس الجمعة" />
-        <button type="button" class="btn btn-outline" style="width:auto;padding:0 16px;" data-action="att-admin-save-name" data-type="${type}">حفظ</button>
-      </div>
-      <div class="admin-session-name" style="margin:14px 0 6px;">🪙 نقاط الحضور (لكل مشارك)</div>
-      <div style="display:flex;gap:8px;">
-        <input class="field" id="att-pts-input" type="number" inputmode="numeric" min="0" max="1000" dir="ltr" value="${attPtsOfCfg(type,c)}" />
-        <button type="button" class="btn btn-outline" style="width:auto;padding:0 16px;" data-action="att-admin-save-points" data-type="${type}">حفظ</button>
-      </div>
-      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">${[0,10,20,50,100].map(v=>`<button type="button" class="btn btn-ghost" style="width:auto;padding:6px 14px;font-size:12px;margin:0;" onclick="var i=document.getElementById('att-pts-input');if(i){i.value=${v};i.focus();}">${v===0?'بدون نقاط':v}</button>`).join('')}</div>
-      <div class="hint">التعديل هنا بيخص الجلسة الحالية. اللي سجّلوا قبل كده نقاطهم مش بتتغير.</div>
+    <div class="aa-grid" style="margin-top:14px;">
+      <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
+      <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${recs.length} حضروا</small></button>
     </div>
-    ${sec('إنشاء جلسة جديدة')}
-    <div class="card att-newsess">
-      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>جلسة ${t.label} جديدة</b><small>جاهزة بتاريخ النهارده — عدّل لو محتاج</small></div></div>
-      <div class="att-ns-grid">
-        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${todayISO}" dir="ltr" onchange="(function(d){var n=document.getElementById('att-new-name');if(n&&!n.dataset.t){n.value=attDefaultName('${type}',d.value);}})(this)" /></label>
-        <label class="att-ns-f"><span>🪙 النقاط</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
-      </div>
-      <label class="att-ns-f"><span>✏️ اسم الجلسة</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
-      <label class="att-ns-open"><input type="checkbox" id="att-new-open" checked /><span>فتح الحضور فورًا بعد الإنشاء</span></label>
-      <button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">🚀 إنشاء جلسة ${t.label}</button>
-      <div class="hint">بيعمل كود QR جديد وعدّاد من صفر، والجلسة الحالية بتتحفظ في «الجلسات السابقة».</div>
-    </div>
-    ${hist ? sec('الجلسات السابقة') + `<div class="card">${hist}</div>` : ''}
-    <button type="button" class="btn btn-ghost" style="margin-top:18px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">مسح كل سجلات ${t.label}</button>`;
-  return `
-    ${tabs}
-    ${vtabs}
-    ${view==='roster' ? rosterHtml : view==='session' ? sessionHtml : overviewHtml}
+    ${hist ? `<div class="aa-sec"><b>الأيام السابقة</b></div><div class="card">${hist}</div>` : ''}
+    <button type="button" class="btn btn-ghost" style="margin-top:18px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">مسح كل سجلات ${escapeHtml(t.label)}</button>
   `;
 }
 var _attQrShown = false; /* الكيو آر مخفي افتراضياً ويظهر بزر "إظهار الكيو آر" */
 function attDrawAdminQr(){
   const el = document.getElementById('att-admin-qr'); if(!el || !window.QRCode) return;
   el.innerHTML = '';
-  if(!_attQrShown) return;
   const c = attCfg(attAdminType()); if(!c) return;
   createQR(el, {text:c.code, width:180, height:180, colorDark:'#12112E', colorLight:'#ffffff'});
 }
@@ -23887,6 +23911,22 @@ async function attAdminAction(action, el){
   const type = el.dataset.type || attAdminType(); const t = ATT_TYPES[type]; if(!t) return;
   const saveToast = (ok, msg)=>{ showToast(ok ? msg : 'تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', !ok); render(); };
   
+  if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-page'){ state.attNav = state.attNav || {type, page:'home'}; state.attNav.page = el.dataset.page; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-addtype'){ state.attNav = {type:null, page:'addtype'}; state.attNewIcon = ATT_ICONS[0]; state.attNewName = ''; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-pick-icon'){ const ni = document.getElementById('att-type-name'); if(ni) state.attNewName = ni.value; state.attNewIcon = el.dataset.icon; render(); return; }
+  if(action==='att-admin-addtype-save'){
+    const ni = document.getElementById('att-type-name'); const nm = ni ? ni.value.trim() : '';
+    if(!nm){ showToast('اكتب اسم النشاط', true); return; }
+    if(ATT_KEYS.some(k=>ATT_TYPES[k].label===nm)){ showToast('النشاط ده موجود بالفعل', true); return; }
+    const idx = ATT_KEYS.filter(k=>ATT_TYPES[k].custom).length;
+    const ct = { key:'c'+Date.now().toString(36), label:nm, icon:state.attNewIcon||'⭐', pre:'C'+Math.random().toString(36).slice(2,5).toUpperCase().replace(/[^A-Z0-9]/g,'X'), color:ATT_COLORS[idx%ATT_COLORS.length] };
+    const res = await window.storage.update(ATT_TYPES_KEY, cur=>{ let a=[]; try{ a = cur ? JSON.parse(cur) : []; }catch(e){ a=[]; } if(!Array.isArray(a)) a=[]; a.push(ct); return JSON.stringify(a); }, true);
+    if(!(res && res.value)){ showToast('تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', true); return; }
+    attApplyTypes([ct]);
+    await attCfgUpdate(()=>{});
+    state.attNav = {type:ct.key, page:'home'}; showToast('تمت إضافة '+nm); render(); try{ window.scrollTo(0,0); }catch(e){} return;
+  }
   if(action==='att-admin-toggle-qr'){ attToggleAdminQr(el); return; }
   if(action==='att-admin-init'){
     _attInitBusy = true; _attInitFailedAt = 0; render();
@@ -23998,15 +24038,16 @@ async function attAdminAction(action, el){
     const nm = quick ? '' : gv('att-new-name').trim();
     const openNow = quick ? true : !!(document.getElementById('att-new-open') || {}).checked;
     const finalName = nm || attDefaultName(type, day);
-    showConfirmDialog('هتبدأ «'+finalName+'» بكود جديد وعدّاد من صفر'+(pts>0?' ('+pts+' نقطة)':' (بدون نقاط)')+(openNow?' والحضور هيتفتح فورًا':'')+'. الجلسة الحالية هتتحفظ في السجل.', async ()=>{
+    await (async ()=>{
       const ok = await attCfgUpdate(o=>{
         const prev = o[type]; const n = attNewCfg(type, day);
         n.name = finalName; n.points = pts; n.open = openNow;
         n.history = (prev.history||[]).concat([{sessionId:prev.sessionId, name:prev.name, startedAt:prev.startedAt}]).slice(-30);
         o[type] = n;
       });
+      if(ok && state.attNav){ state.attNav.page = 'home'; }
       saveToast(ok, '🚀 '+finalName+(openNow?' — الحضور مفتوح':''));
-    }, {icon:'🚀', confirmLabel:'ابدأ'});
+    })();
   }
   else if(action==='att-admin-reset'){
     showConfirmDialog('هتمسح كل سجلات حضور '+t.label+' (كل الجلسات). الخطوة دي مش بترجع.', async ()=>{
@@ -24225,13 +24266,15 @@ document.addEventListener('click', (e)=>{
     else if(t==='participants' && state.addingParticipant){ state.addingParticipant = false; }
     else if(t==='participants' && state.editingParticipantId){ state.editingParticipantId = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
+    else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = 'home'; }
+    else if(t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype')){ state.attNav = {type:null, page:'home'}; }
     else { state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
   }
   else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
   else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
-  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.attNav = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
