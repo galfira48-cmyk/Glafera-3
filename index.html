@@ -3121,6 +3121,58 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @media (prefers-reduced-motion:reduce){ .att-glass.is-done .att-glass-go{ animation:none; } }
 
 
+
+  /* ===== لوحة المنظمين — إعادة هيكلة: مركز تحكم + يحتاج انتباه + وصول سريع + أقسام قائمة ===== */
+  .adm-hero{ position:relative; overflow:hidden; isolation:isolate; padding:16px 14px 12px; margin-bottom:14px; border-radius:22px;
+    background:radial-gradient(120% 100% at 100% 0%, rgba(244,183,64,.16), transparent 55%), linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    border:1px solid var(--border); box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 12px 26px -12px rgba(0,0,0,.5); }
+  .adm-hero-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .adm-hero-kicker{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:700; font-size:10.5px; letter-spacing:2.4px; color:var(--gold-2); direction:ltr; text-align:right; opacity:.9; }
+  .adm-hero-title{ font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; line-height:1.25; }
+  .adm-live{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:20px; font-size:10.5px; font-weight:800; color:var(--text-muted); background:rgba(255,255,255,.06); border:1px solid var(--border); max-width:52%; }
+  .adm-live i{ flex:0 0 auto; width:7px; height:7px; border-radius:50%; background:#8A8A9A; }
+  .adm-live.on{ color:#BFF5DC; background:rgba(95,224,164,.12); border-color:rgba(95,224,164,.45); }
+  .adm-live.on i{ background:#5FE0A4; animation:attDot 1.8s ease-out infinite; }
+  .adm-hero .admin-stat-strip{ margin:0; background:rgba(6,8,30,.28); box-shadow:none; }
+  .adm-sec-head{ display:flex; align-items:center; gap:8px; margin:0 2px 8px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--text-muted); letter-spacing:.2px; }
+  .adm-sec-plain{ margin-top:16px; }
+  .adm-sec-plain::after{ content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .adm-attn{ margin-bottom:6px; padding:12px; border-radius:20px; background:linear-gradient(160deg,rgba(255,107,107,.13),rgba(255,107,107,.03)); border:1px solid rgba(255,107,107,.38); }
+  .adm-attn .adm-sec-head{ color:#FFB3B3; margin-bottom:8px; }
+  .adm-pulse{ width:8px; height:8px; border-radius:50%; background:#FF6B6B; animation:admPing 1.8s ease-out infinite; }
+  @keyframes admPing{ 0%{ box-shadow:0 0 0 0 rgba(255,107,107,.7); } 80%,100%{ box-shadow:0 0 0 8px rgba(255,107,107,0); } }
+  .adm-attn-row{ width:100%; display:flex; align-items:center; gap:10px; padding:10px 12px; margin-top:6px; border-radius:14px; text-align:right; font-family:inherit; color:inherit;
+    background:rgba(6,8,30,.3); border:1px solid rgba(255,255,255,.1); -webkit-tap-highlight-color:transparent; }
+  .adm-attn-row:active{ transform:scale(.98); }
+  .adm-attn-ico{ font-size:18px; } .adm-attn-lab{ flex:1; font-weight:700; font-size:13px; }
+  .adm-attn-n{ min-width:26px; height:26px; padding:0 8px; border-radius:13px; display:grid; place-items:center; background:#FF6B6B; color:#fff; font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .adm-chev{ margin-inline-start:auto; font-size:20px; line-height:1; color:var(--text-muted); opacity:.7; }
+  .adm-attn-n + .adm-chev{ margin-inline-start:2px; }
+  .adm-quick{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .adm-q{ display:flex; flex-direction:column; align-items:center; gap:7px; padding:11px 4px 9px; border-radius:18px; font-family:inherit; color:inherit; background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); border:1px solid var(--border); -webkit-tap-highlight-color:transparent; }
+  .adm-q:active{ transform:scale(.95); }
+  .adm-q-ico{ width:44px; height:44px; border-radius:14px; display:grid; place-items:center; font-size:21px; box-shadow:0 6px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.35); }
+  .adm-q-lab{ font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px; line-height:1.25; text-align:center; }
+  /* الأقسام: قائمة صفوف داخل كارت لكل مجموعة */
+  .admin-hub-group{ margin-bottom:14px; }
+  .admin-hub-group-title{ position:relative; padding-inline-start:12px; }
+  .admin-hub-group-title::before{ content:''; position:absolute; inset-inline-start:0; top:2px; bottom:2px; width:3px; border-radius:3px; background:var(--g); }
+  .admin-hub-group .admin-hub-grid.adm-list{ display:flex; flex-direction:column; gap:0; padding:4px 0; border-radius:20px; overflow:hidden;
+    background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--border); }
+  .admin-hub-group .admin-hub-tile{ position:relative; flex-direction:row; justify-content:flex-start; gap:12px; width:100%; padding:11px 14px; text-align:right;
+    border:0; border-radius:0; background:transparent; box-shadow:none; animation:none; }
+  .admin-hub-group .admin-hub-tile + .admin-hub-tile::before{ content:''; position:absolute; top:0; inset-inline:66px 14px; height:1px; background:var(--border); opacity:.7; }
+  .admin-hub-group .admin-hub-tile:active{ transform:none; background:rgba(255,255,255,.06); }
+  .admin-hub-group .admin-hub-ico{ flex:0 0 auto; width:42px; height:42px; border-radius:13px; font-size:20px; }
+  .admin-hub-group .admin-hub-txt{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; flex:1; }
+  .admin-hub-group .admin-hub-lab{ font-size:14px; }
+  .admin-hub-group .admin-hub-desc{ font-size:11px; color:var(--text-muted); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .admin-hub-group .admin-hub-badge{ position:static; flex:0 0 auto; margin-inline-start:auto; }
+  .admin-hub-group .admin-hub-badge + .adm-chev{ margin-inline-start:2px; }
+  /* صفحات الأقسام من جوه: ترتيب أنظف */
+  .admin-page-head{ padding:14px 0 12px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+  .admin-siblings{ padding-bottom:2px; }
+
   /* ---------- صفحة "جاري التحديث" (زجاجي راقي) ---------- */
   .maint-page{ position:relative; overflow:hidden; isolation:isolate; margin-top:10px; padding:32px 22px 24px; border-radius:20px; text-align:center; color:#FCF9F3;
     background:linear-gradient(140deg,rgba(20,26,78,.94) 0%,rgba(31,33,76,.93) 55%,rgba(56,41,43,.95) 100%);
@@ -21053,217 +21105,7 @@ function lockIconSvg(){
     <circle cx="9.5" cy="12.6" r="1.1" fill="currentColor"/>
   </svg>`;
 }
-function renderAdminSessionsTab(){
-  if(state.editingSessionId){
-    return renderAdminSessionDetail(state.editingSessionId);
-  }
-  if(state.adminDayId){
-    return renderAdminDayDetail(state.adminDayId);
-  }
-  const tiles = DAYS.map(day=>{
-    const sessCount = day.sessions.length;
-    const lockedCount = day.sessions.filter(s=>s.locked).length;
-    return `<div class="admin-day-tile ${day.locked?'is-locked':''}" data-action="open-admin-day" data-day="${day.id}">
-      <div class="admin-day-tile-head">
-        <span class="admin-day-tile-num">${day.num}</span>
-        <button type="button" class="lock-chip icon-only ${day.locked?'locked':''}" data-action="admin-toggle-day-lock" data-day="${day.id}" title="${day.locked?'فتح اليوم':'قفل اليوم'}">${lockIconSvg()}</button>
-      </div>
-      <span class="admin-day-tile-lab">${escapeHtml(day.label)}</span>
-      <span class="admin-day-tile-sub">${sessCount} فقرة${lockedCount?` — ${lockedCount} مقفولة`:''}</span>
-    </div>`;
-  }).join('');
-  return `
-    ${adminKpis([
-      {num:DAYS.length, lab:'يوم'},
-      {num:DAYS.reduce((a,d)=>a+d.sessions.length,0), lab:'فقرة'},
-      {num:DAYS.reduce((a,d)=>a+d.sessions.filter(x=>x.locked).length,0)+DAYS.filter(d=>d.locked).length, lab:'مقفول', cls:'is-alert'},
-      {num:Object.keys(CHECKINS).length, lab:'تسجيل حضور'},
-    ])}
-    ${adminSectionTitle('📅','أيام المؤتمر')}
-    <div class="hint" style="margin-bottom:10px;">اضغط على أي يوم لعرض وتعديل فقراته، أو على القفل لغلقه</div>
-    <div class="admin-day-grid">${tiles}</div>
-  `;
-}
-function renderAdminDayDetail(dayId){
-  const day = DAYS.find(d=>d.id===dayId);
-  if(!day) return `<div class="empty-note">اليوم غير موجود</div>`;
-  let body = `<button type="button" class="admin-back-link" data-action="close-admin-day">${ICO.back} كل الأيام</button>`;
-  body += `<div class="admin-day-card">
-    <div class="admin-day-badge">${day.num}</div>
-    <input class="admin-day-name-input" id="edit-daylabel-${day.id}" value="${escapeHtml(day.label)}" />
-    <button type="button" class="icon-save-btn" data-action="admin-save-day-label" data-day="${day.id}">💾</button>
-    <button type="button" class="lock-chip ${day.locked?'locked':''}" data-action="admin-toggle-day-lock" data-day="${day.id}">${lockIconSvg()} <span>${day.locked?'مقفول':'مفتوح'}</span></button>
-  </div>`;
-  if(day.locked) body += `<div class="hint" style="color:var(--danger);margin-bottom:10px;">هذا اليوم مقفول بالكامل — المشاركين مش هيقدروا يسجلوا حضور في أي فقرة فيه لحد ما تفتحه</div>`;
 
-  const daySessionIds = new Set(day.sessions.map(s=>s.id));
-  const dayCodes = Object.keys(POINT_CODES).filter(c=>daySessionIds.has(POINT_CODES[c].sessionId));
-  const dayUsed = dayCodes.filter(c=>POINT_CODES[c].used).length;
-  const dayUsagePct = dayCodes.length ? Math.round((dayUsed/dayCodes.length)*100) : 0;
-
-  const toolsHtml = `
-    <div class="card" style="margin:0;">
-      <div class="admin-session-name" style="margin-bottom:4px;">🎟️ توليد أكواد QR لكل فقرات هذا اليوم دفعة واحدة</div>
-      <div class="hint" style="margin:0 0 10px;">العدد اللي تكتبه هيتولّد لكل قيمة من الحد الأدنى للأقصى، لكل فقرة على حدة. مثال: 0-10 وعدد 40 = 40 كود لكل قيمة (440 كود لكل فقرة).</div>
-      ${dayCodes.length ? `<div class="hint" style="margin:0 0 10px;">📈 نسبة استخدام أكواد كل فقرات اليوم ده: <b>${dayUsagePct}%</b> (${dayUsed} من ${dayCodes.length})</div>` : ''}
-      <div class="admin-edit-row">
-        <div style="flex:1;"><label>أقل قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-min-${day.id}" placeholder="مثال: 0" /></div>
-        <div style="flex:1;"><label>أعلى قيمة نقاط</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-max-${day.id}" placeholder="مثال: 10" /></div>
-      </div>
-      <div style="margin-top:8px;"><label>عدد الأكواد لكل قيمة (لكل فقرة)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-day-scode-qty-${day.id}" placeholder="مثال: 40" /></div>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-day-point-codes" data-day="${day.id}">توليد الأكواد لكل فقرات اليوم</button>
-      <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="download-all-day-point-codes" data-day="${day.id}">⬇️ تحميل/طباعة كل أكواد QR الخاصة بفقرات اليوم مرة واحدة</button>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;width:100%;padding:7px;font-size:11.5px;color:var(--danger);" data-action="confirm-delete-all-day-point-codes" data-day="${day.id}">🗑️ حذف كل أكواد QR الخاصة بكل فقرات اليوم</button>
-    </div>
-  `;
-
-  const sessionTiles = day.sessions.map(s=>{
-    const info = SESSION_INFO[s.id] || {};
-    const checkedIn = checkinsForSession(s.id);
-    const pct = PARTICIPANTS.length ? Math.round((checkedIn/PARTICIPANTS.length)*100) : 0;
-    return `<div class="admin-session-tile ${s.locked?'is-locked':''}" data-action="edit-session" data-session="${s.id}">
-      <div class="session-tile-top-row">
-        <button type="button" class="lock-chip icon-only ${s.locked?'locked':''}" data-action="admin-toggle-session-lock" data-session="${s.id}">${lockIconSvg()}</button>
-        <button type="button" class="session-tile-del" data-action="admin-delete-session" data-session="${s.id}">🗑️</button>
-      </div>
-      <span class="session-tile-ico" style="background:${TYPE_COLORS[s.type]||'var(--teal)'};">${ICO[s.type]||'📌'}</span>
-      <span class="session-tile-name">${escapeHtml(info.name || s.name)}</span>
-      <span class="session-tile-type">${SESSION_TYPE_LABELS[s.type]||''}</span>
-      <div class="session-tile-progress-track"><div class="session-tile-progress-fill" data-progress-session="${s.id}" style="width:${pct}%"></div></div>
-      <span class="session-tile-pct" data-progress-lab-session="${s.id}">${checkedIn}/${PARTICIPANTS.length} حضروا</span>
-    </div>`;
-  }).join('');
-  const dayCheckins = day.sessions.reduce((a,s)=>a+checkinsForSession(s.id),0);
-  body += adminKpis([
-    {num:day.sessions.length, lab:'فقرة'},
-    {num:day.sessions.filter(s=>s.locked).length, lab:'مقفولة', cls:day.sessions.some(s=>s.locked)?'is-alert':''},
-    {num:dayCheckins, lab:'تسجيل حضور'},
-    {num:dayCodes.length?dayUsagePct+'%':'—', lab:'استخدام الأكواد'},
-  ]);
-  body += adminSectionTitle('🗓️','فقرات اليوم');
-  body += day.sessions.length ? `<div class="admin-session-grid">${sessionTiles}</div>` : adminEmptyState('🗓️','لا توجد فقرات في هذا اليوم','أضف أول فقرة من الأسفل');
-
-  const addHtml = `
-    <div class="admin-add-session-card" style="margin-top:12px;">
-      <div class="admin-session-name" style="margin-bottom:8px;">➕ إضافة فقرة جديدة لهذا اليوم</div>
-      <input class="field" id="new-session-name-${day.id}" placeholder="اسم الفقرة" style="margin-bottom:8px;" />
-      <input class="field" type="text" inputmode="numeric" pattern="[0-9]*" id="new-session-points-${day.id}" placeholder="عدد النقاط (افتراضي 5)" />
-      <button type="button" class="btn btn-primary" style="margin-top:8px;width:100%;" data-action="admin-add-session" data-day="${day.id}">إضافة الفقرة</button>
-    </div>
-  `;
-  body += adminSectionTitle('🛠️','أدوات');
-  body += adminCollapse('day-add-'+day.id,'➕','إضافة فقرة جديدة','لهذا اليوم', addHtml);
-  body += adminCollapse('day-tools-'+day.id,'🎟️','أكواد QR لليوم','توليد وطباعة وحذف أكواد كل فقرات اليوم', toolsHtml);
-  return body;
-}
-function renderAdminSessionDetail(sessionId){
-  const found = findSessionById(sessionId);
-  if(!found) return `<div class="empty-note">الفقرة غير موجودة</div>`;
-  const { day, session } = found;
-  const info = SESSION_INFO[sessionId] || {};
-  const checkedIn = checkinsForSession(sessionId);
-  const pct = PARTICIPANTS.length ? Math.round((checkedIn/PARTICIPANTS.length)*100) : 0;
-
-  const sessionCodes = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId);
-  const denominations = {};
-  sessionCodes.forEach(c=>{
-    const pc = POINT_CODES[c];
-    denominations[pc.value] = denominations[pc.value] || {total:0, used:0};
-    denominations[pc.value].total++;
-    if(pc.used) denominations[pc.value].used++;
-  });
-  const denomKeys = Object.keys(denominations).map(Number).sort((a,b)=>a-b);
-  const totalCodes = sessionCodes.length;
-  const totalUsed = sessionCodes.filter(c=>POINT_CODES[c].used).length;
-  const usagePct = totalCodes ? Math.round((totalUsed/totalCodes)*100) : 0;
-  const denomRows = denomKeys.map(v=>{
-    const d = denominations[v];
-    const vPct = d.total ? Math.round((d.used/d.total)*100) : 0;
-    return `<div class="admin-meta-chip" style="justify-content:space-between;width:100%;padding:9px 12px;margin-top:6px;">
-      <span>🪙 ${v} نقطة — ${d.total} كود (${d.total-d.used} متبقي، استخدام ${vPct}%)</span>
-      <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:10.5px;" data-action="print-session-point-codes" data-value="${v}" data-session="${sessionId}">🖨️ طباعة</button>
-    </div>`;
-  }).join('') || `<div class="hint" style="margin:6px 0 0;">لسه مفيش أكواد QR اتولدت لهذه الفقرة</div>`;
-
-  return `
-    <button type="button" class="admin-back-link" data-action="cancel-edit-session">${ICO.back} ${escapeHtml(day.label)}</button>
-    <div class="admin-day-card">
-      <span class="admin-session-ico" style="background:${TYPE_COLORS[session.type]||'var(--teal)'};">${ICO[session.type]||'📌'}</span>
-      <div style="flex:1;min-width:0;">
-        <div class="admin-session-name">${escapeHtml(info.name||session.name)}</div>
-        <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${SESSION_TYPE_LABELS[session.type]||''} — ${checkedIn}/${PARTICIPANTS.length} حضروا (${pct}%)</div>
-      </div>
-      <button type="button" class="lock-chip ${session.locked?'locked':''}" data-action="admin-toggle-session-lock" data-session="${sessionId}">${lockIconSvg()} <span>${session.locked?'مقفولة':'مفتوحة'}</span></button>
-    </div>
-    ${adminKpis([
-      {num:checkedIn, lab:'حضروا'},
-      {num:pct+'%', lab:'نسبة الحضور'},
-      {num:totalCodes, lab:'كود QR'},
-      {num:totalCodes?usagePct+'%':'—', lab:'استخدام الأكواد'},
-    ])}
-    ${adminSubTabs('session:'+sessionId, [{id:'settings',label:'⚙️ الإعدادات'},{id:'codes',label:'🎟️ الأكواد ('+totalCodes+')'}], adminSubGet('session:'+sessionId,'settings'))}
-    ${adminSubGet('session:'+sessionId,'settings')==='settings' ? `<div class="card">${renderAdminEditForm(session, info)}</div>
-    ${adminSectionTitle('⚠️','منطقة الخطر')}
-    <button type="button" class="btn btn-ghost admin-danger-zone" style="width:100%;color:var(--danger);" data-action="admin-delete-session" data-session="${sessionId}">🗑️ حذف الفقرة نهائيًا</button>` : ''}
-    ${adminSubGet('session:'+sessionId,'settings')==='codes' ? `
-    <div class="card">
-      <div class="admin-session-name" style="margin-bottom:4px;">🎟️ أكواد QR الخاصة بهذه الفقرة</div>
-      ${info.pointsEnabled===false ? `
-      <div class="hint" style="color:var(--danger,#d6473a);">النقاط متوقفة في هذه الفقرة (من إعدادات الفقرة فوق) — فعّل النقاط الأول عشان تقدر تولّد أكواد</div>
-      ` : `
-      <div class="hint" style="margin:0 0 10px;">كل كود اتولد بيبقى 4 خانات عشوائية (حروف وأرقام ورموز) ومش بالترتيب، عشان محدش يقدر يخمّن كود صح. الأكواد دي بتشتغل جوه الفقرة دي بس — محدش هيقدر يستخدمها في فقرة تانية</div>
-      <div class="admin-edit-row">
-        <div style="flex:1;"><label>قيمة الكود (نقاط)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-scode-value-${sessionId}" placeholder="مثال: 5" /></div>
-        <div style="flex:1;"><label>الكمية</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="field" style="color:#1a1a1a;background:#fff;" id="gen-scode-qty-${sessionId}" placeholder="مثال: 30" /></div>
-      </div>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-session-point-codes" data-session="${sessionId}">توليد الأكواد لهذه الفقرة</button>
-      `}
-      ${totalCodes>0 ? `<div class="hint" style="margin:8px 0 0;">📈 نسبة استخدام أكواد هذه الفقرة: <b>${usagePct}%</b> (${totalUsed} من ${totalCodes})</div>` : ''}
-      ${denomRows}
-      ${sessionCodes.length ? `<button type="button" class="btn btn-ghost" style="margin-top:10px;width:100%;padding:7px;font-size:11.5px;color:var(--danger);" data-action="confirm-delete-session-point-codes" data-session="${sessionId}">🗑️ إزالة كل أكواد QR المتولدة لهذه الفقرة (${sessionCodes.length})</button>` : ''}
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
-        <div class="admin-session-name" style="margin-bottom:4px;">🔳 توليد كود QR بنص مخصص</div>
-        <div class="hint" style="margin:0 0 10px;">اكتب أي جملة أو نص تحبه (مش بالضرورة كود نقاط) وهيتحول لكود QR خاص بهذه الفقرة، تقدر تطبعه أو تعرضه زي ما تحب</div>
-        <label>النص</label>
-        <textarea class="field" id="custom-qr-text-${sessionId}" placeholder="اكتب النص أو الجملة اللي تحب تحولها لكود QR">${escapeHtml(info.customQrText||'')}</textarea>
-        <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-custom-session-qr" data-session="${sessionId}">توليد كود QR بهذا النص</button>
-        <div id="custom-qr-holder-${sessionId}" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px;"></div>
-      </div>
-    </div>` : ''}
-  `;
-}
-
-function renderAdminPulseTab(){
-  const sess = state.pulseSessionId ? findSessionById(state.pulseSessionId) : null;
-  const active = sess ? sess.session : autoDetectLiveSession();
-  const options = [];
-  DAYS.forEach(d=>d.sessions.forEach(s=>options.push(`<option value="${s.id}" ${active&&active.id===s.id?'selected':''}>${d.label} — ${s.name}</option>`)));
-  const count = active ? checkinsForSession(active.id) : 0;
-  return `
-    <div class="pulse-wrap">
-      <div style="font-size:13px;color:var(--text-muted);">عدد الحاضرين الآن</div>
-      <div class="pulse-num" id="live-pulse-count" data-count="${count}">${count}</div>
-      <div class="pulse-of">من ${PARTICIPANTS.length} مشارك</div>
-      ${active?`<div class="pulse-session-name">${escapeHtml(active.name)}</div>`:`<div class="pulse-session-name">اختر فقرة لعرضها</div>`}
-      <select class="pulse-select" id="pulse-session-select">
-        <option value="">— تلقائي (حسب وقت الفقرة) —</option>
-        ${options.join('')}
-      </select>
-      <div class="hint" style="margin-top:10px;">مناسبة للعرض على بروجيكتور القاعة، بتتحدث لحظيًا</div>
-    </div>
-  `;
-}
-function updatePulseWidget(){
-  const el = document.getElementById('live-pulse-count');
-  if(!el) return;
-  const sess = state.pulseSessionId ? findSessionById(state.pulseSessionId) : null;
-  const active = sess ? sess.session : autoDetectLiveSession();
-  const count = active ? checkinsForSession(active.id) : 0;
-  if(parseInt(el.dataset.count,10) !== count){
-    el.dataset.count = count;
-    animateCount(el, count, 500);
-  }
-}
 
 function renderAdminAuditTab(){
   const entries = Object.entries(CHECKINS).map(([key, v])=>{
@@ -21366,71 +21208,6 @@ function renderAdminAnalyticsTab(){
   return tabs + body;
 }
 
-function renderAdminLogisticsTab(){
-  const ended = !!CONF_SETTINGS.ended;
-  const rows = PARTICIPANTS.map(p=>{
-    const lg = logisticsOf(p.id);
-    const kit = lg.kit || {};
-    const isEditing = state.editingLogisticsId === p.id;
-    const kitCount = KIT_ITEMS.filter(it=>kit[it.key]).length;
-    const form = isEditing ? `
-      <div class="admin-edit-form">
-        <div class="admin-edit-row">
-          <div style="flex:1;"><label>رقم الغرفة</label><input type="text" id="lg-room-${p.id}" value="${escapeHtml(lg.room||'')}" placeholder="مثال: 305" /></div>
-          <div style="flex:1;"><label>زميل الغرفة</label><input type="text" id="lg-roommate-${p.id}" value="${escapeHtml(lg.roommate||'')}" placeholder="اسم الزميل" /></div>
-        </div>
-        <label>مواعيد الوجبات</label>
-        <input type="text" id="lg-meals-${p.id}" value="${escapeHtml(lg.mealTimes||'')}" placeholder="مثال: الفطار 8، الغدا 2، العشا 8" />
-        <label>مكان الأكل</label>
-        <input type="text" id="lg-food-${p.id}" value="${escapeHtml(lg.foodLocation||'')}" placeholder="مثال: قاعة الطعام الرئيسية" />
-        <div class="admin-edit-row">
-          <div style="flex:1;"><label>مكان التجمع</label><input type="text" id="lg-gather-${p.id}" value="${escapeHtml(lg.gatherPoint||'')}" placeholder="مثال: أمام البوابة" /></div>
-          <div style="flex:1;"><label>ميعاد التحرك</label><input type="text" id="lg-depart-${p.id}" value="${escapeHtml(lg.departTime||'')}" placeholder="مثال: 6:00 ص" /></div>
-        </div>
-        <div class="admin-edit-row">
-          <div style="flex:1;"><label>رقم الأتوبيس</label><input type="text" id="lg-bus-${p.id}" value="${escapeHtml(lg.busNumber||'')}" placeholder="مثال: 2" /></div>
-          <div style="flex:1;"><label>المشرف المسؤول</label><input type="text" id="lg-super-${p.id}" value="${escapeHtml(lg.supervisor||'')}" placeholder="اسم المشرف" /></div>
-        </div>
-        <label>حالة الرحلة</label>
-        <select id="lg-status-${p.id}">
-          <option value="waiting" ${lg.tripStatus==='waiting'?'selected':''}>لم تتحرك بعد</option>
-          <option value="moving" ${lg.tripStatus==='moving'?'selected':''}>في الطريق</option>
-          <option value="arrived" ${lg.tripStatus==='arrived'?'selected':''}>وصلت</option>
-        </select>
-        <label>الكيت المستلم</label>
-        <div class="admin-kit-check-row">
-          ${KIT_ITEMS.map(it=>`<label class="kit-check"><input type="checkbox" id="lg-kit-${it.key}-${p.id}" ${kit[it.key]?'checked':''}/> ${it.ico} ${it.lab}</label>`).join('')}
-        </div>
-        <div class="admin-edit-actions">
-          <button type="button" class="btn btn-primary" data-action="save-logistics" data-pid="${p.id}" style="flex:1;">حفظ</button>
-          <button type="button" class="btn btn-ghost" data-action="cancel-edit-logistics" style="flex:1;">إلغاء</button>
-        </div>
-      </div>` : '';
-    return `<div class="admin-session admin-lg-row" data-search="${escapeHtml((p.name+' '+p.id+' '+(lg.room||'')+' '+(lg.busNumber||'')).toLowerCase())}">
-      <div class="admin-session-top">
-        <div style="flex:1;">
-          <div style="font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;">${escapeHtml(p.name)}</div>
-          <div class="hint" style="margin:2px 0 0;">${lg.room?`غرفة ${escapeHtml(lg.room)} · `:''}${kitCount}/${KIT_ITEMS.length} كيت ${lg.tripStatus?` · ${TRIP_STATUS_LABELS[lg.tripStatus]}`:''}</div>
-        </div>
-        <button type="button" class="icon-btn" data-action="edit-logistics" data-pid="${p.id}">${ICO.edit}</button>
-      </div>
-      ${form}
-    </div>`;
-  }).join('');
-  const kitDone = PARTICIPANTS.filter(p=>{ const k=(logisticsOf(p.id).kit)||{}; return KIT_ITEMS.length && KIT_ITEMS.every(it=>k[it.key]); }).length;
-  const arrived = PARTICIPANTS.filter(p=>logisticsOf(p.id).tripStatus==='arrived').length;
-  const roomed = PARTICIPANTS.filter(p=>logisticsOf(p.id).room).length;
-  return `
-    <div class="admin-stat-strip">
-      <div class="admin-stat-cell"><div class="admin-stat-num">${roomed}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">لهم غرفة</div></div>
-      <div class="admin-stat-cell"><div class="admin-stat-num">${kitDone}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">استلموا الكيت كامل</div></div>
-      <div class="admin-stat-cell"><div class="admin-stat-num">${arrived}/${PARTICIPANTS.length}</div><div class="admin-stat-lab">وصلوا</div></div>
-    </div>
-    <input type="text" class="field admin-search-input" data-filter-target=".admin-lg-row" placeholder="🔍 دور بالاسم أو الكود أو الغرفة أو الأتوبيس..." style="margin-bottom:10px;" />
-    <div class="admin-day-title">بيانات المشاركين (إقامة، مواصلات، كيت)</div>
-    <div class="card">${rows}</div>
-  `;
-}
 function renderAdminSettingsTab(){
   const ended = !!CONF_SETTINGS.ended;
   const verseText = CONF_SETTINGS.verseText || '';
@@ -21608,58 +21385,6 @@ function renderAdminSettingsTab(){
   `;
 }
 
-function renderAdminPointCodesTab(){
-  const denominations = {};
-  let total=0, used=0;
-  Object.values(POINT_CODES).forEach(pc=>{
-    denominations[pc.value] = denominations[pc.value] || {total:0, used:0};
-    denominations[pc.value].total++; total++;
-    if(pc.used){ denominations[pc.value].used++; used++; }
-  });
-  const denomKeys = Object.keys(denominations).map(Number).sort((a,b)=>a-b);
-  const sub = adminSubGet('pointcodes','batches');
-  const kpis = adminKpis([
-    {num:total, lab:'إجمالي الأكواد'},
-    {num:used, lab:'مستخدمة'},
-    {num:total-used, lab:'متبقية', cls:(total>0 && total-used===0)?'is-alert':''},
-    {num:(total?Math.round(used/total*100):0)+'%', lab:'نسبة الاستخدام'},
-  ]);
-  const tabs = adminSubTabs('pointcodes', [
-    {id:'batches', label:'📦 الدفعات ('+denomKeys.length+')'},
-    {id:'gen', label:'➕ توليد جديد'},
-  ], sub);
-  let body = '';
-  if(sub==='gen'){
-    body = `
-    <div class="card">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:8px;">🎟️ توليد أكواد نقاط جديدة</div>
-      <div class="hint" style="margin:0 0 10px;">كل كود يُستخدم مرة واحدة بس من أي مشارك، جوه أي فقرة يفتحها ويمسحه فيها</div>
-      <div class="admin-edit-form" style="padding:0;">
-        <div class="admin-edit-row">
-          <div style="flex:1;"><label>قيمة الكود (نقاط)</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="gen-code-value" placeholder="مثال: 5" /></div>
-          <div style="flex:1;"><label>الكمية</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="gen-code-qty" placeholder="مثال: 100" /></div>
-        </div>
-      </div>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="generate-point-codes">توليد الأكواد</button>
-    </div>`;
-  } else {
-    body = denomKeys.map(v=>{
-      const d = denominations[v];
-      const pct = d.total ? Math.round(d.used/d.total*100) : 0;
-      return `<div class="admin-item-card ${d.total-d.used===0?'is-done':'is-pending'}">
-        <div class="admin-row-line">
-          <div>
-            <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;">🪙 أكواد بقيمة ${v} نقطة</div>
-            <div class="hint" style="margin:2px 0 0;">${d.total} إجمالي · ${d.used} مستخدم · ${d.total-d.used} متبقي · ${pct}%</div>
-          </div>
-          <button type="button" class="btn btn-outline" style="padding:8px 14px;font-size:12px;flex:0 0 auto;" data-action="print-point-codes" data-value="${v}">🖨️ طباعة</button>
-        </div>
-        ${adminPctBar(pct)}
-      </div>`;
-    }).join('') || adminEmptyState('🎟️','لسه مفيش أكواد نقاط','ابدأ بتوليد أول دفعة من تبويب "توليد جديد"');
-  }
-  return kpis + tabs + body;
-}
 
 const ADMIN_HUB_GROUPS = [
   {id:'live', icon:'🔴', title:'التشغيل المباشر', accent:'var(--coral)'},
@@ -21669,17 +21394,12 @@ const ADMIN_HUB_GROUPS = [
   {id:'system', icon:'⚙️', title:'النظام', accent:'var(--text-muted)'},
 ];
 const ADMIN_HUB_ITEMS = [
-  {group:'live',   tab:'sessions', short:"أيام المؤتمر وفقراته", desc:"أيام المؤتمر والفقرات: تعديل، قفل وفتح",    icon:'🗓️', label:'الفقرات والأيام',     color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
   {group:'live',   tab:'attendance', short:"قداس واجتماع وتسبحة", desc:"كود QR وفتح/قفل حضور القداس والاجتماع والتسبحة", icon:'✅', label:'الحضور (QR)', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
-  {group:'live',   tab:'pulse', short:"عدّاد لشاشة القاعة", desc:"عدّاد الحضور اللحظي لعرضه على شاشة القاعة",       icon:'📡', label:'الحضور المباشر',      color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
   {group:'live',   tab:'alerts', short:"تنبيهات فورية ومجدولة", desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين",      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
-  {group:'live',   tab:'questions', short:"أسئلة للمتحدثين", desc:"أسئلة المشاركين للمتحدثين",   icon:'✋', label:'الأسئلة',              color:'linear-gradient(145deg,#F4B740,#9B8CFF)'},
   {group:'live',   tab:'reports', short:"مشاكل من المشاركين", desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
   {group:'people', tab:'participants', short:"الأسماء والنقاط والأكواد", desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {group:'people', tab:'logistics', short:"الغرف والمواصلات والكيت", desc:"الغرف والمواصلات واستلام الكيت",   icon:'🚌', label:'الإقامة والمواصلات',  color:'linear-gradient(145deg,#6FB1FF,#9B8CFF)'},
   {group:'people', tab:'audit', short:"تسجيلات الحضور", desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
   {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
-  {group:'points', tab:'pointcodes', short:"توليد ومتابعة الأكواد", desc:"توليد ومتابعة أكواد النقاط",  icon:'🎟️', label:'أكواد النقاط',        color:'linear-gradient(145deg,#FFDE94,#9B8CFF)'},
   {group:'points', tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
   {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
   {group:'content',tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
@@ -21699,29 +21419,53 @@ function renderAdminHub(){
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
       <span class="admin-hub-txt"><span class="admin-hub-lab">${it.label}</span>${(it.short||it.desc)?`<span class="admin-hub-desc">${it.short||it.desc}</span>`:''}</span>
       ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
+      <span class="adm-chev" aria-hidden="true">‹</span>
     </button>`;
   };
   const groups = ADMIN_HUB_GROUPS.map(g=>{
     const items = ADMIN_HUB_ITEMS.filter(it=>it.group===g.id);
     if(!items.length) return '';
     return `<section class="admin-hub-group" style="--g:${g.accent}">
-      <div class="admin-hub-group-title"><span>${g.icon}</span><span>${g.title}</span><span class="ahg-count">${items.length}</span></div>
-      <div class="admin-hub-grid">${items.map(tileHtml).join('')}</div>
+      <div class="admin-hub-group-title"><span>${g.icon}</span><span>${g.title}</span><span class="ahg-count">${items.length} أقسام</span></div>
+      <div class="admin-hub-grid adm-list">${items.map(tileHtml).join('')}</div>
     </section>`;
   }).join('');
   const strip = `
     <div class="admin-stat-strip">
       <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="participants"><div class="admin-stat-num">${PARTICIPANTS.length}</div><div class="admin-stat-lab">مشارك</div></button>
       <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="teams"><div class="admin-stat-num">${TEAMS.length}</div><div class="admin-stat-lab">فريق</div></button>
-      <button type="button" class="admin-stat-cell ${pendingQ?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="questions"><div class="admin-stat-num">${pendingQ}</div><div class="admin-stat-lab">أسئلة جديدة</div></button>
+      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="audit"><div class="admin-stat-num">${new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size}</div><div class="admin-stat-lab">سجّلوا حضورًا</div></button>
       <button type="button" class="admin-stat-cell ${pendingR?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="reports"><div class="admin-stat-num">${pendingR}</div><div class="admin-stat-lab">بلاغات مفتوحة</div></button>
     </div>`;
+  const openAtt = ATT_KEYS.filter(k=>{ const c=attCfg(k); return c && c.open; }).map(k=>ATT_TYPES[k].label);
+  const attn = [
+    {tab:'reports',   icon:'🛠️', lab:'بلاغات مفتوحة',          n:pendingR},
+    {tab:'cardshop',  icon:'💳', lab:'طلبات كروت مخصصة',       n:pendingCC}
+  ].filter(a=>a.n>0);
+  const attnHtml = attn.length ? `<section class="adm-attn">
+      <div class="adm-sec-head"><span class="adm-pulse"></span>يحتاج انتباهك الآن</div>
+      ${attn.map(a=>`<button type="button" class="adm-attn-row" data-action="admin-hub-tile" data-tab="${a.tab}"><span class="adm-attn-ico">${a.icon}</span><span class="adm-attn-lab">${a.lab}</span><b class="adm-attn-n">${a.n}</b><span class="adm-chev">‹</span></button>`).join('')}
+    </section>` : '';
+  const quickHtml = `<div class="adm-quick">${['attendance','alerts','participants','audit'].map(t=>{
+      const it = ADMIN_HUB_ITEMS.find(x=>x.tab===t); if(!it) return '';
+      return `<button type="button" class="adm-q" data-action="admin-hub-tile" data-tab="${t}"><span class="adm-q-ico" style="background:${it.color}">${it.icon}</span><span class="adm-q-lab">${it.label}</span></button>`;
+    }).join('')}</div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لوحة المنظمين</div>
     </div>
-    ${strip}
+    <div class="adm-hero">
+      <div class="adm-hero-top">
+        <div><div class="adm-hero-kicker">CONTROL CENTER</div><div class="adm-hero-title">مركز التحكم</div></div>
+        <span class="adm-live ${openAtt.length?'on':''}"><i></i>${openAtt.length?'الحضور مفتوح: '+openAtt.join(' · '):'لا يوجد حضور مفتوح'}</span>
+      </div>
+      ${strip}
+    </div>
+    ${attnHtml}
+    <div class="adm-sec-head adm-sec-plain">وصول سريع</div>
+    ${quickHtml}
+    <div class="adm-sec-head adm-sec-plain">كل الأقسام</div>
     <input type="text" class="field admin-search-input admin-hub-search" data-filter-target=".admin-hub-tile" placeholder="🔍 دوّر على قسم..." />
     ${groups}
     <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
@@ -21770,20 +21514,16 @@ function renderAdminSiblingNav(){
 }
 function renderAdmin(){
   if(!state.adminUnlocked) return renderAdminLock();
+  if(!state.adminHub && ['sessions','pulse','questions','logistics','pointcodes'].includes(state.adminTab)) state.adminHub = true;
   if(state.adminHub) return renderAdminHub();
   const tab = state.adminTab;
   let body = '';
-  if(tab==='sessions') body = renderAdminSessionsTab();
-  else if(tab==='settings') body = renderAdminSettingsTab();
+  if(tab==='settings') body = renderAdminSettingsTab();
   else if(tab==='gallery') body = renderAdminGalleryTab();
-  else if(tab==='pointcodes') body = renderAdminPointCodesTab();
   else if(tab==='audit') body = renderAdminAuditTab();
-  else if(tab==='pulse') body = renderAdminPulseTab();
   else if(tab==='analytics') body = renderAdminAnalyticsTab();
-  else if(tab==='logistics') body = renderAdminLogisticsTab();
   else if(tab==='participants') body = renderAdminParticipantsTab();
   else if(tab==='alerts') body = renderAdminAlertsTab();
-  else if(tab==='questions') body = renderAdminQuestionsTab();
   else if(tab==='opinions') body = renderAdminOpinionsTab();
   else if(tab==='reports') body = renderAdminReportsTab();
   else if(tab==='trash') body = renderAdminTrashTab();
@@ -21830,29 +21570,6 @@ function renderAdmin(){
     ${inDetail ? '' : renderAdminSiblingNav()}
     ${body}
   `;
-}
-function renderAdminQuestionsTab(){
-  if(!QUESTIONS.length) return adminEmptyState('✋','لسه محدش سأل سؤال','هتظهر هنا أسئلة المشاركين أول ما توصل');
-  const pending = QUESTIONS.filter(q=>!q.answered).length;
-  const done = QUESTIONS.length - pending;
-  const f = state.adminQFilter || (pending ? 'new' : 'all');
-  let qs = QUESTIONS.slice().sort((a,b)=> (a.answered===b.answered) ? b.ts-a.ts : (a.answered?1:-1));
-  if(f==='new') qs = qs.filter(q=>!q.answered);
-  else if(f==='done') qs = qs.filter(q=>q.answered);
-  const chip = (id,lab,n)=>`<button type="button" class="admin-tab ${f===id?'active':''}" data-action="admin-q-filter" data-f="${id}">${lab} (${n})</button>`;
-  const cards = qs.length ? qs.map(q=>`<div class="admin-item-card ${q.answered?'is-done':'is-pending'}" data-search="${escapeHtml(((q.name||'')+' '+(q.text||'')+' '+(q.sessionName||'')).toLowerCase())}">
-    <div class="admin-item-head">
-      <span class="admin-item-who">${escapeHtml(q.name)}</span>
-      ${q.sessionName?`<span class="admin-meta-chip">${escapeHtml(q.sessionName)}</span>`:''}
-      <span class="admin-item-time">${timeAgoAr(q.ts)}</span>
-    </div>
-    <div class="admin-item-text">${escapeHtml(q.text)}</div>
-    <div class="admin-item-actions">
-      <button type="button" class="btn ${q.answered?'btn-ghost':'btn-primary'}" data-action="admin-mark-question-answered" data-id="${q.id}">${q.answered?'↩️ إرجاع لجديد':'✔️ تم الرد'}</button>
-    </div>
-  </div>`).join('') : adminEmptyState('🎉','مفيش أسئلة في القسم ده','');
-  const search = QUESTIONS.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".admin-item-card" placeholder="🔍 دور في الأسئلة..." style="margin-bottom:10px;" />` : '';
-  return `<div class="admin-tabs">${chip('all','الكل',QUESTIONS.length)}${chip('new','جديدة',pending)}${chip('done','تم الرد',done)}</div>${search}${cards}`;
 }
 function renderAdminReportsTab(){
   const rs = REPORTS.slice().sort((a,b)=>b.ts-a.ts);
@@ -22599,10 +22316,6 @@ function render(){
       state.justScoredSessionId = null;
     }
     attachSessionCodeBoxes();
-  }
-
-  if(state.view==='admin' && state.adminTab==='pulse'){
-    updatePulseWidget();
   }
 
   updateAmbientForView();
@@ -28363,7 +28076,6 @@ function updateLiveWidgetsInPlace(){
     const lab = document.querySelector(`[data-progress-lab-session="${sid}"]`);
     if(lab) lab.textContent = `${checkedIn} من ${PARTICIPANTS.length} سجّلوا حضور (${pct}%)`;
   });
-  if(state.view==='admin' && state.adminTab==='pulse') updatePulseWidget();
 }
 function checkUpcomingSessionAlerts(){
   if(!state.pid) return;
@@ -28406,7 +28118,7 @@ function startLivePolling(){
       }
     }catch(e){}
     try{
-      if(state.view==='session' || (state.view==='admin' && state.adminTab==='pointcodes')){
+      if(state.view==='session'){
         const freshPointCodes = await loadPointCodes();
         if(freshPointCodes && Object.keys(freshPointCodes).length){
           POINT_CODES = freshPointCodes;
