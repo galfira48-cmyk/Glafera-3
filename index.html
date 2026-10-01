@@ -1896,9 +1896,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ===== الشريحة الذهبية = مشاركة رقم البطاقة + آخر المستلمين ===== */
   .vc-chip[data-action]{cursor:pointer; animation:vchHint 4.2s ease-in-out infinite;}
   .vc-expired .vc-chip[data-action]{animation:none;}
-  .vc-chip.vc-chip-code{width:74px; height:59px; border-radius:9px; background:#e6bd5a; z-index:4; box-shadow:0 0 0 1px rgba(0,0,0,.3); animation:none;}
+  .vc-chip.vc-chip-code{width:74px; height:59px; border-radius:9px; background:#e6bd5a; z-index:4; overflow:visible; box-shadow:0 0 0 .5px rgba(90,56,4,.55), 0 4px 10px -2px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.35); animation:none; transition:transform .18s ease, box-shadow .18s ease;}
+  .vc-chip.vc-chip-code:active{transform:scale(.95); box-shadow:0 0 0 .5px rgba(90,56,4,.55), 0 2px 5px -1px rgba(0,0,0,.5);}
   .vc-chip.vc-chip-code::before,.vc-chip.vc-chip-code::after{display:none;}
-  .vc-chip.vc-chip-code img{display:block; width:100%; height:100%; pointer-events:none; -webkit-user-drag:none; user-select:none;}
+  .vc-chip.vc-chip-code img{display:block; width:100%; height:100%; border-radius:9px; pointer-events:none; -webkit-user-drag:none; user-select:none;}
   @keyframes vchHint{0%,72%,100%{filter:drop-shadow(0 0 0 rgba(255,222,140,0)); transform:scale(1)} 86%{filter:drop-shadow(0 0 9px rgba(255,222,140,.95)); transform:scale(1.07)}}
   .vch-stage{position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin:2px 0 6px;}
   .vch-ring{position:absolute; left:50%; top:50%; width:96px; height:96px; margin:-48px 0 0 -48px; border-radius:26px; border:2px solid var(--vc-a,#f4b740); opacity:0; animation:vchRing 2.6s ease-out infinite;}
@@ -5639,6 +5640,104 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   html[data-theme="light"] .meal-chip{background:rgba(30,24,10,.04); border-color:rgba(30,24,10,.12);}
   html[data-theme="light"] .meal-chip.on{color:#fff;}
 
+
+  /* ===== شاشة الإتمام بعد المسح (ring + check + count-up + Done) ===== */
+  .vscan{position:fixed; inset:0; z-index:100001; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px)); background:radial-gradient(120% 80% at 50% 38%, #0b1411 0%, #060809 55%, #030404 100%); color:#F4F6F5; opacity:0; transition:opacity .28s ease; font-family:'Cairo',sans-serif; text-align:center;}
+  .vscan.in{opacity:1;} .vscan.out{opacity:0; transition:opacity .22s ease;}
+  .vscan-x{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); inset-inline-start:16px; width:34px; height:34px; border-radius:50%; border:0; background:rgba(255,255,255,.07); color:rgba(255,255,255,.7); display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; animation:vscFade .4s ease .5s forwards;}
+  .vscan-x svg{width:16px; height:16px; stroke:currentColor; stroke-width:2.2; fill:none; stroke-linecap:round;}
+  .vscan-top{position:absolute; top:calc(20px + env(safe-area-inset-top,0px)); left:0; right:0; font-size:13px; font-weight:600; letter-spacing:.3px; color:rgba(255,255,255,.55); opacity:0; animation:vscFade .4s ease .15s forwards;}
+  .vscan-stage{position:relative; width:150px; height:150px; margin-bottom:26px;}
+  .vscan-br{position:absolute; width:26px; height:26px; border:0 solid #5FE0A4; opacity:0; animation:vscBr .75s ease .05s forwards;}
+  .vscan-br.a{top:0; left:0; border-top-width:3px; border-left-width:3px; border-top-left-radius:8px;} .vscan-br.b{top:0; right:0; border-top-width:3px; border-right-width:3px; border-top-right-radius:8px;}
+  .vscan-br.c{bottom:0; left:0; border-bottom-width:3px; border-left-width:3px; border-bottom-left-radius:8px;} .vscan-br.d{bottom:0; right:0; border-bottom-width:3px; border-right-width:3px; border-bottom-right-radius:8px;}
+  @keyframes vscBr{0%{opacity:0; transform:scale(1.25)} 35%{opacity:1; transform:scale(1)} 70%{opacity:1} 100%{opacity:0; transform:scale(.9)}}
+  .vscan-ring{position:absolute; inset:0; width:100%; height:100%; overflow:visible; transform:rotate(-90deg);}
+  .vscan-ring circle{fill:none; stroke:#5FE0A4; stroke-width:3; stroke-linecap:round; stroke-dasharray:289; stroke-dashoffset:289; animation:vscRing .75s cubic-bezier(.45,.05,.25,1) .3s forwards; filter:drop-shadow(0 0 6px rgba(95,224,164,.35));}
+  .vscan-check{position:absolute; inset:0; width:100%; height:100%; overflow:visible;}
+  .vscan-check path{fill:none; stroke:#5FE0A4; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:60; stroke-dashoffset:60; animation:vscCheck .42s cubic-bezier(.4,0,.2,1) 1s forwards;}
+  .vscan-glow{position:absolute; inset:-30px; border-radius:50%; background:radial-gradient(circle, rgba(95,224,164,.42) 0%, rgba(95,224,164,0) 65%); opacity:0; animation:vscGlow .9s ease-out 1.35s forwards;}
+  @keyframes vscRing{to{stroke-dashoffset:0}} @keyframes vscCheck{to{stroke-dashoffset:0}}
+  @keyframes vscGlow{0%{opacity:0; transform:scale(.7)} 40%{opacity:1} 100%{opacity:0; transform:scale(1.25)}}
+  @keyframes vscFade{to{opacity:1}} @keyframes vscUp{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
+  .vscan-amt{font-size:54px; font-weight:800; line-height:1.1; letter-spacing:-.5px; font-variant-numeric:tabular-nums; direction:ltr; opacity:0; animation:vscUp .5s ease 1.15s forwards;}
+  .vscan-amt small{font-size:16px; font-weight:700; color:rgba(255,255,255,.6); margin-inline-start:8px; letter-spacing:0;}
+  .vscan-ttl{margin-top:10px; font-size:16px; font-weight:800; color:#fff; opacity:0; animation:vscUp .45s ease 1.55s forwards;}
+  .vscan-sub{margin-top:4px; font-size:13.5px; color:rgba(255,255,255,.55); opacity:0; animation:vscUp .45s ease 1.7s forwards;}
+  .vscan-bal{margin-top:16px; padding:7px 16px; border-radius:999px; background:rgba(95,224,164,.1); border:1px solid rgba(95,224,164,.22); color:#8CEBBE; font-size:12.5px; font-weight:700; opacity:0; animation:vscUp .45s ease 1.85s forwards;}
+  .vscan-foot{position:absolute; left:20px; right:20px; bottom:calc(22px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:8px; align-items:stretch; opacity:0; transform:translateY(40px); animation:vscFoot .55s cubic-bezier(.2,.9,.25,1) 2.05s forwards;}
+  @keyframes vscFoot{to{opacity:1; transform:none}}
+  .vscan-done{height:52px; border:0; border-radius:16px; background:#fff; color:#0a0c0b; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer; transition:transform .15s ease;} .vscan-done:active{transform:scale(.97);}
+  .vscan-rc{height:38px; border:0; background:transparent; color:rgba(255,255,255,.55); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;}
+  @media (prefers-reduced-motion:reduce){ .vscan *{animation-duration:.01s !important; animation-delay:0s !important;} .vscan-foot{animation-delay:.1s !important;} }
+
+  /* ===== معاينة الرصيد بعد العملية (إيداع / سحب / تحويل) ===== */
+  .vp-prev{margin:10px 2px 2px; padding:11px 14px; border-radius:16px; background:rgba(255,255,255,.035); border:1px solid var(--border); transition:border-color .25s ease, background .25s ease;}
+  .vp-prev-row{display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--text-muted);}
+  .vp-prev-row b{font-size:15px; color:var(--text); font-variant-numeric:tabular-nums; direction:ltr; transition:color .25s ease;}
+  .vp-prev-row + .vp-prev-row{margin-top:7px; padding-top:7px; border-top:1px dashed var(--border);}
+  .vp-prev-row.after b{font-size:17px;}
+  .vp-prev-d{display:inline-block; margin-inline-start:8px; padding:1px 8px; border-radius:999px; font-size:11.5px; font-weight:800; direction:ltr; opacity:0; transform:scale(.8); transition:opacity .2s ease, transform .2s ease;}
+  .vp-prev.ok .vp-prev-d, .vp-prev.bad .vp-prev-d{opacity:1; transform:none;}
+  .vp-prev-msg{margin-top:0; max-height:0; overflow:hidden; font-size:12px; font-weight:700; color:var(--danger); opacity:0; transition:max-height .25s ease, opacity .25s ease, margin-top .25s ease;}
+  .vp-prev.bad{border-color:rgba(255,107,107,.45); background:rgba(255,107,107,.06);}
+  .vp-prev.bad .vp-prev-msg{max-height:44px; opacity:1; margin-top:8px;}
+  .vp-prev.bad .vp-prev-row.after b{color:var(--danger);}
+  .vp-prev.ok{border-color:rgba(95,224,164,.35);}
+  .vp-prev.ok .vp-prev-row.after b{color:var(--good);}
+  .vp-prev.ok .vp-prev-d{background:rgba(95,224,164,.14); color:var(--good);}
+  .vp-prev.bad .vp-prev-d{background:rgba(255,107,107,.14); color:var(--danger);}
+
+  /* ===== إخفاء الرصيد (زرار العين) ===== */
+  .vp-eye{flex:none; width:32px; height:32px; margin:0; padding:0; border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.05); color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .15s ease, background .2s ease, color .2s ease;}
+  .vp-eye:active{transform:scale(.88);} .vp-eye svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  .vp-eye .e-off{display:none;} body.bal-hidden .vp-eye .e-on{display:none;} body.bal-hidden .vp-eye .e-off{display:block;}
+  body.bal-hidden .vp-eye{color:var(--gold-2); border-color:rgba(244,183,64,.4); background:rgba(244,183,64,.1);}
+  .vp-stats [data-vc-count="wallet"], [data-vc-count="walletBack"], .vp-prev b, .vp-prev-d{transition:filter .3s ease, opacity .3s ease;}
+  body.bal-hidden .vp-stats [data-vc-count="wallet"], body.bal-hidden [data-vc-count="walletBack"], body.bal-hidden .vp-prev b{filter:blur(.42em); opacity:.8; user-select:none; -webkit-user-select:none; pointer-events:none;}
+  body.bal-hidden .vp-prev-d{filter:blur(.5em); opacity:.7;}
+
+  /* ===== آخر المستلمين (نسخة محسّنة) ===== */
+  .vrc-head{justify-content:space-between;} .vrc-head::before{display:none;}
+  .vrc-head span{display:inline-flex; align-items:center; gap:8px;} .vrc-head span::before{content:''; width:3px; height:13px; border-radius:3px; background:linear-gradient(var(--gold-2),var(--gold)); flex:none;}
+  .vrc-clear{margin-inline-start:auto; border:0; background:transparent; color:var(--text-muted); font:700 11.5px 'Cairo',sans-serif; padding:2px 8px; border-radius:8px; cursor:pointer; opacity:.75;} .vrc-clear:active{opacity:1; background:rgba(255,255,255,.06);}
+  .vrc-item{opacity:0; animation:vrcIn .4s cubic-bezier(.2,.9,.25,1) calc(var(--i,0)*45ms) forwards; position:relative;}
+  @keyframes vrcIn{from{opacity:0; transform:translateY(8px) scale(.92)} to{opacity:1; transform:none}}
+  .vrc-av{position:relative; box-shadow:0 8px 16px -8px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.25);}
+  .vrc-item.on .vrc-av::after{content:'✓'; position:absolute; bottom:-3px; inset-inline-end:-3px; width:19px; height:19px; border-radius:50%; background:var(--gold); color:#221900; font:900 11px/19px 'Cairo',sans-serif; text-align:center; box-shadow:0 0 0 2px var(--bg-2,#171630); animation:vrcPop .3s cubic-bezier(.3,1.6,.5,1);}
+  @keyframes vrcPop{from{transform:scale(0)} to{transform:scale(1)}}
+  .vrc-last{font-size:10px; font-weight:800; color:var(--gold-2); min-height:13px; direction:ltr; opacity:.85; margin-top:-3px;} .vrc-last:not(:empty)::after{content:' نقطة'; font-weight:600; opacity:.7; font-size:9px;}
+  @media (prefers-reduced-motion:reduce){ .vrc-item{animation:none; opacity:1;} }
+
+  /* ===== حركة آخر 7 أيام (داخل / خارج) ===== */
+  .cf2-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;} .cf2-head h4{margin:0 !important;}
+  .cf2-leg{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; color:var(--text-muted);} .cf2-leg em{width:8px; height:8px; border-radius:3px; display:inline-block; margin-inline-start:6px;}
+  .cf2 em.in, .cf2 i.in{background:linear-gradient(180deg,#7ff0bd,var(--good,#4ADE80));} .cf2 em.out, .cf2 i.out{background:linear-gradient(180deg,#ff9a9a,var(--danger,#FF6B6B));}
+  .cf2-tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;}
+  .cf2-tiles div{padding:8px 6px; border-radius:12px; background:rgba(255,255,255,.04); text-align:center;} .cf2-tiles small{display:block; font-size:10.5px; color:var(--text-muted);}
+  .cf2-tiles b{font:800 15px Cairo,sans-serif; direction:ltr; display:inline-block; color:var(--text);} .cf2 b.p{color:var(--good);} .cf2 b.n{color:var(--danger);}
+  .cf2-bars{display:flex; align-items:flex-end; gap:6px; height:96px; direction:ltr;}
+  .cf2-day{flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px; background:transparent; border:0; padding:0; cursor:pointer; border-radius:10px; transition:background .2s ease;}
+  .cf2-day.on{background:rgba(255,255,255,.06);} .cf2-day:active{transform:scale(.95);}
+  .cf2-pair{flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; gap:3px; padding:0 3px;}
+  .cf2-pair i{flex:1; max-width:12px; min-height:0; border-radius:5px 5px 2px 2px; transform-origin:bottom; animation:cf-grow .7s cubic-bezier(.2,.8,.2,1) both;}
+  .cf2-pair i[style*="height:0%"]{display:none;}
+  .cf2-day small{font-size:10px; color:var(--text-muted); font-weight:700;} .cf2-day.today small{color:var(--gold-2);} .cf2-day.on small{color:var(--text);}
+  .cf2-tip{display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; margin-top:10px; padding:8px 12px; border-radius:12px; background:rgba(255,255,255,.04); font-size:12px; color:var(--text-muted);}
+  .cf2-tip b{color:var(--text); font-weight:800;} .cf2-tip .p{color:var(--good); font-weight:700; direction:ltr;} .cf2-tip .n{color:var(--danger); font-weight:700; direction:ltr;}
+  .cf2-month{display:flex; align-items:center; gap:10px; margin-top:10px; padding-top:9px; border-top:1px dashed var(--border); font-size:11.5px; color:var(--text-muted);} .cf2-month span{margin-inline-end:auto;} .cf2-month b{font:800 12.5px Cairo,sans-serif; direction:ltr;}
+  @media (prefers-reduced-motion:reduce){ .cf2-pair i{animation:none;} }
+
+  /* ===== بحث كشف الحساب + مجاميع اليوم ===== */
+  .vst-search{position:relative; display:flex; align-items:center; margin:0 0 10px;}
+  .vst-search svg{position:absolute; inset-inline-start:14px; width:18px; height:18px; stroke:var(--text-muted); fill:none; stroke-width:2; stroke-linecap:round; pointer-events:none;}
+  .vst-search input{width:100%; height:46px; border-radius:16px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); font:600 14px 'Cairo',sans-serif; padding:0 44px; outline:none; transition:border-color .2s ease, box-shadow .2s ease; -webkit-appearance:none; appearance:none;}
+  .vst-search input::-webkit-search-cancel-button{display:none;}
+  .vst-search input:focus{border-color:var(--gold); box-shadow:0 0 0 4px rgba(244,183,64,.14);}
+  .vst-search button{position:absolute; inset-inline-end:8px; width:30px; height:30px; border-radius:50%; border:0; background:rgba(255,255,255,.08); color:var(--text-muted); font-size:12px; cursor:pointer;} .vst-search button[hidden]{display:none;}
+  .vst-count{font-size:12px; color:var(--text-muted); margin:8px 4px 0; font-weight:700;}
+  .vst-day{display:flex; align-items:center; justify-content:space-between;}
+  .vst-day-sum{display:inline-flex; gap:8px; font-size:11px; font-weight:800; direction:ltr;} .vst-day-sum em{font-style:normal;} .vst-day-sum .p{color:var(--good);} .vst-day-sum .n{color:var(--danger);}
 </style>
 </head>
 <body>
@@ -6275,9 +6374,60 @@ function visaGameToast(e){
   }catch(err){}
 }
 
+/* ===== شاشة الإتمام بعد المسح — دايرة + صح + عدّاد المبلغ + زر تم ===== */
+function visaScanFx(title, text, opts){
+  const sc = opts.scan || {}, v = window.__vpos;
+  const ref = (window.__lastTx && Date.now() - window.__lastTx.at < 20000) ? window.__lastTx.ref : (v && v.ref) || ('GF-' + Math.random().toString(36).slice(2,10).toUpperCase());
+  visaPosKill(true);
+  const old = document.getElementById('vscan'); if(old) old.remove();
+  const amt = Math.max(0, Math.round(Number(sc.amt)) || 0), reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ov = document.createElement('div');
+  ov.className = 'vscan'; ov.id = 'vscan'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `
+    <div class="vscan-top">${sc.label || (sc.dir === 'from' ? 'استلام' : 'تحويل')} · تمت العملية</div>
+    <button type="button" class="vscan-x" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="vscan-stage">
+      <i class="vscan-br a"></i><i class="vscan-br b"></i><i class="vscan-br c"></i><i class="vscan-br d"></i>
+      <div class="vscan-glow"></div>
+      <svg class="vscan-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg>
+      <svg class="vscan-check" viewBox="0 0 100 100"><path d="M33 51l12 12 22-25"/></svg>
+    </div>
+    <div class="vscan-amt"><span id="vscan-n">0</span><small>نقطة</small></div>
+    <div class="vscan-ttl">${title}</div>
+    <div class="vscan-sub">${sc.who ? (sc.dir === 'from' ? 'من ' : 'إلى ') + sc.who : (text || '')}</div>
+    ${sc.bal != null ? `<div class="vscan-bal">${sc.dir === 'from' ? 'رصيدك الآن' : 'رصيد الفيزا الآن'} · ${sc.bal} نقطة</div>` : ''}
+    <div class="vscan-foot"><button type="button" class="vscan-done" id="vscan-done">تم</button><button type="button" class="vscan-rc" id="vscan-rc">🧾 عرض الإيصال</button></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add('in')));
+  let closed = false;
+  const close = ()=>{ if(closed) return; closed = true; ov.classList.add('out'); setTimeout(()=>ov.remove(), 240); if(opts.onClose) opts.onClose(); };
+  ov.querySelector('#vscan-done').addEventListener('click', close);
+  ov.querySelector('.vscan-x').addEventListener('click', close);
+  ov.querySelector('#vscan-rc').addEventListener('click', ()=>{
+    try{
+      const fake = { last4: vposLast4(state.pid), ref, kind: sc.kind || 'transfer', amt };
+      visaReceiptOpen(vposBuildReceipt(fake, title, opts.rows));
+    }catch(e){}
+  });
+  /* عدّاد المبلغ: من 0 للرقم النهائي بعد ما العلامة تترسم */
+  const n = ov.querySelector('#vscan-n');
+  if(reduce){ n.textContent = amt; }
+  else {
+    const D = 900, start = performance.now() + 1150;
+    const tick = (t)=>{
+      if(closed) return;
+      const k = Math.min(1, Math.max(0, (t - start) / D)), e = 1 - Math.pow(1 - k, 3);
+      n.textContent = Math.round(amt * e);
+      if(k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  setTimeout(()=>{ try{ vposBeep('ok'); }catch(e){} try{ vibrate([15,10,25]); }catch(e){} }, reduce ? 50 : 1000);
+}
 function visaMsg(kind, title, text, opts){
   opts = opts || {};
   if(window.__vpos && !(kind==='success' && opts.pos)){ const _a = arguments; return visaPosAbort(()=>visaMsg.apply(null,_a)); }
+  if(kind==='success' && opts.pos && opts.scan){ return visaScanFx(title, text, opts); }
   if(kind==='success' && opts.pos){ return visaPosFx(title, text, opts); }
   const old = document.getElementById('vmsg-overlay'); if(old) old.remove();
   const ov = document.createElement('div');
@@ -6618,9 +6768,52 @@ async function doVisaSaveDesign(){
 }
 function visaStatsHtml(bal, total){
   return `<div class="vp-stats single">
-    <div><span class="vp-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg></span><small>رصيد الفيزا</small><b data-vc-count="wallet" data-to="${bal}">${bal}</b></div>
+    <div><span class="vp-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg></span><small>رصيد الفيزا</small><button type="button" class="vp-eye" data-action="bal-eye" aria-label="إخفاء أو إظهار الرصيد"><svg class="e-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="e-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0112 6c6.4 0 10 6 10 6a17 17 0 01-3.2 3.9M6.5 7.6A16.6 16.6 0 002 12s3.6 7 10 7c1.6 0 3-.4 4.3-1M9.9 9.9a3 3 0 004.2 4.2"/></svg></button><b data-vc-count="wallet" data-to="${bal}">${bal}</b></div>
   </div>`;
 }
+/* ===== إخفاء الرصيد: الاختيار بيتحفظ على الجهاز ===== */
+function visaBalApply(){
+  let h = false; try{ h = localStorage.getItem('glv-hide-bal') === '1'; }catch(e){}
+  if(document.body) document.body.classList.toggle('bal-hidden', h);
+  document.querySelectorAll('.vp-eye').forEach(b=>b.setAttribute('aria-pressed', h ? 'true' : 'false'));
+}
+function visaBalToggle(){
+  let h = false; try{ h = localStorage.getItem('glv-hide-bal') === '1'; localStorage.setItem('glv-hide-bal', h ? '0' : '1'); }catch(e){ h = document.body.classList.contains('bal-hidden'); }
+  document.body.classList.toggle('bal-hidden', !h);
+  document.querySelectorAll('.vp-eye').forEach(b=>b.setAttribute('aria-pressed', !h ? 'true' : 'false'));
+  try{ vibrate([8]); }catch(e){}
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', visaBalApply); else visaBalApply();
+/* ===== معاينة الرصيد بعد العملية ===== */
+function visaPreviewHtml(tab, bal, total, min){
+  return `<div class="vp-prev" data-vp-prev data-tab="${tab}" data-bal="${bal}" data-total="${total}" data-min="${min}">
+    <div class="vp-prev-row"><span>رصيد الفيزا الآن</span><b>${bal}</b></div>
+    <div class="vp-prev-row after"><span>بعد العملية</span><span><b data-vp-after>${bal}</b><i class="vp-prev-d" data-vp-delta></i></span></div>
+    <div class="vp-prev-msg" data-vp-msg></div>
+  </div>`;
+}
+function visaPreviewUpdate(){
+  const box = document.querySelector('[data-vp-prev]'), inp = document.getElementById('visa-amt');
+  if(!box || !inp) return;
+  const tab = box.dataset.tab, bal = Number(box.dataset.bal)||0, total = Number(box.dataset.total)||0, min = Number(box.dataset.min)||0;
+  const amt = Math.max(0, Math.floor(Number(inp.value)||0));
+  const aft = box.querySelector('[data-vp-after]'), dl = box.querySelector('[data-vp-delta]'), ms = box.querySelector('[data-vp-msg]');
+  box.classList.remove('ok','bad');
+  if(!amt){ aft.textContent = bal; dl.textContent = ''; ms.textContent = ''; return; }
+  const plus = tab === 'deposit', after = plus ? bal + amt : bal - amt;
+  let err = '';
+  if(tab === 'deposit'){ if(amt > total) err = 'المتاح من نقاط الفقرات ' + total + ' نقطة فقط'; }
+  else if(tab === 'withdraw'){
+    if(bal < min) err = 'السحب بيتفتح عند ' + min + ' نقطة';
+    else if(amt > bal) err = 'المبلغ أكبر من رصيد الفيزا';
+    else if(amt < min) err = 'أقل قيمة للسحب ' + min + ' نقطة';
+  } else { if(amt > bal) err = 'رصيدك مش كفاية للتحويل'; }
+  aft.textContent = after;
+  dl.textContent = (plus ? '+' : '−') + amt;
+  ms.textContent = err;
+  box.classList.add(err ? 'bad' : 'ok');
+}
+document.addEventListener('input', (e)=>{ if(e.target && e.target.id === 'visa-amt') visaPreviewUpdate(); });
 function renderVisaPage(){
   const pid = state.pid;
   if(!visaCreated(pid)) return renderVisaCreatePage();
@@ -6630,7 +6823,7 @@ function renderVisaPage(){
   cur.theme = effectiveCardTheme(pid, cur.theme);
   const pct = Math.min(100, Math.round(bal/min*100));
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
-    .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
+    .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${((tab==='deposit'&&v===total)||(tab==='withdraw'&&v===bal))?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
   const allThemeKeys = themeKeysForTier('simple').concat(themeKeysForTier('vip'));
   const swatches = allThemeKeys.map(k=>{
@@ -6658,6 +6851,7 @@ function renderVisaPage(){
       <input id="visa-to" class="field vp-cardno" type="text" inputmode="tel" maxlength="19" autocomplete="off" placeholder="0000 0000 0000 0000" data-vc-live="cardno" />
       <label class="vp-label" for="visa-amt">المبلغ</label>
       <div class="vp-amt-wrap"><input id="visa-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
+      ${visaPreviewHtml('transfer', bal, total, min)}
       <div class="vp-chips">${tChips}</div>
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-transfer">تحويل الآن</button>
       
@@ -6671,6 +6865,7 @@ function renderVisaPage(){
       ${tabsHtml}
       <label class="vp-label" for="visa-amt">${tab==='deposit'?'عدد النقاط المراد إيداعها':'عدد النقاط المراد سحبها'}</label>
       <div class="vp-amt-wrap"><input id="visa-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
+      ${visaPreviewHtml(tab, bal, total, min)}
       <div class="vp-chips">${chips}</div>
       ${tab==='withdraw' ? `<div class="vp-prog"><i style="width:${pct}%"></i></div>
         <div class="vp-hint">${bal>=min ? 'السحب متاح دلوقتي' : `السحب بيتفتح عند ${min} نقطة (فاضل ${min-bal})`}</div>` :
@@ -6716,14 +6911,24 @@ function renderVisaPage(){
     ${editPanel}`;
 }
 /* ============ كشف الحساب: فلاتر + ملخص + رسم الرصيد + إيصال لكل عملية + تصدير ============ */
+function vtxNorm(x){
+  return String(x==null?'':x).toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه')
+    .replace(/[٠-٩]/g, d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\s+/g,' ').trim();
+}
+function vtxMatch(tx, q){
+  const m = VISA_TX_META[tx.type] || {label:tx.type, sign:1, cat:'other'};
+  const hay = vtxNorm([m.label, VTX_CAT_LABELS[m.cat]||'', tx.note||'', vtxRef(tx), tx.amount, m.sign>0?'وارد داخل':'صادر خارج', vtxDayLabel(tx.ts)].join(' '));
+  return q.split(' ').every(t=>hay.indexOf(t) >= 0);
+}
 function vtxFiltered(pid){
   const list = VISA_TX[pid] || [];
-  const f = state.vtxFilter || 'all', p = state.vtxPeriod || 'all';
+  const f = state.vtxFilter || 'all', p = state.vtxPeriod || 'all', q = vtxNorm(state.vtxQuery || '');
   const startToday = new Date(); startToday.setHours(0,0,0,0);
   const from = p==='today' ? startToday.getTime() : (p==='week' ? Date.now()-7*864e5 : (p==='month' ? Date.now()-30*864e5 : 0));
   return list.filter(tx=>{
     const m = VISA_TX_META[tx.type] || {sign:1, cat:'other'};
     if((tx.ts||0) < from) return false;
+    if(q && !vtxMatch(tx, q)) return false;
     if(f==='in') return m.sign>0;
     if(f==='out') return m.sign<0;
     if(f==='all') return true;
@@ -6759,24 +6964,13 @@ function vtxSparkline(list){
     <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.6" fill="var(--gold-2)"/>
   </svg>`;
 }
-function renderVisaHistoryPage(){
-  const pid = state.pid;
-  const all = VISA_TX[pid] || [];
-  const list = vtxFiltered(pid);
-  const bal = WALLET[pid] || 0;
-  let inSum = 0, outSum = 0;
-  list.forEach(tx=>{ const m = VISA_TX_META[tx.type] || {sign:1}; if(m.sign>0) inSum += tx.amount; else outSum += tx.amount; });
-  const f = state.vtxFilter || 'all', p = state.vtxPeriod || 'all';
-  const chip = (act, val, cur, label)=>`<button type="button" class="vst-chip ${cur===val?'on':''}" data-action="${act}" data-v="${val}">${label}</button>`;
-  const periods = [['all','كل الوقت'],['today','اليوم'],['week','آخر 7 أيام'],['month','آخر 30 يوم']].map(x=>chip('vtx-period',x[0],p,x[1])).join('');
-  const types = [['all','الكل'],['in','⬇️ وارد'],['out','⬆️ صادر'],['transfer','🔁 تحويلات'],['game','🎮 ألعاب'],['shop','🛍️ مشتريات'],['wallet','💳 إيداع وسحب'],['admin','🎁 المنظمين']].map(x=>chip('vtx-filter',x[0],f,x[1])).join('');
-  let lastDay = '', rows = '';
+function vtxListHtml(pid, list, all){
+  const groups = []; let cur = null;
   list.forEach(tx=>{
-    const meta = VISA_TX_META[tx.type] || {label:tx.type, ico:'•', sign:1};
-    const pos = meta.sign>0;
-    const day = vtxDayLabel(tx.ts);
-    if(day!==lastDay){ rows += `<div class="vst-day">${day}</div>`; lastDay = day; }
-    rows += `<button type="button" class="vtx-item" data-action="vtx-open" data-id="${escapeHtml(tx.id||'')}">
+    const meta = VISA_TX_META[tx.type] || {label:tx.type, ico:'•', sign:1}, pos = meta.sign>0, day = vtxDayLabel(tx.ts);
+    if(!cur || cur.day!==day){ cur = {day, rows:'', i:0, o:0}; groups.push(cur); }
+    if(pos) cur.i += tx.amount; else cur.o += tx.amount;
+    cur.rows += `<button type="button" class="vtx-item" data-action="vtx-open" data-id="${escapeHtml(tx.id||'')}">
       <div class="vtx-ico ${pos?'pos':'neg'}">${meta.ico}</div>
       <div class="vtx-mid">
         <div class="vtx-row1">
@@ -6795,6 +6989,39 @@ function renderVisaHistoryPage(){
       </div>
     </button>`;
   });
+  const rows = groups.map(g=>`<div class="vst-day"><span>${g.day}</span><span class="vst-day-sum">${g.i?`<em class="p">+${g.i}</em>`:''}${g.o?`<em class="n">−${g.o}</em>`:''}</span></div>${g.rows}`).join('');
+  const q = vtxNorm(state.vtxQuery || '');
+  return list.length ? `${(q || (state.vtxFilter||'all')!=='all' || (state.vtxPeriod||'all')!=='all') ? `<div class="vst-count">${list.length} عملية${q?` تطابق «${escapeHtml(String(state.vtxQuery).trim())}»`:''}</div>` : ''}<div class="vtx-list">${rows}</div>`
+    : `<div class="vtx-empty"><span class="vtx-empty-ico">${all.length?'🔍':'🧾'}</span>${all.length ? `<b>مفيش عمليات تطابق البحث أو الفلتر</b>جرّب كلمة تانية أو غيّر الفترة أو النوع` : `<b>لسه معملتش أي عملية على فيزتك</b>أي إيداع أو سحب أو تحويل أو شراء أو جائزة أو رسوم هيظهر هنا بالتفصيل`}</div>`;
+}
+function vtxSums(list){
+  let i = 0, o = 0;
+  list.forEach(tx=>{ const m = VISA_TX_META[tx.type] || {sign:1}; if(m.sign>0) i += tx.amount; else o += tx.amount; });
+  return { i, o };
+}
+/* بحث لحظي من غير ما الصفحة تتعمل من الأول (عشان الكيبورد والسكرول يفضلوا زي ما هم) */
+function vtxRefresh(){
+  const pid = state.pid, all = VISA_TX[pid] || [], list = vtxFiltered(pid), sm = vtxSums(list);
+  const set = (id, v)=>{ const e = document.getElementById(id); if(e) e.textContent = v; };
+  set('vtx-s-in', '+'+sm.i); set('vtx-s-out', '−'+sm.o); set('vtx-s-n', list.length);
+  const w = document.getElementById('vtx-dyn'); if(w) w.innerHTML = vtxListHtml(pid, list, all);
+  const x = document.getElementById('vtx-q-x'); if(x) x.hidden = !(state.vtxQuery || '').length;
+}
+let _vtxQT = 0;
+document.addEventListener('input', (e)=>{
+  if(!e.target || e.target.id !== 'vtx-q') return;
+  state.vtxQuery = e.target.value; clearTimeout(_vtxQT); _vtxQT = setTimeout(vtxRefresh, 120);
+});
+function renderVisaHistoryPage(){
+  const pid = state.pid;
+  const all = VISA_TX[pid] || [];
+  const list = vtxFiltered(pid);
+  const bal = WALLET[pid] || 0;
+  const sm = vtxSums(list);
+  const f = state.vtxFilter || 'all', p = state.vtxPeriod || 'all', qv = state.vtxQuery || '';
+  const chip = (act, val, cur, label)=>`<button type="button" class="vst-chip ${cur===val?'on':''}" data-action="${act}" data-v="${val}">${label}</button>`;
+  const periods = [['all','كل الوقت'],['today','اليوم'],['week','آخر 7 أيام'],['month','آخر 30 يوم']].map(x=>chip('vtx-period',x[0],p,x[1])).join('');
+  const types = [['all','الكل'],['in','⬇️ وارد'],['out','⬆️ صادر'],['transfer','🔁 تحويلات'],['game','🎮 ألعاب'],['shop','🛍️ مشتريات'],['wallet','💳 إيداع وسحب'],['admin','🎁 المنظمين']].map(x=>chip('vtx-filter',x[0],f,x[1])).join('');
   let notifRow = '';
   if(typeof Notification!=='undefined'){
     if(Notification.permission==='default') notifRow = `<div class="vst-notif"><span>🔔 فعّل إشعارات الجهاز عشان تعرف بأي عملية فورًا حتى لو التطبيق في الخلفية</span><button type="button" data-action="vtx-notif">تفعيل</button></div>`;
@@ -6807,12 +7034,17 @@ function renderVisaHistoryPage(){
       <div class="vst-bal"><small>رصيد الفيزا الحالي</small><b data-vc-count="stmt" data-to="${bal}">${bal}</b><span>نقطة</span></div>
       ${vtxSparkline(all)}
       <div class="vst-sums">
-        <div class="in"><small>الوارد</small><b>+${inSum}</b></div>
-        <div class="out"><small>الصادر</small><b>−${outSum}</b></div>
-        <div><small>العمليات</small><b>${list.length}</b></div>
+        <div class="in"><small>الوارد</small><b id="vtx-s-in">+${sm.i}</b></div>
+        <div class="out"><small>الصادر</small><b id="vtx-s-out">−${sm.o}</b></div>
+        <div><small>العمليات</small><b id="vtx-s-n">${list.length}</b></div>
       </div>
     </div>
     ${window.visaMonthInsightsHtml ? window.visaMonthInsightsHtml(pid) : ''}
+    <div class="vst-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="vtx-q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="ابحث بالاسم أو المبلغ أو رقم العملية" value="${escapeHtml(qv)}" />
+      <button type="button" id="vtx-q-x" data-action="vtx-q-clear" aria-label="مسح البحث" ${qv ? '' : 'hidden'}>✕</button>
+    </div>
     <div class="vst-chips">${periods}</div>
     <div class="vst-chips">${types}</div>
     <div class="vst-actions">
@@ -6821,7 +7053,7 @@ function renderVisaHistoryPage(){
       <button type="button" data-action="vtx-copy">📋<br>نسخ الكشف</button>
     </div>
     ${notifRow}
-    ${list.length ? `<div class="vtx-list">${rows}</div>` : `<div class="vtx-empty"><span class="vtx-empty-ico">${all.length?'🔍':'🧾'}</span>${all.length ? `<b>مفيش عمليات تطابق الفلتر ده</b>جرّب تغيّر الفترة أو النوع` : `<b>لسه معملتش أي عملية على فيزتك</b>أي إيداع أو سحب أو تحويل أو شراء أو جائزة أو رسوم هيظهر هنا بالتفصيل`}</div>`}
+    <div id="vtx-dyn">${vtxListHtml(pid, list, all)}</div>
   `;
 }
 function vtxShowReceipt(id){
@@ -6840,7 +7072,7 @@ function vtxShowReceipt(id){
 function vtxLabelForFilters(){
   const P = {all:'كل الوقت', today:'اليوم', week:'آخر 7 أيام', month:'آخر 30 يوم'};
   const F = {all:'كل العمليات', in:'الوارد فقط', out:'الصادر فقط', transfer:'التحويلات', game:'Games', shop:'المشتريات', wallet:'إيداع وسحب', admin:'المنظمين'};
-  return (F[state.vtxFilter||'all']||'') + ' — ' + (P[state.vtxPeriod||'all']||'');
+  return (F[state.vtxFilter||'all']||'') + ' — ' + (P[state.vtxPeriod||'all']||'') + (String(state.vtxQuery||'').trim() ? ' — بحث: ' + String(state.vtxQuery).trim() : '');
 }
 function vtxDownloadCsv(){
   const pid = state.pid, list = vtxFiltered(pid);
@@ -6964,7 +7196,7 @@ async function executeVisaMove(kind, pid, amt){
   await saveWallet(WALLET); await saveBonus(BONUS);
   await logVisaTx([{ pid, type:kind, amount:amt, balAfter:(WALLET[pid]||0) }]);
   vibrate([15,10,25]); render();
-  visaMsg('success', title, text, { pos:true, rows:[['العملية', kind==='deposit'?'إيداع':'سحب'],['المبلغ', amt+' نقطة'],['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
+  visaMsg('success', title, text, { pos:true, scan:{ amt:amt, dir:(kind==='deposit'?'from':'to'), label:(kind==='deposit'?'إيداع':'سحب'), bal:(WALLET[pid]||0), kind:kind }, rows:[['العملية', kind==='deposit'?'إيداع':'سحب'],['المبلغ', amt+' نقطة'],['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
 }
 /* ---------- تحويل نقاط بين المشاركين عن طريق رقم الفيزا ---------- */
 function visaLookupByNumber(digits){
@@ -6995,26 +7227,40 @@ async function transferWallet(from, to, amt){
 }
 /* ===== آخر المستلمين (محفوظين على الجهاز) ===== */
 function visaRecentsGet(pid){ try{ const l = JSON.parse(localStorage.getItem('glv-recents-'+pid) || '[]'); return Array.isArray(l) ? l.filter(x=>x && x.to) : []; }catch(e){ return []; } }
-function visaRecentAdd(from, to){
-  try{ const l = visaRecentsGet(from).filter(x=>x.to !== to); l.unshift({ to, ts: Date.now() }); localStorage.setItem('glv-recents-'+from, JSON.stringify(l.slice(0, 6))); }catch(e){}
+function visaRecentAdd(from, to, amt){
+  try{
+    const pp = (PARTICIPANTS||[]).find(x=>String(x.id)===String(to)); if(pp) to = pp.id;
+    const l = visaRecentsGet(from).filter(x=>String(x.to) !== String(to));
+    const rec = { to, ts: Date.now() }; if(Number(amt) > 0) rec.amt = Math.floor(Number(amt));
+    l.unshift(rec); localStorage.setItem('glv-recents-'+from, JSON.stringify(l.slice(0, 8)));
+  }catch(e){}
 }
+function visaRecentsClear(){ try{ localStorage.removeItem('glv-recents-'+state.pid); }catch(e){} render(); }
 function visaRecentsHtml(pid){
-  const list = visaRecentsGet(pid).filter(x=>x.to!==pid && visaCreated(x.to) && !visaExpired(x.to)).slice(0, 5);
+  const list = visaRecentsGet(pid).filter(x=>String(x.to)!==String(pid) && visaCreated(x.to) && !visaExpired(x.to)).slice(0, 8);
   if(!list.length) return '';
-  const items = list.map(x=>{
-    const nm = String((VISA_CARDS[x.to]||{}).holder || (PARTICIPANTS.find(p=>p.id===x.to)||{}).name || '—').trim() || '—';
+  const items = list.map((x,idx)=>{
+    const pp = (PARTICIPANTS||[]).find(p=>String(p.id)===String(x.to)) || {};
+    const nm = String((VISA_CARDS[x.to]||{}).holder || pp.name || '—').trim() || '—';
     let h = 0; const t = String(x.to); for(let i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) % 360;
-    return `<button type="button" class="vrc-item" data-action="visa-recent" data-pid="${escapeHtml(x.to)}" aria-label="تحويل إلى ${escapeHtml(nm)}">
-      <span class="vrc-av" style="background:linear-gradient(135deg,hsl(${h} 60% 52%),hsl(${(h+40)%360} 55% 36%))">${escapeHtml(Array.from(nm)[0] || '•')}</span>
-      <span class="vrc-nm">${escapeHtml(nm.split(/\s+/)[0])}</span></button>`;
+    const av = pp.photo
+      ? `<span class="vrc-av" style="background:url('${escapeHtml(pp.photo)}') center/cover"></span>`
+      : `<span class="vrc-av" style="background:linear-gradient(135deg,hsl(${h} 60% 52%),hsl(${(h+40)%360} 55% 36%))">${escapeHtml(Array.from(nm)[0] || '•')}</span>`;
+    return `<button type="button" class="vrc-item" style="--i:${idx}" data-action="visa-recent" data-pid="${escapeHtml(x.to)}" aria-label="تحويل إلى ${escapeHtml(nm)}">
+      ${av}
+      <span class="vrc-nm">${escapeHtml(nm.split(/\s+/)[0])}</span>
+      ${x.amt ? `<span class="vrc-last">${x.amt}</span>` : '<span class="vrc-last"></span>'}</button>`;
   }).join('');
-  return `<div class="vp-label">آخر المستلمين</div><div class="vrc-row">${items}</div>`;
+  return `<div class="vp-label vrc-head"><span>آخر المستلمين</span><button type="button" class="vrc-clear" data-action="visa-recents-clear">مسح</button></div><div class="vrc-row">${items}</div>`;
 }
 function visaPickRecent(el){
   const to = el && el.dataset ? el.dataset.pid : ''; const inp = document.getElementById('visa-to');
   if(!to || !inp) return;
-  inp.value = visaNumber(to); inp.dispatchEvent(new Event('input', { bubbles:true }));
-  document.querySelectorAll('.vrc-item.on').forEach(x=>x.classList.remove('on')); el.classList.add('on');
+  const was = el.classList.contains('on');
+  document.querySelectorAll('.vrc-item.on').forEach(x=>x.classList.remove('on'));
+  if(was){ inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles:true })); return; }
+  inp.value = visaNumber(to); inp.dispatchEvent(new Event('input', { bubbles:true })); el.classList.add('on');
+  try{ vibrate([8]); }catch(e){}
   const a = document.getElementById('visa-amt'); if(a) a.focus();
 }
 
@@ -7099,14 +7345,46 @@ function chipCodeCanvas(token, cssW){
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.style.width = cssW+'px'; cv.style.height = (cssW / CHIPC.AR)+'px';
   cv.setAttribute('role','img'); cv.setAttribute('aria-label','شريحة التحويل');
   const x = cv.getContext('2d'), bits = chipEncode(token), rad = W*0.09;
-  const g = x.createLinearGradient(0,0,W,H); g.addColorStop(0,'#f8e2a6'); g.addColorStop(.5,'#e6bd5a'); g.addColorStop(1,'#f3d78e');
-  chipRoundRect(x,0,0,W,H,rad); x.fillStyle = g; x.fill();
-  x.strokeStyle = 'rgba(120,78,10,.38)'; x.lineWidth = W*0.006; chipRoundRect(x, W*.045, H*.06, W*.91, H*.88, rad*.6); x.stroke();
+  /* ---- metal body: layered gold, brushed texture, diagonal sheen ---- */
+  chipRoundRect(x,0,0,W,H,rad);
+  const g = x.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#fbe9b4'); g.addColorStop(.26,'#efcd6e'); g.addColorStop(.5,'#e2b64e'); g.addColorStop(.74,'#f0d27e'); g.addColorStop(1,'#f8e3a4');
+  x.fillStyle = g; x.fill();
+  x.save(); chipRoundRect(x,0,0,W,H,rad); x.clip();
+  const step = Math.max(1, Math.round(dpr*0.8));
+  for(let y=0, i=0; y<H; y+=step, i++){
+    const n = Math.sin(i*12.9898)*43758.5453, a = (n - Math.floor(n))*0.07;
+    x.fillStyle = (i & 1) ? 'rgba(255,250,220,'+a+')' : 'rgba(120,80,10,'+(a*.8)+')'; x.fillRect(0,y,W,step);
+  }
+  const sh = x.createLinearGradient(W*.05,0,W*.95,H);
+  sh.addColorStop(0,'rgba(255,255,255,0)'); sh.addColorStop(.36,'rgba(255,255,255,0)'); sh.addColorStop(.46,'rgba(255,255,255,.30)'); sh.addColorStop(.56,'rgba(255,255,255,0)'); sh.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle = sh; x.fillRect(0,0,W,H);
+  const vg = x.createRadialGradient(W*.5,H*.5,H*.2,W*.5,H*.5,W*.75);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(110,70,8,.22)');
+  x.fillStyle = vg; x.fillRect(0,0,W,H);
+  x.restore();
+  /* ---- bevelled edge: dark rim + light-to-dark inner ring ---- */
+  x.lineWidth = W*0.008; x.strokeStyle = 'rgba(110,70,8,.45)'; chipRoundRect(x, W*.004, W*.004, W-W*.008, H-W*.008, rad); x.stroke();
+  const bv = x.createLinearGradient(0,0,W,H); bv.addColorStop(0,'rgba(255,250,225,.9)'); bv.addColorStop(.5,'rgba(255,240,190,.25)'); bv.addColorStop(1,'rgba(120,78,10,.55)');
+  x.lineWidth = W*0.012; x.strokeStyle = bv; chipRoundRect(x, W*.022, W*.022, W-W*.044, H-W*.044, rad*.82); x.stroke();
+  /* ---- engraved contact-pad frame + grooves (margins only, never over the data cells) ---- */
+  const fr = x.createLinearGradient(0,0,W,H); fr.addColorStop(0,'rgba(110,70,8,.55)'); fr.addColorStop(1,'rgba(255,245,200,.7)');
+  x.lineWidth = W*0.007; x.strokeStyle = fr; chipRoundRect(x, W*.055, H*.07, W*.89, H*.86, rad*.55); x.stroke();
   const mx = W*CHIPC.FX, my = H*CHIPC.FY, cw = (W-2*mx)/CHIPC.COLS, ch = (H-2*my)/CHIPC.ROWS;
-  x.fillStyle = '#3b2506';
+  const groove = (x1,y1,x2,y2)=>{
+    x.lineCap = 'round';
+    x.lineWidth = W*0.006; x.strokeStyle = 'rgba(105,66,6,.5)'; x.beginPath(); x.moveTo(x1,y1); x.lineTo(x2,y2); x.stroke();
+    x.lineWidth = W*0.004; x.strokeStyle = 'rgba(255,246,205,.65)'; x.beginPath(); x.moveTo(x1+W*.003,y1+W*.004); x.lineTo(x2+W*.003,y2+W*.004); x.stroke();
+  };
+  groove(W*.07, H*.5, mx*.82, H*.5); groove(W-W*.07, H*.5, W-mx*.82, H*.5);
+  groove(W*.5, H*.085, W*.5, my*.8); groove(W*.5, H-H*.085, W*.5, H-my*.8);
+  /* ---- data cells: engraved dark pads with a soft lit lower edge ---- */
   for(let r=0;r<CHIPC.ROWS;r++) for(let c=0;c<CHIPC.COLS;c++){
     if(!bits[r*CHIPC.COLS + c]) continue;
-    chipRoundRect(x, mx + c*cw + cw*.09, my + r*ch + ch*.09, cw*.82, ch*.82, cw*.22); x.fill();
+    const X = mx + c*cw + cw*.09, Y = my + r*ch + ch*.09, w = cw*.82, h = ch*.82;
+    chipRoundRect(x, X, Y + ch*.07, w, h, cw*.22); x.fillStyle = 'rgba(255,246,205,.6)'; x.fill();
+    const dg = x.createLinearGradient(0,Y,0,Y+h); dg.addColorStop(0,'#4d320a'); dg.addColorStop(1,'#271602');
+    chipRoundRect(x, X, Y, w, h, cw*.22); x.fillStyle = dg; x.fill();
   }
   return cv;
 }
@@ -7427,9 +7705,9 @@ async function visaChipSenderDone(key, rec, r){
   const pid = state.pid;
   try{ WALLET = await loadWallet(); }catch(e){}
   render();
-  if(!window.__vpos) visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt });
+  try{ if(r.to || rec.to) visaRecentAdd(pid, r.to || rec.to, rec.amt); }catch(e){}
   const toName = escapeHtml(r.toName || '—');
-  visaMsg('success','تم التحويل بنجاح',`تم تحويل ${rec.amt} نقطة إلى ${toName}.`,{ pos:true, rows:[['المستلم', toName], ['المبلغ', rec.amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
+  visaMsg('success','تم التحويل بنجاح',`تم تحويل ${rec.amt} نقطة إلى ${toName}.`,{ pos:true, scan:{ amt:rec.amt, who:toName, dir:'to', bal:(WALLET[pid]||0), kind:'transfer' }, rows:[['المستلم', toName], ['المبلغ', rec.amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
   window.storage.delete(key, true).catch(()=>{});
 }
 function visaChipSenderFailed(key, r){
@@ -7567,8 +7845,7 @@ function chipWaitForSender(key, rec, from, fromName){
       if(r.ref) window.__lastTx = { ref: r.ref, at: Date.now() };
       render(); cleanup();
       const nm = escapeHtml(r.fromName || fromName || '—');
-      visaPosBegin({ amount: rec.amt+' نقطة', kind:'receive', amt: rec.amt });
-      visaMsg('success','تم استلام التحويل', `وصلك ${rec.amt} نقطة من ${nm}.`, { pos:true, rows:[['من', nm], ['المبلغ', rec.amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
+      visaMsg('success','تم استلام التحويل', `وصلك ${rec.amt} نقطة من ${nm}.`, { pos:true, scan:{ amt:rec.amt, who:nm, dir:'from', bal:(WALLET[me]||0), kind:'receive' }, rows:[['من', nm], ['المبلغ', rec.amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
     } else if(r.status === 'declined'){ stop(); cleanup(); cool(); visaMsg('warn','صاحبك رفض التحويل','لم يتم تحويل أي نقاط.'); }
     else if(r.status === 'failed'){ stop(); cleanup(); cool(); const sh = r.reason === 'short'; visaMsg(sh ? 'warn' : 'error', sh ? 'رصيد صاحبك مش كفاية' : 'تعذّر إتمام التحويل', 'لم يتم تحويل أي نقاط.'); }
     else if(r.status === 'expired' || r.status === 'cancelled'){ stop(); cleanup(); cool(); visaMsg('info','انتهت مدة الطلب','صاحبك مأكّدش في الوقت. لم يتم تحويل أي نقاط.'); }
@@ -7676,9 +7953,10 @@ async function chipHandleIncoming(r){
   }catch(e){}
   const ref = window.__lastTx ? window.__lastTx.ref : '';
   await window.storage.update(key, c=>(c && c.id === r.id) ? Object.assign({}, c, { status:'done', fromName: myName, ref }) : undefined, true);
+  try{ visaRecentAdd(me, r.to, amt); }catch(e){}
   render();
   const tn = escapeHtml(toName);
-  visaMsg('success','تم التحويل بنجاح', `تم تحويل ${amt} نقطة إلى ${tn}.`, { pos:true, rows:[['المستلم', tn], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[me]||0)+' نقطة']] });
+  visaMsg('success','تم التحويل بنجاح', `تم تحويل ${amt} نقطة إلى ${tn}.`, { pos:true, scan:{ amt:amt, who:tn, dir:'to', bal:(WALLET[me]||0), kind:'transfer' }, rows:[['المستلم', tn], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[me]||0)+' نقطة']] });
 }
 if(!window.__chipInboxTimer){ window.__chipInboxTimer = setInterval(chipInboxPoll, 2000); }
 
@@ -7832,7 +8110,7 @@ async function executeVisaTransfer(from, to, amt, rName){
     if(r==='short'){ visaMsg('warn','رصيد الفيزا غير كافٍ','تغيّر رصيدك أثناء العملية، لم يتم تحويل أي نقاط.'); return; }
     if(r!=='ok'){ visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة في الاتصال بالسيرفر ولم يتم خصم أي نقاط. حاول مرة أخرى.'); return; }
     WALLET = await loadWallet();
-    try{ visaRecentAdd(from, to); }catch(e){}
+    try{ visaRecentAdd(from, to, amt); }catch(e){}
     const me = PARTICIPANTS.find(x=>x.id===from) || {};
     const senderName = (VISA_CARDS[from]||{}).holder || me.name || '';
     await logVisaTx([
@@ -7842,7 +8120,7 @@ async function executeVisaTransfer(from, to, amt, rName){
     pushNotification(from, `📤 تم تحويل ${amt} نقطة إلى ${(VISA_CARDS[to]||{}).holder || (PARTICIPANTS.find(x=>x.id===to)||{}).name || ''}`, '📤');
     pushNotification(to, `📥 وصلك ${amt} نقطة في فيزتك من ${senderName}`, '📥');
     vibrate([15,10,25]); render();
-    visaMsg('success','تم التحويل بنجاح',`تم تحويل ${amt} نقطة إلى ${rName}.`,{ pos:true, rows:[['المستلم', rName], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[from]||0)+' نقطة']] });
+    visaMsg('success','تم التحويل بنجاح',`تم تحويل ${amt} نقطة إلى ${rName}.`,{ pos:true, scan:{ amt:amt, who:rName, dir:'to', bal:(WALLET[from]||0), kind:'transfer' }, rows:[['المستلم', rName], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[from]||0)+' نقطة']] });
   } catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة، حاول مرة أخرى.')); } finally { window.__visaTransferring = false; }
 }
 async function copyMyVisaNumber(btn){
@@ -25203,13 +25481,15 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-visa-history'){ go('visa-history'); loadVisaTx().then(t=>{ VISA_TX=t; if(state.view==='visa-history') render(); }); }
   else if(action==='vtx-filter'){ state.vtxFilter = el.dataset.v || 'all'; render(); }
   else if(action==='vtx-period'){ state.vtxPeriod = el.dataset.v || 'all'; render(); }
+  else if(action==='vtx-q-clear'){ state.vtxQuery = ''; const q = document.getElementById('vtx-q'); if(q){ q.value = ''; q.focus(); } vtxRefresh(); }
   else if(action==='vtx-open'){ vtxShowReceipt(el.dataset.id); }
   else if(action==='vtx-csv'){ vtxDownloadCsv(); }
   else if(action==='vtx-copy'){ vtxCopyStatement(); }
   else if(action==='vtx-print'){ vtxPrintStatement(); }
   else if(action==='vtx-notif'){ vtxEnableNotifs(); }
+  else if(action==='bal-eye'){ visaBalToggle(); }
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
-  else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
+  else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i){ i.value = el.dataset.v; visaPreviewUpdate(); } }
   else if(action==='visa-theme'){ if(!visaEditOpen(state.pid)) return; const g=id=>((document.getElementById(id)||{}).value||''); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:g('visa-holder'), _p1:g('visa-edit-pin'), _p2:g('visa-edit-pin2')}); render(); }
   else if(action==='visa-theme-locked'){ visaMsg('info','التصميم غير مملوك','هذا التصميم غير متاح لك بعد، يمكنك شراؤه من المتجر (Shop) ← تاب كارد.'); }
   else if(action==='visa-create'){ doVisaCreate(); }
@@ -25220,6 +25500,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-chip-recv'){ visaChipOpen('recv'); }
   else if(action==='visa-chip-send'){ visaChipOpen('recv'); }
   else if(action==='visa-recent'){ visaPickRecent(el); }
+  else if(action==='visa-recents-clear'){ visaRecentsClear(); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
@@ -29229,6 +29510,7 @@ function vcPulse(){
 }
 /* عدّاد أرقام: لما الرقم يتغير بيعدّ من القديم للجديد بدل ما يقفز */
 function visaFxAfterRender(){
+  try{ visaBalApply(); }catch(e){}
   const store = window.__vcCounts || (window.__vcCounts = {});
   document.querySelectorAll('[data-vc-count]').forEach(el=>{
     const key = el.dataset.vcCount, to = Number(el.dataset.to)||0, from = store[key];
@@ -29845,14 +30127,39 @@ function loginWaitAndRetry(retry){
   window.visaMonthInsightsHtml = function(pid){
     var all = VISA_TX[pid] || [];
     if(!all.length) return '';
-    var now = new Date(), inn = 0, out = 0, days = [];
-    all.forEach(function(t){ var d = new Date(t.ts), m = VISA_TX_META[t.type] || {sign:1}; if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){ if(m.sign>0) inn += t.amount; else out += t.amount; } });
-    for(var i=6;i>=0;i--){ var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i), a = d0.getTime(), b = a + 864e5, v = 0;
-      all.forEach(function(t){ if(t.ts>=a && t.ts<b) v += t.amount; }); days.push({v:v, l:d0.toLocaleDateString('ar-EG',{weekday:'narrow'})}); }
-    var mx = Math.max.apply(null, days.map(function(x){ return x.v; })) || 1;
-    return '<div class="cf-ins"><h4>ملخص الشهر</h4><div class="cf-io"><div><small>داخل</small><b class="p">+'+inn+'</b></div><div><small>خارج</small><b>−'+out+'</b></div></div><div class="cf-bars">'
-      + days.map(function(x,i){ return '<div><i style="height:'+Math.max(4,Math.round(x.v/mx*100))+'%;animation-delay:'+(i*.05)+'s"></i><small>'+x.l+'</small></div>'; }).join('') + '</div></div>';
+    var now = new Date(), mIn = 0, mOut = 0, days = [], wIn = 0, wOut = 0, esc = escapeHtml;
+    all.forEach(function(t){ var d = new Date(t.ts), m = VISA_TX_META[t.type] || {sign:1}; if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){ if(m.sign>0) mIn += t.amount; else mOut += t.amount; } });
+    for(var i=6;i>=0;i--){
+      var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i), a = d0.getTime(), b = a + 864e5, vi = 0, vo = 0, n = 0;
+      all.forEach(function(t){ if(t.ts>=a && t.ts<b){ var m = VISA_TX_META[t.type] || {sign:1}; if(m.sign>0) vi += t.amount; else vo += t.amount; n++; } });
+      wIn += vi; wOut += vo;
+      days.push({i:i, vi:vi, vo:vo, n:n, s:d0.toLocaleDateString('ar-EG',{weekday:'narrow'}), l:(i===0 ? 'اليوم' : (i===1 ? 'أمس' : d0.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})))});
+    }
+    var mx = 1; days.forEach(function(x){ mx = Math.max(mx, x.vi, x.vo); });
+    var net = wIn - wOut, sg = function(v){ return (v>0?'+':(v<0?'−':'')) + Math.abs(v); };
+    var bars = days.map(function(x,k){
+      var hi = x.vi ? Math.max(6, Math.round(x.vi/mx*100)) : 0, ho = x.vo ? Math.max(6, Math.round(x.vo/mx*100)) : 0;
+      return '<button type="button" class="cf2-day'+(x.i===0?' on today':'')+'" data-cf2="1" data-l="'+esc(x.l)+'" data-in="'+x.vi+'" data-out="'+x.vo+'" data-n="'+x.n+'" aria-label="'+esc(x.l)+'">'
+        + '<span class="cf2-pair"><i class="in" style="height:'+hi+'%;animation-delay:'+(k*.05)+'s"></i><i class="out" style="height:'+ho+'%;animation-delay:'+(k*.05+.03)+'s"></i></span><small>'+x.s+'</small></button>';
+    }).join('');
+    var td = days[days.length-1];
+    return '<div class="cf-ins cf2"><div class="cf2-head"><h4>حركة آخر 7 أيام</h4><span class="cf2-leg"><em class="in"></em>داخل<em class="out"></em>خارج</span></div>'
+      + '<div class="cf2-tiles"><div><small>داخل</small><b class="p">+'+wIn+'</b></div><div><small>خارج</small><b class="n">−'+wOut+'</b></div><div><small>الصافي</small><b class="'+(net>0?'p':(net<0?'n':''))+'">'+sg(net)+'</b></div></div>'
+      + '<div class="cf2-bars">'+bars+'</div>'
+      + '<div class="cf2-tip" id="cf2-tip" aria-live="polite">'+cf2TipHtml(td.l, td.vi, td.vo, td.n)+'</div>'
+      + '<div class="cf2-month"><span>هذا الشهر</span><b class="p">+'+mIn+'</b><b class="n">−'+mOut+'</b></div></div>';
   };
+  function cf2TipHtml(l, vi, vo, n){
+    if(!n) return '<b>'+l+'</b><span>مفيش عمليات في اليوم ده</span>';
+    return '<b>'+l+'</b><span class="p">داخل +'+vi+'</span><span class="n">خارج −'+vo+'</span><span class="c">'+n+' عملية</span>';
+  }
+  document.addEventListener('click', function(e){
+    var d = e.target.closest && e.target.closest('[data-cf2]'); if(!d) return;
+    var box = d.closest('.cf2'); if(!box) return;
+    box.querySelectorAll('.cf2-day.on').forEach(function(x){ x.classList.remove('on'); }); d.classList.add('on');
+    var tip = box.querySelector('#cf2-tip'); if(tip) tip.innerHTML = cf2TipHtml(d.dataset.l, +d.dataset.in||0, +d.dataset.out||0, +d.dataset.n||0);
+    try{ vibrate([6]); }catch(_){}
+  });
   /* صفحة الفيزا رجعت نظيفة: الكارد + زر الكشف + لوحة العمليات الأصلية.
      الاستثناء الوحيد: لو الفيزا مجمّدة بيظهر شريط فك التجميد عشان محدش يتقفل عليه. */
   window.renderVisaPage = function(){
@@ -29865,7 +30172,7 @@ function loginWaitAndRetry(retry){
   };
   var _vm = window.visaMsg;
   window.visaMsg = function(type, title, text, opts){
-    if(CF.cap && type === 'success'){ CF.cap.msg = {title:title, text:text, rows:(opts && opts.rows)||[]}; return; }
+    if(CF.cap && type === 'success'){ CF.cap.msg = {title:title, text:text, rows:(opts && opts.rows)||[], opts:opts, scan:!!(opts && opts.scan)}; return; }
     return _vm.apply(this, arguments);
   };
   function wrapOp(name, build){
@@ -29875,7 +30182,8 @@ function loginWaitAndRetry(retry){
       try{ return await orig.apply(this, a); }
       finally {
         CF.cap = null;
-        if(cap.msg){ try{ var R = build.apply(null, a); R.title = cap.msg.title; R.text = cap.msg.text; R.rows = cap.msg.rows; R.ref = mkRef(); R.ts = Date.now(); openOp(R); }catch(e){ console.error(e); _vm('success', cap.msg.title, cap.msg.text, {rows:cap.msg.rows}); } }
+        if(cap.msg && cap.msg.scan){ try{ _vm('success', cap.msg.title, cap.msg.text, cap.msg.opts); }catch(e){ console.error(e); } }
+        else if(cap.msg){ try{ var R = build.apply(null, a); R.title = cap.msg.title; R.text = cap.msg.text; R.rows = cap.msg.rows; R.ref = mkRef(); R.ts = Date.now(); openOp(R); }catch(e){ console.error(e); _vm('success', cap.msg.title, cap.msg.text, {rows:cap.msg.rows}); } }
       }
     };
   }
