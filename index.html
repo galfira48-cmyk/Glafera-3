@@ -1645,6 +1645,192 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vtx-banner.neg .vtx-b-amt{color:var(--danger);}
   @media (prefers-reduced-motion:reduce){ .vc-scene{animation:none;} .vc-scene.vc-enter .vc-tilt,.vc-scene.vc-pulse .vc-tilt,.vc-scene.vc-pulse .vc-front{animation:none;} .vc-chip::after{animation:none;} .vtx-banner{transition:opacity .2s ease;} }
 
+
+  /* ===== Visa POS terminal v2: live processing -> result -> receipt ===== */
+  .vpos-overlay{position:fixed; inset:0; z-index:100000; display:flex; align-items:center; justify-content:center; padding:18px;
+    background:rgba(6,8,16,.78); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); animation:vposFade .25s ease both;}
+  .vpos-overlay.leaving{animation:vposFadeOut .2s ease both;}
+  @keyframes vposFade{from{opacity:0}to{opacity:1}} @keyframes vposFadeOut{to{opacity:0}}
+  .vpos-sheet{width:min(100%,380px); max-height:100%; overflow:auto; border-radius:28px; padding:20px 18px 18px; text-align:center;
+    background:linear-gradient(165deg,color-mix(in srgb,var(--surface) 92%,#fff 8%),var(--surface)); border:1px solid color-mix(in srgb,var(--gold) 26%,var(--border));
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.07); transition:border-color .4s ease, box-shadow .4s ease;}
+  .vpos-sheet.ok{border-color:rgba(46,204,145,.45); box-shadow:0 40px 80px -30px rgba(0,0,0,.85), 0 0 0 4px rgba(46,204,145,.08);}
+  .vpos-sheet.fail{border-color:rgba(255,91,107,.5); box-shadow:0 40px 80px -30px rgba(0,0,0,.85), 0 0 0 4px rgba(255,91,107,.08);}
+  .vpos-stage{position:relative; height:190px; margin:0 auto 4px; transition:height .6s cubic-bezier(.2,.8,.2,1);}
+  .vpos-sheet.done .vpos-stage{height:150px;}
+  .vpos-term{position:absolute; z-index:2; left:50%; bottom:0; width:190px; height:150px; margin-left:-95px; filter:drop-shadow(0 18px 18px rgba(0,0,0,.45));}
+  .vpos-term svg{display:block; width:100%; height:100%; overflow:visible;}
+  .vpos-led{fill:#f0b840; transition:fill .3s ease;} .vpos-sheet.ok .vpos-led{fill:#2ecc91;} .vpos-sheet.fail .vpos-led{fill:#ff5b6b;}
+  .vpos-screen{position:absolute; left:34px; top:82px; width:122px; height:34px; border-radius:6px; overflow:hidden; direction:rtl;}
+  .vpos-proc{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; transition:opacity .2s ease;}
+  .vpos-sheet.ok .vpos-proc,.vpos-sheet.fail .vpos-proc{opacity:0;}
+  .vpos-amt{font:800 11px/1 'Cairo',sans-serif; color:#7ce8b8; white-space:nowrap; letter-spacing:.2px;}
+  .vpos-dots{display:flex; gap:5px; align-items:center; height:6px;}
+  .vpos-dots span{width:5px; height:5px; border-radius:50%; background:#7ce8b8; animation:vposDot 1s ease-in-out infinite;} .vpos-dots span:nth-child(2){animation-delay:.15s} .vpos-dots span:nth-child(3){animation-delay:.3s}
+  @keyframes vposDot{0%,100%{opacity:.25; transform:scale(.7)}50%{opacity:1; transform:scale(1.2)}}
+  .vpos-ic{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(.6); transition:opacity .25s ease, transform .35s cubic-bezier(.3,1.6,.5,1);}
+  .vpos-ic svg{width:28px; height:28px; fill:none; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round;}
+  .vpos-ic-ok svg{stroke:#2ecc91;} .vpos-ic-fail svg{stroke:#ff5b6b;}
+  .vpos-ic path{stroke-dasharray:30; stroke-dashoffset:30; transition:stroke-dashoffset .45s .1s ease-out;}
+  .vpos-sheet.ok .vpos-ic-ok,.vpos-sheet.fail .vpos-ic-fail{opacity:1; transform:none;}
+  .vpos-sheet.ok .vpos-ic-ok path,.vpos-sheet.fail .vpos-ic-fail path{stroke-dashoffset:0;}
+  .vpos-card{position:absolute; left:50%; top:0; width:124px; height:78px; margin-left:-88px; border-radius:11px; z-index:1; padding:9px 10px; text-align:left; direction:ltr;
+    background:linear-gradient(135deg,var(--vc-b,#fff0b8),var(--vc-a,#f4b740) 55%,var(--vc-c,#a86a12)); color:#1b1405;
+    box-shadow:0 10px 22px -8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.6);
+    transform:translateY(-70px) rotate(-8deg) scale(1.08); opacity:0; animation:vposCard 1s .15s cubic-bezier(.3,.8,.25,1) forwards;}
+  .vpos-card .chip{width:20px; height:15px; border-radius:4px; background:linear-gradient(135deg,#f6e4a8,#b98a2a); opacity:.9;}
+  .vpos-card .brand{position:absolute; right:10px; bottom:7px; font:italic 800 17px/1 'Montserrat',Arial,sans-serif; letter-spacing:.5px;}
+  .vpos-card .num{position:absolute; left:10px; bottom:9px; font:600 8px 'IBM Plex Mono',monospace; letter-spacing:1px; opacity:.7;}
+  @keyframes vposCard{0%{opacity:0; transform:translateY(-70px) rotate(-8deg) scale(1.08)}
+    35%{opacity:1; transform:translateY(10px) rotate(-3deg) scale(1)} 100%{opacity:1; transform:translateY(46px) rotate(0) scale(.96)}}
+  .vpos-receipt{position:absolute; left:50%; bottom:88px; width:70px; margin-left:20px; z-index:0; background:#fff; color:#222; border-radius:4px 4px 0 0; padding:7px 7px 4px; direction:rtl;
+    height:0; overflow:hidden; opacity:0; transform:rotate(4deg); transform-origin:bottom center; box-shadow:0 4px 10px rgba(0,0,0,.25);
+    transition:height .9s cubic-bezier(.2,.8,.2,1), opacity .2s ease;}
+  .vpos-sheet.ok .vpos-receipt{height:70px; opacity:1;}
+  .vpos-receipt i{display:block; height:3px; border-radius:2px; background:#d9dce2; margin:0 0 4px;} .vpos-receipt i.s{width:60%} .vpos-receipt i.g{background:#2ecc91; width:45%}
+  .vpos-status{font-size:12.5px; color:var(--text-muted); min-height:18px; margin-bottom:4px; letter-spacing:.2px; transition:color .3s ease;}
+  .vpos-sheet.ok .vpos-status{color:#2ecc91;} .vpos-sheet.fail .vpos-status{color:#ff5b6b;}
+  .vpos-body{display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s cubic-bezier(.2,.8,.2,1);}
+  .vpos-body-in{overflow:hidden; min-height:0; opacity:0; transition:opacity .45s .12s ease;}
+  .vpos-sheet.done .vpos-body{grid-template-rows:1fr;} .vpos-sheet.done .vpos-body-in{opacity:1;}
+  .vpos-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:22px; margin:2px 0 4px;}
+  .vpos-text{font-size:13.5px; line-height:1.7; color:var(--text-muted);}
+  .vpos-rows{margin:14px 0 4px; border-radius:18px; overflow:hidden; border:1px solid var(--border); background:rgba(0,0,0,.18);}
+  .vpos-rows .vmsg-row{display:flex; justify-content:space-between; gap:10px; padding:12px 14px; font-size:13.5px; border-bottom:1px dashed var(--border);}
+  .vpos-rows .vmsg-row:last-child{border-bottom:0} .vpos-rows .vmsg-row span{color:var(--text-muted)} .vpos-rows .vmsg-row b{font-weight:800}
+  .vpos-ref{font:600 10.5px 'IBM Plex Mono',monospace; color:var(--text-muted); letter-spacing:.8px; margin-top:8px; direction:ltr;}
+  .vpos-actions{display:flex; gap:8px; margin-top:14px;}
+  .vpos-actions button{flex:1; padding:14px 8px; border-radius:16px; border:1px solid var(--border); background:transparent; color:var(--text); font:800 14px 'Cairo',sans-serif; cursor:pointer;}
+  .vpos-actions button.primary{border:0; background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:#1b1405; box-shadow:0 10px 20px -10px var(--gold);}
+  .vpos-actions button:active{transform:scale(.97)}
+  .vpos-paper-wrap{display:none;} .vpos-sheet.show-receipt .vpos-main{display:none;} .vpos-sheet.show-receipt .vpos-paper-wrap{display:block; animation:vposPaper .5s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes vposPaper{from{opacity:0; transform:translateY(24px)}to{opacity:1; transform:none}}
+  .vpos-paper{position:relative; background:#fff; color:#1d2230; border-radius:14px 14px 0 0; padding:18px 16px 16px; text-align:center; margin-bottom:22px; box-shadow:0 10px 24px -12px rgba(0,0,0,.5);}
+  .vpos-paper::after{content:''; position:absolute; left:0; right:0; bottom:-8px; height:8px; background:conic-gradient(from -45deg at bottom,#0000,#fff 1deg 90deg,#0000 91deg) bottom/12px 100% repeat-x;}
+  .rp-brand{font:800 18px 'Cairo',sans-serif; letter-spacing:.3px;} .rp-sub{font-size:11.5px; color:#7b8194; margin-top:2px;}
+  .rp-ok{display:inline-block; margin:12px 0 4px; padding:4px 12px; border-radius:99px; background:#e7f8f0; color:#18a06b; font:800 12px 'Cairo',sans-serif;}
+  .rp-title{font:800 15px 'Cairo',sans-serif; margin:4px 0 8px;}
+  .rp-line{display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed #d6d9e2; font-size:12.5px;} .rp-line span{color:#7b8194} .rp-line b{font-weight:800; text-align:left}
+  .rp-bar{height:34px; margin:14px auto 6px; width:70%; background:repeating-linear-gradient(90deg,#1d2230 0 2px,#fff 2px 4px,#1d2230 4px 5px,#fff 5px 8px,#1d2230 8px 11px,#fff 11px 13px);}
+  .rp-ref{font:600 10.5px 'IBM Plex Mono',monospace; color:#7b8194; letter-spacing:.8px; direction:ltr;}
+  @media (prefers-reduced-motion:reduce){ .vpos-card,.vpos-receipt,.vpos-body,.vpos-ic path{animation-duration:.01s; transition-duration:.01s} }
+
+/* ===== v3: kinds, receipt tools, pay-confirm (slide to pay), game toast ===== */
+  .vpos-stage{perspective:700px;}
+  .vpos-sheet.k-withdraw .vpos-card{transform:translateY(46px) scale(.96); animation:vposCardOut 1.3s .15s cubic-bezier(.3,.8,.25,1) forwards;}
+  @keyframes vposCardOut{0%{opacity:0; transform:translateY(46px) scale(.96)} 25%{opacity:1} 100%{opacity:1; transform:translateY(-4px) rotate(-4deg) scale(1.04)}}
+  .vpos-sheet.k-renew .vpos-card{animation:vposCardFlip 1.5s .15s cubic-bezier(.3,.8,.25,1) forwards;}
+  @keyframes vposCardFlip{0%{opacity:0; transform:translateY(-70px) rotateY(0) scale(1.08)}
+    40%{opacity:1; transform:translateY(8px) rotateY(360deg) scale(1)} 100%{opacity:1; transform:translateY(46px) rotateY(360deg) scale(.96)}}
+  .vpos-sheet.k-transfer .vpos-card{z-index:3; animation:vposCardTap 1.2s .15s cubic-bezier(.3,.8,.25,1) forwards;}
+  @keyframes vposCardTap{0%{opacity:0; transform:translateY(-70px) rotate(-8deg) scale(1.08)}
+    55%{opacity:1; transform:translateY(14px) rotate(-4deg) scale(1)} 100%{opacity:1; transform:translateY(8px) rotate(-2deg) scale(1)}}
+  .vpos-waves{position:absolute; left:50%; top:88px; width:64px; height:30px; margin-left:-26px; z-index:2; pointer-events:none; transition:opacity .25s ease;}
+  .vpos-waves svg{width:100%; height:100%; overflow:visible; fill:none; stroke:var(--vc-a,#f4b740); stroke-width:3; stroke-linecap:round;}
+  .vpos-waves path{opacity:0; animation:vposWave 1.1s ease-in-out infinite;} .vpos-waves path:nth-child(2){animation-delay:.18s} .vpos-waves path:nth-child(3){animation-delay:.36s}
+  @keyframes vposWave{0%,100%{opacity:0} 45%{opacity:1}}
+  .vpos-sheet.ok .vpos-waves,.vpos-sheet.fail .vpos-waves{opacity:0;}
+  .vpos-tools{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px;}
+  .vpos-tools button{display:flex; flex-direction:column; align-items:center; gap:4px; padding:11px 4px; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--text); font:700 12px 'Cairo',sans-serif; cursor:pointer;}
+  .vpos-tools button span{font-size:19px; line-height:1;} .vpos-tools button:active{transform:scale(.96)} .vpos-tools button:disabled{opacity:.5}
+  .vpos-paper-wrap .vpos-actions{margin-top:10px;}
+  .rp-amt{font:900 32px/1.1 'Cairo',sans-serif; margin:6px 0 0;} .rp-amt.pos{color:#18a06b} .rp-amt.neg{color:#d64545} .rp-amt-u{font-size:12.5px; color:#7b8194; margin-bottom:6px;}
+  /* pay confirm (slide to pay) */
+  .vpc-sheet{animation:vposPaper .45s cubic-bezier(.2,.8,.2,1) both;}
+  .vpc-mini{position:relative; height:104px; border-radius:16px; padding:12px 14px; text-align:left; direction:ltr; color:#1b1405; overflow:hidden;
+    background:linear-gradient(135deg,var(--vc-b,#fff0b8),var(--vc-a,#f4b740) 55%,var(--vc-c,#a86a12)); box-shadow:0 14px 26px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.6);}
+  .vpc-mini::after{content:''; position:absolute; inset:0; background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%); transform:translateX(-120%); animation:vpcShine 3.2s 1s ease-in-out infinite;}
+  @keyframes vpcShine{to{transform:translateX(120%)}}
+  .vpc-mini .chip{width:24px; height:18px; border-radius:5px; background:linear-gradient(135deg,#f6e4a8,#b98a2a); opacity:.92;}
+  .vpc-mini .brand{position:absolute; right:14px; bottom:10px; font:italic 800 21px/1 'Montserrat',Arial,sans-serif;}
+  .vpc-mini .num{position:absolute; left:14px; bottom:12px; font:600 11px 'IBM Plex Mono',monospace; letter-spacing:1.4px; opacity:.75;}
+  .vpc-mini .hold{position:absolute; left:14px; bottom:30px; font:700 10.5px 'Montserrat','Cairo',sans-serif; letter-spacing:.6px; opacity:.7; max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; direction:rtl;}
+  .vpc-title{font:800 20px 'Cairo',sans-serif; margin:14px 0 0;} .vpc-sub{font-size:12.5px; color:var(--text-muted); margin-top:2px;}
+  .vpc-amount{font:900 38px/1 'Cairo',sans-serif; margin:12px 0 0; letter-spacing:.3px;} .vpc-amount small{font-size:13px; font-weight:700; color:var(--text-muted); margin-inline-start:6px;}
+  .vpc-slide{position:relative; height:60px; margin-top:16px; border-radius:30px; background:rgba(0,0,0,.28); border:1px solid var(--border); overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; direction:rtl; box-shadow:inset 0 2px 8px rgba(0,0,0,.35);}
+  .vpc-fill{position:absolute; top:0; bottom:0; right:0; width:0; background:linear-gradient(270deg,var(--gold),rgba(244,183,64,.12)); pointer-events:none;}
+  .vpc-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:800 14px 'Cairo',sans-serif; color:var(--text-muted); pointer-events:none; padding-inline:64px 20px;
+    background:linear-gradient(90deg,var(--text-muted) 40%,#fff 50%,var(--text-muted) 60%); background-size:220% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:vpcText 2.4s linear infinite;}
+  @keyframes vpcText{from{background-position:100% 0}to{background-position:-100% 0}}
+  .vpc-thumb{position:absolute; top:4px; right:4px; width:52px; height:52px; border-radius:50%; border:0; cursor:grab; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#1b1405;
+    background:linear-gradient(135deg,var(--gold-2),var(--gold)); box-shadow:0 8px 18px -6px var(--gold); touch-action:none; transition:transform .28s cubic-bezier(.2,.8,.2,1);}
+  .vpc-slide.drag .vpc-thumb{transition:none; cursor:grabbing;} .vpc-slide.done .vpc-thumb{background:linear-gradient(135deg,#7ce8b8,#2ecc91); box-shadow:0 8px 18px -6px #2ecc91;}
+  .vpc-slide.done .vpc-fill{background:linear-gradient(270deg,#2ecc91,rgba(46,204,145,.15));} .vpc-slide.done .vpc-label{opacity:0}
+  .vpc-cancel{margin-top:12px; background:none; border:0; color:var(--text-muted); font:700 13px 'Cairo',sans-serif; cursor:pointer; padding:8px 16px;}
+  /* game toast: خفيف وما بيقطعش اللعب */
+  .vgt{position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); left:50%; transform:translate(-50%,-160%); z-index:99990; width:min(92vw,360px); display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:18px; direction:rtl; cursor:pointer;
+    background:linear-gradient(165deg,color-mix(in srgb,var(--surface) 90%,#fff 10%),var(--surface)); border:1px solid var(--border); box-shadow:0 18px 36px -16px rgba(0,0,0,.8); transition:transform .5s cubic-bezier(.2,.9,.3,1.15);}
+  .vgt.in{transform:translate(-50%,0);} .vgt.pos{border-color:rgba(46,204,145,.4)} .vgt.neg{border-color:rgba(255,91,107,.32)}
+  .vgt-term{position:relative; flex:none; width:46px; height:46px; border-radius:13px; background:#12141c; border:1px solid #2b2f3d; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .vgt-term::before{content:''; position:absolute; left:8px; right:8px; bottom:7px; height:5px; border-radius:3px; background:repeating-linear-gradient(90deg,#3b4152 0 6px,transparent 6px 9px);}
+  .vgt-dots{display:flex; gap:3px;} .vgt-dots span{width:4px; height:4px; border-radius:50%; background:#7ce8b8; animation:vposDot 1s ease-in-out infinite;} .vgt-dots span:nth-child(2){animation-delay:.15s} .vgt-dots span:nth-child(3){animation-delay:.3s}
+  .vgt-ck{position:absolute; inset:0 0 8px 0; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(.5); transition:.3s cubic-bezier(.3,1.6,.5,1);}
+  .vgt-ck svg{width:22px; height:22px; fill:none; stroke:#2ecc91; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round;}
+  .vgt.ok .vgt-dots{opacity:0} .vgt.ok .vgt-ck{opacity:1; transform:none}
+  .vgt-t{flex:1; min-width:0; text-align:right;} .vgt-t b{display:block; font:800 13.5px 'Cairo',sans-serif;} .vgt-t small{display:block; font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .vgt-a{text-align:left; direction:ltr; flex:none;} .vgt-a b{display:block; font:900 18px 'Cairo',sans-serif;} .vgt.pos .vgt-a b{color:#2ecc91} .vgt.neg .vgt-a b{color:#ff7a88} .vgt-a small{font-size:10.5px; color:var(--text-muted)}
+  
+  /* ===== الشريحة الذهبية = مشاركة رقم البطاقة + آخر المستلمين ===== */
+  .vc-chip[data-action]{cursor:pointer; animation:vchHint 4.2s ease-in-out infinite;}
+  .vc-expired .vc-chip[data-action]{animation:none;}
+  @keyframes vchHint{0%,72%,100%{filter:drop-shadow(0 0 0 rgba(255,222,140,0)); transform:scale(1)} 86%{filter:drop-shadow(0 0 9px rgba(255,222,140,.95)); transform:scale(1.07)}}
+  .vch-stage{position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin:2px 0 6px;}
+  .vch-ring{position:absolute; left:50%; top:50%; width:96px; height:96px; margin:-48px 0 0 -48px; border-radius:26px; border:2px solid var(--vc-a,#f4b740); opacity:0; animation:vchRing 2.6s ease-out infinite;}
+  .vch-ring.r2{animation-delay:1.3s;}
+  @keyframes vchRing{0%{transform:scale(.8); opacity:.55}100%{transform:scale(2.1); opacity:0}}
+  .vch-chip{position:relative; z-index:1; width:112px; height:86px; filter:drop-shadow(0 16px 20px rgba(0,0,0,.5)); animation:vchPulse 2.6s ease-in-out infinite;}
+  @keyframes vchPulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.035)}}
+  .vch-waves{position:absolute; z-index:1; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 62px; fill:none; stroke:var(--vc-a,#f4b740); stroke-width:3.4; stroke-linecap:round;}
+  .vch-waves path{opacity:0; animation:vposWave 1.4s ease-in-out infinite;} .vch-waves path:nth-child(2){animation-delay:.2s} .vch-waves path:nth-child(3){animation-delay:.4s}
+  .vch-title{font:800 21px 'Cairo',sans-serif; margin:0 0 2px;} .vch-sub{font-size:12.5px; line-height:1.7; color:var(--text-muted); padding:0 6px;}
+  .vch-card{margin:14px 0 2px; padding:14px; border-radius:18px; border:1px solid var(--border); background:rgba(0,0,0,.2);}
+  .vch-card small{display:block; font-size:11px; color:var(--text-muted);} .vch-card b{display:block; font:800 15px 'Cairo',sans-serif; margin-top:2px;}
+  .vch-num{margin-top:10px; font:700 19px 'IBM Plex Mono',monospace; letter-spacing:1.6px; direction:ltr; color:var(--gold-2);}
+  .vrc-row{display:flex; gap:12px; overflow-x:auto; padding:2px 2px 10px; margin:0 -2px; scrollbar-width:none;} .vrc-row::-webkit-scrollbar{display:none}
+  .vrc-item{flex:0 0 auto; width:62px; display:flex; flex-direction:column; align-items:center; gap:6px; background:none; border:0; padding:0; cursor:pointer; color:var(--text); font-family:'Cairo',sans-serif;}
+  .vrc-av{width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font:800 18px 'Cairo',sans-serif; color:#fff; border:2px solid transparent; box-shadow:0 8px 16px -8px rgba(0,0,0,.7); transition:transform .18s ease, border-color .2s ease, box-shadow .2s ease;}
+  .vrc-item:active .vrc-av{transform:scale(.92);} .vrc-item.on .vrc-av{border-color:var(--gold); box-shadow:0 0 0 4px rgba(244,183,64,.18);}
+  .vrc-nm{font-size:11px; font-weight:700; max-width:62px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted);} .vrc-item.on .vrc-nm{color:var(--gold-2);}
+
+  /* ===== كود الشريحة: مسح بالكاميرا الأمامية + إرسال بالشريحة ===== */
+  .vcs-tabs{display:flex; padding:4px; border-radius:16px; background:rgba(0,0,0,.28); border:1px solid var(--border); margin-bottom:12px;}
+  .vcs-tabs button{flex:1; padding:10px 6px; border-radius:12px; border:0; background:transparent; color:var(--text-muted); font:800 13.5px 'Cairo',sans-serif; cursor:pointer; transition:background .2s ease,color .2s ease;}
+  .vcs-tabs button.on{background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:#1b1405; box-shadow:0 8px 16px -10px var(--gold);}
+  .vcs-title{font:800 20px 'Cairo',sans-serif; margin:2px 0 2px;} .vcs-sub{font-size:12.5px; line-height:1.7; color:var(--text-muted); padding:0 6px;}
+  .vcs-vf{position:relative; width:236px; height:236px; margin:14px auto 10px; border-radius:30px; overflow:hidden; background:#05060c; border:1px solid var(--border); box-shadow:0 20px 40px -20px rgba(0,0,0,.8);}
+  .vcs-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+  .vcs-br{position:absolute; width:34px; height:34px; border:3px solid var(--gold); transition:border-color .25s ease; z-index:2;}
+  .vcs-br.tl{top:14px; left:14px; border-right:0; border-bottom:0; border-top-left-radius:14px;} .vcs-br.tr{top:14px; right:14px; border-left:0; border-bottom:0; border-top-right-radius:14px;}
+  .vcs-br.bl{bottom:14px; left:14px; border-right:0; border-top:0; border-bottom-left-radius:14px;} .vcs-br.brr{bottom:14px; right:14px; border-left:0; border-top:0; border-bottom-right-radius:14px;}
+  .vcs-vf.near .vcs-br{border-color:#7ce8b8;} .vcs-vf.lock .vcs-br{border-color:#2ecc91;}
+  .vcs-ghost{position:absolute; left:50%; top:50%; width:126px; height:100px; margin:-50px 0 0 -63px; border:2px dashed rgba(255,222,140,.6); border-radius:14px; z-index:2; animation:vcsGhost 2.4s ease-in-out infinite;}
+  @keyframes vcsGhost{0%,100%{opacity:.35; transform:scale(1)}50%{opacity:.9; transform:scale(1.04)}}
+  .vcs-vf.near .vcs-ghost{border-color:#7ce8b8;} .vcs-vf.lock .vcs-ghost{opacity:0; animation:none;}
+  .vcs-line{position:absolute; left:16px; right:16px; height:2px; z-index:2; background:linear-gradient(90deg,transparent,var(--gold),transparent); box-shadow:0 0 12px var(--gold); animation:vcsScan 2.2s ease-in-out infinite;}
+  @keyframes vcsScan{0%,100%{top:16%}50%{top:82%}} .vcs-vf.lock .vcs-line{display:none;}
+  .vcs-vfmsg{position:absolute; inset:0; z-index:3; display:none; align-items:center; justify-content:center; padding:24px; text-align:center; font:700 13px/1.8 'Cairo',sans-serif; color:var(--text-muted); background:rgba(5,6,12,.92);}
+  .vcs-vf.bad .vcs-vfmsg{display:flex;}
+  .vcs-status{min-height:22px; font:800 13px 'Cairo',sans-serif; color:var(--text-muted); margin-bottom:6px; transition:color .25s ease;} .vcs-status.ok{color:#2ecc91;} .vcs-status.near{color:#7ce8b8;}
+  .vcs-bal{font-size:12.5px; color:var(--text-muted); margin:12px 0 8px;} .vcs-bal b{color:var(--gold-2); font-weight:800;}
+  .vcs-send .vp-amt-wrap{margin-top:0;} .vcs-send .vp-chips{margin-top:10px; justify-content:center;}
+  .vcs-codebox{position:relative; margin:14px auto 6px; padding:14px; width:fit-content; border-radius:24px; background:#0a0c14; border:1px solid var(--border);}
+  .vcs-codebox canvas{display:block; border-radius:16px;}
+  .vcs-glow{position:absolute; inset:-6px; border-radius:30px; border:2px solid var(--gold); opacity:0; pointer-events:none; animation:vcsGlow 2.2s ease-out infinite;}
+  @keyframes vcsGlow{0%{opacity:.5; transform:scale(.98)}100%{opacity:0; transform:scale(1.08)}}
+  .vcs-amt-tag{font:800 26px 'Cairo',sans-serif; margin-top:8px;} .vcs-amt-tag small{font-size:12.5px; color:var(--text-muted); font-weight:700; margin-inline-start:6px;}
+  .vcs-timer{height:5px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin:10px 8px 6px;} .vcs-timer i{display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--gold),var(--gold-2)); transition:width .3s linear;}
+  .vcs-hint{font-size:11.5px; color:var(--text-muted); line-height:1.7;}
+  .vcs-foot{margin-top:10px; background:none; border:0; color:var(--text-muted); font:700 12.5px 'Cairo',sans-serif; cursor:pointer; text-decoration:underline; text-underline-offset:3px; padding:6px 10px;}
+  @media (prefers-reduced-motion:reduce){ .vcs-ghost,.vcs-line,.vcs-glow{animation:none;} }
+
+  /* ===== نغمة الشريحة (إرسال/استلام بالصوت) ===== */
+  .vcs-mic{display:inline-flex; align-items:center; gap:8px; margin:4px auto 0; padding:9px 14px; border-radius:99px; border:1px solid var(--border); background:rgba(0,0,0,.25); color:var(--text-muted); font:800 12.5px 'Cairo',sans-serif; cursor:pointer; transition:border-color .2s ease,color .2s ease,background .2s ease;}
+  .vcs-mic.on{border-color:var(--gold); color:var(--gold-2); background:rgba(244,183,64,.08);}
+  .vcs-mic.hear{border-color:#2ecc91; color:#2ecc91; background:rgba(46,204,145,.1);}
+  .vcs-mic.on .ic{display:inline-block; animation:vcsBeat 1.2s ease-in-out infinite;}
+  @keyframes vcsBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+  @media (prefers-reduced-motion:reduce){ .vcs-mic.on .ic{animation:none;} }
+
   /* ===== Visa ops panel — premium look ===== */
   .vp-pro{position:relative; overflow:hidden; border-radius:26px; padding:18px 16px 16px; border:1px solid color-mix(in srgb,var(--gold) 24%,var(--border));
     background:radial-gradient(120% 80% at 90% -10%, rgba(244,183,64,.14), transparent 55%), linear-gradient(165deg, color-mix(in srgb,var(--surface) 90%,#fff 10%), var(--surface));
@@ -5569,6 +5755,7 @@ async function logVisaTx(entries){
   await Promise.all((entries||[]).map(async (e, i)=>{
     if(!e || !e.pid) return;
     const entry = { id:'tx'+now+i+Math.random().toString(36).slice(2,6), type:e.type, amount:Math.abs(Number(e.amount)||0), balAfter:Number(e.balAfter)||0, note:e.note||'', ts:now, dev:VTX_DEV };
+    e.__id = entry.id; if(e.pid===state.pid) window.__lastTx = { ref:'GF-'+String(entry.id).slice(-8).toUpperCase(), at:Date.now() };
     const apply = (cur)=>{ const arr = cur ? vtxParse(cur) : []; arr.unshift(entry); return JSON.stringify(arr.slice(0, VTX_MAX)); };
     try{
       if(window.storage && window.storage.update){ await window.storage.update(vtxKey(e.pid), apply, true); }
@@ -5576,7 +5763,7 @@ async function logVisaTx(entries){
     }catch(err){}
   }));
 }
-function vtxLogSafe(entries){ try{ logVisaTx(entries).then(()=>{ if((entries||[]).some(e=>e && e.pid===state.pid && e.type==='game_win')){ ACH.loading=false; achRefresh(true); } }).catch(()=>{}); }catch(e){} }
+function vtxLogSafe(entries){ try{ const _p = logVisaTx(entries); (entries||[]).forEach(e=>{ if(e && e.pid===state.pid && /^game_/.test(e.type)) visaGameToast(e); }); _p.then(()=>{ if((entries||[]).some(e=>e && e.pid===state.pid && e.type==='game_win')){ ACH.loading=false; achRefresh(true); } }).catch(()=>{}); }catch(e){} }
 const VISA_THEMES = {
   aurora:{name:'أورورا', base:'#2a1b5e', a:'#c04fd6', b:'#2ec5c0', c:'#ff7eb6'},
   gold:{name:'ذهبي', base:'#3b2a0a', a:'#f4b740', b:'#fff0b8', c:'#a86a12'},
@@ -5640,8 +5827,312 @@ const VMSG_ICONS = {
   locked:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="5.25" y="10.75" width="13.5" height="9.5" rx="2.6"/><path d="M8 10.75V7.6a4 4 0 018 0v3.15"/><circle cx="12" cy="15" r="1.15" fill="#fff" stroke="none"/></svg>',
   shop:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 8.2h11l-.9 11.3a1.6 1.6 0 01-1.6 1.5H9a1.6 1.6 0 01-1.6-1.5L6.5 8.2z"/><path d="M9 8.2V6.7a3 3 0 016 0v1.5"/><circle cx="9.2" cy="11.4" r=".55" fill="#fff" stroke="none"/><circle cx="14.8" cy="11.4" r=".55" fill="#fff" stroke="none"/></svg>'
 };
+
+/* ---------- ماكينة الدفع (POS): تأكيد بالسحب -> تنفيذ حي -> نتيجة -> إيصال ---------- */
+window.__vpos = null;
+const VPOS_KIND_SIGN = { deposit:'+', receive:'+', withdraw:'−', transfer:'−', renew:'−', shop:'−' };
+function vposBeep(kind){
+  try{
+    const ctx = getAudioCtx(); if(!ctx) return;
+    if(ctx.state==='suspended') ctx.resume();
+    const out = getMasterOut(ctx), t = ctx.currentTime, bad = kind==='fail';
+    (bad ? [[220,0,.16],[165,.18,.26]] : [[1318,0,.09],[1760,.11,.18]]).forEach(([f,d,l])=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = bad ? 'sawtooth' : 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t+d); g.gain.exponentialRampToValueAtTime(bad?.05:.09, t+d+.012); g.gain.exponentialRampToValueAtTime(.0001, t+d+l);
+      o.connect(g); g.connect(out); o.start(t+d); o.stop(t+d+l+.02);
+    });
+  }catch(e){}
+}
+function vposText(html){ const t = document.createElement('div'); t.innerHTML = html==null ? '' : String(html); return t.textContent; }
+function vposThemeOf(pid){ const vc = (VISA_CARDS && VISA_CARDS[pid]) || {}; return (VISA_THEMES[vc.theme] || VISA_THEMES.gold); }
+function vposLast4(pid){ return String(visaNumber(pid)).replace(/\s/g,'').slice(-4); }
+
+/* ===== الإيصال: نفس التصميم في الماكينة وفي كشف الحساب ===== */
+function vposPaperHtml(r){
+  const a = r.amount ? `<div class="rp-amt ${r.amount.sign==='+'?'pos':'neg'}" dir="ltr">${r.amount.sign}${r.amount.value}</div><div class="rp-amt-u">نقطة</div>` : '';
+  return `<div class="vpos-paper">
+    <div class="rp-brand">جلافيرا 3</div><div class="rp-sub">إيصال عملية · فيزا Games</div>
+    <div class="rp-ok">✓ عملية ناجحة</div>
+    <div class="rp-title">${r.title}</div>${a}
+    ${r.lines.map(x=>`<div class="rp-line"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}
+    <div class="rp-bar"></div><div class="rp-ref">REF · ${r.ref}</div>
+  </div>`;
+}
+function vposReceiptPlain(r){
+  const head = ['جلافيرا 3 — إيصال عملية', vposText(r.title)];
+  if(r.amount) head.push('المبلغ: ' + r.amount.sign + r.amount.value + ' نقطة');
+  return head.concat(r.lines.map(x=>vposText(x[0])+': '+vposText(x[1])), ['REF: '+r.ref]).join('\n');
+}
+function vposDrawReceipt(r){
+  const S = 2, W = 360*S, out = 16*S, pad = 18*S;
+  const lines = r.lines.map(x=>[vposText(x[0]), vposText(x[1])]);
+  const hHead = 150*S, hAmt = r.amount ? 84*S : 0, hLine = 36*S, hBar = 104*S;
+  const paperH = hHead + hAmt + lines.length*hLine + hBar;
+  const c = document.createElement('canvas'); c.width = W + out*2; c.height = paperH + out*2 + 10*S;
+  const x = c.getContext('2d'), F = "Cairo, Tajawal, Tahoma, Arial, sans-serif", M = "'IBM Plex Mono', Menlo, monospace";
+  const bg = x.createLinearGradient(0,0,0,c.height); bg.addColorStop(0,'#141726'); bg.addColorStop(1,'#1d2136');
+  x.fillStyle = bg; x.fillRect(0,0,c.width,c.height);
+  const x0 = out, y0 = out, rad = 18*S, n = Math.round(W/(12*S)), step = W/n;
+  x.save(); x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 24*S; x.shadowOffsetY = 8*S;
+  x.beginPath(); x.moveTo(x0, y0+rad); x.arcTo(x0,y0,x0+rad,y0,rad); x.lineTo(x0+W-rad,y0); x.arcTo(x0+W,y0,x0+W,y0+rad,rad); x.lineTo(x0+W, y0+paperH);
+  for(let i=0;i<n;i++){ x.lineTo(x0+W-step*(i+.5), y0+paperH+8*S); x.lineTo(x0+W-step*(i+1), y0+paperH); }
+  x.closePath(); x.fillStyle = '#fff'; x.fill(); x.restore();
+  const T = (t, px, py, font, col, al, dir, mw)=>{ x.font = font; x.fillStyle = col; x.textAlign = al; x.direction = dir || 'rtl'; if(mw) x.fillText(t, px, py, mw); else x.fillText(t, px, py); };
+  const cx = x0 + W/2; let y = y0;
+  T('جلافيرا 3', cx, y+40*S, '800 24px '+F, '#1d2230', 'center');
+  T('إيصال عملية · فيزا Games', cx, y+62*S, '500 12px '+F, '#7b8194', 'center');
+  x.fillStyle = '#e7f8f0'; x.beginPath(); x.roundRect ? x.roundRect(cx-62*S, y+76*S, 124*S, 26*S, 13*S) : x.rect(cx-62*S, y+76*S, 124*S, 26*S); x.fill();
+  T('✓ عملية ناجحة', cx, y+94*S, '800 12px '+F, '#18a06b', 'center');
+  T(vposText(r.title), cx, y+130*S, '800 17px '+F, '#1d2230', 'center', 'rtl', W-pad*2);
+  y += hHead;
+  if(r.amount){
+    T(r.amount.sign + r.amount.value, cx, y+34*S, '900 36px '+F, r.amount.sign==='+' ? '#18a06b' : '#d64545', 'center', 'ltr');
+    T('نقطة', cx, y+60*S, '600 13px '+F, '#7b8194', 'center');
+    y += hAmt;
+  }
+  lines.forEach((l, i)=>{
+    const ly = y + i*hLine;
+    x.font = '500 13px '+F; const lw = x.measureText(l[0]).width;
+    T(l[0], x0+W-pad, ly+24*S, '500 13px '+F, '#7b8194', 'right');
+    T(l[1], x0+pad, ly+24*S, '800 13px '+F, '#1d2230', 'left', 'rtl', Math.max(60*S, W-pad*2-lw-14*S));
+    x.save(); x.setLineDash([4*S,4*S]); x.strokeStyle = '#d6d9e2'; x.lineWidth = S; x.beginPath(); x.moveTo(x0+pad, ly+hLine-2*S); x.lineTo(x0+W-pad, ly+hLine-2*S); x.stroke(); x.restore();
+  });
+  y += lines.length*hLine;
+  let h = 7; for(let i=0;i<r.ref.length;i++) h = (h*31 + r.ref.charCodeAt(i))>>>0;
+  let bx = x0 + W*0.15; const bw = W*0.7, by = y+16*S; x.fillStyle = '#1d2230';
+  while(bx < x0 + W*0.85){ h = (Math.imul(h,1103515245)+12345)>>>0; const w = (1 + (h>>>8)%3)*S*1.4, gap = (1 + (h>>>12)%3)*S*1.3; x.fillRect(bx, by, w, 40*S); bx += w + gap; }
+  T('REF · '+r.ref, cx, y+82*S, '600 11px '+M, '#7b8194', 'center', 'ltr');
+  return c;
+}
+async function vposReceiptBlob(r){
+  try{ await Promise.race([ Promise.all([document.fonts.load('800 24px Cairo'), document.fonts.load('500 13px Cairo'), document.fonts.load('600 11px "IBM Plex Mono"')]), new Promise(res=>setTimeout(res, 1500)) ]); }catch(e){}
+  const c = vposDrawReceipt(r);
+  return await new Promise(res=>c.toBlob(res, 'image/png'));
+}
+async function vposSaveImage(r){
+  const blob = await vposReceiptBlob(r);
+  if(!blob){ showToast('تعذّر إنشاء صورة الإيصال', true); return false; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'receipt-'+r.ref+'.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  showToast('✅ اتحفظ الإيصال كصورة'); return true;
+}
+async function vposShareImage(r){
+  const blob = await vposReceiptBlob(r);
+  if(!blob){ showToast('تعذّر إنشاء صورة الإيصال', true); return; }
+  const file = new File([blob], 'receipt-'+r.ref+'.png', { type:'image/png' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{ await navigator.share({ files:[file], title:'إيصال عملية', text:'إيصال عملية '+r.ref }); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  await vposSaveImage(r);
+}
+function vposReceiptPanel(wrap, r, onBack, backLabel){
+  wrap.innerHTML = vposPaperHtml(r) + `
+    <div class="vpos-tools">
+      <button type="button" data-t="img"><span>🖼️</span>حفظ صورة</button>
+      <button type="button" data-t="share"><span>📤</span>مشاركة</button>
+      <button type="button" data-t="copy"><span>📋</span>نسخ</button>
+    </div>
+    <div class="vpos-actions"><button type="button" class="primary" data-t="back">${backLabel||'رجوع'}</button></div>`;
+  const busy = async (btn, fn)=>{ if(btn.disabled) return; btn.disabled = true; const old = btn.innerHTML; btn.innerHTML = '<span>⏳</span>ثواني…'; try{ await fn(); } finally { btn.disabled = false; btn.innerHTML = old; } };
+  wrap.querySelector('[data-t=img]').addEventListener('click', e=>busy(e.currentTarget, ()=>vposSaveImage(r)));
+  wrap.querySelector('[data-t=share]').addEventListener('click', e=>busy(e.currentTarget, ()=>vposShareImage(r)));
+  wrap.querySelector('[data-t=back]').addEventListener('click', onBack);
+  wrap.querySelector('[data-t=copy]').addEventListener('click', async e=>{
+    const btn = e.currentTarget; let ok = false; const plain = vposReceiptPlain(r);
+    try{ await navigator.clipboard.writeText(plain); ok = true; }catch(err){
+      try{ const ta = document.createElement('textarea'); ta.value = plain; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); }catch(e2){}
+    }
+    const old = btn.innerHTML; btn.innerHTML = '<span>'+(ok?'✓':'⚠️')+'</span>'+(ok?'تم النسخ':'تعذّر'); setTimeout(()=>{ btn.innerHTML = old; }, 1800);
+  });
+}
+/* إيصال مستقل (من كشف الحساب) */
+function visaReceiptOpen(r){
+  const old = document.getElementById('vrc-overlay'); if(old) old.remove();
+  const th = vposThemeOf(state.pid);
+  const ov = document.createElement('div');
+  ov.className = 'vpos-overlay'; ov.id = 'vrc-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `<div class="vpos-sheet show-receipt" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}"><div class="vpos-paper-wrap"></div></div>`;
+  document.body.appendChild(ov);
+  const close = ()=>{ ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 200); };
+  vposReceiptPanel(ov.querySelector('.vpos-paper-wrap'), r, close, 'إغلاق');
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+}
+
+/* ===== شاشة التأكيد: اسحب للدفع ===== */
+function visaPayConfirm(opts){
+  opts = opts || {};
+  return new Promise((resolve)=>{
+    const old = document.getElementById('vpc-overlay'); if(old) old.remove();
+    const pid = state.pid, vc = (VISA_CARDS && VISA_CARDS[pid]) || {}, th = vposThemeOf(pid);
+    const rows = (opts.rows||[]).map(r=>`<div class="vmsg-row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+    const ov = document.createElement('div');
+    ov.className = 'vpos-overlay'; ov.id = 'vpc-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML = `
+      <div class="vpos-sheet vpc-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
+        <div class="vpc-mini"><div class="chip"></div>${vc.holder ? `<div class="hold">${escapeHtml(String(vc.holder).toUpperCase())}</div>` : ''}<div class="num">•••• •••• •••• ${vposLast4(pid)}</div><div class="brand">VISA</div></div>
+        <div class="vpc-title">${opts.title || 'تأكيد العملية'}</div>
+        ${opts.subtitle ? `<div class="vpc-sub">${opts.subtitle}</div>` : ''}
+        ${opts.amount!=null ? `<div class="vpc-amount" dir="ltr">${opts.amount}<small>${opts.unit || 'نقطة'}</small></div>` : ''}
+        ${rows ? `<div class="vpos-rows">${rows}</div>` : ''}
+        <div class="vpc-slide" id="vpc-slide">
+          <div class="vpc-fill"></div><div class="vpc-label">${opts.label || 'اسحب للدفع'}</div>
+          <button type="button" class="vpc-thumb" id="vpc-thumb" aria-label="${opts.label || 'اسحب للدفع'}">‹</button>
+        </div>
+        <button type="button" class="vpc-cancel" id="vpc-cancel">إلغاء</button>
+      </div>`;
+    document.body.appendChild(ov);
+    const track = ov.querySelector('#vpc-slide'), thumb = ov.querySelector('#vpc-thumb'), fill = ov.querySelector('.vpc-fill'), lab = ov.querySelector('.vpc-label');
+    let dragging = false, startX = 0, x = 0, max = 1, finished = false;
+    const finish = (v)=>{ if(finished) return; finished = true; ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 200); resolve(v); };
+    const paint = ()=>{ thumb.style.transform = `translateX(${-x}px)`; fill.style.width = (x + 56) + 'px'; lab.style.opacity = String(Math.max(0, 1 - (x/max)*1.5)); };
+    const complete = ()=>{ if(finished) return; x = max; paint(); track.classList.add('done'); thumb.textContent = '✓'; vposBeep('ok'); setTimeout(()=>finish(true), 320); };
+    thumb.addEventListener('pointerdown', e=>{ if(finished) return; dragging = true; max = Math.max(1, track.clientWidth - thumb.offsetWidth - 8); startX = e.clientX; try{ thumb.setPointerCapture(e.pointerId); }catch(_){} track.classList.add('drag'); });
+    thumb.addEventListener('pointermove', e=>{ if(!dragging) return; x = Math.max(0, Math.min(max, startX - e.clientX)); paint(); });
+    const up = ()=>{ if(!dragging) return; dragging = false; track.classList.remove('drag'); if(x >= max*0.86) complete(); else { x = 0; paint(); } };
+    thumb.addEventListener('pointerup', up); thumb.addEventListener('pointercancel', up);
+    thumb.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); max = Math.max(1, track.clientWidth - thumb.offsetWidth - 8); complete(); } });
+    ov.querySelector('#vpc-cancel').addEventListener('click', ()=>finish(false));
+    ov.addEventListener('click', e=>{ if(e.target===ov) finish(false); });
+  });
+}
+
+/* ===== الماكينة أثناء التنفيذ ===== */
+function visaPosKill(instant){
+  const v = window.__vpos; if(!v) return;
+  clearTimeout(v.timer); window.__vpos = null;
+  if(instant){ v.ov.remove(); return; }
+  v.ov.classList.add('leaving'); setTimeout(()=>v.ov.remove(), 200);
+}
+function visaPosBegin(opts){
+  opts = opts || {};
+  visaPosKill(true);
+  const pid = state.pid, th = vposThemeOf(pid), last4 = vposLast4(pid), kind = opts.kind || 'deposit';
+  const ref = 'GF-' + Math.random().toString(36).slice(2,10).toUpperCase();
+  const ov = document.createElement('div');
+  ov.className = 'vpos-overlay'; ov.id = 'vpos-overlay';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `
+    <div class="vpos-sheet k-${kind}" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
+      <div class="vpos-main">
+        <div class="vpos-stage">
+          <div class="vpos-receipt"><i></i><i class="s"></i><i></i><i class="s"></i><i class="g"></i><i></i></div>
+          <div class="vpos-card"><div class="chip"></div><div class="num">•••• ${last4}</div><div class="brand">VISA</div></div>
+          ${kind==='transfer' ? `<div class="vpos-waves"><svg viewBox="0 0 60 30"><path d="M18 22 Q30 12 42 22"/><path d="M10 15 Q30 -2 50 15"/><path d="M3 8 Q30 -16 57 8"/></svg></div>` : ''}
+          <div class="vpos-term">
+            <svg viewBox="0 0 190 150" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 60 L160 60 L182 132 Q184 142 172 142 L18 142 Q6 142 8 132 Z" fill="#1c1f27"/>
+              <path d="M30 60 L160 60 L166 78 L24 78 Z" fill="#2a2e39"/>
+              <rect x="34" y="82" width="122" height="34" rx="6" fill="#0d1a17" stroke="#3a4050" stroke-width="1.5"/>
+              <g fill="#3b4152">${[0,1,2].map(c=>`<rect x="${60+c*26}" y="120" width="20" height="5" rx="2.5"/>`).join('')}</g>
+              <g fill="#3b4152">${[0,1,2].map(c=>`<rect x="${58+c*28}" y="128" width="22" height="5" rx="2.5"/>`).join('')}</g>
+              <circle class="vpos-led" cx="150" cy="128" r="3.5"/>
+              <rect x="26" y="56" width="138" height="6" rx="3" fill="#0a0c11"/>
+            </svg>
+            <div class="vpos-screen">
+              <div class="vpos-proc">${opts.amount ? `<div class="vpos-amt">${opts.amount}</div>` : ''}<div class="vpos-dots"><span></span><span></span><span></span></div></div>
+              <div class="vpos-ic vpos-ic-ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+              <div class="vpos-ic vpos-ic-fail"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="vpos-status">جاري تنفيذ العملية…</div>
+        <div class="vpos-body"><div class="vpos-body-in"></div></div>
+      </div>
+      <div class="vpos-paper-wrap"></div>
+    </div>`;
+  document.body.appendChild(ov);
+  window.__vpos = { ov, sheet: ov.querySelector('.vpos-sheet'), t0: Date.now(), ref, last4, kind: opts.kind || null, amt: (opts.amt!=null ? opts.amt : null), finishing:false,
+    timer: setTimeout(()=>visaPosKill(), 30000) };
+}
+function vposBuildReceipt(v, title, rows){
+  const ts = Date.now(), vc = (VISA_CARDS && VISA_CARDS[state.pid]) || {};
+  const lines = [['التاريخ', vtxDate(ts) + ' · ' + vtxTime(ts)]];
+  if(vc.holder) lines.push(['حامل البطاقة', escapeHtml(vc.holder)]);
+  lines.push(['البطاقة', '•••• ' + v.last4]);
+  (rows||[]).forEach(x=>lines.push(x));
+  const sign = v.kind ? VPOS_KIND_SIGN[v.kind] : null;
+  return { title, ref:v.ref, ts, lines, amount: (sign && v.amt!=null) ? { sign, value: v.amt } : null };
+}
+/* نجاح: بيكمّل الماكينة اللي فتحت وقت التنفيذ (أو بيفتح واحدة جديدة لو مفيش) */
+function visaPosFx(title, text, opts){
+  opts = opts || {};
+  if(!window.__vpos) visaPosBegin({ amount: opts.amount });
+  const v = window.__vpos; if(v.finishing) return; v.finishing = true;
+  /* نفس رقم العملية اللي اتسجل في كشف الحساب */
+  if(window.__lastTx && Date.now() - window.__lastTx.at < 20000) v.ref = window.__lastTx.ref;
+  v.receipt = vposBuildReceipt(v, title, opts.rows);
+  const wait = Math.max(0, 1600 - (Date.now() - v.t0));
+  setTimeout(()=>{
+    if(window.__vpos !== v) return;
+    const st = v.sheet.querySelector('.vpos-status');
+    v.sheet.classList.add('ok'); st.textContent = '✓ تمت العملية بنجاح';
+    vposBeep('ok');
+    const rows = (opts.rows||[]).map(r=>`<div class="vmsg-row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+    v.sheet.querySelector('.vpos-body-in').innerHTML = `
+      <div class="vpos-title">${title}</div><div class="vpos-text">${text||''}</div>
+      ${rows ? `<div class="vpos-rows">${rows}</div>` : ''}
+      <div class="vpos-ref">REF · ${v.ref}</div>
+      <div class="vpos-actions"><button type="button" id="vpos-rcpt">🧾 عرض الإيصال</button><button type="button" class="primary" id="vpos-done">تمام</button></div>`;
+    const close = ()=>{ visaPosKill(); if(opts.onClose) opts.onClose(); };
+    v.sheet.querySelector('#vpos-done').addEventListener('click', close);
+    v.sheet.querySelector('#vpos-rcpt').addEventListener('click', ()=>{
+      vposReceiptPanel(v.sheet.querySelector('.vpos-paper-wrap'), v.receipt, ()=>v.sheet.classList.remove('show-receipt'), 'رجوع');
+      v.sheet.classList.add('show-receipt');
+    });
+    v.ov.addEventListener('click', (e)=>{ if(e.target===v.ov && v.sheet.classList.contains('done')) close(); });
+    setTimeout(()=>{ if(window.__vpos===v) v.sheet.classList.add('done'); }, 1000);
+  }, wait);
+}
+/* فشل/تحذير أثناء التنفيذ: الماكينة تبيّن ✕ وبعدها تظهر الرسالة العادية */
+function visaPosAbort(cb){
+  const v = window.__vpos;
+  if(!v){ if(cb) cb(); return; }
+  if(v.finishing){ visaPosKill(); if(cb) cb(); return; }
+  v.finishing = true;
+  const wait = Math.max(0, 900 - (Date.now() - v.t0));
+  setTimeout(()=>{
+    if(window.__vpos !== v){ if(cb) cb(); return; }
+    v.sheet.classList.add('fail'); v.sheet.querySelector('.vpos-status').textContent = 'تعذّرت العملية';
+    vposBeep('fail');
+    setTimeout(()=>{ visaPosKill(); if(cb) cb(); }, 950);
+  }, wait);
+}
+
+/* ===== إشعار العمليات الخفيف للألعاب (رسوم / جوائز / غرامات) ===== */
+let _vgtTimer = 0;
+function visaGameToast(e){
+  try{
+    const meta = VISA_TX_META[e.type] || { label:e.type, sign:1 }, pos = meta.sign > 0;
+    const old = document.getElementById('vgt'); if(old) old.remove(); clearTimeout(_vgtTimer);
+    const el = document.createElement('div');
+    el.id = 'vgt'; el.className = 'vgt ' + (pos ? 'pos' : 'neg');
+    el.innerHTML = `<div class="vgt-term"><div class="vgt-dots"><span></span><span></span><span></span></div><div class="vgt-ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div></div>
+      <div class="vgt-t"><b>${meta.label}</b>${e.note ? `<small>${escapeHtml(String(e.note))}</small>` : '<small>اتسجلت على فيزتك</small>'}</div>
+      <div class="vgt-a"><b>${pos?'+':'−'}${Math.abs(Number(e.amount)||0)}</b><small>الرصيد ${Number(e.balAfter)||0}</small></div>`;
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
+    setTimeout(()=>{ el.classList.add('ok'); vposBeep('ok'); }, 650);
+    const hide = ()=>{ el.classList.remove('in'); setTimeout(()=>el.remove(), 500); };
+    _vgtTimer = setTimeout(hide, 3400);
+    el.addEventListener('click', ()=>{
+      hide();
+      const ts = Date.now(), vc = (VISA_CARDS && VISA_CARDS[state.pid]) || {}, ref = e.__id ? 'GF-'+String(e.__id).slice(-8).toUpperCase() : 'GF-'+Math.random().toString(36).slice(2,10).toUpperCase();
+      const lines = [['التاريخ', vtxDate(ts)+' · '+vtxTime(ts)]];
+      if(vc.holder) lines.push(['حامل البطاقة', escapeHtml(vc.holder)]);
+      lines.push(['البطاقة', '•••• '+vposLast4(state.pid)], ['نوع العملية', meta.label]);
+      if(e.note) lines.push(['التفاصيل', escapeHtml(String(e.note))]);
+      lines.push(['الرصيد بعد العملية', (Number(e.balAfter)||0)+' نقطة']);
+      visaReceiptOpen({ title: meta.label, ref, ts, lines, amount:{ sign: pos?'+':'−', value: Math.abs(Number(e.amount)||0) } });
+    });
+  }catch(err){}
+}
+
 function visaMsg(kind, title, text, opts){
   opts = opts || {};
+  if(window.__vpos && !(kind==='success' && opts.pos)){ const _a = arguments; return visaPosAbort(()=>visaMsg.apply(null,_a)); }
+  if(kind==='success' && opts.pos){ return visaPosFx(title, text, opts); }
   const old = document.getElementById('vmsg-overlay'); if(old) old.remove();
   const ov = document.createElement('div');
   ov.className = 'modal-overlay vmsg-overlay'; ov.id = 'vmsg-overlay';
@@ -5892,7 +6383,7 @@ function visaCardHtml(pid, draft, isNew){
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
       <div class="vc-top"><span class="vc-brand">Glafira</span><span class="vc-tag">GAME CARD</span></div>
-      <div class="vc-mid"><span class="vc-chip"></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
+      <div class="vc-mid"><span class="vc-chip" ${isNew ? '' : 'data-action="visa-chip" role="button" tabindex="0" aria-label="مشاركة رقم بطاقتي"'}></span><svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
         <span class="vc-num">${String(numDisplay).split(' ').map(g=>`<i>${g}</i>`).join('')}</span>
       </div>
@@ -6016,14 +6507,16 @@ function renderVisaPage(){
     <div class="vp-panel vp-pro">
       ${visaStatsHtml(bal, total)}
       ${tabsHtml}
+      ${visaRecentsHtml(state.pid)}
       <label class="vp-label" for="visa-to">رقم بطاقة المستلم — الرقم الكبير على وجه البطاقة</label>
       <input id="visa-to" class="field vp-cardno" type="text" inputmode="tel" maxlength="19" autocomplete="off" placeholder="0000 0000 0000 0000" data-vc-live="cardno" />
       <label class="vp-label" for="visa-amt">المبلغ</label>
       <div class="vp-amt-wrap"><input id="visa-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
       <div class="vp-chips">${tChips}</div>
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-transfer">تحويل الآن</button>
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-chip-send">📲 تحويل بالشريحة — قرّبها من كاميرا صاحبك</button>
       <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-copy-number">📋 نسخ رقم بطاقتي</button>
-      <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة.</div>
+      <div class="vp-hint" style="margin-top:8px;">التحويل بيتخصم من رصيد الفيزا ويوصل للمستلم فورًا. المستلم لازم يكون عنده فيزا صالحة. وتقدر تحوّل أو تستلم من غير ما تكتب أي رقم: اضغط على الشريحة الذهبية في بطاقتك.</div>
     </div>`;
   const opsPanel = `
     <div class="vp-panel vp-pro">
@@ -6189,17 +6682,13 @@ function vtxShowReceipt(id){
   const tx = (VISA_TX[pid]||[]).find(t=>t.id===id);
   if(!tx) return;
   const m = VISA_TX_META[tx.type] || {label:tx.type, ico:'•', sign:1};
-  const pos = m.sign>0;
-  const rows = [
-    ['نوع العملية', m.label],
-    ['المبلغ', `<span dir="ltr">${pos?'+':'−'}${tx.amount}</span> نقطة`],
-    ['الرصيد بعد العملية', `<span dir="ltr">${tx.balAfter}</span> نقطة`],
-    ['التاريخ', vtxDate(tx.ts)],
-    ['الوقت', vtxTime(tx.ts)],
-    ['رقم العملية', `<span dir="ltr">${vtxRef(tx)}</span>`]
-  ];
-  if(tx.note) rows.splice(1, 0, [pos?'من / التفاصيل':'إلى / التفاصيل', escapeHtml(tx.note)]);
-  visaMsg('info', `${m.ico} إيصال عملية`, '', { rows, primary:{label:'تمام'}, secondary:{label:'نسخ رقم العملية', onClick:()=>{ try{ navigator.clipboard.writeText(vtxRef(tx)); showToast('✅ تم نسخ رقم العملية'); }catch(e){} }} });
+  const pos = m.sign>0, vc = (VISA_CARDS && VISA_CARDS[pid]) || {};
+  const lines = [['التاريخ', vtxDate(tx.ts) + ' · ' + vtxTime(tx.ts)]];
+  if(vc.holder) lines.push(['حامل البطاقة', escapeHtml(vc.holder)]);
+  lines.push(['البطاقة', '•••• ' + vposLast4(pid)], ['نوع العملية', m.label]);
+  if(tx.note) lines.push([pos?'من / التفاصيل':'إلى / التفاصيل', escapeHtml(tx.note)]);
+  lines.push(['الرصيد بعد العملية', `<span dir="ltr">${tx.balAfter}</span> نقطة`]);
+  visaReceiptOpen({ title: m.label, ref: vtxRef(tx), ts: tx.ts, lines, amount:{ sign: pos?'+':'−', value: tx.amount } });
 }
 function vtxLabelForFilters(){
   const P = {all:'كل الوقت', today:'اليوم', week:'آخر 7 أيام', month:'آخر 30 يوم'};
@@ -6291,12 +6780,20 @@ async function doVisaMove(kind){
   const pid = state.pid, amt = Math.floor(Number((document.getElementById('visa-amt')||{}).value)||0);
   if(visaExpired(pid)){ showExpiredDialog(); return; }
   if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد '+(kind==='deposit'?'إيداعها':'سحبها')+'.'); return; }
+  {
+    const curBal = WALLET[pid]||0, after = kind==='deposit' ? curBal+amt : curBal-amt;
+    const okConfirm = await visaPayConfirm({ title: kind==='deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب', subtitle: kind==='deposit' ? 'من نقاط الفقرات إلى الفيزا' : 'من الفيزا إلى نقاط الفقرات', amount: amt,
+      rows:[['رصيد الفيزا الحالي', curBal+' نقطة'], ['رصيد الفيزا بعد العملية', after+' نقطة']], label:'اسحب للتأكيد' });
+    if(!okConfirm) return;
+  }
   showPinEntryModal({
     title: kind==='deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب',
     text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
     onSubmit: async (pin)=>{
       if(!(await verifyVisaPin(pid, pin))) return false;
-      await executeVisaMove(kind, pid, amt);
+      visaPosBegin({ amount: amt+' نقطة', kind, amt });
+      try{ await executeVisaMove(kind, pid, amt); }
+      catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام العملية','حدثت مشكلة، حاول مرة أخرى.')); }
       return true;
     }
   });
@@ -6320,7 +6817,7 @@ async function executeVisaMove(kind, pid, amt){
   await saveWallet(WALLET); await saveBonus(BONUS);
   await logVisaTx([{ pid, type:kind, amount:amt, balAfter:(WALLET[pid]||0) }]);
   vibrate([15,10,25]); render();
-  visaMsg('success', title, text, { rows:[['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
+  visaMsg('success', title, text, { pos:true, rows:[['العملية', kind==='deposit'?'إيداع':'سحب'],['المبلغ', amt+' نقطة'],['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
 }
 /* ---------- تحويل نقاط بين المشاركين عن طريق رقم الفيزا ---------- */
 function visaLookupByNumber(digits){
@@ -6349,6 +6846,578 @@ async function transferWallet(from, to, amt){
   if(res) return 'ok';
   return blocked ? 'short' : 'fail';
 }
+/* ===== آخر المستلمين (محفوظين على الجهاز) ===== */
+function visaRecentsGet(pid){ try{ const l = JSON.parse(localStorage.getItem('glv-recents-'+pid) || '[]'); return Array.isArray(l) ? l.filter(x=>x && x.to) : []; }catch(e){ return []; } }
+function visaRecentAdd(from, to){
+  try{ const l = visaRecentsGet(from).filter(x=>x.to !== to); l.unshift({ to, ts: Date.now() }); localStorage.setItem('glv-recents-'+from, JSON.stringify(l.slice(0, 6))); }catch(e){}
+}
+function visaRecentsHtml(pid){
+  const list = visaRecentsGet(pid).filter(x=>x.to!==pid && visaCreated(x.to) && !visaExpired(x.to)).slice(0, 5);
+  if(!list.length) return '';
+  const items = list.map(x=>{
+    const nm = String((VISA_CARDS[x.to]||{}).holder || (PARTICIPANTS.find(p=>p.id===x.to)||{}).name || '—').trim() || '—';
+    let h = 0; const t = String(x.to); for(let i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) % 360;
+    return `<button type="button" class="vrc-item" data-action="visa-recent" data-pid="${escapeHtml(x.to)}" aria-label="تحويل إلى ${escapeHtml(nm)}">
+      <span class="vrc-av" style="background:linear-gradient(135deg,hsl(${h} 60% 52%),hsl(${(h+40)%360} 55% 36%))">${escapeHtml(Array.from(nm)[0] || '•')}</span>
+      <span class="vrc-nm">${escapeHtml(nm.split(/\s+/)[0])}</span></button>`;
+  }).join('');
+  return `<div class="vp-label">آخر المستلمين</div><div class="vrc-row">${items}</div>`;
+}
+function visaPickRecent(el){
+  const to = el && el.dataset ? el.dataset.pid : ''; const inp = document.getElementById('visa-to');
+  if(!to || !inp) return;
+  inp.value = visaNumber(to); inp.dispatchEvent(new Event('input', { bubbles:true }));
+  document.querySelectorAll('.vrc-item.on').forEach(x=>x.classList.remove('on')); el.classList.add('on');
+  const a = document.getElementById('visa-amt'); if(a) a.focus();
+}
+
+/* ===== الشريحة الذهبية: استقبل تحويل (بدل الـ QR) ===== */
+function visaChipNumberOpen(){
+  const pid = state.pid;
+  if(!visaCreated(pid)){ visaMsg('warn','اعمل فيزتك الأول','لازم تفعّل فيزتك قبل ما تقدر تستقبل تحويلات.'); return; }
+  if(visaExpired(pid)){ showExpiredDialog(); return; }
+  const old = document.getElementById('vch-overlay'); if(old) old.remove();
+  const vc = (VISA_CARDS && VISA_CARDS[pid]) || {}, th = vposThemeOf(pid);
+  const num = visaNumber(pid), holder = String(vc.holder || '').trim();
+  const shareText = 'فيزا جلافيرا 3' + (holder ? ' — ' + holder : '') + '\n' + num + '\nحوّل لي من صفحة الفيزا ← تحويل';
+  const ov = document.createElement('div');
+  ov.className = 'vpos-overlay'; ov.id = 'vch-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `
+    <div class="vpos-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
+      <div class="vch-stage">
+        <span class="vch-ring"></span><span class="vch-ring r2"></span>
+        <svg class="vch-chip" viewBox="0 0 120 92" aria-hidden="true"><defs><linearGradient id="vchg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc9a"/><stop offset=".55" stop-color="#c9962c"/><stop offset="1" stop-color="#f0d488"/></linearGradient></defs>
+          <rect x="2" y="2" width="116" height="88" rx="14" fill="url(#vchg)" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
+          <g fill="none" stroke="rgba(90,58,8,.65)" stroke-width="2"><rect x="38" y="26" width="44" height="40" rx="8"/><path d="M2 34h36M2 58h36M82 34h36M82 58h36M60 2v24M60 66v24"/></g></svg>
+        <svg class="vch-waves" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6c3 3.5 3 8.5 0 12"/><path d="M12 4c4.5 5 4.5 11 0 16"/><path d="M16 2c6 6.5 6 13.5 0 20"/></svg>
+      </div>
+      <div class="vch-title">استقبل تحويل</div>
+      <div class="vch-sub">دي شريحة فيزتك. ابعت رقمها لصاحبك وهو يكتبه في صفحة التحويل.</div>
+      <div class="vch-card">${holder ? `<small>حامل البطاقة</small><b dir="auto">${escapeHtml(holder)}</b>` : ''}<div class="vch-num">${num}</div></div>
+      <div class="vpos-tools" style="grid-template-columns:repeat(2,1fr)">
+        <button type="button" data-t="copy"><span>📋</span>نسخ الرقم</button>
+        <button type="button" data-t="share"><span>📤</span>مشاركة</button>
+      </div>
+      <div class="vpos-actions"><button type="button" class="primary" data-t="close">تمام</button></div>
+    </div>`;
+  document.body.appendChild(ov);
+  const close = ()=>{ ov.classList.add('leaving'); setTimeout(()=>ov.remove(), 200); };
+  ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
+  ov.querySelector('[data-t=close]').addEventListener('click', close);
+  const flash = (btn, ico, txt)=>{ const o = btn.innerHTML; btn.innerHTML = `<span>${ico}</span>${txt}`; setTimeout(()=>{ btn.innerHTML = o; }, 1800); };
+  ov.querySelector('[data-t=copy]').addEventListener('click', async e=>{
+    const btn = e.currentTarget; let ok = false; const plain = num.replace(/\s/g,'');
+    try{ await navigator.clipboard.writeText(plain); ok = true; }catch(err){
+      try{ const ta = document.createElement('textarea'); ta.value = plain; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); }catch(e2){}
+    }
+    flash(btn, ok ? '✓' : '⚠️', ok ? 'تم النسخ' : 'تعذّر');
+  });
+  ov.querySelector('[data-t=share]').addEventListener('click', async e=>{
+    const btn = e.currentTarget;
+    if(navigator.share){ try{ await navigator.share({ text: shareText }); return; }catch(err){ if(err && err.name==='AbortError') return; } }
+    let ok = false; try{ await navigator.clipboard.writeText(shareText); ok = true; }catch(err){}
+    flash(btn, ok ? '✓' : '⚠️', ok ? 'اتنسخ النص' : 'تعذّر');
+  });
+}
+
+/* =====================================================================
+   كود الشريحة: الشريحة الذهبية نفسها هي الكود (بدل الـ QR)
+   - المرسل بيظهّر شريحته لكاميرا صاحبه الأمامية، والمستلم بيمسحها فيتم التحويل
+   - الشريحة بتشفّر رقم عملية (32 bit) + CRC16 في شبكة 8×6 من الفصوص الداكنة
+   ===================================================================== */
+const CHIPC = { COLS:8, ROWS:6, FX:0.10, FY:0.125, AR:1.25, TTL:90000, GRACE:20000 };
+function chipKey(token){ return 'glavera-chip-' + (token>>>0).toString(36).padStart(7,'0'); }
+function chipCrc16(bytes){
+  let c = 0xFFFF;
+  for(let k=0;k<bytes.length;k++){ c ^= bytes[k] << 8; for(let i=0;i<8;i++) c = (c & 0x8000) ? (((c << 1) ^ 0x1021) & 0xFFFF) : ((c << 1) & 0xFFFF); }
+  return (c ^ 0x5A5A) & 0xFFFF;
+}
+function chipWhiten(bits){ let x = 0x2F6B9A1D >>> 0; return bits.map(b=>{ x = (Math.imul(x, 1664525) + 1013904223) >>> 0; return b ^ ((x >>> 23) & 1); }); }
+function chipBytes(t){ return [(t>>>24)&255, (t>>>16)&255, (t>>>8)&255, t&255]; }
+function chipEncode(token){
+  token = token >>> 0; const crc = chipCrc16(chipBytes(token)), bits = [];
+  for(let i=31;i>=0;i--) bits.push((token >>> i) & 1);
+  for(let i=15;i>=0;i--) bits.push((crc >>> i) & 1);
+  return chipWhiten(bits);
+}
+function chipDecodeBits(raw){
+  const bits = chipWhiten(raw); let token = 0, crc = 0;
+  for(let i=0;i<32;i++) token = ((token << 1) | bits[i]) >>> 0;
+  for(let i=32;i<48;i++) crc = (crc << 1) | bits[i];
+  return crc === chipCrc16(chipBytes(token)) ? token : null;
+}
+function chipRoundRect(x, X, Y, W, H, r){ x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+W,Y,X+W,Y+H,r); x.arcTo(X+W,Y+H,X,Y+H,r); x.arcTo(X,Y+H,X,Y,r); x.arcTo(X,Y,X+W,Y,r); x.closePath(); }
+function chipCodeCanvas(token, cssW){
+  const dpr = Math.min(3, window.devicePixelRatio || 2), W = Math.round(cssW*dpr), H = Math.round(W / CHIPC.AR);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.style.width = cssW+'px'; cv.style.height = (cssW / CHIPC.AR)+'px';
+  cv.setAttribute('role','img'); cv.setAttribute('aria-label','شريحة التحويل');
+  const x = cv.getContext('2d'), bits = chipEncode(token), rad = W*0.09;
+  const g = x.createLinearGradient(0,0,W,H); g.addColorStop(0,'#f8e2a6'); g.addColorStop(.5,'#e6bd5a'); g.addColorStop(1,'#f3d78e');
+  chipRoundRect(x,0,0,W,H,rad); x.fillStyle = g; x.fill();
+  x.strokeStyle = 'rgba(120,78,10,.38)'; x.lineWidth = W*0.006; chipRoundRect(x, W*.045, H*.06, W*.91, H*.88, rad*.6); x.stroke();
+  const mx = W*CHIPC.FX, my = H*CHIPC.FY, cw = (W-2*mx)/CHIPC.COLS, ch = (H-2*my)/CHIPC.ROWS;
+  x.fillStyle = '#3b2506';
+  for(let r=0;r<CHIPC.ROWS;r++) for(let c=0;c<CHIPC.COLS;c++){
+    if(!bits[r*CHIPC.COLS + c]) continue;
+    chipRoundRect(x, mx + c*cw + cw*.09, my + r*ch + ch*.09, cw*.82, ch*.82, cw*.22); x.fill();
+  }
+  return cv;
+}
+/* ---- قارئ الشريحة: بيلاقي البقعة الذهبية، يقيس مستطيلها، ويقرأ الفصوص ---- */
+function chipMinRect(xs, ys){
+  const n = xs.length; let cx = 0, cy = 0; for(let i=0;i<n;i++){ cx += xs[i]; cy += ys[i]; } cx /= n; cy /= n;
+  const test = (deg)=>{
+    const a = deg*Math.PI/180, c = Math.cos(a), s = Math.sin(a); let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9;
+    for(let i=0;i<n;i++){ const dx = xs[i]-cx, dy = ys[i]-cy, u = dx*c + dy*s, v = -dx*s + dy*c; if(u<u0)u0=u; if(u>u1)u1=u; if(v<v0)v0=v; if(v>v1)v1=v; }
+    return { deg, c, s, u0, u1, v0, v1, area:(u1-u0)*(v1-v0) };
+  };
+  let best = null; for(let d=-45; d<45; d+=3){ const t = test(d); if(!best || t.area < best.area) best = t; }
+  const c0 = best.deg; for(let d=c0-3; d<=c0+3; d+=0.5){ const t = test(d); if(t.area < best.area) best = t; }
+  const uc = (best.u0+best.u1)/2, vc = (best.v0+best.v1)/2;
+  let eu = [best.c, best.s], ev = [-best.s, best.c], w = best.u1-best.u0, h = best.v1-best.v0;
+  if(w < h){ const t = eu; eu = ev; ev = t; const tw = w; w = h; h = tw; }
+  return { cx: cx + uc*best.c - vc*best.s, cy: cy + uc*best.s + vc*best.c, eu, ev, w, h };
+}
+function chipSampleGrid(luma, W, H, R, gs){
+  const { COLS, ROWS, FX, FY } = CHIPC, spanX = (1-2*FX)*gs, spanY = (1-2*FY)*gs;
+  const rad = Math.max(1, Math.round(spanX*R.w/COLS*0.2)), out = new Float32Array(COLS*ROWS);
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const tx = ((c+.5)/COLS - .5)*spanX*R.w, ty = ((r+.5)/ROWS - .5)*spanY*R.h;
+    const px = Math.round(R.cx + tx*R.eu[0] + ty*R.ev[0]), py = Math.round(R.cy + tx*R.eu[1] + ty*R.ev[1]);
+    let sum = 0, cnt = 0;
+    for(let yy=py-rad; yy<=py+rad; yy++){ if(yy<0||yy>=H) continue; for(let xx=px-rad; xx<=px+rad; xx++){ if(xx<0||xx>=W) continue; sum += luma[yy*W+xx]; cnt++; } }
+    out[r*COLS+c] = cnt ? sum/cnt : 128;
+  }
+  return out;
+}
+function chipTryDecode(vals){
+  const { COLS, ROWS } = CHIPC, sorted = Array.from(vals).sort((a,b)=>a-b), n = sorted.length;
+  let bestK = -1, bestV = -1;
+  for(let k=1;k<n;k++){
+    let s1=0,s2=0; for(let i=0;i<k;i++) s1 += sorted[i]; for(let i=k;i<n;i++) s2 += sorted[i];
+    const m1 = s1/k, m2 = s2/(n-k), v = k*(n-k)*(m1-m2)*(m1-m2);
+    if(v > bestV){ bestV = v; bestK = k; }
+  }
+  let lo = 0, hi = 0; for(let i=0;i<bestK;i++) lo += sorted[i]; for(let i=bestK;i<n;i++) hi += sorted[i];
+  lo /= bestK; hi /= (n-bestK); if(hi - lo < 40) return null;
+  const thr = (sorted[bestK-1] + sorted[bestK]) / 2, g = [];
+  let dark = 0;
+  for(let r=0;r<ROWS;r++){ g.push([]); for(let c=0;c<COLS;c++){ const b = vals[r*COLS+c] < thr ? 1 : 0; dark += b; g[r].push(b); } }
+  if(dark < 8 || dark > 40) return null;
+  const maps = [ (r,c)=>g[r][c], (r,c)=>g[r][COLS-1-c], (r,c)=>g[ROWS-1-r][c], (r,c)=>g[ROWS-1-r][COLS-1-c] ];
+  for(const f of maps){
+    const raw = []; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) raw.push(f(r,c));
+    const t = chipDecodeBits(raw); if(t !== null) return t;
+  }
+  return null;
+}
+function chipScanFrame(img){
+  const w = img.width, h = img.height, d = img.data, N = w*h;
+  const luma = new Uint8Array(N), mask = new Uint8Array(N);
+  for(let i=0,p=0;i<N;i++,p+=4){
+    const r = d[p], g = d[p+1], b = d[p+2]; luma[i] = (r*77 + g*150 + b*29) >> 8;
+    const rb = r - b; if(r > 100 && rb > 40 && g > b){ const q = (g-b)/rb; if(q > 0.5 && q < 1.0) mask[i] = 1; }
+  }
+  const lab = new Uint16Array(N), stack = new Int32Array(N), comps = []; let id = 0;
+  for(let s0=0;s0<N;s0++){
+    if(!mask[s0] || lab[s0]) continue;
+    if(++id > 60000) break;
+    let sp = 0, area = 0, minx = w, maxx = 0, miny = h, maxy = 0; stack[sp++] = s0; lab[s0] = id;
+    while(sp){
+      const p = stack[--sp]; area++; const px = p % w, py = (p / w) | 0;
+      if(px<minx)minx=px; if(px>maxx)maxx=px; if(py<miny)miny=py; if(py>maxy)maxy=py;
+      if(px>0){ const q=p-1; if(mask[q]&&!lab[q]){ lab[q]=id; stack[sp++]=q; } }
+      if(px<w-1){ const q=p+1; if(mask[q]&&!lab[q]){ lab[q]=id; stack[sp++]=q; } }
+      if(py>0){ const q=p-w; if(mask[q]&&!lab[q]){ lab[q]=id; stack[sp++]=q; } }
+      if(py<h-1){ const q=p+w; if(mask[q]&&!lab[q]){ lab[q]=id; stack[sp++]=q; } }
+    }
+    if(area >= 300 && (maxx-minx) >= 40 && (maxy-miny) >= 30) comps.push({ id, area, minx, maxx, miny, maxy });
+  }
+  comps.sort((a,b)=>b.area-a.area);
+  let cand = null;
+  for(const cp of comps.slice(0,4)){
+    const xs = [], ys = [];
+    for(let y=cp.miny; y<=cp.maxy; y+=2) for(let x=cp.minx; x<=cp.maxx; x+=2) if(lab[y*w+x] === cp.id){ xs.push(x); ys.push(y); }
+    if(xs.length < 60) continue;
+    const R = chipMinRect(xs, ys), ratio = R.w / R.h;
+    if(R.w < 60 || ratio < 1.05 || ratio > 1.6) continue;
+    cand = R;
+    for(const gs of [1, 0.96, 1.04]){
+      const token = chipTryDecode(chipSampleGrid(luma, w, h, R, gs));
+      if(token !== null) return { token, cand: R };
+    }
+  }
+  return { token: null, cand };
+}
+function visaChipScannerStart(vf, statusFn, onToken){
+  const ctl = { stopped:false, stream:null, timer:0 };
+  const video = document.createElement('video');
+  video.className = 'vcs-video'; video.muted = true; video.autoplay = true; video.playsInline = true; video.setAttribute('playsinline',''); video.setAttribute('muted','');
+  vf.prepend(video);
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently:true });
+  const last = { token:null, t:0, n:0 };
+  ctl.stop = ()=>{ ctl.stopped = true; clearTimeout(ctl.timer); try{ if(ctl.stream) ctl.stream.getTracks().forEach(t=>t.stop()); }catch(e){} try{ video.srcObject = null; }catch(e){} };
+  (async ()=>{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ statusFn('nocam'); return; }
+    try{ ctl.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ ideal:640 }, height:{ ideal:480 } }, audio:false }); }
+    catch(e){ statusFn(e && e.name === 'NotAllowedError' ? 'denied' : 'nocam'); return; }
+    if(ctl.stopped){ ctl.stop(); return; }
+    video.srcObject = ctl.stream; try{ await video.play(); }catch(e){}
+    statusFn('search');
+    const tick = ()=>{
+      if(ctl.stopped) return;
+      if(video.readyState >= 2 && video.videoWidth){
+        const W = 480, H = Math.round(480 * video.videoHeight / video.videoWidth);
+        if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
+        cx.drawImage(video, 0, 0, W, H);
+        let res = null; try{ res = chipScanFrame(cx.getImageData(0, 0, W, H)); }catch(e){}
+        if(res && res.token !== null){
+          const now = Date.now();
+          if(last.token === res.token && now - last.t < 1500) last.n++; else last.n = 1;
+          last.token = res.token; last.t = now; statusFn('lock');
+          if(last.n >= 2){ ctl.stop(); onToken(res.token); return; }
+        } else statusFn(res && res.cand ? 'near' : 'search');
+      }
+      ctl.timer = setTimeout(tick, 110);
+    };
+    tick();
+  })();
+  return ctl;
+}
+
+/* ---- الواجهة: تبويب استلام (مسح) وتبويب إرسال (إظهار الشريحة) ---- */
+let _vcs = null;
+function visaChipClose(){
+  const v = _vcs; if(!v) return; _vcs = null;
+  try{ if(v.scanner) v.scanner.stop(); }catch(e){}
+  try{ if(v.listener) v.listener.stop(); }catch(e){}
+  try{ if(v.audio) v.audio.stop(); }catch(e){}
+  clearInterval(v.poll); clearInterval(v.tick);
+  try{ if(v.wake) v.wake.release(); }catch(e){}
+  v.ov.classList.add('leaving'); setTimeout(()=>v.ov.remove(), 200);
+}
+function visaChipStopWork(){
+  const v = _vcs; if(!v) return;
+  try{ if(v.scanner) v.scanner.stop(); }catch(e){} v.scanner = null;
+  try{ if(v.listener) v.listener.stop(); }catch(e){} v.listener = null;
+  try{ if(v.audio) v.audio.stop(); }catch(e){} v.audio = null;
+  clearInterval(v.poll); clearInterval(v.tick);
+  try{ if(v.wake) v.wake.release(); }catch(e){} v.wake = null;
+  if(v.pending){ const k = v.pending.key; v.pending = null; window.storage.update(k, c=>(c && c.status==='open') ? Object.assign({}, c, { status:'cancelled' }) : undefined, true).then(()=>window.storage.delete(k, true)).catch(()=>{}); }
+}
+function visaChipFail(kind, title, text){ visaChipClose(); visaMsg(kind, title, text); }
+function visaChipOpen(mode){
+  const pid = state.pid;
+  if(!visaCreated(pid)){ visaMsg('warn','اعمل فيزتك الأول','لازم تفعّل فيزتك قبل ما تستخدم الشريحة.'); return; }
+  if(visaExpired(pid)){ showExpiredDialog(); return; }
+  if(_vcs) visaChipClose();
+  const th = vposThemeOf(pid), ov = document.createElement('div');
+  ov.className = 'vpos-overlay'; ov.id = 'vcs-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `<div class="vpos-sheet vcs-sheet" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
+    <div class="vcs-tabs"><button type="button" data-m="recv">📷 استلام</button><button type="button" data-m="send">✨ إرسال</button></div>
+    <div class="vcs-body"></div>
+    <button type="button" class="vcs-foot" id="vcs-num">أو شارك رقم بطاقتي بدل المسح</button>
+    <div class="vpos-actions" style="margin-top:6px"><button type="button" id="vcs-close">إغلاق</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  _vcs = { ov, mode:null, scanner:null, listener:null, audio:null, poll:0, tick:0, wake:null, pending:null };
+  ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.addEventListener('click', ()=>visaChipSetMode(b.dataset.m)));
+  ov.querySelector('#vcs-close').addEventListener('click', ()=>{ visaChipStopWork(); visaChipClose(); });
+  ov.querySelector('#vcs-num').addEventListener('click', ()=>{ visaChipStopWork(); visaChipClose(); visaChipNumberOpen(); });
+  ov.addEventListener('click', e=>{ if(e.target === ov){ visaChipStopWork(); visaChipClose(); } });
+  visaChipSetMode(mode || 'recv');
+}
+function visaChipSetMode(mode){
+  const v = _vcs; if(!v) return;
+  visaChipStopWork(); v.mode = mode;
+  v.ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.m === mode));
+  const body = v.ov.querySelector('.vcs-body');
+  if(mode === 'recv'){
+    body.innerHTML = `<div class="vcs-title">استلم بالشريحة</div><div class="vcs-sub">خلّي صاحبك يقرّب شريحته الذهبية من الكاميرا الأمامية.</div>
+      <div class="vcs-vf" id="vcs-vf"><i class="vcs-br tl"></i><i class="vcs-br tr"></i><i class="vcs-br bl"></i><i class="vcs-br brr"></i><span class="vcs-ghost"></span><span class="vcs-line"></span><div class="vcs-vfmsg" id="vcs-vfmsg"></div></div>
+      <div class="vcs-status" id="vcs-status">بفتح الكاميرا…</div>
+      <button type="button" class="vcs-mic" id="vcs-mic"><span class="ic">🎧</span><span class="tx">استماع بالصوت</span></button>`;
+    const vf = body.querySelector('#vcs-vf'), st = body.querySelector('#vcs-status'), msg = body.querySelector('#vcs-vfmsg');
+    const say = (state)=>{
+      vf.classList.remove('near','lock','bad'); st.className = 'vcs-status';
+      if(state === 'search'){ st.textContent = 'قرّب الشريحة من الكاميرا…'; }
+      else if(state === 'near'){ vf.classList.add('near'); st.classList.add('near'); st.textContent = 'شفتها… ثبّتها وقرّب شوية'; }
+      else if(state === 'lock'){ vf.classList.add('lock'); st.classList.add('ok'); st.textContent = '✓ اتعرّفت على الشريحة'; }
+      else { vf.classList.add('bad'); st.textContent = ''; msg.textContent = state === 'denied' ? 'محتاج تسمح للتطبيق بالكاميرا من إعدادات المتصفح، وبعدها افتح الشاشة دي تاني.' : 'الكاميرا مش متاحة. اتأكد إن الموقع مفتوح بـ https وإن مفيش تطبيق تاني شاغلها.'; }
+    };
+    v.scanner = visaChipScannerStart(vf, say, (token)=>{ visaChipClose(); visaChipReceive(token); });
+    const mic = body.querySelector('#vcs-mic'), mtx = mic.querySelector('.tx');
+    const micSay = (st)=>{
+      mic.classList.toggle('on', st === 'on' || st === 'hear'); mic.classList.toggle('hear', st === 'hear');
+      mtx.textContent = st === 'on' ? 'بسمع النغمة…' : st === 'hear' ? 'سامع النغمة — ثبّت الموبايلين' : st === 'denied' ? 'محتاج إذن الميكروفون' : st === 'nomic' ? 'الميكروفون مش متاح' : 'استماع بالصوت';
+      if(st === 'denied' || st === 'nomic'){ try{ localStorage.removeItem('glv-chip-mic'); }catch(e){} }
+    };
+    const micStart = ()=>{ v.listener = visaChipListenStart(micSay, (token)=>{ visaChipClose(); visaChipReceive(token); }); };
+    mic.addEventListener('click', ()=>{
+      if(v.listener){ v.listener.stop(); v.listener = null; micSay('off'); try{ localStorage.removeItem('glv-chip-mic'); }catch(e){} }
+      else { micStart(); try{ localStorage.setItem('glv-chip-mic', '1'); }catch(e){} }
+    });
+    try{ if(localStorage.getItem('glv-chip-mic') === '1') micStart(); }catch(e){}
+  } else {
+    const pid = state.pid, bal = WALLET[pid] || 0;
+    const chips = [25,50,100,bal].filter((x,i,a)=>x>0 && a.indexOf(x)===i).map(x=>`<button type="button" class="vp-chip" data-v="${x}">${x===bal?'الكل':x}</button>`).join('');
+    body.innerHTML = `<div class="vcs-send"><div class="vcs-title">حوّل بالشريحة</div><div class="vcs-sub">اكتب المبلغ، وبعدها قرّب شريحتك من الكاميرا الأمامية لصاحبك.</div>
+      <div class="vcs-bal">رصيد فيزتك: <b>${bal}</b> نقطة</div>
+      <div class="vp-amt-wrap"><input id="vcs-amt" class="field vp-amt-input" type="number" inputmode="numeric" min="1" placeholder="0" /><span class="vp-amt-suffix">نقطة</span></div>
+      <div class="vp-chips">${chips}</div>
+      <div class="vpos-actions"><button type="button" class="primary" id="vcs-make">إنشاء الشريحة</button></div></div>`;
+    body.querySelectorAll('.vp-chip').forEach(b=>b.addEventListener('click', ()=>{ const i = body.querySelector('#vcs-amt'); i.value = b.dataset.v; }));
+    body.querySelector('#vcs-make').addEventListener('click', visaChipSendGo);
+  }
+}
+async function visaChipCreate(amt, forcedToken){
+  const pid = state.pid; let token;
+  if(forcedToken != null) token = forcedToken >>> 0;
+  else { try{ token = crypto.getRandomValues(new Uint32Array(1))[0]; }catch(e){ token = Math.floor(Math.random()*4294967296) >>> 0; } }
+  const rec = { from: pid, amt, exp: Date.now() + CHIPC.TTL, status: 'open', name: (VISA_CARDS[pid]||{}).holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || '' };
+  const key = chipKey(token);
+  const ok = await window.storage.set(key, rec, true);
+  return ok ? { token, key, rec } : null;
+}
+async function visaChipSendGo(){
+  const v = _vcs; if(!v) return;
+  const pid = state.pid, bal = WALLET[pid] || 0, inp = v.ov.querySelector('#vcs-amt');
+  const amt = Math.floor(Number(inp && inp.value) || 0);
+  if(amt <= 0){ showToast('اكتب عدد النقاط الأول', true); if(inp) inp.focus(); return; }
+  if(amt > bal){ showToast('رصيد الفيزا غير كافٍ', true); return; }
+  const ok = await visaPayConfirm({ title:'تأكيد التحويل بالشريحة', subtitle:'الخصم بيتم لما صاحبك يمسح شريحتك', amount: amt,
+    rows:[['رصيدك الحالي', bal+' نقطة'], ['رصيدك بعد التحويل', (bal-amt)+' نقطة']], label:'اسحب للتأكيد' });
+  if(!ok || !_vcs) return;
+  showPinEntryModal({
+    title:'تأكيد التحويل', text:'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك',
+    onSubmit: async (pin)=>{
+      if(!(await verifyVisaPin(pid, pin))) return false;
+      const made = await visaChipCreate(amt);
+      if(!made){ showToast('تعذّر إنشاء الشريحة، جرّب تاني', true); return true; }
+      if(_vcs) visaChipShowCode(made);
+      return true;
+    }
+  });
+  const pm = document.getElementById('pinmodal-overlay'); if(pm) pm.style.zIndex = '100050';
+}
+function visaChipShowCode(made){
+  const v = _vcs; if(!v) return;
+  const { token, key, rec } = made, body = v.ov.querySelector('.vcs-body');
+  v.ov.querySelectorAll('.vcs-tabs button').forEach(b=>b.classList.remove('on'));
+  const cssW = Math.min(260, Math.max(200, window.innerWidth - 110));
+  body.innerHTML = `<div class="vcs-title">قرّب الشريحة</div><div class="vcs-sub">قرّبها من الكاميرا الأمامية لصاحبك، أو قرّب الموبايلين من بعض والنغمة هتوصله. التحويل بيتم أوتوماتيك.</div>
+    <div class="vcs-codebox"><span class="vcs-glow"></span></div>
+    <div class="vcs-amt-tag" dir="ltr">${rec.amt}<small>نقطة</small></div>
+    <div class="vcs-timer"><i id="vcs-tfill"></i></div>
+    <div class="vcs-hint" id="vcs-thint"></div>
+    <button type="button" class="vcs-mic on" id="vcs-snd"><span class="ic">🔊</span><span class="tx">النغمة شغالة</span></button>
+    <div class="vpos-actions"><button type="button" id="vcs-cancel">إلغاء التحويل</button></div>`;
+  body.querySelector('.vcs-codebox').appendChild(chipCodeCanvas(token, cssW));
+  v.pending = { key };
+  const snd = body.querySelector('#vcs-snd'), sndTx = snd.querySelector('.tx');
+  const sndSay = (on, label)=>{ snd.classList.toggle('on', on); sndTx.textContent = label; };
+  const sndStart = ()=>{
+    try{ v.audio = visaChipAudioPlay(token); }catch(e){ v.audio = null; }
+    setTimeout(()=>{ if(_vcs !== v) return; if(v.audio && v.audio.running()) sndSay(true, 'النغمة شغالة — ارفع الصوت'); else { if(v.audio){ v.audio.stop(); v.audio = null; } sndSay(false, 'اضغط لتشغيل النغمة'); } }, 350);
+  };
+  snd.addEventListener('click', ()=>{ if(v.audio){ v.audio.stop(); v.audio = null; sndSay(false, 'النغمة متوقفة'); } else sndStart(); });
+  sndStart();
+  try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>{ if(_vcs === v) v.wake = w; else w.release(); }).catch(()=>{}); }catch(e){}
+  const fill = body.querySelector('#vcs-tfill'), hint = body.querySelector('#vcs-thint');
+  v.tick = setInterval(()=>{
+    const left = Math.max(0, rec.exp - Date.now());
+    fill.style.width = (left / CHIPC.TTL * 100) + '%'; hint.textContent = 'باقي ' + Math.ceil(left/1000) + ' ثانية · ارفع سطوع الشاشة لآخره';
+    if(left <= 0){
+      visaChipStopWork(); visaChipClose();
+      visaMsg('info','انتهت مدة الشريحة','لم يتم خصم أي نقاط. اعمل شريحة جديدة لو لسه عايز تحوّل.');
+    }
+  }, 250);
+  body.querySelector('#vcs-cancel').addEventListener('click', ()=>{ visaChipStopWork(); visaChipClose(); });
+  let busy = false;
+  v.poll = setInterval(async ()=>{
+    if(busy || !_vcs || _vcs !== v) return; busy = true;
+    try{
+      const cur = await window.storage.get(key, true); let r = cur && cur.value; if(typeof r === 'string'){ try{ r = JSON.parse(r); }catch(e){ r = null; } }
+      if(!_vcs || _vcs !== v) return;
+      if(r && r.status === 'claimed'){
+        v.pending = null; clearInterval(v.poll); clearInterval(v.tick); visaChipClose();
+        visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt });
+        visaChipWatchDone(key, rec, pid0());
+      } else if(r && r.status === 'done'){
+        v.pending = null; clearInterval(v.poll); clearInterval(v.tick); visaChipClose(); visaChipSenderDone(key, rec, r);
+      } else if(r && r.status === 'failed'){
+        v.pending = null; clearInterval(v.poll); clearInterval(v.tick); visaChipClose(); visaChipSenderFailed(key, r);
+      }
+    }catch(e){} finally { busy = false; }
+  }, 1200);
+}
+function pid0(){ return state.pid; }
+/* بعد ما المستلم يمسح: المرسل يستنى النتيجة النهائية */
+function visaChipWatchDone(key, rec, pid){
+  let tries = 0;
+  const iv = setInterval(async ()=>{
+    tries++;
+    try{
+      const cur = await window.storage.get(key, true); let r = cur && cur.value; if(typeof r === 'string'){ try{ r = JSON.parse(r); }catch(e){ r = null; } }
+      if(r && r.status === 'done'){ clearInterval(iv); visaChipSenderDone(key, rec, r); }
+      else if(r && r.status === 'failed'){ clearInterval(iv); visaChipSenderFailed(key, r); }
+      else if(tries > 40){ clearInterval(iv); visaPosAbort(()=>visaMsg('error','التحويل اتأخر','مقدرناش نتأكد من نتيجة التحويل. راجع كشف الحساب قبل ما تعيد المحاولة.')); }
+    }catch(e){}
+  }, 1000);
+}
+async function visaChipSenderDone(key, rec, r){
+  const pid = state.pid;
+  try{ WALLET = await loadWallet(); }catch(e){}
+  render();
+  if(!window.__vpos) visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt });
+  const toName = escapeHtml(r.toName || '—');
+  visaMsg('success','تم التحويل بنجاح',`تم تحويل ${rec.amt} نقطة إلى ${toName}.`,{ pos:true, rows:[['المستلم', toName], ['المبلغ', rec.amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
+  window.storage.delete(key, true).catch(()=>{});
+}
+function visaChipSenderFailed(key, r){
+  const short = r && r.reason === 'short';
+  visaPosAbort(()=>visaMsg(short ? 'warn' : 'error', short ? 'رصيد الفيزا غير كافٍ' : 'تعذّر إتمام التحويل', short ? 'رصيدك اتغيّر ومبقاش يكفي، لم يتم خصم أي نقاط.' : 'حصلت مشكلة أثناء التحويل، لم يتم خصم أي نقاط.'));
+  window.storage.delete(key, true).catch(()=>{});
+}
+/* المستلم: بعد قراءة الشريحة بيتحقق، يحجز الشريحة (ذرّيًا)، وبعدين ينفّذ التحويل */
+async function visaChipReceive(token){
+  const me = state.pid, key = chipKey(token);
+  const rd = async ()=>{ const cur = await window.storage.get(key, true); let r = cur && cur.value; if(typeof r === 'string'){ try{ r = JSON.parse(r); }catch(e){ r = null; } } return r; };
+  let rec = null; try{ rec = await rd(); }catch(e){}
+  if(!rec){ visaMsg('warn','الشريحة مش صالحة','الشريحة دي منتهية أو اتلغت. اطلب من صاحبك يعمل شريحة جديدة.'); return; }
+  if(rec.status !== 'open'){ visaMsg('warn','الشريحة اتستخدمت قبل كده','كل شريحة بتشتغل مرة واحدة بس. اطلب من صاحبك شريحة جديدة.'); return; }
+  if(Date.now() > rec.exp + CHIPC.GRACE){ visaMsg('warn','انتهت مدة الشريحة','اطلب من صاحبك يعمل شريحة جديدة.'); return; }
+  if(rec.from === me){ visaMsg('warn','دي شريحتك أنت','قرّب شريحة صاحبك، مش شريحتك.'); return; }
+  if(!visaCreated(me) || visaExpired(me)){ if(visaExpired(me)) showExpiredDialog(); else visaMsg('warn','اعمل فيزتك الأول','لازم تفعّل فيزتك عشان تستلم التحويل.'); return; }
+  const amt = Math.floor(Number(rec.amt) || 0);
+  if(amt <= 0){ visaMsg('error','بيانات الشريحة غير صحيحة','اطلب من صاحبك يعمل شريحة جديدة.'); return; }
+  visaPosBegin({ amount: amt+' نقطة', kind:'receive', amt });
+  try{
+    const fresh = await loadVisaCards(); if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh;
+    const fromCard = VISA_CARDS[rec.from];
+    if(!fromCard || !visaCreated(rec.from) || visaExpired(rec.from)){ visaPosAbort(()=>visaMsg('warn','بطاقة صاحبك غير صالحة','فيزا المرسل منتهية أو غير مفعّلة.')); return; }
+    const meName = (VISA_CARDS[me]||{}).holder || (PARTICIPANTS.find(x=>x.id===me)||{}).name || '';
+    const claimed = await window.storage.update(key, c=>{
+      if(!c || c.status !== 'open' || Date.now() > c.exp + CHIPC.GRACE) return;
+      return Object.assign({}, c, { status:'claimed', to: me, toName: meName });
+    }, true);
+    if(!claimed){ visaPosAbort(()=>visaMsg('warn','الشريحة اتستخدمت أو انتهت','اطلب من صاحبك شريحة جديدة.')); return; }
+    const r = await transferWallet(rec.from, me, amt);
+    if(r !== 'ok'){
+      await window.storage.update(key, c=>c ? Object.assign({}, c, { status:'failed', reason: r }) : undefined, true);
+      visaPosAbort(()=>visaMsg(r==='short' ? 'warn' : 'error', r==='short' ? 'رصيد صاحبك مش كفاية' : 'تعذّر إتمام التحويل', r==='short' ? 'رصيد المرسل أقل من المبلغ، لم يتم تحويل أي نقاط.' : 'حصلت مشكلة في الاتصال، لم يتم تحويل أي نقاط.'));
+      return;
+    }
+    WALLET = await loadWallet();
+    const senderName = fromCard.holder || rec.name || (PARTICIPANTS.find(x=>x.id===rec.from)||{}).name || '';
+    await logVisaTx([
+      { pid:rec.from, type:'transfer_out', amount:amt, balAfter:(WALLET[rec.from]||0), note:meName },
+      { pid:me, type:'transfer_in', amount:amt, balAfter:(WALLET[me]||0), note:senderName }
+    ]);
+    pushNotification(rec.from, `📤 تم تحويل ${amt} نقطة إلى ${meName}`, '📤');
+    pushNotification(me, `📥 وصلك ${amt} نقطة في فيزتك من ${senderName}`, '📥');
+    await window.storage.update(key, c=>c ? Object.assign({}, c, { status:'done' }) : undefined, true);
+    render();
+    const sn = escapeHtml(senderName || '—');
+    visaMsg('success','تم استلام التحويل',`وصلك ${amt} نقطة من ${sn}.`,{ pos:true, rows:[['من', sn], ['المبلغ', amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
+  }catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة، حاول مرة أخرى.')); }
+}
+
+/* =====================================================================
+   نغمة الشريحة: نفس رقم العملية بيتبعت كنغمة قصيرة (FSK بـ 16 نغمة)
+   المرسل بيبث النغمة، وميكروفون المستلم بيلتقطها ويفكّها (CRC16 بيأكد الصحة)
+   ===================================================================== */
+const CHIPA = { T:0.07, S0:1500, S1:1750, BASE:2000, STEP:150, NSYM:12, GAP:0.5 };
+function chipAudioSynth(token, fs){
+  const bits = chipEncode(token), nib = [];
+  for(let j=0;j<CHIPA.NSYM;j++) nib.push((bits[4*j]<<3) | (bits[4*j+1]<<2) | (bits[4*j+2]<<1) | bits[4*j+3]);
+  const tones = [CHIPA.S0, CHIPA.S1, CHIPA.S0, CHIPA.S1].concat(nib.map(n=>CHIPA.BASE + n*CHIPA.STEP));
+  const sl = Math.round(CHIPA.T*fs), total = sl*tones.length + Math.round(CHIPA.GAP*fs), out = new Float32Array(total), ramp = Math.round(0.006*fs);
+  for(let i=0;i<tones.length;i++){
+    const n0 = i*sl, w = 2*Math.PI*tones[i]/fs;
+    for(let n=0;n<sl;n++){ const env = Math.min(1, n/ramp, (sl-n)/ramp); out[n0+n] = 0.85*env*Math.sin(w*n); }
+  }
+  return out;
+}
+function chipGoertzel(x, s, n, f, fs){
+  const c = 2*Math.cos(2*Math.PI*f/fs); let s1 = 0, s2 = 0;
+  for(let i=s;i<s+n;i++){ const y = x[i] + c*s1 - s2; s2 = s1; s1 = y; }
+  return s1*s1 + s2*s2 - c*s1*s2;
+}
+function chipAudioDecode(x, fs){
+  const sl = Math.round(CHIPA.T*fs), frameLen = sl*(4+CHIPA.NSYM), w0 = Math.round(sl*0.25), wn = Math.round(sl*0.70);
+  if(x.length < frameLen + sl) return null;
+  const pre = (t)=>{
+    let sc = 0;
+    for(let k=0;k<4;k++){
+      const st = t + k*sl + w0, fa = (k%2) ? CHIPA.S1 : CHIPA.S0, fb = (k%2) ? CHIPA.S0 : CHIPA.S1;
+      const a = chipGoertzel(x, st, wn, fa, fs), b = chipGoertzel(x, st, wn, fb, fs); sc += (a-b) / (a+b+1e-9);
+    }
+    return sc;
+  };
+  const hop = Math.max(1, Math.round(0.008*fs)), last = x.length - frameLen, cands = [];
+  for(let t=0;t<=last;t+=hop){ const sc = pre(t); if(sc > 2.4) cands.push([sc, t]); }
+  if(!cands.length) return null;
+  cands.sort((a,b)=>b[0]-a[0]);
+  const picked = []; for(const c of cands){ if(picked.every(p=>Math.abs(p[1]-c[1]) > 3*hop)) picked.push(c); if(picked.length >= 6) break; }
+  const dec = (t)=>{
+    if(t < 0 || t + frameLen > x.length) return null;
+    const raw = [];
+    for(let j=0;j<CHIPA.NSYM;j++){
+      const st = t + (4+j)*sl + w0; let bi = 0, bp = -1, sum = 0;
+      for(let q=0;q<16;q++){ const p = chipGoertzel(x, st, wn, CHIPA.BASE + q*CHIPA.STEP, fs); sum += p; if(p > bp){ bp = p; bi = q; } }
+      if(bp < sum*0.3) return null;
+      raw.push((bi>>3)&1, (bi>>2)&1, (bi>>1)&1, bi&1);
+    }
+    return chipDecodeBits(raw);
+  };
+  const fine = Math.max(1, Math.round(hop/4));
+  for(const [, t] of picked) for(let d=0; d<=hop*1.5; d+=fine) for(const sg of (d ? [-1, 1] : [1])){
+    const tok = dec(t + sg*d); if(tok !== null) return tok;
+  }
+  return null;
+}
+function visaChipAudioPlay(token){
+  const ctx = getAudioCtx(); if(!ctx) return null;
+  if(ctx.state === 'suspended') ctx.resume();
+  const pcm = chipAudioSynth(token, ctx.sampleRate), buf = ctx.createBuffer(1, pcm.length, ctx.sampleRate); buf.copyToChannel(pcm, 0);
+  const src = ctx.createBufferSource(), g = ctx.createGain(); src.buffer = buf; src.loop = true; g.gain.value = 0.9;
+  src.connect(g); g.connect(ctx.destination); src.start();
+  return { stop(){ try{ src.stop(); }catch(e){} try{ src.disconnect(); g.disconnect(); }catch(e){} }, running(){ return ctx.state === 'running'; } };
+}
+function visaChipListenStart(statusFn, onToken){
+  const ctl = { stopped:false, stream:null, ctx:null, proc:null, src:null, timer:0 };
+  ctl.stop = ()=>{
+    if(ctl.stopped) return; ctl.stopped = true; clearInterval(ctl.timer);
+    try{ if(ctl.proc){ ctl.proc.onaudioprocess = null; ctl.proc.disconnect(); } }catch(e){}
+    try{ if(ctl.src) ctl.src.disconnect(); }catch(e){}
+    try{ if(ctl.stream) ctl.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+    try{ if(ctl.ctx && ctl.ctx.state !== 'closed') ctl.ctx.close().catch(()=>{}); }catch(e){}
+  };
+  (async ()=>{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ statusFn('nomic'); return; }
+    try{ ctl.stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1 }, video:false }); }
+    catch(e){ statusFn(e && e.name === 'NotAllowedError' ? 'denied' : 'nomic'); return; }
+    if(ctl.stopped){ try{ ctl.stream.getTracks().forEach(t=>t.stop()); }catch(e){} return; }
+    const Ctx = window.AudioContext || window.webkitAudioContext; ctl.ctx = new Ctx(); try{ await ctl.ctx.resume(); }catch(e){}
+    const fs = ctl.ctx.sampleRate, RING = Math.ceil(fs*3.2), ring = new Float32Array(RING); let w = 0, total = 0;
+    ctl.src = ctl.ctx.createMediaStreamSource(ctl.stream);
+    ctl.proc = ctl.ctx.createScriptProcessor(4096, 1, 1);
+    ctl.proc.onaudioprocess = (e)=>{ const inp = e.inputBuffer.getChannelData(0); for(let i=0;i<inp.length;i++){ ring[w] = inp[i]; w = (w+1) % RING; } total += inp.length; };
+    const mute = ctl.ctx.createGain(); mute.gain.value = 0; ctl.src.connect(ctl.proc); ctl.proc.connect(mute); mute.connect(ctl.ctx.destination);
+    statusFn('on');
+    const snap = (sec)=>{ const n = Math.min(total, Math.round(sec*fs), RING), out = new Float32Array(n); for(let i=0;i<n;i++) out[i] = ring[(w - n + i + RING) % RING]; return out; };
+    ctl.timer = setInterval(()=>{
+      if(ctl.stopped || total < fs*1.3) return;
+      const tail = snap(0.3); let e2 = 0; for(let i=0;i<tail.length;i++) e2 += tail[i]*tail[i];
+      statusFn(Math.sqrt(e2 / Math.max(1, tail.length)) > 0.02 ? 'hear' : 'on');
+      let tok = null; try{ tok = chipAudioDecode(snap(2.8), fs); }catch(e){}
+      if(tok !== null){ ctl.stop(); onToken(tok); }
+    }, 350);
+  })();
+  return ctl;
+}
+
 async function doVisaTransfer(){
   const pid = state.pid;
   if(visaExpired(pid)){ showExpiredDialog(); return; }
@@ -6371,27 +7440,27 @@ async function continueVisaTransfer(pid, digits, amt){
   const [w, fresh] = await Promise.all([loadWallet(), loadVisaCards()]);
   WALLET = w; if(fresh && Object.keys(fresh).length) VISA_CARDS = fresh;
   const to = visaLookupByNumber(digits);
-  if(!to || !visaCreated(to)){ visaMsg('error','رقم البطاقة غير صحيح','لم نعثر على فيزا صالحة بهذا الرقم، تأكد من الرقم وحاول مرة أخرى.',{onClose:()=>{ if(toEl) toEl.focus(); }}); return; }
+  if(!to || !visaCreated(to)){ visaMsg('error','رقم البطاقة غير صحيح','لم نعثر على فيزا صالحة بهذا الرقم، تأكد من الرقم وحاول مرة أخرى.',{onClose:()=>{ const t = document.getElementById('visa-to'); if(t) t.focus(); }}); return; }
   if(to===pid){ visaMsg('warn','لا يمكن التحويل لنفس البطاقة','هذا رقم بطاقتك أنت، اكتب رقم بطاقة المستلم.'); return; }
   if(visaExpired(to)){ visaMsg('warn','بطاقة المستلم منتهية','لا يمكن التحويل إلى هذه البطاقة لأن صلاحيتها انتهت، اطلب من صاحبها تجديدها أولًا.'); return; }
   const bal = WALLET[pid]||0;
   if(amt>bal){ visaMsg('warn','رصيد الفيزا غير كافٍ','رصيدك الحالي أقل من المبلغ المراد تحويله.',{rows:[['رصيدك الحالي', bal+' نقطة'],['المبلغ المطلوب', amt+' نقطة']]}); return; }
   const rp = PARTICIPANTS.find(x=>x.id===to) || {};
   const rName = escapeHtml((VISA_CARDS[to]||{}).holder || rp.name || '—');
-  visaMsg('info','تأكيد التحويل','راجع بيانات المستلم جيدًا قبل التأكيد، فلا يمكن استرجاع التحويل بعد إتمامه.',{
-    rows:[['المستلم', rName], ['رقم البطاقة', '•••• '+digits.slice(-4)], ['المبلغ', amt+' نقطة']],
-    primary:{label:'تأكيد التحويل', onClick:()=>executeVisaTransfer(pid, to, amt, rName)},
-    secondary:{label:'إلغاء'}
-  });
+  visaPayConfirm({ title:'تأكيد التحويل', subtitle:'راجع بيانات المستلم جيدًا، فلا يمكن استرجاع التحويل بعد إتمامه', amount: amt,
+    rows:[['المستلم', rName], ['رقم البطاقة', '•••• '+digits.slice(-4)], ['رصيدك بعد التحويل', (bal-amt)+' نقطة']], label:'اسحب للتحويل' })
+    .then(ok=>{ if(ok) executeVisaTransfer(pid, to, amt, rName); });
 }
 async function executeVisaTransfer(from, to, amt, rName){
   if(window.__visaTransferring) return;
   window.__visaTransferring = true;
   try{
+    visaPosBegin({ amount: amt+' نقطة', kind:'transfer', amt });
     const r = await transferWallet(from, to, amt);
     if(r==='short'){ visaMsg('warn','رصيد الفيزا غير كافٍ','تغيّر رصيدك أثناء العملية، لم يتم تحويل أي نقاط.'); return; }
     if(r!=='ok'){ visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة في الاتصال بالسيرفر ولم يتم خصم أي نقاط. حاول مرة أخرى.'); return; }
     WALLET = await loadWallet();
+    try{ visaRecentAdd(from, to); }catch(e){}
     const me = PARTICIPANTS.find(x=>x.id===from) || {};
     const senderName = (VISA_CARDS[from]||{}).holder || me.name || '';
     await logVisaTx([
@@ -6401,8 +7470,8 @@ async function executeVisaTransfer(from, to, amt, rName){
     pushNotification(from, `📤 تم تحويل ${amt} نقطة إلى ${(VISA_CARDS[to]||{}).holder || (PARTICIPANTS.find(x=>x.id===to)||{}).name || ''}`, '📤');
     pushNotification(to, `📥 وصلك ${amt} نقطة في فيزتك من ${senderName}`, '📥');
     vibrate([15,10,25]); render();
-    visaMsg('success','تم التحويل بنجاح',`تم تحويل ${amt} نقطة إلى ${rName}.`,{ rows:[['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[from]||0)+' نقطة']] });
-  } finally { window.__visaTransferring = false; }
+    visaMsg('success','تم التحويل بنجاح',`تم تحويل ${amt} نقطة إلى ${rName}.`,{ pos:true, rows:[['المستلم', rName], ['المبلغ', amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[from]||0)+' نقطة']] });
+  } catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام التحويل','حدثت مشكلة، حاول مرة أخرى.')); } finally { window.__visaTransferring = false; }
 }
 async function copyMyVisaNumber(btn){
   const num = visaNumber(state.pid);
@@ -6417,12 +7486,17 @@ async function doVisaRenew(src){
   if(window.__visaRenewing) return;
   const pid = state.pid, fee = visaRenewFee();
   if(!visaExpired(pid)){ render(); return; }
+  const okConfirm = await visaPayConfirm({ title:'تأكيد تجديد الفيزا', subtitle:'رسوم التجديد بتتخصم فورًا', amount: fee,
+    rows:[['الخصم من', src==='wallet' ? 'رصيد الفيزا' : 'نقاط الفقرات'], ['صالحة حتى', fmtVisaDate(Date.now() + visaValidDays()*VISA_DAY_MS)]], label:'اسحب للتجديد' });
+  if(!okConfirm) return;
   showPinEntryModal({
     title: 'تأكيد التجديد',
     text: 'اكتب الرقم السري (CVV) الموجود على ظهر بطاقتك لإتمام العملية',
     onSubmit: async (pin)=>{
       if(!(await verifyVisaPin(pid, pin))) return false;
-      await executeVisaRenew(pid, src, fee);
+      visaPosBegin({ amount: fee+' نقطة', kind:'renew', amt: fee });
+      try{ await executeVisaRenew(pid, src, fee); }
+      catch(e){ visaPosAbort(()=>visaMsg('error','تعذّر إتمام التجديد','حدثت مشكلة، حاول مرة أخرى.')); }
       return true;
     }
   });
@@ -6456,7 +7530,7 @@ async function executeVisaRenew(pid, src, fee){
     pushNotification(pid, `✅ تم تجديد فيزتك حتى ${fmtVisaDate(expires)}`, '✅');
     vibrate([15,10,25]); render();
     visaMsg('success','تم تجديد الفيزا','فيزتك تعمل الآن ويمكنك استخدامها في الإيداع والسحب وGames.',
-      { rows:[['المدفوع', fee+' نقطة'], ['صالحة حتى', fmtVisaDate(expires)]] });
+      { pos:true, rows:[['المدفوع', fee+' نقطة'], ['صالحة حتى', fmtVisaDate(expires)]] });
   } finally { window.__visaRenewing = false; }
 }
 /* نقاط صندوق الهدايا اليومي برضو منفصلة عن مجموع النقاط لنفس السبب */
@@ -9959,15 +11033,21 @@ async function doBuyCardTheme(themeKey, price){
   const owned = OWNED_CARD_THEMES[state.pid] || [];
   if(owned.indexOf(themeKey)>-1){ render(); return; }
   const isFirstCard = owned.length===0;
-  WALLET[state.pid] = bal - price;
+  const okPay = await visaPayConfirm({ title:'تأكيد الشراء', subtitle:'تصميم كارد جديد لفيزتك', amount: price,
+    rows:[['التصميم', escapeHtml(cardThemeName(themeKey))], ['رصيدك الحالي', bal+' نقطة'], ['الرصيد بعد الشراء', (bal-price)+' نقطة']], label:'اسحب للشراء' });
+  if(!okPay) return;
+  WALLET = await loadWallet();
+  if((WALLET[state.pid]||0) < price){ showToast('رصيدك اتغيّر ومبقاش يكفي، جرّب تاني', true); return; }
+  visaPosBegin({ amount: price+' نقطة', kind:'shop', amt: price });
+  WALLET[state.pid] = (WALLET[state.pid]||0) - price;
   owned.push(themeKey);
   OWNED_CARD_THEMES[state.pid] = owned;
   await saveWallet(WALLET);
   await saveOwnedCardThemes(OWNED_CARD_THEMES);
   try{ await updateVisaCard(state.pid, { editOpen:true }); }catch(e){}
   vtxLogSafe([{ pid:state.pid, type:'shop_card', amount:price, balAfter:(WALLET[state.pid]||0), note:cardThemeName(themeKey) }]);
-  showToast('✅ اتشترى تصميم الكارد — اختاره من صفحة فيزتي');
   render();
+  visaMsg('success','تم شراء تصميم الكارد','اختاره من صفحة «فيزتي» وهيظهر على بطاقتك فورًا.',{ pos:true, rows:[['التصميم', escapeHtml(cardThemeName(themeKey))],['المدفوع', price+' نقطة'],['رصيد الفيزا الآن', (WALLET[state.pid]||0)+' نقطة']] });
 }
 /* ---- تاب المخصص: طلب تصميم كارد خاص من الأدمن ---- */
 function renderShopCustomTab(){
@@ -10031,7 +11111,13 @@ async function doSubmitCustomCard(price){
   CUSTOM_CARD_REQUESTS = await loadCustomCardRequests();
   const existing = myCustomCardRequest(state.pid);
   if(existing && existing.status!=='received'){ render(); return; }
-  WALLET[state.pid] = bal - price;
+  const okPay = await visaPayConfirm({ title:'تأكيد طلب الكارد المخصص', subtitle:'تصميم خاص بيتجهّز بواسطة المنظمين', amount: price,
+    rows:[['رصيدك الحالي', bal+' نقطة'], ['الرصيد بعد الطلب', (bal-price)+' نقطة']], label:'اسحب للطلب' });
+  if(!okPay) return;
+  WALLET = await loadWallet();
+  if((WALLET[state.pid]||0) < price){ showToast('رصيدك اتغيّر ومبقاش يكفي، جرّب تاني', true); return; }
+  visaPosBegin({ amount: price+' نقطة', kind:'shop', amt: price });
+  WALLET[state.pid] = (WALLET[state.pid]||0) - price;
   await saveWallet(WALLET);
   try{ await updateVisaCard(state.pid, { editOpen:true }); }catch(e){}
   vtxLogSafe([{ pid:state.pid, type:'shop_custom', amount:price, balAfter:(WALLET[state.pid]||0), note:'كارد بتصميم خاص' }]);
@@ -10039,9 +11125,9 @@ async function doSubmitCustomCard(price){
   CUSTOM_CARD_REQUESTS.push({ id:'cc'+Date.now()+Math.random().toString(36).slice(2,6), pid:state.pid, name, photo, status:'pending', resultImage:null, ts:Date.now(), resultTs:null });
   const saved = await saveCustomCardRequestsWithRetry(CUSTOM_CARD_REQUESTS);
   state.customCardDraftPhoto = null;
-  if(saved) showToast('✅ اترسل طلبك للأدمن، استنى الكارد المميز بتاعك');
-  else showToast('⚠️ حصلت مشكلة في إرسال الطلب، جرب تاني', true);
+  if(!saved){ showToast('⚠️ حصلت مشكلة في إرسال الطلب، جرب تاني', true); visaPosAbort(); }
   render();
+  if(saved) visaMsg('success','تم إرسال طلب الكارد المخصص','اتسجل طلبك وهيوصلك الكارد المميز بعد ما الأدمن يجهّزه.',{ pos:true, rows:[['المدفوع', price+' نقطة'],['رصيد الفيزا الآن', (WALLET[state.pid]||0)+' نقطة']] });
 }
 async function doClaimCustomCard(){
   CUSTOM_CARD_REQUESTS = await loadCustomCardRequests();
@@ -23277,6 +24363,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-renew'){ doVisaRenew(el.dataset.src); }
   else if(action==='visa-transfer'){ doVisaTransfer(); }
   else if(action==='visa-copy-number'){ copyMyVisaNumber(el); }
+  else if(action==='visa-chip'){ visaChipOpen('recv'); }
+  else if(action==='visa-chip-send'){ visaChipOpen('send'); }
+  else if(action==='visa-recent'){ visaPickRecent(el); }
   else if(action==='visa-deposit'){ doVisaMove('deposit'); }
   else if(action==='visa-withdraw'){ doVisaMove('withdraw'); }
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
