@@ -622,9 +622,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
   .welcome-name-wrap{ position:relative; z-index:1; margin-top:22px; opacity:0; animation:fadeInUp .6s cubic-bezier(.22,1.1,.32,1) .9s forwards; }
   .welcome-name{font-size:23px; font-weight:800; font-family:'Cairo',sans-serif; color:var(--text); letter-spacing:.2px;}
-  .welcome-team-badge{ margin-top:10px; display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border-radius:999px;
-    background:rgba(255,255,255,.05); border:1px solid var(--border); font-family:'Cairo',sans-serif; font-weight:700; font-size:11.5px; color:var(--text-muted); }
-  .welcome-team-dot{ width:7px; height:7px; border-radius:50%; box-shadow:0 0 6px color-mix(in srgb, var(--dot-color, var(--gold)) 60%, transparent); }
 
   .welcome-checkin{ position:relative; z-index:1; margin-top:14px; display:inline-flex; align-items:center; gap:6px;
     font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:var(--good); opacity:0;
@@ -700,11 +697,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:linear-gradient(160deg, rgba(244,183,64,.1), rgba(244,183,64,.02));
     box-shadow:0 3px 10px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05); }
   .pill-code-hash{ color:var(--gold); margin-inline-end:1px; opacity:.8; }
-  .pill-team{border-color:transparent; color:#1a1633; font-weight:800; position:relative; overflow:hidden; padding:6px 16px;
-    font-family:'Cairo',sans-serif; letter-spacing:.3px; box-shadow:0 5px 16px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.3); }
-  .pill-team::before{ content:''; position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.5) 48%, transparent 62%);
-    background-size:220% 100%; animation:pillShine 3.4s ease-in-out infinite; }
   @keyframes pillShine{ 0%{ background-position:220% 0; } 55%,100%{ background-position:-70% 0; } }
 
   .medal-wrap{display:flex; justify-content:center; margin:38px 0 6px; position:relative;}
@@ -786,7 +778,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   
   
 
-  /* ---------- id card glass (صورة + الاسم/الكود/الفريق) ---------- */
+  /* ---------- id card glass (صورة + الاسم/الكود) ---------- */
   .id-card-glass{ position:relative; display:flex; align-items:center; gap:16px; margin:4px 0 18px; padding:18px;
     border-radius:24px; overflow:hidden;
     background:linear-gradient(150deg, rgba(255,255,255,.10), rgba(255,255,255,.025) 60%);
@@ -1047,12 +1039,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   
   
 
-  /* ---------- team roster ---------- */
   .roster-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 
-  /* ============================= TEAM MESSAGES ============================= */
-  .team-msg.mine{ border-color:rgba(244,183,64,.4); background:linear-gradient(160deg, rgba(244,183,64,.08), var(--surface-2)); }
-  .team-msg-love.on{ color:#fff; background:linear-gradient(95deg,var(--coral),#ff9a7d); border-color:transparent; animation:loveBeat .5s ease; }
   @keyframes loveBeat{ 0%{ transform:scale(1);} 30%{ transform:scale(1.3);} 55%{ transform:scale(.92);} 100%{ transform:scale(1);} }
   .member-card{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px;
     padding:18px 10px; aspect-ratio:1; justify-content:center; overflow:hidden; border-radius:22px;
@@ -1298,7 +1286,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   #app.is-admin .admin-participant-tile .avatar{ grid-column:1; grid-row:1 / span 2; }
   #app.is-admin .admin-participant-tile .pt-name{ grid-column:2 / span 2; grid-row:1; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #app.is-admin .admin-participant-tile .pt-code{ grid-column:2; grid-row:2; font-size:10.5px; color:var(--text-muted); }
-  #app.is-admin .admin-participant-tile .pt-team-chip{ grid-column:3; grid-row:2; justify-self:start; }
   #app.is-admin .admin-participant-tile .pt-points{ grid-column:4; grid-row:1; justify-self:end; font-size:16px; line-height:1.1; }
   #app.is-admin .admin-participant-tile .pt-points-lab{ grid-column:4; grid-row:2; justify-self:end; font-size:9.5px; }
 
@@ -1336,21 +1323,21 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ---------- admin: shared entrance animation + tactile feedback ---------- */
   @keyframes aRise{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
   .admin-hub-tile, .admin-day-tile, .admin-session-tile, .admin-participant-tile,
-  .admin-team-tile, .admin-member-tile, .admin-session-card, .admin-cc-item, .admin-glass-box{
+  .admin-session-card, .admin-cc-item, .admin-glass-box{
     animation:aRise .38s cubic-bezier(.22,.9,.32,1) backwards; }
   .admin-hub-grid > :nth-child(1), .admin-day-grid > :nth-child(1), .admin-session-grid > :nth-child(1),
-  .admin-participant-grid > :nth-child(1), .admin-team-grid > :nth-child(1), .admin-member-grid > :nth-child(1){ animation-delay:0ms; }
+  .admin-participant-grid > :nth-child(1){ animation-delay:0ms; }
   .admin-hub-grid > :nth-child(2), .admin-day-grid > :nth-child(2), .admin-session-grid > :nth-child(2),
-  .admin-participant-grid > :nth-child(2), .admin-team-grid > :nth-child(2), .admin-member-grid > :nth-child(2){ animation-delay:40ms; }
+  .admin-participant-grid > :nth-child(2){ animation-delay:40ms; }
   .admin-hub-grid > :nth-child(3), .admin-day-grid > :nth-child(3), .admin-session-grid > :nth-child(3),
-  .admin-participant-grid > :nth-child(3), .admin-team-grid > :nth-child(3), .admin-member-grid > :nth-child(3){ animation-delay:80ms; }
+  .admin-participant-grid > :nth-child(3){ animation-delay:80ms; }
   .admin-hub-grid > :nth-child(4), .admin-day-grid > :nth-child(4), .admin-session-grid > :nth-child(4),
-  .admin-participant-grid > :nth-child(4), .admin-team-grid > :nth-child(4), .admin-member-grid > :nth-child(4){ animation-delay:120ms; }
+  .admin-participant-grid > :nth-child(4){ animation-delay:120ms; }
   .admin-hub-grid > :nth-child(n+5), .admin-day-grid > :nth-child(n+5), .admin-session-grid > :nth-child(n+5),
-  .admin-participant-grid > :nth-child(n+5), .admin-team-grid > :nth-child(n+5), .admin-member-grid > :nth-child(n+5){ animation-delay:150ms; }
+  .admin-participant-grid > :nth-child(n+5){ animation-delay:150ms; }
   @media (prefers-reduced-motion: reduce){
     .admin-hub-tile, .admin-day-tile, .admin-session-tile, .admin-participant-tile,
-    .admin-team-tile, .admin-member-tile, .admin-session-card, .admin-cc-item, .admin-glass-box{ animation:none; }
+    .admin-session-card, .admin-cc-item, .admin-glass-box{ animation:none; }
   }
   .admin-act-btn, .admin-edit-btn, .admin-tab, .admin-hub-tile, .admin-back-link{
     transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .2s ease, border-color .2s ease, color .2s ease; }
@@ -1360,10 +1347,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
   /* ---------- admin: pressed-depth feedback on tiles (premium tactile feel) ---------- */
   .admin-hub-tile, .admin-day-tile, .admin-session-tile, .admin-participant-tile,
-  .admin-team-tile, .admin-member-tile, .admin-session-card{
+  .admin-session-card{
     transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, border-color .2s ease; }
   .admin-hub-tile:active, .admin-day-tile:active, .admin-session-tile:active, .admin-participant-tile:active,
-  .admin-team-tile:active, .admin-member-tile:active{ box-shadow:var(--a-shadow-tile-active); }
   .admin-edit-form input:focus, .admin-edit-form textarea:focus, .admin-edit-form select:focus{
     border-color:var(--gold-2); box-shadow:var(--a-focus-ring); }
   .admin-act-btn:focus-visible, .admin-edit-btn:focus-visible, .admin-tab:focus-visible,
@@ -1454,7 +1440,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .admin-participant-tile.is-editing{ border-color:var(--gold-2); box-shadow:0 0 0 2px rgba(244,183,64,.2); }
   .pt-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; line-height:1.3; }
   .pt-code{ font-size:10px; color:var(--text-muted); direction:ltr; }
-  .pt-team-chip{ font-size:9.5px; font-weight:700; padding:3px 9px; border-radius:999px; color:#fff; margin-top:2px; }
   .pt-points{ font-family:'Cairo',sans-serif; font-weight:900; font-size:14px; color:var(--gold-2); margin-top:2px; }
   .pt-points-lab{ font-size:8.5px; color:var(--text-muted); margin-top:-4px; }
 
@@ -2238,8 +2223,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
   .empty-note{text-align:center; color:var(--text-muted); font-size:13px; padding:20px 6px;}
 
-  /* ---------- team ambient tint ---------- */
-  #team-tint-bg{position:fixed; inset:0; z-index:-1; pointer-events:none; transition:background 1s ease;}
 
   /* ---------- badges ---------- */
   .badge-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
@@ -2378,50 +2361,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     -webkit-mask-composite:xor; mask-composite:exclude; }
   .admin-glass-title{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
 
-  .admin-team-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--a-gap); margin-bottom:var(--a-pad); }
-  .admin-team-tile{ position:relative; aspect-ratio:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:8px; padding:16px 10px; border-radius:var(--a-r-xl); text-align:center;
-    background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.14);
-    box-shadow:0 10px 28px -10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.10), inset 0 0 0 1px rgba(255,255,255,.02);
-    overflow:hidden; }
-  .admin-team-tile::before{ content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
-    background:linear-gradient(135deg, rgba(244,183,64,.35), transparent 40%, transparent 60%, rgba(244,183,64,.15));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
-  .admin-team-tile:active{ transform:scale(.96); }
-  .admin-team-tile .avatar{ width:48px; height:48px; font-size:16px; box-shadow:0 4px 14px rgba(0,0,0,.35); }
-  .admin-team-tile .att-name{ font-weight:800; font-family:'Cairo',sans-serif; font-size:13px; }
-  .admin-team-tile .att-meta{ font-size:10.5px; color:var(--text-muted); line-height:1.5; }
-  .admin-team-tile .att-pts{ font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:var(--gold-2); }
-  .admin-team-tile .att-chev{ position:absolute; top:10px; left:10px; opacity:.45; font-size:12px; }
-  .admin-team-tile .att-rank{ position:absolute; top:8px; right:8px; z-index:1; font-family:'Cairo',sans-serif; font-weight:800; font-size:10.5px;
-    padding:3px 8px; border-radius:999px; letter-spacing:.3px; }
-  .admin-team-tile .att-rank.rank-1{ color:#3a2a05; background:linear-gradient(135deg,#FFE9B0,#F4B740); box-shadow:0 3px 10px rgba(244,183,64,.45); }
-  .admin-team-tile .att-rank.rank-2{ color:#2c2f36; background:linear-gradient(135deg,#EDEFF3,#B8C0CC); box-shadow:0 3px 10px rgba(184,192,204,.35); }
-  .admin-team-tile .att-rank.rank-3{ color:#3a1f10; background:linear-gradient(135deg,#E3A272,#C47A43); box-shadow:0 3px 10px rgba(196,122,67,.4); }
-  .admin-team-tile .att-rank.rank-n{ color:var(--text-muted); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); }
 
-  /* ---------- admin: team members glass squares ---------- */
-  .admin-member-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--a-gap); margin-bottom:6px; }
-  .admin-member-tile{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px;
-    padding:16px 10px 12px; border-radius:var(--a-r-xl); overflow:hidden;
-    background:linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.015));
-    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.14);
-    box-shadow:0 10px 26px -12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.10); }
-  .admin-member-tile::before{ content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none;
-    background:linear-gradient(135deg, rgba(244,183,64,.38), transparent 42%, transparent 58%, rgba(244,183,64,.16));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; }
-  .admin-member-tile.is-leader{ border-color:rgba(244,183,64,.5); box-shadow:0 10px 26px -12px rgba(0,0,0,.5), inset 0 0 0 1px rgba(244,183,64,.4), inset 0 1px 0 rgba(255,255,255,.10); }
-  .admin-member-tile .avatar{ width:42px; height:42px; font-size:13px; position:relative; z-index:1; box-shadow:0 4px 12px rgba(0,0,0,.35); }
-  .admin-member-tile .amt-name{ font-size:12px; font-weight:700; position:relative; z-index:1; line-height:1.3; }
-  .admin-member-tile .amt-pts{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--gold-2); position:relative; z-index:1; }
-  .admin-member-tile .amt-crown{ position:absolute; top:8px; right:10px; font-size:13px; z-index:1; }
-  .admin-member-tile .amt-move{ width:100%; margin-top:4px; font-size:10.5px; padding:6px 8px; border-radius:10px; position:relative; z-index:1;
-    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:var(--text-muted); }
 
   /* ---------- login otp inline scan icon ---------- */
   .otp-boxes-row{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:nowrap; }
@@ -2945,6 +2885,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes apDust{ 0%{ transform:translateY(0) translateX(0) scale(.6); opacity:0; } 15%{ opacity:.9; } 100%{ transform:translateY(-120px) translateX(var(--sx)) scale(1.2); opacity:0; } }
   @keyframes apBreath{ 0%,100%{ transform:scale(1); opacity:.11; } 50%{ transform:scale(1.06); opacity:.2; } }
   @keyframes apShake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-9px); } 40%{ transform:translateX(8px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
+  @keyframes apPop{ from{ transform:scale(.4); opacity:0; } }
   @keyframes apGrow{ from{ transform:scaleY(.1); opacity:0; } }
   .ap-pass{ --rx:0deg; --ry:0deg; --sc:1; --mx:50%; --my:0%; transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--sc)); transition:transform .28s cubic-bezier(.22,.9,.28,1); will-change:transform; touch-action:manipulation; }
   .ap-pass::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background:radial-gradient(230px circle at var(--mx) var(--my), rgba(255,255,255,.2), transparent 62%); }
@@ -2957,15 +2898,23 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ap-stat{ padding:14px 8px; border-radius:20px; text-align:center; background:var(--card, rgba(255,255,255,.06)); border:1px solid var(--border); }
   .ap-stat-n{ font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; line-height:1.1; background:linear-gradient(180deg,#FFF3D2,#F4B740); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
   .ap-stat-l{ margin-top:4px; font-size:10.5px; font-weight:700; color:var(--text-muted); line-height:1.4; }
-  .ap-weeks{ display:flex; align-items:flex-end; justify-content:space-between; gap:8px; height:84px; padding-top:6px; }
-  .ap-wk{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; height:100%; }
-  .ap-wk b{ width:100%; max-width:34px; height:26px; border-radius:9px; background:rgba(255,255,255,.08); border:1px solid var(--border); transform-origin:bottom; }
-  .ap-wk.on b{ height:52px; background:var(--cap); border-color:transparent; box-shadow:0 6px 16px rgba(0,0,0,.3), 0 0 14px rgba(244,183,64,.3); }
-  .ap-wk.now b{ outline:2px solid rgba(255,222,148,.7); outline-offset:2px; }
-  .ap-wk span{ font-size:9.5px; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+  .ap-wkcard{ padding:16px 14px 14px; }
+  .ap-wk-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .ap-wk-head b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; }
+  .ap-wk-head small{ font-size:11px; font-weight:700; color:var(--text-muted); }
+  .ap-weeks{ position:relative; display:grid; grid-template-columns:repeat(6,1fr); gap:0; }
+  .ap-weeks::before{ content:''; position:absolute; top:17px; inset-inline:calc(100%/12); height:2px; border-radius:2px; background:rgba(255,255,255,.1); }
+  .ap-wk{ position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .ap-wk .nd{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#1d1b4f; border:1.5px solid rgba(255,255,255,.14); color:rgba(255,255,255,.28); box-sizing:border-box; }
+  .ap-wk .nd svg{ width:16px; height:16px; }
+  .ap-wk.on .nd{ background:linear-gradient(145deg,#3FBF8A,#2A9D78); border-color:transparent; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,.28); }
+  .ap-wk.now .nd{ outline:2px solid rgba(214,196,166,.75); outline-offset:3px; }
+  .ap-wk.now:not(.on) .nd{ border-style:dashed; border-color:rgba(214,196,166,.7); color:rgba(214,196,166,.8); }
+  .ap-wk span{ font-size:10px; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+  .ap-wk.now span{ color:#E6D5B8; font-weight:800; }
   .ap-anim .ap-stat{ animation:apIn .6s cubic-bezier(.22,1,.36,1) backwards; animation-delay:calc(var(--i) * .1s + .8s); }
-  .ap-anim .ap-wk b{ animation:apGrow .6s cubic-bezier(.34,1.56,.64,1) backwards; animation-delay:calc(var(--i) * .08s + 1s); }
-  @media (prefers-reduced-motion:reduce){ .ap-cross,.ap-dust i,.ap-shake,.ap-anim .ap-stat,.ap-anim .ap-wk b{ animation:none !important; } .ap-dust{ display:none; } }
+  .ap-anim .ap-wk .nd{ animation:apPop .5s cubic-bezier(.34,1.56,.64,1) backwards; animation-delay:calc(var(--i) * .08s + 1s); }
+  @media (prefers-reduced-motion:reduce){ .ap-cross,.ap-dust i,.ap-shake,.ap-anim .ap-stat,.ap-anim .ap-wk .nd{ animation:none !important; } .ap-dust{ display:none; } }
 
 
   /* ---------- لمسة احترافية: آية، إيصال موثّق، أوسمة، تحميل ---------- */
@@ -3196,19 +3145,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02)); border:1px solid var(--border); -webkit-tap-highlight-color:transparent; }
   .att-tool span{ font-size:20px; } .att-tool b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; } .att-tool small{ font-size:10.5px; color:var(--text-muted); max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .att-tool:active{ transform:scale(.97); } .att-tool[disabled]{ opacity:.45; pointer-events:none; }
-  .att-tbars{ display:flex; flex-direction:column; gap:6px; padding:10px; }
-  .att-tbar{ display:flex; align-items:center; gap:10px; padding:7px 8px; border-radius:12px; font-family:inherit; color:inherit; background:transparent; border:1px solid transparent; text-align:right; }
-  .att-tbar.on{ background:rgba(244,183,64,.1); border-color:rgba(244,183,64,.45); }
-  .atb-name{ flex:0 0 84px; font-weight:700; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .atb-track{ flex:1; height:8px; border-radius:6px; background:rgba(255,255,255,.1); overflow:hidden; }
-  .atb-track i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#5FE0A4,#F4B740); transition:width .4s ease; }
-  .atb-n{ flex:0 0 46px; text-align:left; font-size:11.5px; font-weight:800; color:var(--gold-2); font-variant-numeric:tabular-nums; direction:ltr; }
   .att-roster{ margin-bottom:6px; }
   .att-chips{ display:flex; gap:6px; margin-bottom:8px; }
   .att-chips-scroll{ overflow-x:auto; scrollbar-width:none; padding-bottom:2px; } .att-chips-scroll::-webkit-scrollbar{ display:none; }
   .att-chip{ flex:1 1 0; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 10px; border-radius:20px; font-family:inherit; font-size:12px; font-weight:800; white-space:nowrap; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); }
   .att-chip b{ font-size:11px; padding:1px 7px; border-radius:10px; background:rgba(255,255,255,.1); font-variant-numeric:tabular-nums; }
-  .att-chip-t{ flex:0 0 auto; padding:7px 13px; font-size:11.5px; }
   .att-chip.on{ color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); border-color:transparent; } .att-chip.on b{ background:rgba(0,0,0,.14); }
   .att-bulk{ width:100%; margin-bottom:10px; }
   .att-roster-list{ border-radius:18px; overflow:hidden; border:1px solid var(--border); background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); }
@@ -5801,12 +5742,7 @@ function createQR(el, opts){
   return qr;
 }
 
-const TEAMS = [
-  {id:'t1', name:'فريق النور',    color:'#F4B740'},
-  {id:'t2', name:'فريق الأمل',    color:'#3FDCC9'},
-  {id:'t3', name:'فريق الشروق',   color:'#FF7A59'},
-  {id:'t4', name:'فريق الرسالة',  color:'#9B8CFF'},
-];
+const AVATAR_COLOR = '#3B4A7A';
 
 const DAYS = [
   {id:'d1', label:'اليوم الأول', num:1, sessions:[
@@ -5817,7 +5753,7 @@ const DAYS = [
   {id:'d2', label:'اليوم الثاني', num:2, sessions:[
     {id:'d2s1', code:'D2-1', name:'الجلسة الصباحية', points:10, type:'lecture'},
     {id:'d2s2', code:'D2-2', name:'ورشة عمل تفاعلية', points:15, type:'workshop'},
-    {id:'d2s3', code:'D2-3', name:'مسابقة الفرق الأولى', points:20, type:'activity'},
+    {id:'d2s3', code:'D2-3', name:'المسابقة الأولى', points:20, type:'activity'},
   ]},
   {id:'d3', label:'اليوم الثالث', num:3, sessions:[
     {id:'d3s1', code:'D3-1', name:'جلسة إرشادية', points:10, type:'lecture'},
@@ -5828,12 +5764,12 @@ const DAYS = [
 const SESSION_TYPE_LABELS = { opening:'افتتاح', lecture:'محاضرة', workshop:'ورشة عمل', activity:'نشاط', closing:'ختام' };
 
 const NAMES = [
-  ['1234','جورج مجدى','t1'],['1002','مريم عادل','t1'],['1003','يوسف كريم','t1'],['1004','هبة فادي','t1'],
-  ['2001','عمر ناصر','t2'],['2002','ندى جورج','t2'],['2003','طارق رأفت','t2'],['2004','ياسمين إيهاب','t2'],
-  ['3001','خالد صبري','t3'],['3002','آية عماد','t3'],['3003','عمرو وجيه','t3'],['3004','دينا نبيل','t3'],
-  ['4001','كريم حنا','t4'],['4002','سلمى سمير','t4'],['4003','محمود زكريا','t4'],['4004','رنا ماجد','t4'],
+  ['1234','جورج مجدى'],['1002','مريم عادل'],['1003','يوسف كريم'],['1004','هبة فادي'],
+  ['2001','عمر ناصر'],['2002','ندى جورج'],['2003','طارق رأفت'],['2004','ياسمين إيهاب'],
+  ['3001','خالد صبري'],['3002','آية عماد'],['3003','عمرو وجيه'],['3004','دينا نبيل'],
+  ['4001','كريم حنا'],['4002','سلمى سمير'],['4003','محمود زكريا'],['4004','رنا ماجد'],
 ];
-const PARTICIPANTS = NAMES.map(([id,name,teamId])=>({id,name,teamId}));
+const PARTICIPANTS = NAMES.map(([id,name])=>({id,name}));
 
 /* ============================= STORAGE (Firebase-backed, shared for real) ============================= */
 const firebaseConfig = {
@@ -8083,15 +8019,6 @@ async function loadGamePointsSettings(){
 async function saveGamePointsSettings(obj){
   try{ await window.storage.set('glavera-game-points-settings', JSON.stringify(obj), true); }catch(e){}
 }
-async function loadTeamMessages(){
-  try{
-    const r = await window.storage.get('glavera-team-messages', true);
-    return r ? JSON.parse(r.value) : {};
-  }catch(e){ return {}; }
-}
-async function saveTeamMessages(obj){
-  try{ await window.storage.set('glavera-team-messages', JSON.stringify(obj), true); }catch(e){}
-}
 async function loadDailyMessage(){
   try{
     const r = await window.storage.get('glavera-daily-message', true);
@@ -8183,24 +8110,6 @@ async function loadAdminAlerts(){
 }
 async function saveAdminAlerts(obj){
   try{ await window.storage.set('glavera-admin-alerts', JSON.stringify(obj), true); }catch(e){}
-}
-async function loadTeamOverrides(){
-  try{ const r = await window.storage.get('glavera-team-overrides', true); return r ? JSON.parse(r.value) : {}; }catch(e){ return {}; }
-}
-async function saveTeamOverrides(obj){
-  try{ await window.storage.set('glavera-team-overrides', JSON.stringify(obj), true); }catch(e){}
-}
-async function loadCustomTeams(){
-  try{ const r = await window.storage.get('glavera-custom-teams', true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
-}
-async function saveCustomTeams(arr){
-  try{ await window.storage.set('glavera-custom-teams', JSON.stringify(arr), true); }catch(e){}
-}
-async function loadTeamBonus(){
-  try{ const r = await window.storage.get('glavera-team-bonus', true); return r ? JSON.parse(r.value) : {}; }catch(e){ return {}; }
-}
-async function saveTeamBonus(obj){
-  try{ await window.storage.set('glavera-team-bonus', JSON.stringify(obj), true); }catch(e){}
 }
 async function loadWallPosts(){
   try{
@@ -8708,12 +8617,10 @@ function exportParticipantsXlsx(){
   if(typeof XLSX==='undefined'){ showToast('تعذّر تجهيز ملف Excel', true); return; }
   const totalSessions = flatSessions().length;
   const rows = PARTICIPANTS.map(p=>{
-    const team = teamOf(p.teamId);
     const attended = flatSessions().filter(f=>CHECKINS[p.id+'__'+f.session.id]).length;
     return {
       'الكود': p.id,
       'الاسم': p.name,
-      'الفريق': team ? team.name : '',
       'النقاط': participantTotal(p.id),
       'عدد الفقرات المحضورة': attended,
       'إجمالي الفقرات': totalSessions,
@@ -8727,7 +8634,6 @@ function exportParticipantsXlsx(){
   XLSX.writeFile(wb, `glavera3-participants-${new Date().toISOString().slice(0,10)}.xlsx`);
   showToast('اتحمّل تقرير الإكسل');
 }
-let TEAM_MESSAGES = {};
 let DAILY_MESSAGE = null;
 let POINT_CODES = {};
 let WALL_POSTS = [];
@@ -8738,11 +8644,8 @@ let DAY_OVERRIDES = {};
 let SESSION_OVERRIDES = {};
 let CUSTOM_SESSIONS = {};
 let CUSTOM_PARTICIPANTS = [];
-let CUSTOM_TEAMS = [];
 let ADMIN_ALERTS = [];
-let TEAM_OVERRIDES = {};
 let PARTICIPANT_OVERRIDES = {};
-let TEAM_BONUS = {};
 let POINTS_BACKUP = null;          /* نسخة النقاط اللي اتصفرت (للاسترجاع) */
 let _pointsBackupLoaded = false;
 let _pointsOpBusy = false;
@@ -8917,7 +8820,6 @@ function initials(name){
   const parts = name.trim().split(' ');
   return (parts[0]?.[0]||'') + (parts[1]?.[0]||'');
 }
-function teamOf(teamId){ return TEAMS.find(t=>t.id===teamId); }
 function timeGreeting(){
   const h = new Date().getHours();
   if(h<12) return 'صباح الخير';
@@ -8936,13 +8838,6 @@ function dayTotal(pid, day){
 function rankedParticipants(){
   return PARTICIPANTS.map(p=>({...p, total:participantTotal(p.id)}))
     .sort((a,b)=>b.total-a.total);
-}
-function rankedTeams(){
-  return TEAMS.map(t=>{
-    const members = PARTICIPANTS.filter(p=>p.teamId===t.id);
-    const total = members.reduce((s,p)=>s+participantTotal(p.id),0) + (TEAM_BONUS[t.id]||0);
-    return {...t, total, count:members.length};
-  }).sort((a,b)=>b.total-a.total);
 }
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9114,7 +9009,7 @@ function avgRatingOverall(){
 }
 
 /* ============================= STATE ============================= */
-const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminToolsOpen:false, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingTeamId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, addingTeam:false, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
+const FRESH_STATE = ()=>({ view:'splash', pid:null, dayId:null, sessionId:null, lbTab:'solo', history:[], splashLeaving:false, justScoredSessionId:null, pulseMedal:false, adminUnlocked:false, adminHub:true, adminToolsOpen:false, adminTab:'sessions', adminDayId:null, editingSessionId:null, editingLogisticsId:null, editingParticipantId:null, addingParticipant:false, justAddedParticipantId:null, alertImmediate:true, compareId:null, pulseSessionId:null, viewedDays:{}, radialMenuOpen:false, galleryAlbumIndex:0, roomCode:null, roomJoinInput:'', roomSpectate:false });
 let state = FRESH_STATE();
 
 /* ============================= جلسة الجهاز الواحد (منع فتح نفس الكود من جهازين في نفس الوقت) ============================= */
@@ -9195,7 +9090,7 @@ function renderMaintenancePage(title, icon){
       <button type="button" class="btn btn-outline maint-back" data-action="back">العودة</button>
     </div>`;
 }
-function go(view, extra={}){ if(['certificate','pass','leaderboard','team'].includes(view)) return; /* الخانات دي اتشالت من الموقع */
+function go(view, extra={}){ if(['certificate','pass','leaderboard'].includes(view)) return; /* الخانات دي اتشالت من الموقع */
   if(view==='games' && CONF_SETTINGS.gamesLocked && state.pid!==GAMES_LOCK_REVIEWER_ID){
     showToast('خانة Games مقفولة مؤقتًا لحد ما نخلص تعديل، هترجع تفتح قريب 🔧', true);
     return;
@@ -9362,20 +9257,13 @@ function renderLogin(){
 /* ============================= RENDER: WELCOME ============================= */
 function renderWelcome(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = p ? teamOf(p.teamId) : null;
   const photoStyle = p && p.photo
     ? `background-image:url('${p.photo}');background-size:cover;background-position:center;`
-    : `background:linear-gradient(150deg, ${team?team.color:'#F4B740'}, ${team?team.color:'#F4B740'}88);`;
+    : `background:linear-gradient(150deg, ${AVATAR_COLOR}, ${AVATAR_COLOR}88);`;
   const points = p ? participantTotal(p.id) : 0;
   const rankList = rankedParticipants();
   const rankIdx = p ? rankList.findIndex(x=>x.id===p.id) : -1;
   const rank = rankIdx>=0 ? rankIdx+1 : null;
-  let teamRank = null;
-  if(team){
-    const teamRankList = rankedTeams();
-    const teamRankIdx = teamRankList.findIndex(t=>t.id===team.id);
-    teamRank = teamRankIdx>=0 ? teamRankIdx+1 : null;
-  }
   return `
     <div class="welcome-scene">
       <div class="welcome-glow"></div>
@@ -9384,7 +9272,7 @@ function renderWelcome(){
       <div class="welcome-en-pre">WELCOME TO</div>
       <div class="welcome-en-title">Glafera</div>
       <div class="welcome-rule"><span></span><i>III</i><span></span></div>
-      <div class="welcome-photo-frame"${team?` style="--wp-accent:${team.color}"`:''}>
+      <div class="welcome-photo-frame">
         <div class="welcome-photo-frame-ring"></div>
         <div class="welcome-photo" style="${photoStyle}">${p&&!p.photo?`<span class="welcome-photo-fallback">${initials(p.name)}</span>`:''}</div>
       </div>
@@ -9554,21 +9442,19 @@ document.addEventListener('pointerup', radialPressEnd, {passive:true});
 document.addEventListener('pointercancel', radialPressEnd, {passive:true});
 document.addEventListener('pointerleave', radialPressEnd, {passive:true});
 
-function meAvatarHtml(p,team,cls){
-  const st = p.photo ? `background-image:url('${p.photo}');` : `background:${team.color};`;
+function meAvatarHtml(p,cls){
+  const st = p.photo ? `background-image:url('${p.photo}');` : `background:${AVATAR_COLOR};`;
   return `<div class="${cls}" style="${st}">${p.photo?'':escapeHtml(initials(p.name))}</div>`;
 }
 /* ============================= RENDER: PERSONAL PROFILE PAGE ============================= */
 function renderMePage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
   const total = participantTotal(p.id);
   const tier = medalTier(total);
   const streak = computeStreak(p.id);
   const title = computeTitle(p.id);
   const ranked = rankedParticipants();
   const rank = ranked.findIndex(x=>x.id===p.id)+1;
-  const tRank = rankedTeams().findIndex(t=>t.id===team.id)+1;
   const flat = flatSessions();
   const attended = flat.filter(f=>CHECKINS[p.id+'__'+f.session.id]).length;
   const tierName = ['','برونزية','فضية','ذهبية'][tier];
@@ -9581,13 +9467,12 @@ function renderMePage(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">ملفي الشخصي</div>
     </div>
-    <div class="me-card" style="--me-cover:linear-gradient(135deg, ${team.color}cc, ${team.color}33 70%, transparent);">
+    <div class="me-card" style="--me-cover:linear-gradient(135deg, ${AVATAR_COLOR}cc, ${AVATAR_COLOR}33 70%, transparent);">
       <div class="me-cover"></div>
-      ${meAvatarHtml(p,team,'me-av').replace('class="me-av"','class="me-av" data-action="open-my-avatar"')}
+      ${meAvatarHtml(p,'me-av').replace('class="me-av"','class="me-av" data-action="open-my-avatar"')}
       <div class="me-name">${escapeHtml(p.name)}</div>
       <div class="me-chips">
         <span class="me-chip gold">#${escapeHtml(p.id)}</span>
-        <span class="me-chip" style="color:${team.color};border-color:${team.color}66;">${escapeHtml(team.name)}</span>
         ${title?`<span class="me-chip">🏷️ ${title}</span>`:''}
       </div>
     </div>
@@ -10167,7 +10052,6 @@ document.addEventListener('click', function(e){
 });
 function renderProfile(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
   const total = participantTotal(p.id);
   const tier = medalTier(total);
   const streak = computeStreak(p.id);
@@ -10181,7 +10065,7 @@ function renderProfile(){
     <div class="top-bar">
       <div style="display:flex;align-items:center;gap:10px;">
         <div class="tb-me" data-action="tile-nav" data-page="me" role="button" aria-label="ملفي الشخصي">
-          ${meAvatarHtml(p,team,'tb-av')}
+          ${meAvatarHtml(p,'tb-av')}
         </div>
         <div class="brand-title" style="font-size:18px;">جلافيرا 3</div>
       </div>
@@ -10307,7 +10191,6 @@ function renderQuestsPage(){
   `;
 }
 
-/* ============================= RENDER: TEAM PAGE ============================= */
 /* ============================= RENDER: DNA PAGE ============================= */
 function renderDnaPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -10686,9 +10569,8 @@ function renderWallPage(){
   const posts = WALL_POSTS.slice().sort((a,b)=>b.ts-a.ts);
   const postsHtml = posts.length ? posts.map(post=>{
     const author = PARTICIPANTS.find(x=>x.id===post.pid);
-    const team = author ? teamOf(author.teamId) : null;
     return `<div class="wall-post">
-      <span class="wall-post-avatar" style="background:${team?team.color:'var(--teal)'}">${initials(post.name)}</span>
+      <span class="wall-post-avatar" style="background:var(--teal)">${initials(post.name)}</span>
       <div style="flex:1;">
         <div><span class="wall-post-name">${escapeHtml(post.name)}</span><span class="wall-post-time">${timeAgoAr(post.ts)}</span></div>
         <div class="wall-post-text">${escapeHtml(post.text)}</div>
@@ -12173,12 +12055,11 @@ function renderReflexLeaderboard(){
   const rows = reflexLeaderboardRows();
   if(!rows.length) return `<div class="hint" style="text-align:center;margin-top:8px;">لسه محدش سجّل وقت رسمي — يلا اكسب أول جولة وكن الأول! 🥇</div>`;
   return `<div class="card" style="margin-top:8px;">${rows.map((r,i)=>{
-    const t = teamOf(r.p.teamId);
     const mine = r.p.id===state.pid;
     const rankHtml = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
     return `<div class="lb-row ${mine?'gh-lb-me':''}">
       <div class="lb-rank">${rankHtml}</div>
-      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:${t?t.color:'#8C8CA1'}">${initials(r.p.name)}</div>
+      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:#8C8CA1">${initials(r.p.name)}</div>
       <div class="lb-name">${escapeHtml(r.p.name)}${mine?' '+tr('lb_you'):''}</div>
       <div class="lb-pts">${r.best} م.ث</div>
     </div>`;
@@ -16645,7 +16526,7 @@ function renderUnoGame(){
   return g.winner ? unoWinHtml(g,'me','','uno-next') : unoTableHtml(g,'me','');
 }
 /* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
-// يعرض صورة المشارك (أو الحروف الأولى بلون فريقه لو مفيش صورة) بدل الاسم
+// يعرض صورة المشارك (أو الحروف الأولى لو مفيش صورة) بدل الاسم
 function gameAvatar(pid, badgeText, size, dotColorId){
   const p = PARTICIPANTS.find(x=>x.id===pid);
   const crying = badgeText==='😭';
@@ -16655,10 +16536,9 @@ function gameAvatar(pid, badgeText, size, dotColorId){
   const tears = crying ? `<span class="pl-tear pl-tear-l"></span><span class="pl-tear pl-tear-r"></span>` : '';
   const cryCls = crying ? ' pl-crying' : '';
   if(!p) return `<div class="pl-avatar pl-ai ${size||''}${cryCls}">👤${badge}${tears}</div>`;
-  const t = teamOf(p.teamId);
   const bg = p.photo
     ? `background-image:url('${p.photo}');background-size:cover;background-position:center;`
-    : `background:${t?t.color:'var(--gold)'};`;
+    : `background:${AVATAR_COLOR};`;
   return `<div class="pl-avatar ${size||''}${cryCls}" style="${bg}" title="${escapeHtml(p.name)}">${p.photo?'':escapeHtml(initials(p.name))}${badge}${tears}</div>`;
 }
 function gameAiAvatar(badgeText, size, dotColorId){
@@ -18066,7 +17946,7 @@ function renderRoomMysteryLobby(room){
         : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ</div>`}
     </div>`;
 }
-async function awardMysteryTeamPoints(room){
+async function awardMysteryRoomPoints(room){
   try{
     const pts = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.mysteryWin) || 60;
     const ps = room.players || [];
@@ -18131,7 +18011,7 @@ async function doRoomMysterySubmit(){
     M.pointsAwarded = true;
     await saveGameRooms(GAME_ROOMS);
     SND.coinChime(); launchConfetti();
-    awardMysteryTeamPoints(room);
+    awardMysteryRoomPoints(room);
   }
 }
 async function doRoomMysteryTimeUp(){
@@ -20291,8 +20171,7 @@ function roomChatWidget(){
 function vsPhotoHtml(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
   if(!p) return `<div class="vs-photo" style="background:var(--surface-2);font-size:40px;">👤</div>`;
-  const t = teamOf(p.teamId);
-  const bg = p.photo ? `background-image:url('${p.photo}');background-size:cover;background-position:center;` : `background:${t?t.color:'#F4B740'};`;
+  const bg = p.photo ? `background-image:url('${p.photo}');background-size:cover;background-position:center;` : `background:${AVATAR_COLOR};`;
   return `<div class="vs-photo" style="${bg}">${p.photo?'':escapeHtml(initials(p.name))}</div>`;
 }
 function roomMaybeIntro(){
@@ -20986,11 +20865,10 @@ function renderSession(){
 /* ============================= RENDER: COMPARE ============================= */
 function renderCompare(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
   if(!state.compareId){
-    const others = PARTICIPANTS.filter(m=>m.teamId===p.teamId && m.id!==p.id);
+    const others = PARTICIPANTS.filter(m=>m.id!==p.id);
     const rows = others.map(m=>`<div class="compare-pick-row" data-action="pick-compare" data-member="${m.id}">
-      <div class="avatar" style="width:38px;height:38px;font-size:13px;background:${team.color}">${initials(m.name)}</div>
+      <div class="avatar" style="width:38px;height:38px;font-size:13px;background:${AVATAR_COLOR}">${initials(m.name)}</div>
       <div style="flex:1;">${escapeHtml(m.name)}</div>
       <div class="lb-pts">${participantTotal(m.id)} نقطة</div>
       <span class="chevron">${ICO.chev}</span>
@@ -21000,12 +20878,11 @@ function renderCompare(){
         <button class="icon-btn" data-action="back">${ICO.back}</button>
         <div class="back-title">قارن نفسك</div>
       </div>
-      <div class="hint" style="margin-bottom:10px;">اختر عضو من فريقك للمقارنة</div>
+      <div class="hint" style="margin-bottom:10px;">اختر مشارك للمقارنة</div>
       <div class="card">${rows || '<div class="empty-note">لا يوجد أعضاء آخرون بعد</div>'}</div>
     `;
   }
   const other = PARTICIPANTS.find(x=>x.id===state.compareId);
-  const otherTeam = teamOf(other.teamId);
   const myTotal = participantTotal(p.id), otherTotal = participantTotal(other.id);
   const maxTotal = Math.max(1, myTotal, otherTotal);
 
@@ -21017,8 +20894,8 @@ function renderCompare(){
     return `<div class="compare-bar-row">
       <div class="compare-bar-lab"><span>${mine}</span><span>${d.label}</span><span>${theirs}</span></div>
       <div class="compare-bar-track">
-        <div class="compare-bar-half left"><div class="compare-fill" style="width:${(mine/mMax)*100}%;background:${team.color}"></div></div>
-        <div class="compare-bar-half"><div class="compare-fill" style="width:${(theirs/mMax)*100}%;background:${otherTeam.color}"></div></div>
+        <div class="compare-bar-half left"><div class="compare-fill" style="width:${(mine/mMax)*100}%;background:${AVATAR_COLOR}"></div></div>
+        <div class="compare-bar-half"><div class="compare-fill" style="width:${(theirs/mMax)*100}%;background:#8C6A4A"></div></div>
       </div>
     </div>`;
   }).join('');
@@ -21036,9 +20913,9 @@ function renderCompare(){
     </div>
     <div class="card" style="text-align:center;">
       <div style="display:flex;justify-content:space-around;align-items:center;">
-        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:${team.color};margin:0 auto 6px;">${initials(p.name)}</div><div style="font-size:12px;">أنت</div></div>
+        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:${AVATAR_COLOR};margin:0 auto 6px;">${initials(p.name)}</div><div style="font-size:12px;">أنت</div></div>
         <div style="font-family:'Cairo',sans-serif;font-weight:900;color:var(--text-muted);">VS</div>
-        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:${otherTeam.color};margin:0 auto 6px;">${initials(other.name)}</div><div style="font-size:12px;">${escapeHtml(other.name)}</div></div>
+        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:#8C6A4A;margin:0 auto 6px;">${initials(other.name)}</div><div style="font-size:12px;">${escapeHtml(other.name)}</div></div>
       </div>
       <div class="compare-stats-row">
         <div><div class="cs-num">${myTotal}</div><div class="cs-lab">نقاطك</div></div>
@@ -21218,7 +21095,7 @@ function renderAdminAuditTab(){
     const p = PARTICIPANTS.find(x=>x.id===pid);
     let session=null, day=null;
     DAYS.forEach(d=>d.sessions.forEach(s=>{ if(s.id===sid){ session=s; day=d; } }));
-    return { pid, name:p?p.name:pid, team: p?teamOf(p.teamId).name:'', sessionName: session?session.name:sid, dayLabel: day?day.label:'', points:v.points, ts:v.ts };
+    return { pid, name:p?p.name:pid, sessionName: session?session.name:sid, dayLabel: day?day.label:'', points:v.points, ts:v.ts };
   }).sort((a,b)=>b.ts-a.ts);
 
   if(entries.length===0){
@@ -21227,8 +21104,8 @@ function renderAdminAuditTab(){
   const rows = entries.map(e=>{
     const d = new Date(e.ts);
     const timeStr = d.toLocaleString('ar-EG', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit' });
-    return `<div class="audit-row" data-search="${escapeHtml((e.name+' '+e.pid+' '+e.sessionName+' '+e.team).toLowerCase())}">
-      <div class="audit-left">${escapeHtml(e.name)}<div class="audit-sub">${escapeHtml(e.sessionName)} · ${e.team} · +${e.points}ن</div></div>
+    return `<div class="audit-row" data-search="${escapeHtml((e.name+' '+e.pid+' '+e.sessionName).toLowerCase())}">
+      <div class="audit-left">${escapeHtml(e.name)}<div class="audit-sub">${escapeHtml(e.sessionName)} · +${e.points}ن</div></div>
       <div class="audit-time">${timeStr}</div>
     </div>`;
   }).join('');
@@ -21237,7 +21114,7 @@ function renderAdminAuditTab(){
       <div class="admin-stat-cell"><div class="admin-stat-num">${entries.length}</div><div class="admin-stat-lab">تسجيل حضور</div></div>
       <div class="admin-stat-cell"><div class="admin-stat-num">${new Set(entries.map(e=>e.pid)).size}</div><div class="admin-stat-lab">مشارك حضر</div></div>
     </div>
-    <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم أو الفقرة أو الفريق..." style="margin-bottom:10px;" />
+    <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم أو الفقرة..." style="margin-bottom:10px;" />
     <div class="card">${rows}</div>`;
 }
 
@@ -21298,8 +21175,8 @@ function renderAdminAnalyticsTab(){
     const streakRows = streaks.length ? streaks.map(({p,streak})=>`<div class="streak-lead-row">🔥 <div style="flex:1;">${escapeHtml(p.name)}</div><span style="color:var(--gold);font-weight:800;">${streak} متتالية</span></div>`).join('')
       : `<div class="empty-note">لا توجد بيانات كافية بعد</div>`;
     const inactive = PARTICIPANTS.filter(p=>participantTotal(p.id)===0);
-    const top = rankedParticipants().slice(0,5).map((p,i)=>`<div class="admin-rank-row"><div class="arr-num">${i+1}</div><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">${escapeHtml(teamOf(p.teamId).name)}</div></div><div class="arr-pts">${p.total}</div></div>`).join('');
-    const inactiveHtml = inactive.length ? inactive.slice(0,40).map(p=>`<div class="admin-rank-row admin-inactive-row" data-search="${escapeHtml((p.name+' '+p.id).toLowerCase())}"><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">#${escapeHtml(p.id)} · ${escapeHtml(teamOf(p.teamId).name)}</div></div></div>`).join('') + (inactive.length>40?`<div class="hint" style="text-align:center;padding-top:8px;">و ${inactive.length-40} آخرين</div>`:'') : '<div class="empty-note">كل المشاركين لديهم نقاط 🎉</div>';
+    const top = rankedParticipants().slice(0,5).map((p,i)=>`<div class="admin-rank-row"><div class="arr-num">${i+1}</div><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">#${escapeHtml(p.id)}</div></div><div class="arr-pts">${p.total}</div></div>`).join('');
+    const inactiveHtml = inactive.length ? inactive.slice(0,40).map(p=>`<div class="admin-rank-row admin-inactive-row" data-search="${escapeHtml((p.name+' '+p.id).toLowerCase())}"><div class="arr-body">${escapeHtml(p.name)}<div class="arr-sub">#${escapeHtml(p.id)}</div></div></div>`).join('') + (inactive.length>40?`<div class="hint" style="text-align:center;padding-top:8px;">و ${inactive.length-40} آخرين</div>`:'') : '<div class="empty-note">كل المشاركين لديهم نقاط 🎉</div>';
     body = `
       ${adminKpis([{num:activeCount,lab:'نشطون'},{num:inactive.length,lab:'بلا نقاط',cls:inactive.length?'is-alert':'is-ok'},{num:avgPoints,lab:'متوسط النقاط'}])}
       ${adminSectionTitle('🏅','الأعلى نقاطًا')}
@@ -21493,7 +21370,7 @@ function renderAdminSettingsTab(){
 
 const ADMIN_HUB_GROUPS = [
   {id:'live', icon:'🔴', title:'التشغيل المباشر', accent:'var(--coral)'},
-  {id:'people', icon:'👥', title:'المشاركون والفرق', accent:'var(--teal)'},
+  {id:'people', icon:'👥', title:'المشاركون', accent:'var(--teal)'},
   {id:'points', icon:'🏆', title:'النقاط والتقييم', accent:'var(--gold)'},
   {id:'content', icon:'🎨', title:'المحتوى والمتجر', accent:'var(--violet)'},
   {id:'system', icon:'⚙️', title:'النظام', accent:'var(--text-muted)'},
@@ -21538,7 +21415,6 @@ function renderAdminHub(){
   const strip = `
     <div class="admin-stat-strip">
       <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="participants"><div class="admin-stat-num">${PARTICIPANTS.length}</div><div class="admin-stat-lab">مشارك</div></button>
-      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="teams"><div class="admin-stat-num">${TEAMS.length}</div><div class="admin-stat-lab">فريق</div></button>
       <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="audit"><div class="admin-stat-num">${new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size}</div><div class="admin-stat-lab">سجّلوا حضورًا</div></button>
       <button type="button" class="admin-stat-cell ${pendingR?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="reports"><div class="admin-stat-num">${pendingR}</div><div class="admin-stat-lab">بلاغات مفتوحة</div></button>
     </div>`;
@@ -21598,8 +21474,7 @@ function adminInDetailView(){
   const t = state.adminTab;
   return (t==='sessions' && (state.editingSessionId || state.adminDayId))
     || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
-    || (t==='opinions' && state.viewingOpinionId)
-    || (t==='teams' && state.editingTeamId);
+    || (t==='opinions' && state.viewingOpinionId);
 }
 function adminPendingBadge(tab){
   if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
@@ -21825,12 +21700,10 @@ function renderAdminParticipantsTab(){
   }
   const justAdded = PARTICIPANTS.find(p=>p.id===state.justAddedParticipantId);
   const tiles = PARTICIPANTS.map(p=>{
-    const team = teamOf(p.teamId);
     return `<div class="admin-participant-tile" data-action="edit-participant" data-pid="${p.id}" data-search="${escapeHtml((p.name+' '+p.id).toLowerCase())}">
-      <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
+      <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${p.photo?'':initials(p.name)}</div>
       <span class="pt-name">${escapeHtml(p.name)}</span>
       <span class="pt-code">#${escapeHtml(p.id)}</span>
-      <span class="pt-team-chip" style="background:${team.color};">${escapeHtml(team.name)}</span>
       <span class="pt-points">${participantTotal(p.id)}</span>
       <span class="pt-points-lab">نقطة</span>
     </div>`;
@@ -21845,7 +21718,6 @@ function renderAdminParticipantsTab(){
     ${justAddedCard}
     ${adminKpis([
       {num:PARTICIPANTS.length, lab:'مشارك'},
-      {num:TEAMS.length, lab:'فريق'},
       {num:new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size, lab:'سجّلوا حضورًا'},
       {num:PARTICIPANTS.reduce((a,p)=>a+participantTotal(p.id),0), lab:'إجمالي النقاط'},
     ])}
@@ -21867,11 +21739,10 @@ function renderAdminParticipantsTab(){
     <div class="admin-participant-grid">${tiles}</div>
     <div class="admin-section-title"><span>📤</span><span>تصدير</span></div>
     <button type="button" class="btn btn-outline" style="width:100%;" data-action="download-all-qr">⬇️ تحميل كل أكواد QR الخاصة بالمشاركين</button>
-    <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="export-participants-xlsx">📊 تصدير تقرير Excel (الأسماء، الفرق، النقاط، الحضور)</button>
+    <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="export-participants-xlsx">📊 تصدير تقرير Excel (الأسماء، النقاط، الحضور)</button>
   `;
 }
 function renderAdminAddParticipantPage(){
-  const teamOptions = TEAMS.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
   let suggested = state._suggestedNewCode;
   if(!suggested){
     do{ suggested = String(1000 + Math.floor(Math.random()*9000)); } while(PARTICIPANTS.some(p=>p.id===suggested));
@@ -21889,15 +21760,11 @@ function renderAdminAddParticipantPage(){
         <button type="button" class="btn btn-ghost" style="width:auto;padding:0 16px;" data-action="regen-new-code">🎲 كود عشوائي</button>
       </div>
       <div class="hint" style="margin-top:4px;">تقدر تكتب أي كود رقمي تحبه بدل الكود المقترح، بشرط ميكونش مستخدم قبل كده</div>
-      <label style="margin-top:10px;">الفريق</label>
-      <select class="field" id="new-p-team">${teamOptions}</select>
       <button type="button" class="btn btn-primary" style="margin-top:14px;width:100%;" data-action="admin-add-participant">إضافة المشارك</button>
     </div>
   `;
 }
 function renderAdminParticipantDetail(p){
-  const team = teamOf(p.teamId);
-  const teamOptions = TEAMS.map(t=>`<option value="${t.id}" ${t.id===p.teamId?'selected':''}>${escapeHtml(t.name)}</option>`).join('');
   const myRank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
   const attendedCount = DAYS.reduce((sum,d)=>sum+d.sessions.filter(s=>CHECKINS[p.id+'__'+s.id]).length, 0);
   const attendedRows = [];
@@ -21922,10 +21789,10 @@ function renderAdminParticipantDetail(p){
     <button type="button" class="admin-back-link" data-action="cancel-edit-participant">${ICO.back} كل المشاركين</button>
     <div class="admin-hero">
       <div style="display:contents;">
-        <div class="avatar" style="width:52px;height:52px;font-size:16px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
+        <div class="avatar" style="width:52px;height:52px;font-size:16px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${p.photo?'':initials(p.name)}</div>
         <div>
           <div class="admin-session-name" style="font-size:15px;">${escapeHtml(p.name)}</div>
-          <div style="font-size:11px;color:var(--text-muted);">#${escapeHtml(p.id)} — ${escapeHtml(team.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">#${escapeHtml(p.id)}</div>
         </div>
       </div>
       
@@ -21940,11 +21807,9 @@ function renderAdminParticipantDetail(p){
       <input class="field" id="edit-pname-${p.id}" value="${escapeHtml(p.name)}" />
       <label style="margin-top:10px;">كود الدخول</label>
       <input class="field" id="edit-pid-${p.id}" value="${escapeHtml(p.id)}" dir="ltr" inputmode="numeric" pattern="[0-9]*" placeholder="أرقام فقط" />
-      <label style="margin-top:10px;">الفريق</label>
-      <select class="field" id="edit-pteam-${p.id}">${teamOptions}</select>
       <label style="margin-top:10px;">الصورة الشخصية</label>
       <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
-        <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${team.color};`}">${p.photo?'':initials(p.name)}</div>
+        <div class="avatar" style="width:44px;height:44px;font-size:14px;${p.photo?`background-image:url('${p.photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${p.photo?'':initials(p.name)}</div>
         <input type="file" accept="image/*" id="edit-pphoto-${p.id}" style="font-size:11px;flex:1;" />
       </div>
       
@@ -22006,7 +21871,6 @@ function renderParticipantPrivatePhotosBlock(pid){
   `;
 }
 
-/* ============================= ADMIN: TEAMS TAB ============================= */
 /* ============================= ADMIN: ALERTS / NOTIFICATIONS TAB ============================= */
 function renderAdminAlertsTab(){
   const pending = ADMIN_ALERTS.filter(a=>!a.sent).sort((a,b)=>a.sendAt-b.sendAt);
@@ -22034,11 +21898,9 @@ function renderAdminAlertsTab(){
     const target = adminSubGet('alerts-target','all');
     const tt = adminSubTabs('alerts-target', [
       {id:'all', label:'👥 للجميع'},
-      {id:'team', label:'🏷️ لفريق'},
       {id:'person', label:'👤 لمشارك'},
     ], target);
     const participantOptions = PARTICIPANTS.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-    const teamOptions2 = TEAMS.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
     if(target==='all'){
       body = `
       <div class="admin-glass-box">
@@ -22060,16 +21922,6 @@ function renderAdminAlertsTab(){
           </select>
         </div>` : ''}
         <button type="button" class="btn btn-primary" style="margin-top:14px;width:100%;" data-action="submit-admin-alert">${state.alertImmediate!==false?'📢 إرسال الآن':'⏰ جدولة الإرسال'}</button>
-      </div>`;
-    } else if(target==='team'){
-      body = `
-      <div class="admin-glass-box">
-        <div class="admin-glass-title">🏷️ رسالة لفريق معين</div>
-        <label>الفريق</label>
-        <select class="field" id="alert-team-select">${teamOptions2}</select>
-        <label style="margin-top:10px;">الرسالة</label>
-        <textarea class="field" id="alert-team-msg" placeholder="اكتب رسالة لكل أعضاء الفريق المحدد..." style="min-height:70px;"></textarea>
-        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="send-team-alert">إرسال للفريق</button>
       </div>`;
     } else {
       body = `
@@ -22347,7 +22199,6 @@ function render(){
   app.innerHTML = html;
   app.classList.toggle('is-admin', state.view==='admin');
   if(state.view!=='game-domino') dominoSyncYardLayer('');
-  updateTeamTint();
   /* الأنيميشن ده (فيد + حركة خفيفة) لازم يشتغل بس لما فعلاً بنتنقل بين شاشات (go/goBack) —
      مش في كل مرة الشاشة نفسها بترندر تاني (زي تحديثات polling الغرفة كل ثانيتين أو بعد كل حركة في اللعبة)،
      عشان كده كانت الشاشة بتـ"اهتز" في إكس أو والكونكت فور كل ما اللوح يتحدث. */
@@ -22488,17 +22339,6 @@ document.addEventListener('pointerdown', (e)=>{
 }, {passive:true});
 
 
-function updateTeamTint(){
-  let bg = document.getElementById('team-tint-bg');
-  if(!bg){ bg = document.createElement('div'); bg.id='team-tint-bg'; document.body.appendChild(bg); }
-  const p = state.pid ? PARTICIPANTS.find(x=>x.id===state.pid) : null;
-  if(p && ['profile','me','session','compare','timeline','badges','quests','dna','share','settings','stay','kit','transport','retreat'].includes(state.view)){
-    const t = teamOf(p.teamId);
-    bg.style.background = `radial-gradient(circle at 20% 0%, ${t.color}22, transparent 55%), radial-gradient(circle at 90% 100%, ${t.color}18, transparent 55%)`;
-  } else {
-    bg.style.background = 'transparent';
-  }
-}
 
 /* ============================= ANIMATION HELPERS ============================= */
 function animateCount(el, to, duration){
@@ -23725,7 +23565,10 @@ function renderAttendanceScanPage(){
       <div class="ap-stat" style="--i:2"><div class="ap-stat-n ap-num" ${lastD>0?`data-to="${lastD}"`:''}>${lastTxt}</div><div class="ap-stat-l">${lastD>0?'يوم من آخر حضور':'آخر حضور'}</div></div>
     </div>
     <div class="section-title">آخر ٦ أسابيع</div>
-    <div class="card"><div class="ap-weeks" style="--cap:${t.color}">${[5,4,3,2,1,0].map((w,i)=>`<div class="ap-wk ${ago.has(w)?'on':''} ${w===0?'now':''}" style="--i:${i}"><b></b><span>${w===0?'الحالي':w===1?'الماضي':'-'+w}</span></div>`).join('')}</div></div>
+    <div class="card ap-wkcard">
+      <div class="ap-wk-head"><b>حضرت ${[0,1,2,3,4,5].filter(w=>ago.has(w)).length} من ٦ أسابيع</b><small>${[0,1,2,3,4,5].filter(w=>ago.has(w)).length===6?'التزام كامل':'استمر على المواظبة'}</small></div>
+      <div class="ap-weeks">${[5,4,3,2,1,0].map((w,i)=>{ const on = ago.has(w); const d = new Date(wk0 - w*7*DAY); const lab = w===0?'الحالي':w===1?'الماضي':d.toLocaleDateString('ar-EG',{day:'numeric',month:'short'}); return `<div class="ap-wk ${on?'on':''} ${w===0?'now':''}" style="--i:${i}"><div class="nd">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 12h10"/></svg>'}</div><span>${lab}</span></div>`; }).join('')}</div>
+    </div>
     <div style="height:16px"></div>` : '';
   setTimeout(()=>{ document.querySelectorAll('.ap-num[data-to]:not([data-ran])').forEach(el=>{
     el.dataset.ran = 1; if(!anim || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
@@ -23859,7 +23702,7 @@ function renderAdminAttendanceTab(){
   const rows = recs.map(r=>{
     const p = PARTICIPANTS.find(x=>x.id===r.pid);
     return `<div class="audit-row" data-search="${escapeHtml(((p?p.name:'')+' '+r.pid).toLowerCase())}">
-      <div class="audit-left">${escapeHtml(p?p.name:r.pid)}<div class="audit-sub">${escapeHtml(p?teamOf(p.teamId).name:'')} · ${attFmtTime(r.ts)}</div></div>
+      <div class="audit-left">${escapeHtml(p?p.name:r.pid)}<div class="audit-sub">${attFmtTime(r.ts)}</div></div>
       <button type="button" class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:10.5px;color:var(--danger);margin:0;" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}">حذف</button>
     </div>`;
   }).join('');
@@ -23870,31 +23713,25 @@ function renderAdminAttendanceTab(){
   const todayISO = attTodayISO();
   const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
   const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ الجلسة الحالية من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ جلسة النهارده</button></div>` : '';
-  const R = state.attRoster || (state.attRoster = {f:'absent', team:'all'});
+  const R = state.attRoster || (state.attRoster = {f:'absent'});
   const here = new Set(recs.map(r=>r.pid));
   const recOf = {}; recs.forEach(r=>{ recOf[r.pid] = r; });
-  const teamStats = TEAMS.map(tm=>{ const m = PARTICIPANTS.filter(p=>p.teamId===tm.id); const a = m.filter(p=>here.has(p.id)).length; return {tm, n:m.length, a, pc:m.length?Math.round(a/m.length*100):0}; }).filter(x=>x.n);
-  const inScope = PARTICIPANTS.filter(p=>R.team==='all' || p.teamId===R.team);
+  const inScope = PARTICIPANTS.slice();
   const cntAll = inScope.length, cntIn = inScope.filter(p=>here.has(p.id)).length, cntOut = cntAll - cntIn;
   const rosterList = inScope.filter(p=> R.f==='all' || (R.f==='present') === here.has(p.id));
   const RLIM = 250;
   const rosterRows = rosterList.slice(0,RLIM).map(p=>{
-    const r = recOf[p.id]; const tmn = teamOf(p.teamId) ? teamOf(p.teamId).name : '';
+    const r = recOf[p.id];
     const btn = r
       ? `<button type="button" class="arr-btn in" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}" aria-label="إلغاء حضور ${escapeHtml(p.name)}"><span>✓</span><small>${attFmtTime(r.ts)}</small></button>`
       : `<button type="button" class="arr-btn" data-action="att-admin-quick" data-type="${type}" data-pid="${escapeHtml(String(p.id))}">سجّل</button>`;
-    return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id+' '+tmn).toLowerCase())}">
+    return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id).toLowerCase())}">
       <span class="arr-av">${escapeHtml((p.name||'?').trim().charAt(0))}</span>
-      <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(tmn)} · ${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
+      <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
       ${btn}
     </div>`;
   }).join('');
   const chipF = (id,lab,n)=>`<button type="button" class="att-chip ${R.f===id?'on':''}" data-action="att-admin-rf" data-f="${id}">${lab}<b>${n}</b></button>`;
-  const chipT = (id,lab)=>`<button type="button" class="att-chip att-chip-t ${R.team===id?'on':''}" data-action="att-admin-rteam" data-team="${escapeHtml(String(id))}">${escapeHtml(lab)}</button>`;
-  const teamBars = teamStats.map(x=>`<button type="button" class="att-tbar ${R.team===x.tm.id?'on':''}" data-action="att-admin-rteam" data-team="${escapeHtml(String(x.tm.id))}">
-      <span class="atb-name">${escapeHtml(x.tm.name)}</span>
-      <span class="atb-track"><i style="width:${x.pc}%"></i></span>
-      <span class="atb-n">${x.a}/${x.n}</span></button>`).join('');
   const lastRec = recs[0];
   const toolsHtml = `<div class="att-tools">
       <button type="button" class="att-tool" data-action="att-admin-undo" data-type="${type}" ${lastRec?'':'disabled'}><span>↩️</span><b>تراجع عن آخر تسجيل</b><small>${lastRec?escapeHtml((PARTICIPANTS.find(x=>x.id===lastRec.pid)||{}).name||''):'—'}</small></button>
@@ -23904,8 +23741,6 @@ function renderAdminAttendanceTab(){
     ${tabs}
     ${kpis}
     ${toolsHtml}
-    ${adminSectionTitle('📊','حضور الفرق')}
-    <div class="card att-tbars">${teamBars || '<div class="empty-note">لا توجد فرق</div>'}</div>
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div>
         <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">${CONF_SETTINGS.attendanceLocked?'🔧':'🛠️'} وضع "جاري التحديث" للحضور</div>
@@ -23976,11 +23811,9 @@ function renderAdminAttendanceTab(){
     ${adminSectionTitle('📋','كشف الحضور')}
     <div class="att-roster">
       <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('all','الكل',cntAll)}</div>
-      <div class="att-chips att-chips-scroll">${chipT('all','كل الفرق')}${TEAMS.filter(tm=>PARTICIPANTS.some(p=>p.teamId===tm.id)).map(tm=>chipT(tm.id,tm.name)).join('')}</div>
-      <input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دور بالاسم أو الكود أو الفريق..." style="margin:2px 0 10px;" />
-      ${(R.team!=='all' && cntOut>0) ? `<button type="button" class="btn btn-outline att-bulk" data-action="att-admin-team-all" data-type="${type}">✅ سجّل ${escapeHtml((teamOf(R.team)||{}).name||'الفريق')} كله (${cntOut})</button>` : ''}
+      <input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دور بالاسم أو الكود..." style="margin:2px 0 10px;" />
       <div class="att-roster-list">${rosterRows || `<div class="empty-note">${R.f==='absent'?'🎉 كل المشاركين في النطاق ده سجّلوا حضورهم':'مفيش أسماء في الفلتر ده'}</div>`}</div>
-      ${rosterList.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${rosterList.length} — استخدم البحث أو فلتر الفريق</div>` : ''}
+      ${rosterList.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${rosterList.length} — استخدم البحث</div>` : ''}
     </div>
     ${hist ? adminSectionTitle('🕓','الجلسات السابقة') + `<div class="card">${hist}</div>` : ''}
     <button type="button" class="btn btn-ghost" style="margin-top:14px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">🗑️ مسح كل سجلات ${t.label}</button>
@@ -24103,24 +23936,13 @@ async function attAdminAction(action, el){
     if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); return; }
     saveToast(ok, 'تم تسجيل حضور '+p.name);
   }
-  else if(action==='att-admin-rf'){ (state.attRoster = state.attRoster || {f:'absent',team:'all'}).f = el.dataset.f; render(); }
-  else if(action==='att-admin-rteam'){ const R0 = (state.attRoster = state.attRoster || {f:'absent',team:'all'}); R0.team = (R0.team===el.dataset.team) ? 'all' : el.dataset.team; render(); }
+  else if(action==='att-admin-rf'){ (state.attRoster = state.attRoster || {f:'absent'}).f = el.dataset.f; render(); }
   else if(action==='att-admin-quick'){
     const p = PARTICIPANTS.find(x=>String(x.id)===el.dataset.pid); const c = attCfg(type); if(!p || !c) return;
     const rkey = attRecKey(p.id, type, c.sessionId); let dup = false;
     const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, pts:attPtsOfCfg(type,c)}; });
     if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); render(); return; }
     saveToast(ok, '✓ '+p.name);
-  }
-  else if(action==='att-admin-team-all'){
-    const c = attCfg(type); const R0 = state.attRoster || {team:'all'}; if(!c || R0.team==='all') return;
-    const todo = PARTICIPANTS.filter(p=>p.teamId===R0.team && !ATT_RECORDS[attRecKey(p.id,type,c.sessionId)]);
-    if(!todo.length) return;
-    showConfirmDialog('تسجّل حضور '+todo.length+' من '+((teamOf(R0.team)||{}).name||'الفريق')+' دفعة واحدة؟', async ()=>{
-      const ts = Date.now(); const pts = attPtsOfCfg(type,c);
-      const ok = await attRecUpdate(o=>{ todo.forEach(p=>{ const k = attRecKey(p.id,type,c.sessionId); if(!o[k]) o[k] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts, manual:true, pts}; }); });
-      saveToast(ok, 'تم تسجيل '+todo.length+' مشارك');
-    }, {confirmLabel:'سجّل الكل'});
   }
   else if(action==='att-admin-undo'){
     const c = attCfg(type); if(!c) return;
@@ -24135,9 +23957,9 @@ async function attAdminAction(action, el){
   else if(action==='att-admin-export'){
     const c = attCfg(type); if(!c) return;
     const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-    const rows = [['الاسم','الكود','الفريق','الحالة','وقت الحضور','طريقة التسجيل','النقاط']];
+    const rows = [['الاسم','الكود','الحالة','وقت الحضور','طريقة التسجيل','النقاط']];
     PARTICIPANTS.forEach(p=>{ const r = ATT_RECORDS[attRecKey(p.id,type,c.sessionId)];
-      rows.push([p.name, p.id, (teamOf(p.teamId)||{}).name||'', r?'حاضر':'غائب', r?attFmtTime(r.ts):'', r?(r.manual?'يدوي':'QR'):'', r?(r.pts||0):'']); });
+      rows.push([p.name, p.id, r?'حاضر':'غائب', r?attFmtTime(r.ts):'', r?(r.manual?'يدوي':'QR'):'', r?(r.pts||0):'']); });
     const csv = '\ufeff' + rows.map(r=>r.map(q).join(',')).join('\r\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     a.download = 'حضور-'+t.label+'-'+(c.name||'الجلسة')+'.csv'; document.body.appendChild(a); a.click();
@@ -24380,14 +24202,13 @@ document.addEventListener('click', (e)=>{
     else if(t==='participants' && state.addingParticipant){ state.addingParticipant = false; }
     else if(t==='participants' && state.editingParticipantId){ state.editingParticipantId = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
-    else if(t==='teams' && state.editingTeamId){ state.editingTeamId = null; }
     else { state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
   }
   else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
   else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
-  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.editingTeamId = null; state.addingTeam = false; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
@@ -24462,7 +24283,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='invite-friend'){ doInviteFriend(); }
   else if(action==='claim-quest'){ doClaimQuest(el, el.dataset.claim, parseInt(el.dataset.reward,10)||0); }
   else if(action==='toggle-reminder'){ doToggleReminder(el, el.dataset.session); }
-  else if(action==='love-message'){ doLoveMessage(el.dataset.team, el.dataset.msg); }
   else if(action==='save-daily-message'){ doSaveDailyMessage(); }
   else if(action==='send-participant-alert'){ doSendParticipantAlert(); }
   else if(action==='generate-point-codes'){ doGeneratePointCodes(); }
@@ -25980,11 +25800,9 @@ async function doSaveParticipant(pid){
   const ov = overrides[pid] || (overrides[pid] = {});
   const nameEl = document.getElementById('edit-pname-'+pid);
   const idEl = document.getElementById('edit-pid-'+pid);
-  const teamEl = document.getElementById('edit-pteam-'+pid);
   const photoEl = document.getElementById('edit-pphoto-'+pid);
   const pendingCroppedKey = photoEl ? photoEl.id : null;
   if(nameEl && nameEl.value.trim()){ ov.name = nameEl.value.trim(); p.name = ov.name; }
-  if(teamEl){ ov.teamId = teamEl.value; p.teamId = ov.teamId; }
   delete ov.photo;
   let currentPid = pid;
   if(idEl && idEl.value.trim()){
@@ -26023,14 +25841,12 @@ async function doSaveParticipant(pid){
 async function doAdminAddParticipant(){
   const nameEl = document.getElementById('new-p-name');
   const idEl = document.getElementById('new-p-id');
-  const teamEl = document.getElementById('new-p-team');
   const name = nameEl ? nameEl.value.trim() : '';
   if(!name){ showToast('اكتب اسم المشارك الأول', true); return; }
-  const teamId = teamEl ? teamEl.value : TEAMS[0].id;
   let newId = idEl ? normalizeDigits(idEl.value.trim()).replace(/[^0-9]/g,'') : '';
   if(!newId){ showToast('كود الدخول لازم يكون أرقام بس', true); return; }
   if(PARTICIPANTS.some(p=>p.id===newId)){ showToast('الكود ده مستخدم بالفعل — اختار كود تاني', true); return; }
-  const newP = { id:newId, name, teamId };
+  const newP = { id:newId, name };
   CUSTOM_PARTICIPANTS.push(newP);
   PARTICIPANTS.push(newP);
   showToast(`تمت إضافة ${name} — الكود #${newId}`);
@@ -26045,10 +25861,8 @@ async function doDownloadAllQR(){
   const w = window.open('', '_blank');
   if(!w){ showToast('يرجى السماح بالنوافذ المنبثقة للتحميل', true); return; }
   const cardsHtml = PARTICIPANTS.map((p,i)=>{
-    const team = teamOf(p.teamId);
     return `
     <div class="pc">
-      <div class="pc-team" style="background:${team.color};">${escapeHtml(team.name)}</div>
       <div class="pc-qr" id="pqr-${i}"></div>
       <div class="pc-name">${escapeHtml(p.name)}</div>
       <div class="pc-code">#${escapeHtml(p.id)}</div>
@@ -26061,7 +25875,6 @@ async function doDownloadAllQR(){
     .doc-sub{text-align:center; color:#8a8270; font-size:12.5px; margin-bottom:22px;}
     .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px;}
     .pc{background:#fff; border:1.5px solid #e4dcc4; border-radius:16px; padding:12px; text-align:center; break-inside:avoid;}
-    .pc-team{display:inline-block; color:#fff; font-size:9.5px; font-weight:800; padding:3px 10px; border-radius:999px; margin-bottom:8px;}
     .pc-qr{display:flex; justify-content:center; margin-bottom:8px;}
     .pc-name{font-family:'Cairo',Arial,sans-serif; font-weight:800; font-size:12.5px; color:#221900;}
     .pc-code{font-size:10.5px; color:#8a8270; direction:ltr;}
@@ -26164,18 +25977,18 @@ async function doApplyParticipantGamePoints(pid, sign){
   } finally { _participantGamePointsBusy = false; }
 }
 /* ============================= ADMIN: تصفير / استرجاع نقاط الجميع ============================= */
-/* التصفير بياخد نسخة كاملة من (نقاط الفقرات + البونص + بونص الفرق) ويحفظها في مفتاح منفصل على Firebase
+/* التصفير بياخد نسخة كاملة من (نقاط الفقرات + البونص) ويحفظها في مفتاح منفصل على Firebase
    وبعدين يصفّر النقاط الحية. الاسترجاع بيرجّع النسخة دي "بالإضافة" لأي نقاط اتجمعت بعد التصفير، وبعدها بيمسح النسخة
    (عشان محدش يرجّعها مرتين). لو ضغطت تصفير أكتر من مرة قبل الاسترجاع، النسخ بتتجمع مع بعض ومفيش حاجة بتضيع. */
 const POINTS_BACKUP_KEY = 'glavera-points-backup';
-const POINTS_LIVE_KEYS = { checkins:'glavera-checkins', bonus:'glavera-bonus', teamBonus:'glavera-team-bonus' };
+const POINTS_LIVE_KEYS = { checkins:'glavera-checkins', bonus:'glavera-bonus' };
 
 async function loadPointsBackup(){
   try{
     const r = await window.storage.get(POINTS_BACKUP_KEY, true);
     if(!r || !r.value) return null;
     const v = JSON.parse(r.value);
-    return (v && typeof v==='object' && (v.checkins || v.bonus || v.teamBonus)) ? v : null;
+    return (v && typeof v==='object' && (v.checkins || v.bonus)) ? v : null;
   }catch(e){ return null; }
 }
 /* بيرجّع كائن البيانات، أو undefined لو القراءة فشلت/مشكوك فيها (السيرفر رجّع فاضي بينما عندنا بيانات في الذاكرة) */
@@ -26189,22 +26002,21 @@ async function readLivePointsStore(key, mem){
   return {};
 }
 async function readLivePoints(){
-  const [checkins, bonus, teamBonus] = await Promise.all([
+  const [checkins, bonus] = await Promise.all([
     readLivePointsStore(POINTS_LIVE_KEYS.checkins, CHECKINS),
-    readLivePointsStore(POINTS_LIVE_KEYS.bonus, BONUS),
-    readLivePointsStore(POINTS_LIVE_KEYS.teamBonus, TEAM_BONUS)
+    readLivePointsStore(POINTS_LIVE_KEYS.bonus, BONUS)
   ]);
-  if(checkins===undefined || bonus===undefined || teamBonus===undefined) return null;
-  return { checkins, bonus, teamBonus };
+  if(checkins===undefined || bonus===undefined) return null;
+  return { checkins, bonus };
 }
 function pointsDataIsEmpty(d){
   if(!d) return true;
   const nz = o => Object.values(o||{}).some(v => v && (typeof v==='object' ? (v.points||0)!==0 : v!==0));
-  return !nz(d.checkins) && !nz(d.bonus) && !nz(d.teamBonus);
+  return !nz(d.checkins) && !nz(d.bonus);
 }
 /* جمع مجموعتين نقاط (النتيجة = a + b) */
 function mergePointsData(a, b){
-  const out = { checkins:{}, bonus:{}, teamBonus:{} };
+  const out = { checkins:{}, bonus:{} };
   [a, b].forEach(src=>{
     if(!src) return;
     Object.entries(src.checkins||{}).forEach(([k, v])=>{
@@ -26216,11 +26028,11 @@ function mergePointsData(a, b){
         out.checkins[k] = Object.assign({}, v, { points:v.points||0 });
       }
     });
-    ['bonus','teamBonus'].forEach(f=>{
+    ['bonus'].forEach(f=>{
       Object.entries(src[f]||{}).forEach(([k, v])=>{ if(v) out[f][k] = (out[f][k]||0) + v; });
     });
   });
-  ['bonus','teamBonus'].forEach(f=>{ Object.keys(out[f]).forEach(k=>{ if(!out[f][k]) delete out[f][k]; }); });
+  ['bonus'].forEach(f=>{ Object.keys(out[f]).forEach(k=>{ if(!out[f][k]) delete out[f][k]; }); });
   Object.keys(out.checkins).forEach(k=>{ if(!out.checkins[k].points) delete out.checkins[k]; });
   return out;
 }
@@ -26236,14 +26048,13 @@ function summarizePointsData(d){
 async function writePointsStores(data){
   const res = await Promise.all([
     window.storage.set(POINTS_LIVE_KEYS.checkins, JSON.stringify(data.checkins), true),
-    window.storage.set(POINTS_LIVE_KEYS.bonus, JSON.stringify(data.bonus), true),
-    window.storage.set(POINTS_LIVE_KEYS.teamBonus, JSON.stringify(data.teamBonus), true)
+    window.storage.set(POINTS_LIVE_KEYS.bonus, JSON.stringify(data.bonus), true)
   ]);
-  return res.map(r=>!!r);   /* [checkinsOk, bonusOk, teamBonusOk] */
+  return res.map(r=>!!r);   /* [checkinsOk, bonusOk] */
 }
 async function rollbackPointsStores(original, okFlags){
   /* لو الحفظ فشل في جزء، بنرجّع الأجزاء اللي اتغيّرت لأصلها */
-  const keys = ['checkins','bonus','teamBonus'];
+  const keys = ['checkins','bonus'];
   for(let i=0;i<keys.length;i++){
     if(okFlags[i]){ try{ await window.storage.set(POINTS_LIVE_KEYS[keys[i]], JSON.stringify(original[keys[i]]), true); }catch(e){} }
   }
@@ -26252,7 +26063,7 @@ function confirmResetAllPoints(){
   if(_pointsOpBusy) return;
   showConfirmDialog('تصفير نقاط جميع المشاركين؟', ()=>doResetAllPoints(), {
     icon:'⚠️', confirmLabel:'تصفير الكل',
-    sub:'كل المشاركين والفرق هيرجعوا بصفر نقطة. النقاط بتتحفظ في نسخة، وتقدر ترجّعها بزر "استرجاع النقاط اللي اتصفرت".'
+    sub:'كل المشاركين هيرجعوا بصفر نقطة. النقاط بتتحفظ في نسخة، وتقدر ترجّعها بزر "استرجاع النقاط اللي اتصفرت".'
   });
 }
 function confirmRestorePoints(){
@@ -26276,14 +26087,14 @@ async function doResetAllPoints(){
     if(!oldBackup && POINTS_BACKUP){ showToast('تعذر قراءة نسخة النقاط المحفوظة — حاول تاني', true); return; }
     const merged = mergePointsData(oldBackup, live);
     const sum = summarizePointsData(merged);
-    const doc = { ts: Date.now(), checkins: merged.checkins, bonus: merged.bonus, teamBonus: merged.teamBonus, participants: sum.participants, total: sum.total };
+    const doc = { ts: Date.now(), checkins: merged.checkins, bonus: merged.bonus, participants: sum.participants, total: sum.total };
 
     /* 1) نحفظ النسخة الأول — لو فشلت منصفّرش */
     const backupSaved = await window.storage.set(POINTS_BACKUP_KEY, JSON.stringify(doc), true);
     if(!backupSaved){ showToast('تعذر حفظ نسخة النقاط — مفيش حاجة اتصفّرت. تحقق من الاتصال وحاول تاني', true); return; }
 
     /* 2) نصفّر النقاط الحية */
-    const flags = await writePointsStores({ checkins:{}, bonus:{}, teamBonus:{} });
+    const flags = await writePointsStores({ checkins:{}, bonus:{} });
     if(flags.some(f=>!f)){
       await rollbackPointsStores(live, flags);
       if(oldBackup){ await window.storage.set(POINTS_BACKUP_KEY, JSON.stringify(oldBackup), true); }
@@ -26291,7 +26102,7 @@ async function doResetAllPoints(){
       showToast('تعذر إتمام التصفير على السيرفر — رجّعنا كل حاجة زي ما كانت. حاول تاني', true);
       return;
     }
-    CHECKINS = {}; BONUS = {}; TEAM_BONUS = {};
+    CHECKINS = {}; BONUS = {};
     POINTS_BACKUP = doc; _pointsBackupLoaded = true;
     showToast('✅ تم تصفير نقاط جميع المشاركين');
     render();
@@ -26319,7 +26130,7 @@ async function doRestorePoints(){
       showToast('تعذر إتمام الاسترجاع على السيرفر — رجّعنا كل حاجة زي ما كانت. حاول تاني', true);
       return;
     }
-    CHECKINS = merged.checkins; BONUS = merged.bonus; TEAM_BONUS = merged.teamBonus;
+    CHECKINS = merged.checkins; BONUS = merged.bonus;
 
     /* بعد نجاح الاسترجاع نمسح النسخة عشان مترجعش مرتين */
     let cleared = false;
@@ -26599,7 +26410,6 @@ async function doAdminResetVisaPin(pid){
   pushNotification(pid, '🔑 المنظمين أعادوا تعيين الرقم السري لفيزتك — اكتب رقم جديد من صفحة فيزتي', '🔑');
   showToast('✅ تمت إعادة تعيين الرقم السري');
 }
-/* ============================= ADMIN: TEAMS ============================= */
 /* ============================= ADMIN: ALERTS ============================= */
 async function doSubmitAdminAlert(){
   const ta = document.getElementById('alert-text');
@@ -26907,7 +26717,6 @@ async function doInviteFriend(){
 function doShareCard(){
   if(!state.pid) return;
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
   const total = participantTotal(p.id);
   const rank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
 
@@ -26926,14 +26735,14 @@ function doShareCard(){
 
   ctx.beginPath();
   ctx.arc(canvas.width/2, 260, 90, 0, Math.PI*2);
-  ctx.fillStyle = team.color; ctx.fill();
+  ctx.fillStyle = '#3B4A7A'; ctx.fill();
   ctx.fillStyle='#1a1633'; ctx.font='800 46px Cairo, sans-serif';
   ctx.fillText(initials(p.name), canvas.width/2, 275);
 
   ctx.fillStyle='#F6F5FF'; ctx.font='800 30px Cairo, sans-serif';
   ctx.fillText(p.name, canvas.width/2, 400);
   ctx.fillStyle='#9D9BC4'; ctx.font='500 15px Tajawal, sans-serif';
-  ctx.fillText(team.name+' · كود '+p.id, canvas.width/2, 428);
+  ctx.fillText('كود '+p.id, canvas.width/2, 428);
 
   ctx.fillStyle='#F4B740'; ctx.font='900 84px Cairo, sans-serif';
   ctx.fillText(String(total), canvas.width/2, 560);
@@ -26961,7 +26770,6 @@ function doShareCard(){
 function doExportJourneyPdf(){
   if(!state.pid) return;
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const team = teamOf(p.teamId);
   const total = participantTotal(p.id);
   const rank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
 
@@ -26984,7 +26792,7 @@ function doExportJourneyPdf(){
     <style>body{font-family:Tajawal,Arial,sans-serif;padding:32px;color:#222;} h1{color:#c98a1f;} h3{color:#333;margin-top:22px;}</style>
     </head><body>
     <h1>جلافيرا 3 — رحلة المشارك</h1>
-    <p><strong>${escapeHtml(p.name)}</strong> · ${team.name} · كود <span dir="ltr" style="unicode-bidi:isolate;">${p.id}</span></p>
+    <p><strong>${escapeHtml(p.name)}</strong> · كود <span dir="ltr" style="unicode-bidi:isolate;">${p.id}</span></p>
     <p>مجموع النقاط: <strong>${total}</strong> — الترتيب الفردي: <strong>#${rank}</strong></p>
     <hr/>
     ${rowsHtml}
@@ -26995,18 +26803,6 @@ function doExportJourneyPdf(){
   setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 400);
 }
 
-/* ============================= TEAM MESSAGES ============================= */
-async function doLoveMessage(teamId, msgId){
-  const list = TEAM_MESSAGES[teamId]||[];
-  const msg = list.find(m=>m.id===msgId);
-  if(!msg || !state.pid) return;
-  msg.loves = msg.loves || [];
-  const idx = msg.loves.indexOf(state.pid);
-  if(idx>=0) msg.loves.splice(idx,1); else msg.loves.push(state.pid);
-  await saveTeamMessages(TEAM_MESSAGES);
-  SND.cheer();
-  render();
-}
 
 /* ============================= DAILY MORNING MESSAGE ============================= */
 async function doSaveDailyMessage(){
@@ -27851,10 +27647,10 @@ async function doExportFullBackup(){
       version: 1,
       data: {
         CHECKINS, SESSION_INFO, PROFILE_EXTRA, CHEERS, BONUS, GIFT_POINTS,
-        GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
+        GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, DAILY_MESSAGE,
         POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES,
-        SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS,
-        CUSTOM_PARTICIPANTS, CUSTOM_TEAMS, GALLERY_ALBUMS, galleryPhotos,
+        SESSION_OVERRIDES, CUSTOM_SESSIONS, ADMIN_ALERTS,
+        CUSTOM_PARTICIPANTS, GALLERY_ALBUMS, galleryPhotos,
         PARTICIPANT_PHOTOS, participantPhotos, CHAT_MESSAGES, chatMedia
       }
     };
@@ -27875,16 +27671,9 @@ async function doExportFullBackup(){
   }
 }
 function doExportResults(){
-  const rows = [['الترتيب','الاسم','الكود','الفريق','مجموع النقاط']];
+  const rows = [['الترتيب','الاسم','الكود','مجموع النقاط']];
   rankedParticipants().forEach((p,i)=>{
-    const t = teamOf(p.teamId);
-    rows.push([i+1, p.name, p.id, t.name, p.total]);
-  });
-  rows.push([]);
-  rows.push(['ترتيب الفرق']);
-  rows.push(['الترتيب','الفريق','عدد الأعضاء','مجموع النقاط']);
-  rankedTeams().forEach((t,i)=>{
-    rows.push([i+1, t.name, t.count, t.total]);
+    rows.push([i+1, p.name, p.id, p.total]);
   });
   const csv = '\uFEFF' + rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
@@ -28220,17 +28009,16 @@ document.addEventListener('keydown', (e)=>{
 async function refreshAllData(){
   let customAdminHash;
   [CHECKINS, customAdminHash, SESSION_INFO, PROFILE_EXTRA, CHEERS, BONUS, GIFT_POINTS,
-   GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, GAME_POINTS_SETTINGS, TEAM_MESSAGES, DAILY_MESSAGE,
+   GAME_STATS, GAME_ROOMS, LOGISTICS, CONF_SETTINGS, GAME_POINTS_SETTINGS, DAILY_MESSAGE,
    POINT_CODES, WALL_POSTS, QUESTIONS, REPORTS, OPINIONS, TRASH, DAY_OVERRIDES, SESSION_OVERRIDES,
-   CUSTOM_SESSIONS, ADMIN_ALERTS, TEAM_OVERRIDES, TEAM_BONUS, CUSTOM_PARTICIPANTS,
-   CUSTOM_TEAMS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CUSTOM_STICKERS, OWNED_STICKERS,
+   CUSTOM_SESSIONS, ADMIN_ALERTS, CUSTOM_PARTICIPANTS, GALLERY_ALBUMS, PARTICIPANT_PHOTOS, CHAT_MESSAGES, CUSTOM_STICKERS, OWNED_STICKERS,
    OWNED_CARD_THEMES, SHOP_PRICES, CUSTOM_CARD_REQUESTS, CUSTOM_CARD_THEMES, HIDDEN_BUILTIN_THEMES, VISA_CARDS, QUIZ_QUESTIONS] = await Promise.all([
     loadCheckins(), loadAdminPasscodeHash(), loadSessionInfo(), loadProfileExtra(),
     loadCheers(), loadBonus(), loadGiftPoints(), loadGameStats(), loadGameRooms(),
-    loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadTeamMessages(), loadDailyMessage(),
+    loadLogistics(), loadConfSettings(), loadGamePointsSettings(), loadDailyMessage(),
     loadPointCodes(), loadWallPosts(), loadQuestions(), loadReports(), loadOpinions(), loadTrash(),
     loadDayOverrides(), loadSessionOverrides(), loadCustomSessions(), loadAdminAlerts(),
-    loadTeamOverrides(), loadTeamBonus(), loadCustomParticipants(), loadCustomTeams(),
+    loadCustomParticipants(),
     loadGalleryAlbums(), loadParticipantPhotosIndex(), loadChatMessages(), loadCustomStickers(), loadOwnedStickers(),
     loadOwnedCardThemes(), loadShopPrices(), loadCustomCardRequests(), loadCustomCardThemes(), loadHiddenBuiltinThemes(), loadVisaCards(), loadQuizQuestions()
   ]);
@@ -28238,11 +28026,8 @@ async function refreshAllData(){
   await preloadGalleryPhotos(GALLERY_ALBUMS);
   await preloadStickerImages(CUSTOM_STICKERS);
   await preloadCardThemeImages(CUSTOM_CARD_THEMES);
-  CUSTOM_TEAMS.forEach(ct=>{
-    if(!TEAMS.some(t=>t.id===ct.id)) TEAMS.push({id:ct.id, name:ct.name, color:ct.color});
-  });
   CUSTOM_PARTICIPANTS.forEach(cp=>{
-    if(!PARTICIPANTS.some(p=>p.id===cp.id)) PARTICIPANTS.push({id:cp.id, name:cp.name, teamId:cp.teamId});
+    if(!PARTICIPANTS.some(p=>p.id===cp.id)) PARTICIPANTS.push({id:cp.id, name:cp.name});
   });
 
   // ---- apply day/session overrides + custom sessions ----
@@ -28265,15 +28050,7 @@ async function refreshAllData(){
     });
   });
 
-  // ---- apply team overrides ----
-  TEAMS.forEach(t=>{
-    const tov = TEAM_OVERRIDES[t.id];
-    t.logo = tov ? tov.logo : null;
-    t.leaderId = tov ? tov.leaderId : null;
-    t.name = (tov && tov.name) ? tov.name : (t.baseName || (t.baseName = t.name));
-  });
-
-  // ---- apply participant overrides (name/team/bonus) ----
+  // ---- apply participant overrides (name/bonus) ----
   PARTICIPANT_OVERRIDES = await loadParticipantOverrides();
   const overrides = PARTICIPANT_OVERRIDES;
   let overridesChanged = false;
@@ -28283,7 +28060,6 @@ async function refreshAllData(){
     if(!ov) continue;
     if(ov.deleted){ PARTICIPANTS.splice(i,1); continue; }
     if(ov.name) p.name = ov.name;
-    if(ov.teamId) p.teamId = ov.teamId;
     if(ov.photo) p.photo = ov.photo; // legacy fallback for photos saved before individual-key storage
     if(ov.newId && ov.newId !== p.id && !ov.migrated){
       const oldId = p.id, newId = ov.newId;
@@ -28376,12 +28152,10 @@ function startLivePolling(){
       }
     }catch(e){}
     try{
-      /* البونص وبونص الفرق: نحدّثهم كل دورة (وبس لو القراءة نجحت) عشان تصفير/استرجاع النقاط يظهر عند الكل ومحدش يكتب فوقه ببيانات قديمة */
+      /* البونص: نحدّثهم كل دورة (وبس لو القراءة نجحت) عشان تصفير/استرجاع النقاط يظهر عند الكل ومحدش يكتب فوقه ببيانات قديمة */
       const readObj = async (key)=>{ const r = await window.storage.get(key, true); if(!r || !r.value) return null; const v = JSON.parse(r.value); return (v && typeof v==='object') ? v : null; };
       const fb = await readObj('glavera-bonus');
       if(fb && JSON.stringify(fb) !== JSON.stringify(BONUS)) BONUS = fb;
-      const ftb = await readObj('glavera-team-bonus');
-      if(ftb && JSON.stringify(ftb) !== JSON.stringify(TEAM_BONUS)) TEAM_BONUS = ftb;
     }catch(e){}
     try{
       if(state.view==='wall'){
@@ -28604,9 +28378,8 @@ const __loginDataPromise = new Promise(r=>{ __loginDataResolve = r; });
 function __markLoginDataReady(){ __loginDataReady = true; __loginDataResolve(); }
 async function preloadLoginData(){
   try{
-    const [cp, ct] = await Promise.all([loadCustomParticipants(), loadCustomTeams()]);
-    (ct||[]).forEach(t=>{ if(!TEAMS.some(x=>x.id===t.id)) TEAMS.push({id:t.id, name:t.name, color:t.color}); });
-    (cp||[]).forEach(c=>{ if(!PARTICIPANTS.some(x=>x.id===c.id)) PARTICIPANTS.push({id:c.id, name:c.name, teamId:c.teamId}); });
+    const cp = await loadCustomParticipants();
+    (cp||[]).forEach(c=>{ if(!PARTICIPANTS.some(x=>x.id===c.id)) PARTICIPANTS.push({id:c.id, name:c.name}); });
   }catch(e){ console.error('preloadLoginData failed', e); }
 }
 function loginWaitAndRetry(retry){
