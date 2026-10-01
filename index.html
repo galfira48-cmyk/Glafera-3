@@ -383,6 +383,66 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .btn:disabled{opacity:.5;}
   /* ---------- professional "Next" pill button (post-round transition) ---------- */
   #app{transition:opacity .22s ease;}
+
+  /* ============ شريط التنقل السفلي — "الفقاعة السائلة" ============ */
+  #bnav{ position:fixed; left:0; right:0; bottom:0; z-index:90; display:none; justify-content:center; pointer-events:none; padding:0 10px calc(10px + env(safe-area-inset-bottom,0px)); transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .3s; }
+  #bnav.show{ display:flex; animation:bnavIn .6s cubic-bezier(.22,1,.36,1) both; }
+  #bnav.hide{ transform:translateY(150%); opacity:0; }
+  @keyframes bnavIn{ from{ transform:translateY(130%); opacity:0; } to{ transform:none; opacity:1; } }
+  body.kb-open #bnav{ display:none !important; }
+  .bnav-bar{ pointer-events:auto; position:relative; width:100%; max-width:456px; height:66px; margin-top:28px; display:grid; grid-template-columns:repeat(5,1fr); padding:0 16px; filter:drop-shadow(0 14px 16px rgba(0,0,0,.42)) drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+  html[data-theme="light"] .bnav-bar{ filter:drop-shadow(0 12px 14px rgba(30,24,10,.2)) drop-shadow(0 2px 3px rgba(30,24,10,.12)); }
+  .bnav-bg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+  .bnav-bg path{ fill:var(--surface); fill-opacity:.97; stroke:var(--gold); stroke-opacity:.28; stroke-width:1; }
+  .bnav-orb{ position:absolute; top:-28px; left:0; width:56px; height:56px; border-radius:50%; z-index:3; pointer-events:none; display:flex; align-items:center; justify-content:center; color:#1a1633; will-change:transform,left;
+    background:linear-gradient(150deg,var(--gold-2) 0%,var(--gold) 100%);
+    box-shadow:0 10px 22px -6px color-mix(in srgb,var(--gold) 65%,transparent), inset 0 1.5px 1px rgba(255,255,255,.55), inset 0 -4px 7px rgba(120,80,0,.22); }
+  @keyframes bnavPulse{ 0%{ transform:scale(.8); opacity:.5; } 100%{ transform:scale(1.3); opacity:0; } }
+  .bnav-orb svg{ width:26px; height:26px; fill:rgba(26,22,51,.18); stroke:#1a1633; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; animation:bnavPop .5s cubic-bezier(.34,1.8,.5,1); }
+  @keyframes bnavPop{ from{ transform:scale(.3) rotate(-30deg); opacity:0; } to{ transform:none; opacity:1; } }
+  .bnav-item{ appearance:none; border:none; background:none; cursor:pointer; font-family:'Cairo',Tahoma,sans-serif; color:var(--text-muted); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; height:100%; padding:0; position:relative; z-index:2; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:color .3s; }
+  .bnav-ico{ width:30px; height:26px; display:flex; align-items:center; justify-content:center; position:relative; transition:transform .45s cubic-bezier(.34,1.7,.5,1), opacity .25s; }
+  .bnav-ico svg{ width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .bnav-ico svg .d, .bnav-orb svg .d{ fill:currentColor; fill-opacity:.16; }
+  .bnav-qi svg{ width:20px; height:20px; fill:none; stroke:var(--gold); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .bnav-lab{ font-size:10.5px; white-space:nowrap; font-weight:700; line-height:1; transition:transform .4s cubic-bezier(.34,1.6,.5,1); }
+  .bnav-item:active .bnav-ico{ transform:scale(.8); }
+  .bnav-item.active{ color:var(--gold); }
+  .bnav-item.active .bnav-ico{ opacity:0; transform:translateY(14px) scale(.4); }
+  .bnav-item.active .bnav-lab{ font-weight:800; transform:translateY(-1px); }
+  .bnav-dot{ position:absolute; top:11px; inset-inline-end:calc(50% - 20px); width:9px; height:9px; border-radius:50%; background:var(--danger); border:2px solid var(--surface); }
+  .bnav-dot::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--danger); animation:bnavPulse 1.6s ease-out infinite; }
+  .bnav-quick{ position:fixed; z-index:91; left:0; right:0; bottom:0; margin:0 auto; width:100%; max-width:480px; padding:8px 14px calc(16px + env(safe-area-inset-bottom,0px));
+    border-radius:28px 28px 0 0; background:color-mix(in srgb,var(--surface) 97%,transparent); -webkit-backdrop-filter:blur(24px) saturate(1.3); backdrop-filter:blur(24px) saturate(1.3);
+    border:1px solid color-mix(in srgb,var(--gold) 30%,var(--border)); border-bottom:none; box-shadow:0 -18px 50px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.07);
+    animation:bnavSheet .4s cubic-bezier(.22,1,.36,1) both; touch-action:pan-x; }
+  html[data-theme="light"] .bnav-quick{ box-shadow:0 -14px 40px -14px rgba(30,24,10,.3), inset 0 1px 0 rgba(255,255,255,.7); }
+  .bnav-quick.out{ animation:bnavSheetOut .22s ease both !important; }
+  @keyframes bnavSheet{ from{ transform:translateY(100%); } to{ transform:none; } }
+  @keyframes bnavSheetOut{ to{ transform:translateY(105%); } }
+  .bnav-qgrab{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:4px 0 6px; touch-action:none; cursor:grab; }
+  .bnav-qgrab::before{ content:''; width:40px; height:4px; border-radius:99px; background:color-mix(in srgb,var(--text-muted) 55%,transparent); }
+  .bnav-qh{ display:flex; align-items:center; gap:10px; width:100%; padding:2px 4px 6px; font-weight:800; font-size:15px; color:var(--text); }
+  .bnav-qhi{ width:30px; height:30px; border-radius:10px; display:grid; place-items:center; color:var(--gold); background:color-mix(in srgb,var(--gold) 14%,transparent); }
+  .bnav-qhi svg{ width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .bnav-qhi svg .d{ fill:currentColor; fill-opacity:.16; }
+  .bnav-qlist{ display:flex; flex-direction:column; border-radius:20px; overflow:hidden; background:color-mix(in srgb,var(--text) 5%,transparent); border:1px solid color-mix(in srgb,var(--border) 80%,transparent); }
+  .bnav-quick button{ position:relative; appearance:none; border:none; background:transparent; width:100%; display:flex; align-items:center; gap:14px; padding:12px 14px; text-align:start; cursor:pointer;
+    font-family:'Cairo',Tahoma,sans-serif; color:var(--text); -webkit-tap-highlight-color:transparent; outline:none; transition:background-color .18s; }
+  .bnav-quick button + button::before{ content:''; position:absolute; top:0; inset-inline-start:72px; inset-inline-end:0; height:1px; background:color-mix(in srgb,var(--border) 90%,transparent); }
+  .bnav-quick button:active, .bnav-quick button:focus-visible{ background:color-mix(in srgb,var(--gold) 13%,transparent); }
+  .bnav-qi{ flex:none; width:44px; height:44px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(145deg,color-mix(in srgb,var(--gold) 26%,transparent),color-mix(in srgb,var(--gold) 8%,transparent)); border:1px solid color-mix(in srgb,var(--gold) 34%,transparent); transition:transform .22s cubic-bezier(.34,1.7,.5,1); }
+  .bnav-qi svg{ width:23px; height:23px; fill:none; stroke:var(--gold); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .bnav-quick button:active .bnav-qi{ transform:scale(.92); }
+  .bnav-qt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .bnav-ql{ font-size:15px; font-weight:800; line-height:1.4; }
+  .bnav-qd{ font-size:12px; font-weight:600; line-height:1.4; color:var(--text-muted); }
+  .bnav-qc{ flex:none; width:18px; height:18px; fill:none; stroke:var(--text-muted); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; opacity:.6; }
+  html[dir="rtl"] .bnav-qc{ transform:scaleX(-1); }
+  #bnav-scrim{ position:fixed; inset:0; z-index:89; background:rgba(6,5,20,.45); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); animation:bnavIn .2s both; }
+  #app.has-bnav{ padding-bottom:120px; }
+  body.has-bnav .toast{ bottom:calc(104px + env(safe-area-inset-bottom,0px)); }
+  @media (prefers-reduced-motion: reduce){ #bnav, #bnav.show, .bnav-orb::after, .bnav-orb svg, .bnav-ico, .bnav-quick, .bnav-quick button{ animation:none !important; transition:none !important; } }
   #app.screen-fade-out{opacity:0;}
   .btn-next-pro{display:flex; align-items:center; justify-content:center; gap:10px;
     width:fit-content; margin:18px auto 0; padding:12px 16px 12px 24px; border-radius:999px; direction:ltr;
@@ -9906,12 +9966,6 @@ function renderProfile(){
 
     ${attHomeSectionHtml()}
 
-    <div class="section-title">${tr('conf_capabilities_title')} <span class="sub">${tr('conf_capabilities_sub')}</span></div>
-    <div class="radial-launcher">
-      <button type="button" class="radial-fab" data-action="tile-nav" data-page="capabilities" aria-label="${tr('conf_capabilities_title')}">
-        <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
-      </button>
-    </div>
 
     <div class="brand-signature">te-epistoly</div>
     <div class="brand-signature-sub">جلافيرا 3 — بإدارة تي إبستولي</div>
@@ -22163,6 +22217,150 @@ function renderAdminAlertsTab(){
   return kpis + tabs + body;
 }
 
+
+/* ============================= BOTTOM NAV BAR ============================= */
+const BNAV_ICONS = {
+  me:'<svg viewBox="0 0 24 24"><circle class="d" cx="12" cy="8" r="3.7"/><path fill="none" d="M5 20.2c.5-3.7 3.3-5.9 7-5.9s6.5 2.2 7 5.9"/></svg>',
+  games:'<svg viewBox="0 0 24 24"><path class="d" d="M7.2 7.5h9.6a4.7 4.7 0 0 1 4.6 3.8l.9 4.6a2.6 2.6 0 0 1-4.4 2.3l-1.8-1.9H7.9l-1.8 1.9a2.6 2.6 0 0 1-4.4-2.3l.9-4.6a4.7 4.7 0 0 1 4.6-3.8z"/><path fill="none" d="M8 10.8v3.4M6.3 12.5h3.4"/><circle cx="15.8" cy="11.6" r="1" fill="currentColor" stroke="none"/><circle cx="18.1" cy="13.8" r="1" fill="currentColor" stroke="none"/></svg>',
+  attend:'<svg viewBox="0 0 24 24"><rect class="d" x="3.5" y="5" width="17" height="15.5" rx="3.2"/><path fill="none" d="M8 3v3.6M16 3v3.6M3.5 10h17"/><path fill="none" d="m8.8 15.1 2.3 2.3 4.3-4.6"/></svg>',
+  home:'<svg viewBox="0 0 24 24"><path class="d" d="M4.5 10.8 12 4.2l7.5 6.6V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19z"/><path fill="none" d="M9.6 20.5v-4.6a1.4 1.4 0 0 1 1.4-1.4h2a1.4 1.4 0 0 1 1.4 1.4v4.6"/></svg>',
+  more:'<svg viewBox="0 0 24 24"><rect class="d" x="4" y="4" width="6.6" height="6.6" rx="2"/><rect fill="none" x="13.4" y="4" width="6.6" height="6.6" rx="2"/><rect fill="none" x="4" y="13.4" width="6.6" height="6.6" rx="2"/><rect class="d" x="13.4" y="13.4" width="6.6" height="6.6" rx="2"/></svg>'
+};
+/* أيقونات القوائم السريعة (خط واحد متناسق) */
+const BNAV_QI = {
+  me:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.7"/><path d="M5 20.2c.5-3.7 3.3-5.9 7-5.9s6.5 2.2 7 5.9"/></svg>',
+  settings:'<svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
+  gallery:'<svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="9" cy="9.5" r="1.6"/><path d="M4 17.5l4.8-4.6a1.6 1.6 0 0 1 2.2 0l2.4 2.3 2-1.9a1.6 1.6 0 0 1 2.2 0L20 15.5"/></svg>',
+  opinion:'<svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5z"/><path d="M8.5 9h7M8.5 12h4"/></svg>',
+  solo:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1" fill="currentColor" stroke="none"/></svg>',
+  rooms:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.4-3 2.7-5 5.5-5s5.1 2 5.5 5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M16 14.3c2.6-.2 4.5 1.5 4.9 4.2"/></svg>',
+  store:'<svg viewBox="0 0 24 24"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h13A1.5 1.5 0 0 1 20 8.5V10a2 2 0 0 0 0 4v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5V14a2 2 0 0 0 0-4z"/><path d="M14.5 9v6" stroke-dasharray="1.6 2"/></svg>'
+};
+const BNAV_TABS = [
+  {page:'me',           label:'الملف الشخصي', ico:BNAV_ICONS.me,    quick:[['gallery','صوري','myphotos','كل صورك في مكان واحد'],['settings','الإعدادات','settings','تحكّم في حسابك وتفضيلاتك']]},
+  {page:'games',        label:'الألعاب',  ico:BNAV_ICONS.games,   quick:[['solo','ألعاب فردية','games-solo','العب بمفردك وتحدَّ نفسك'],['rooms','غرف الأصحاب','game-rooms','العب مع أصدقائك في غرفة واحدة'],['store','متجر الاستيكر','sticker-store','تصفّح الاستيكرات المتاحة']]},
+  {page:'profile',      label:'الرئيسية', ico:BNAV_ICONS.home,    quick:[['gallery','المعرض','gallery','صور المجموعة وذكرياتها'],['opinion','رأيك','opinion','شاركنا رأيك وملاحظاتك']]},
+  {page:'attendance',   label:'الحضور',   ico:BNAV_ICONS.attend,  badge:'live'},
+  {page:'capabilities', label:'المزيد',   ico:BNAV_ICONS.more,    quick:[['gallery','المعرض','gallery','صور المجموعة وذكرياتها'],['opinion','رأيك','opinion','شاركنا رأيك وملاحظاتك'],['settings','الإعدادات','settings','تحكّم في حسابك وتفضيلاتك']]}
+];
+const BNAV_VIEW_TAB = {profile:'profile', attendance:'attendance', games:'games', me:'me',
+  gallery:'capabilities', capabilities:'capabilities', opinion:'capabilities', myphotos:'me', settings:'capabilities'};
+let _bnLastY = 0, _bnPress = null;
+const _bn = {x:null, raf:0};
+function bnavDraw(cx, sq){
+  const bar = document.querySelector('#bnav .bnav-bar'); if(!bar) return;
+  const W = bar.offsetWidth, H = bar.offsetHeight, R = 20;
+  const rn = 33, f = 6;                         /* نصف قطر التجويف (الكرة 28 + فراغ 5) ونعومة الحواف */
+  const k = Math.sqrt((rn+f)*(rn+f) - f*f);     /* بداية انحناء الحافة أفقيًا */
+  const tx = rn*k/(rn+f), ty = rn*f/(rn+f);     /* نقطة التقاء الانحناء بالدائرة */
+  const c = Math.max(R+k, Math.min(W-R-k, cx));
+  const path = `M${R},0 H${c-k} A${f},${f} 0 0 1 ${c-tx},${ty} A${rn},${rn} 0 0 0 ${c+tx},${ty} A${f},${f} 0 0 1 ${c+k},0 H${W-R} Q${W},0 ${W},${R} V${H-R} Q${W},${H} ${W-R},${H} H${R} Q0,${H} 0,${H-R} V${R} Q0,0 ${R},0 Z`;
+  const svg = bar.querySelector('.bnav-bg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.firstChild.setAttribute('d', path);
+  const o = bar.querySelector('.bnav-orb'); o.style.left = (c-28)+'px';
+  o.style.transform = `scale(${1+sq*.6}, ${1-sq*.45})`;
+}
+function bnavMoveGlide(snap){
+  const bar = document.querySelector('#bnav .bnav-bar'); if(!bar) return;
+  const a = bar.querySelector('.bnav-item.active'); if(!a || !a.offsetWidth) return;
+  const tx = a.offsetLeft + a.offsetWidth/2;
+  cancelAnimationFrame(_bn.raf);
+  if(_bn.x==null || snap===true){ _bn.x = tx; bnavDraw(tx, 0); return; }
+  const from = _bn.x, dist = tx-from, t0 = performance.now(), dur = 640;
+  if(Math.abs(dist)<1){ bnavDraw(tx,0); return; }
+  const step = now=>{
+    const t = Math.min(1,(now-t0)/dur), u = t-1, e = 1 + 2.2*u*u*u + 1.2*u*u; /* easeOutBack */
+    const x = from + dist*e; _bn.x = x;
+    bnavDraw(x, Math.sin(Math.PI*Math.min(1,t*1.15))*Math.min(1,Math.abs(dist)/170)*.3);
+    if(t<1) _bn.raf = requestAnimationFrame(step); else { _bn.x = tx; bnavDraw(tx,0); }
+  };
+  _bn.raf = requestAnimationFrame(step);
+}
+function updateBottomNav(){
+  let nav = document.getElementById('bnav');
+  if(!nav){ nav = document.createElement('nav'); nav.id='bnav'; nav.setAttribute('aria-label','التنقل الرئيسي'); document.body.appendChild(nav); }
+  const active = state.pid ? BNAV_VIEW_TAB[state.view] : null;
+  const visible = !!active && !state.roomSpectate;
+  const app = document.getElementById('app');
+  if(app) app.classList.toggle('has-bnav', visible);
+  document.body.classList.toggle('has-bnav', visible);
+  nav.classList.toggle('show', visible);
+  if(!visible){ bnavCloseQuick(); return; }
+  nav.classList.remove('hide');
+  if(!nav.querySelector('.bnav-bar')){
+    nav.innerHTML = `<div class="bnav-bar"><svg class="bnav-bg"><path d=""/></svg><div class="bnav-orb"></div>${BNAV_TABS.map(t=>`
+      <button type="button" class="bnav-item" data-action="bnav" data-page="${t.page}" aria-label="${t.label}">
+        <span class="bnav-ico">${t.ico}</span><span class="bnav-lab">${t.label}</span>${t.badge?'<i class="bnav-dot" hidden></i>':''}
+      </button>`).join('')}</div>`;
+    nav.querySelectorAll('.bnav-item').forEach(b=>{
+      b.addEventListener('pointerdown', ()=>{ _bnPress = setTimeout(()=>{ _bnPress='fired'; bnavQuick(b); }, 480); });
+      ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t, ()=>{ if(_bnPress && _bnPress!=='fired') clearTimeout(_bnPress); }));
+      b.addEventListener('click', ev=>{ if(_bnPress==='fired'){ _bnPress=null; ev.stopImmediatePropagation(); ev.preventDefault(); } }, true);
+      b.addEventListener('contextmenu', ev=>ev.preventDefault());
+    });
+    _bn.x = null;
+  }
+  nav.querySelectorAll('.bnav-item').forEach(b=>{
+    const on = b.dataset.page===active; b.classList.toggle('active', on);
+    if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+  });
+  const tab = BNAV_TABS.find(t=>t.page===active), orb = nav.querySelector('.bnav-orb');
+  if(tab && orb.dataset.p!==active){ orb.dataset.p = active; orb.innerHTML = tab.ico; }
+  let live=false; try{ live = !!autoDetectLiveSession(); }catch(e){}
+  const dot = nav.querySelector('.bnav-dot'); if(dot) dot.hidden = !live || active==='attendance';
+  requestAnimationFrame(()=>bnavMoveGlide());
+}
+function bnavCloseQuick(){ document.querySelectorAll('.bnav-quick,#bnav-scrim').forEach(n=>n.remove()); }
+function bnavDismiss(){
+  const q = document.querySelector('.bnav-quick'), sc = document.getElementById('bnav-scrim');
+  if(!q || q.classList.contains('out')) return bnavCloseQuick();
+  q.classList.add('out'); if(sc){ sc.style.transition='opacity .2s'; sc.style.opacity='0'; }
+  setTimeout(bnavCloseQuick, 210);
+}
+function bnavQuick(b){
+  const tab = BNAV_TABS.find(t=>t.page===b.dataset.page); if(!tab || !tab.quick) return;
+  bnavCloseQuick();
+  const scrim = document.createElement('div'); scrim.id='bnav-scrim'; scrim.onclick = bnavDismiss; document.body.appendChild(scrim);
+  const q = document.createElement('div'); q.className='bnav-quick'; q.setAttribute('role','menu'); q.setAttribute('aria-label', tab.label);
+  const chev = '<svg class="bnav-qc" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  q.innerHTML = `<div class="bnav-qgrab"><div class="bnav-qh"><span class="bnav-qhi">${tab.ico}</span><span>اختصارات ${tab.label}</span></div></div><div class="bnav-qlist">`
+    + tab.quick.map(i=>`<button type="button" role="menuitem" data-action="tile-nav" data-page="${i[2]}"><span class="bnav-qi" aria-hidden="true">${BNAV_QI[i[0]]||i[0]}</span><span class="bnav-qt"><span class="bnav-ql">${i[1]}</span>${i[3]?`<span class="bnav-qd">${i[3]}</span>`:''}</span>${chev}</button>`).join('')
+    + '</div>';
+  document.body.appendChild(q);
+  /* سحب الورقة لأسفل لإغلاقها */
+  const g = q.querySelector('.bnav-qgrab'); let y0 = null;
+  g.addEventListener('pointerdown', e=>{ y0 = e.clientY; g.setPointerCapture(e.pointerId); q.style.animation='none'; });
+  g.addEventListener('pointermove', e=>{ if(y0==null) return; q.style.transform = `translateY(${Math.max(0, e.clientY-y0)}px)`; });
+  const end = e=>{ if(y0==null) return; const dy = e.clientY-y0; y0 = null;
+    if(dy>70){ bnavDismiss(); } else { q.style.transition='transform .25s cubic-bezier(.22,1,.36,1)'; q.style.transform=''; } };
+  g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+  q.querySelector('.bnav-qlist').addEventListener('click', bnavCloseQuick);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') bnavDismiss(); });
+window.addEventListener('scroll', ()=>{
+  const nav = document.getElementById('bnav'); if(!nav || !nav.classList.contains('show')) return;
+  const y = window.scrollY, dy = y-_bnLastY;
+  if(Math.abs(dy)>8){ nav.classList.toggle('hide', dy>0 && y>140); _bnLastY = y; }
+}, {passive:true});
+window.addEventListener('resize', ()=>requestAnimationFrame(()=>bnavMoveGlide(true)));
+function bnavGo(page){
+  bnavCloseQuick();
+  const cur = BNAV_VIEW_TAB[state.view];
+  if(state.view===page || (cur===page && page!=='capabilities')){ window.scrollTo({top:0,behavior:'smooth'}); return; }
+  go(page);
+  if(state.view!==page) return; /* لو الخانة مقفولة go() بترجع من غير ما تتنقل */
+  /* التنقل بين خانات الشريط مش بيكدّس history: الرجوع دايمًا للرئيسية */
+  state.history = (page==='profile') ? [] : [{view:'profile', dayId:state.dayId, sessionId:state.sessionId, lbTab:state.lbTab}];
+  if(page==='games'){
+    loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); });
+    loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); });
+    loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); });
+  }
+  window.scrollTo({top:0});
+}
+/* اخفاء الشريط وقت ما الكيبورد مفتوح عشان ما يطلعش فوقه */
+document.addEventListener('focusin', e=>{ if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) document.body.classList.add('kb-open'); });
+document.addEventListener('focusout', ()=>{ setTimeout(()=>{ const a=document.activeElement; if(!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) document.body.classList.remove('kb-open'); }, 60); });
+
 /* ============================= MASTER RENDER ============================= */
 function render(){
   { const _d = document.getElementById('c4dlg'); if(_d && !/connect4/.test(state.view||'')) _d.remove(); }
@@ -22252,6 +22450,7 @@ function render(){
   else if(state.navDir){ playPageTransition(app, state.navDir); }
   state.navDir = null;
   staggerRevealChildren(app);
+  updateBottomNav();
 
   if(state.view==='splash'){ attachLampDrag(); }
   if(state.view==='gallery'){ attachGalleryEvents(); }
@@ -24508,6 +24707,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='reflex-reset'){ initReflexGame(); render(); }
   else if(action==='reflex-toggle-leaderboard'){ state.reflexLeaderboardOpen = !state.reflexLeaderboardOpen; render(); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
+  else if(action==='bnav'){ bnavGo(el.dataset.page); }
   else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); }); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
   else if(action==='radial-tap'){
