@@ -3229,6 +3229,39 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   #att-admin-qr img, #att-admin-qr canvas{ width:180px !important; height:180px !important; max-width:none !important; min-width:0 !important; padding:0 !important; margin:0 !important; border-radius:0 !important; object-fit:contain; display:block; }
   #att-admin-qr canvas:not(:only-child){ display:none !important; }
 
+  /* ===== زر إظهار/إخفاء كود QR (لوحة الأدمن) ===== */
+  .att-qr-reveal{ display:flex; flex-direction:column; align-items:center; width:100%; }
+  .att-qr-toggle{
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    min-height:42px; padding:0 18px; margin:0; border-radius:999px; cursor:pointer;
+    border:1px solid rgba(244,183,64,.42);
+    background:linear-gradient(180deg,rgba(244,183,64,.16),rgba(244,183,64,.05));
+    color:#F4B740; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; line-height:1;
+    -webkit-tap-highlight-color:transparent; user-select:none;
+    transition:border-color .2s, box-shadow .2s, background .2s, transform .12s;
+  }
+  .att-qr-toggle:hover{ border-color:rgba(244,183,64,.8); box-shadow:0 0 0 4px rgba(244,183,64,.10); }
+  .att-qr-toggle:active{ transform:scale(.97); }
+  .att-qr-toggle:focus-visible{ outline:2px solid #F4B740; outline-offset:3px; }
+  .att-qr-toggle svg{ width:17px; height:17px; flex:0 0 auto; display:block; }
+  .att-qr-toggle .att-qr-chev{ width:15px; height:15px; opacity:.75; transition:transform .25s ease; }
+  .att-qr-reveal.is-open .att-qr-toggle{ background:rgba(244,183,64,.10); }
+  .att-qr-reveal.is-open .att-qr-chev{ transform:rotate(180deg); }
+  .att-qr-panel{ display:none; width:100%; justify-content:center; }
+  .att-qr-reveal.is-open .att-qr-panel{ display:flex; }
+  .att-qr-frame{
+    margin-top:14px; padding:12px; max-width:100%; box-sizing:border-box;
+    background:#fff; border-radius:16px; line-height:0;
+    box-shadow:0 12px 30px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.10);
+  }
+  .att-qr-reveal.is-open .att-qr-frame{ animation:attQrIn .28s cubic-bezier(.22,.9,.32,1) both; }
+  .att-qr-frame #att-admin-qr{ padding:0; width:180px; height:180px; max-width:100%; display:block; }
+  @keyframes attQrIn{ from{ opacity:0; transform:translateY(-8px) scale(.96); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){
+    .att-qr-reveal.is-open .att-qr-frame{ animation:none; }
+    .att-qr-toggle, .att-qr-toggle .att-qr-chev{ transition:none; }
+  }
+
   /* ---------- صفحة "جاري التحديث" (زجاجي راقي) ---------- */
   .maint-page{ position:relative; overflow:hidden; isolation:isolate; margin-top:10px; padding:32px 22px 24px; border-radius:20px; text-align:center; color:#FCF9F3;
     background:linear-gradient(140deg,rgba(20,26,78,.94) 0%,rgba(31,33,76,.93) 55%,rgba(56,41,43,.95) 100%);
@@ -23873,7 +23906,16 @@ function renderAdminAttendanceTab(){
     </div>
     ${adminSectionTitle('🔳','كود QR')}
     <div class="card" style="text-align:center;">
-      <div style="display:flex;justify-content:center;"><div id="att-admin-qr" style="background:#fff;padding:10px;border-radius:12px;"></div></div>
+      <div class="att-qr-reveal${_attQrShown?' is-open':''}" id="att-qr-reveal">
+        <button type="button" class="att-qr-toggle" data-action="att-admin-toggle-qr" data-type="${type}" aria-expanded="${_attQrShown?'true':'false'}" aria-controls="att-qr-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>
+          <span class="att-qr-toggle-txt">${_attQrShown?'إخفاء الكيو آر':'إظهار الكيو آر'}</span>
+          <svg class="att-qr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="att-qr-panel" id="att-qr-panel" aria-hidden="${_attQrShown?'false':'true'}">
+          <div class="att-qr-frame"><div id="att-admin-qr"></div></div>
+        </div>
+      </div>
       <div class="hint" style="word-break:break-all;direction:ltr;">${escapeHtml(c.code)}</div>
       <div class="admin-actions-row" style="display:flex;gap:8px;margin-top:10px;">
         <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
@@ -23928,11 +23970,27 @@ function renderAdminAttendanceTab(){
     <button type="button" class="btn btn-ghost" style="margin-top:14px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">🗑️ مسح كل سجلات ${t.label}</button>
   `;
 }
+var _attQrShown = false; /* الكيو آر مخفي افتراضياً ويظهر بزر "إظهار الكيو آر" */
 function attDrawAdminQr(){
   const el = document.getElementById('att-admin-qr'); if(!el || !window.QRCode) return;
-  const c = attCfg(attAdminType()); if(!c) return;
   el.innerHTML = '';
+  if(!_attQrShown) return;
+  const c = attCfg(attAdminType()); if(!c) return;
   createQR(el, {text:c.code, width:180, height:180, colorDark:'#12112E', colorLight:'#ffffff'});
+}
+function attToggleAdminQr(btn){
+  _attQrShown = !_attQrShown;
+  const wrap = document.getElementById('att-qr-reveal');
+  if(wrap) wrap.classList.toggle('is-open', _attQrShown);
+  const panel = document.getElementById('att-qr-panel');
+  if(panel) panel.setAttribute('aria-hidden', _attQrShown ? 'false' : 'true');
+  const b = btn || document.querySelector('[data-action="att-admin-toggle-qr"]');
+  if(b){
+    b.setAttribute('aria-expanded', _attQrShown ? 'true' : 'false');
+    const tx = b.querySelector('.att-qr-toggle-txt');
+    if(tx) tx.textContent = _attQrShown ? 'إخفاء الكيو آر' : 'إظهار الكيو آر';
+  }
+  attDrawAdminQr();
 }
 function attPrintCode(type){
   const t = ATT_TYPES[type], c = attCfg(type); if(!t || !c) return;
@@ -23956,6 +24014,8 @@ async function attAdminAction(action, el){
   if(!state.adminUnlocked) return;
   const type = el.dataset.type || attAdminType(); const t = ATT_TYPES[type]; if(!t) return;
   const saveToast = (ok, msg)=>{ showToast(ok ? msg : 'تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', !ok); render(); };
+  
+  if(action==='att-admin-toggle-qr'){ attToggleAdminQr(el); return; }
   if(action==='att-admin-init'){
     _attInitBusy = true; _attInitFailedAt = 0; render();
     const ok = await attCfgUpdate(()=>{});
