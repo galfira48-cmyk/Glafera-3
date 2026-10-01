@@ -19,19 +19,35 @@
   var DESIGN_WIDTH = 480;   // reference width the design was built for (matches #app max-width)
   var MIN_ZOOM = 1;         // never shrink below normal on phones
   var MAX_ZOOM = 2;         // cap growth on very large tablets
+  var lastZoom = null, pendingRender = false;
+  function isEditing(){
+    var a = document.activeElement;
+    return !!(a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || a.isContentEditable));
+  }
+  function safeRender(){
+    if (typeof window.render !== 'function') return;
+    if (isEditing()) { pendingRender = true; return; } // don't rebuild the page while the user is typing
+    pendingRender = false;
+    try { window.render(); } catch(e){}
+  }
   function applyAutoScale(){
     if (!('zoom' in document.documentElement.style)) return; // unsupported browser: leave as-is
     var vw = window.innerWidth || document.documentElement.clientWidth || DESIGN_WIDTH;
     var z = vw / DESIGN_WIDTH;
     if (z < MIN_ZOOM) z = MIN_ZOOM;
     if (z > MAX_ZOOM) z = MAX_ZOOM;
-    var changed = document.documentElement.style.zoom != z;
-    document.documentElement.style.zoom = z;
+    z = Math.round(z * 100) / 100;
+    // compare numbers with the last value we applied (style.zoom is a rounded string, so comparing it to z was always "changed" on tablets)
+    var changed = lastZoom !== null && Math.abs(lastZoom - z) > 0.01;
+    if (lastZoom === null || changed) document.documentElement.style.zoom = z;
+    lastZoom = z;
     // re-render so any visible QR codes regenerate crisp at the new zoom level
-    if (changed && typeof window.render === 'function') {
-      try { window.render(); } catch(e){}
-    }
+    if (changed) safeRender();
   }
+  document.addEventListener('focusout', function(){
+    if (!pendingRender) return;
+    setTimeout(function(){ if (pendingRender && !isEditing()) safeRender(); }, 400);
+  }, true);
   applyAutoScale();
   window.addEventListener('resize', applyAutoScale);
   window.addEventListener('orientationchange', function(){ setTimeout(applyAutoScale, 250); });
