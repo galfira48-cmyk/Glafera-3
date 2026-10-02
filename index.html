@@ -1641,44 +1641,57 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .confirm-msg{font-family:'Cairo',sans-serif; font-weight:800; font-size:15.5px; text-align:center; color:var(--text); line-height:1.6;}
   .confirm-sub{font-size:12.5px; color:var(--text-muted); text-align:center; margin-top:8px; line-height:1.7;}
 
-  /* ---------- نافذة اختيار نوع التحدي ---------- */
-  .ch-card{ position:relative; max-width:360px; padding:28px 16px 14px; overflow:hidden; border-radius:30px; text-align:center;
-    border:1px solid color-mix(in srgb, var(--gold) 42%, transparent);
-    background:radial-gradient(circle at 50% -8%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 58%), var(--bg-2);
-    box-shadow:0 26px 64px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); animation:chPop .34s cubic-bezier(.2,1,.3,1); font-family:'Cairo',sans-serif; }
+  /* ---------- نافذة اختيار نوع التحدي (تصميم جديد) ---------- */
+  #challenge-type-overlay{ overflow-y:auto; padding:70px 18px 24px; align-items:center; }
+  .ch-wrap{ position:relative; width:100%; max-width:340px; margin:auto; font-family:'Cairo',sans-serif; direction:rtl; animation:chPop .38s cubic-bezier(.2,1,.3,1); }
   @keyframes chPop{ from{ transform:translateY(26px) scale(.95); opacity:0; } to{ transform:none; opacity:1; } }
-  .ch-x{ position:absolute; top:12px; left:12px; width:34px; height:34px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px;
-    color:var(--text-muted); background:rgba(255,255,255,.06); border:1px solid var(--border); -webkit-tap-highlight-color:transparent; }
-  .ch-emblem{ position:relative; width:78px; height:78px; margin:0 auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:38px;
-    background:radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--gold-2) 38%, transparent), color-mix(in srgb, var(--gold) 8%, transparent) 70%);
-    border:1.5px solid color-mix(in srgb, var(--gold) 70%, transparent); box-shadow:0 10px 26px rgba(0,0,0,.4), 0 0 0 7px color-mix(in srgb, var(--gold) 9%, transparent); }
-  .ch-emblem span{ display:block; animation:chFloat 3s ease-in-out infinite; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
-  @keyframes chFloat{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-4px) rotate(3deg); } }
-  .ch-title{ font-weight:900; font-size:21px; color:var(--text); line-height:1.3; }
-  .ch-sub{ margin:6px auto 0; max-width:270px; font-size:12.5px; line-height:1.8; color:var(--text-muted); font-weight:600; }
-  .ch-pw{ margin-top:16px; padding:10px 12px 12px; border-radius:18px; text-align:right; background:rgba(255,255,255,.04); border:1px dashed var(--border); }
-  .ch-pw label{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; font-weight:800; color:var(--text); }
-  .ch-pw label small{ font-size:10.5px; font-weight:700; color:var(--text-muted); padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.07); }
-  .ch-pw .field{ margin:8px 0 0; text-align:center; letter-spacing:2px; direction:ltr; }
-  .ch-pw .hint{ margin-top:6px; font-size:11px; line-height:1.7; color:var(--text-muted); }
-  .ch-opt{ position:relative; display:flex; align-items:center; gap:12px; width:100%; margin-top:12px; padding:14px 14px; border-radius:22px; text-align:right; cursor:pointer;
-    font-family:'Cairo',sans-serif; color:var(--text); border:1px solid var(--border); background:rgba(255,255,255,.05); -webkit-tap-highlight-color:transparent; transition:transform .16s ease, box-shadow .16s ease; }
-  .ch-opt:active{ transform:scale(.97); }
-  .ch-opt .oi{ flex:0 0 auto; width:50px; height:50px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px; background:rgba(255,255,255,.08); }
-  .ch-opt .ot{ flex:1; min-width:0; }
-  .ch-opt .ot b{ display:block; font-weight:900; font-size:16.5px; line-height:1.3; }
-  .ch-opt .ot small{ display:block; margin-top:3px; font-size:11.5px; font-weight:700; line-height:1.6; opacity:.78; }
-  .ch-opt .og{ flex:0 0 auto; display:flex; opacity:.7; }
-  .ch-opt .og svg{ width:18px; height:18px; }
-  .ch-opt.coin{ color:#1a1633; border-color:transparent; background:linear-gradient(100deg, var(--gold-2), var(--gold)); box-shadow:0 14px 30px color-mix(in srgb, var(--gold) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.55); }
-  .ch-opt.coin .oi{ background:rgba(26,22,51,.13); }
+  .ch-mascot{ position:absolute; z-index:3; top:-82px; left:6%; width:44%; pointer-events:none; filter:drop-shadow(0 8px 10px rgba(0,0,0,.45)); animation:chBob 3.2s ease-in-out infinite; }
+  .ch-mascot svg{ display:block; width:100%; height:auto; overflow:visible; }
+  @keyframes chBob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-3px);} }
+  .ch-bubble{ position:absolute; z-index:3; top:-62px; right:2%; width:34%; padding:9px 10px 10px; border-radius:20px 20px 20px 4px; text-align:center;
+    font-weight:900; font-size:11.5px; line-height:1.45; color:#2a1a05; background:linear-gradient(180deg,#ffd44d,#f7ad1a); box-shadow:0 8px 20px rgba(245,170,20,.35), inset 0 1px 0 rgba(255,255,255,.55); transform:rotate(3deg); }
+  .ch-bubble::after{ content:''; position:absolute; bottom:-7px; left:14px; border:7px solid transparent; border-top-color:#f7ad1a; border-bottom:0; border-left-width:4px; transform:skewX(-12deg); }
+  .ch-bubble-crown{ position:absolute; z-index:3; top:-84px; right:0; width:26px; transform:rotate(14deg); }
+  .ch-card{ position:relative; border-radius:30px; padding:20px 16px 16px; text-align:center;
+    border:1.5px solid rgba(96,125,255,.38);
+    background:radial-gradient(120% 60% at 50% 0%, rgba(80,110,230,.2), transparent 60%), linear-gradient(165deg,#1a2650 0%,#101a3d 55%,#0c1431 100%);
+    box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,255,255,.03); }
+  .ch-x{ position:absolute; top:12px; right:12px; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+    color:#cfd9ff; background:rgba(40,60,130,.55); border:1.5px solid rgba(110,140,255,.5); -webkit-tap-highlight-color:transparent; }
+  .ch-x svg{ width:16px; height:16px; }
+  .ch-x:active{ transform:scale(.9); }
+  .ch-swords{ width:92px; margin:6px auto 0; filter:drop-shadow(0 6px 10px rgba(0,0,0,.4)); }
+  .ch-swords svg{ display:block; width:100%; height:auto; }
+  .ch-ttl{ position:relative; width:104%; margin:-14px -2% 0; height:74px; display:flex; align-items:center; justify-content:center; transform:rotate(-2.5deg); }
+  .ch-ttl svg{ position:absolute; inset:0; width:100%; height:100%; filter:drop-shadow(0 6px 12px rgba(245,170,20,.3)); }
+  .ch-ttl span{ position:relative; font-weight:900; font-size:27px; color:#1b1328; line-height:1; text-shadow:0 1px 0 rgba(255,255,255,.35); }
+  .ch-desc{ margin:10px 6px 16px; font-size:13.5px; font-weight:700; line-height:1.85; color:#eef1ff; }
+  .ch-opt{ position:relative; display:grid; align-items:center; width:100%; border-radius:26px; cursor:pointer; font-family:'Cairo',sans-serif; -webkit-tap-highlight-color:transparent; transition:transform .15s ease; }
+  .ch-opt:active{ transform:translateY(2px) scale(.985); }
+  .ch-opt.coin{ grid-template-columns:62px 1fr 38px; gap:4px; padding:12px 12px 12px 10px; border:0; color:#1b1328;
+    background:linear-gradient(180deg,#ffdc5a 0%,#fbbd1f 55%,#f59e0b 100%);
+    box-shadow:0 5px 0 #c27806, 0 16px 30px rgba(245,158,11,.38), inset 0 2px 0 rgba(255,255,255,.65), inset 0 -2px 6px rgba(190,100,0,.25); overflow:hidden; }
   .ch-opt.coin::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-    background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.38) 50%, transparent 65%); transform:translateX(-130%); animation:hgSheen 4.5s ease-in-out 1s infinite; }
-  .ch-tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
-  .ch-tag{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(26,22,51,.14); }
-  .ch-opt.free .ch-tag{ background:rgba(255,255,255,.09); color:var(--text); }
-  .ch-ribbon{ position:absolute; top:-9px; left:16px; padding:3px 11px; border-radius:999px; font-size:10.5px; font-weight:900; color:#fff; background:linear-gradient(90deg,#ff6b6b,#ff9f43); box-shadow:0 6px 14px rgba(255,107,107,.4); }
-  .ch-cancel{ display:block; width:100%; margin-top:6px; padding:11px; background:none; border:0; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--text-muted); }
+    background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%); transform:translateX(-130%); animation:hgSheen 4.5s ease-in-out 1s infinite; }
+  .ch-opt .ot{ text-align:center; }
+  .ch-opt .ot b{ display:block; font-weight:900; font-size:23px; line-height:1.25; }
+  .ch-opt .ot em{ display:inline-block; margin-top:4px; padding:2px 16px 3px; border-radius:999px; font-style:normal; font-weight:800; font-size:13px; color:#ffd65a; background:#1c1a35; }
+  .ch-coins{ width:60px; } .ch-coins svg{ display:block; width:100%; height:auto; filter:drop-shadow(0 4px 4px rgba(150,80,0,.35)); }
+  .ch-crown{ width:34px; opacity:.95; } .ch-crown svg{ display:block; width:100%; height:auto; }
+  .ch-opt.free{ grid-template-columns:62px 1fr 38px; gap:4px; margin-top:16px; padding:16px 12px 16px 10px; color:#fff;
+    border:2px solid #2f7bff; background:linear-gradient(180deg,rgba(32,50,110,.9),rgba(14,24,64,.95));
+    box-shadow:0 0 0 1px rgba(60,120,255,.25), 0 0 22px rgba(47,123,255,.4), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -10px 18px rgba(0,0,0,.25); }
+  .ch-opt.free .ot b{ font-size:23px; }
+  .ch-free-tk{ width:60px; transform:rotate(-8deg); filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); } .ch-free-tk svg{ display:block; width:100%; height:auto; }
+  .ch-dash{ width:22px; justify-self:center; } .ch-dash svg{ display:block; width:100%; height:auto; }
+  .ch-priv{ margin-top:14px; }
+  .ch-priv-btn{ background:none; border:0; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#b6c3ff; padding:4px 10px; -webkit-tap-highlight-color:transparent; }
+  .ch-priv-btn small{ font-size:11px; opacity:.75; font-weight:700; }
+  .ch-pw{ margin-top:8px; padding:10px 12px 12px; border-radius:18px; text-align:right; background:rgba(255,255,255,.05); border:1px dashed rgba(130,155,255,.4); }
+  .ch-pw[hidden]{ display:none; }
+  .ch-pw .field{ margin:0; text-align:center; letter-spacing:2px; direction:ltr; }
+  .ch-pw .hint{ margin-top:6px; font-size:11px; line-height:1.7; color:#9fb0e6; }
+  .ch-swoosh{ display:block; width:46%; height:14px; margin:8px auto 0; }
   .confirm-actions{display:flex; gap:10px; margin-top:20px;}
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
@@ -17599,36 +17612,82 @@ function showChallengeTypeModal(gameType){
   overlay.className = 'modal-overlay confirm-overlay';
   overlay.id = 'challenge-type-overlay';
   overlay.innerHTML = `
-    <div class="confirm-card ch-card" role="dialog" aria-modal="true" aria-label="اختار نوع التحدي">
-      <button type="button" class="ch-x" id="challenge-x-btn" aria-label="إغلاق">✕</button>
-      <div class="ch-emblem"><span>⚔️</span></div>
-      <div class="ch-title">جاهز للتحدي؟</div>
-      <div class="ch-sub">اختار طريقة اللعب وابعت الكود لصاحبك — الغرفة بتتفتح في ثواني</div>
-      <div class="ch-pw">
-        <label for="challenge-pw"><span>🔒 غرفة خاصة</span><small>اختياري</small></label>
-        <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="اكتب كلمة سر للغرفة">
-        <div class="hint">لو كتبت كلمة سر، محدش هيدخل غير اللي تديهاله.</div>
+    <div class="ch-wrap" role="dialog" aria-modal="true" aria-label="اختار نوع التحدي">
+      <div class="ch-mascot"><svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="chCr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#e8a012"/></linearGradient>
+          <radialGradient id="chBd" cx=".35" cy=".25" r=".9"><stop offset="0" stop-color="#3a3647"/><stop offset=".55" stop-color="#17141f"/><stop offset="1" stop-color="#0c0a12"/></radialGradient>
+        </defs>
+        <ellipse cx="110" cy="96" rx="84" ry="54" fill="url(#chBd)"/>
+        <ellipse cx="70" cy="70" rx="22" ry="9" fill="#fff" opacity=".1" transform="rotate(-25 70 70)"/>
+        <g transform="rotate(-9 112 50)">
+          <path d="M62 62 L66 22 L89 42 L112 12 L135 42 L158 22 L162 62 Q112 72 62 62Z" fill="url(#chCr)" stroke="#b97708" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="66" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="112" cy="10" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="158" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/>
+          <path d="M72 56 Q112 64 152 56" stroke="#fff3b0" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+        </g>
+        <path d="M54 82 Q56 70 70 72 L104 76 Q112 78 120 76 L154 72 Q168 70 170 82 Q170 104 148 104 L132 104 Q118 104 114 94 Q112 90 110 94 Q106 104 92 104 L76 104 Q54 104 54 82Z" fill="#050408"/>
+        <path d="M64 80 Q80 76 98 82" stroke="#fff" stroke-width="3" opacity=".25" fill="none" stroke-linecap="round"/>
+        <path d="M128 80 Q142 76 156 80" stroke="#fff" stroke-width="3" opacity=".2" fill="none" stroke-linecap="round"/>
+        <path d="M88 118 Q112 130 136 118" stroke="#050408" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+        <g fill="#fff" stroke="#c9ccd8" stroke-width="1.5">
+          <ellipse cx="46" cy="136" rx="26" ry="15"/><ellipse cx="174" cy="136" rx="26" ry="15"/>
+        </g>
+        <g stroke="#c9ccd8" stroke-width="1.6" stroke-linecap="round"><path d="M38 124 V134 M48 122 V134 M58 124 V134"/><path d="M162 124 V134 M172 122 V134 M182 124 V134"/></g>
+      </svg></div>
+      <svg class="ch-bubble-crown" viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#f7b92a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <div class="ch-bubble">اختيارك يحدد أسلوب اللعبة!</div>
+      <div class="ch-card">
+        <button type="button" class="ch-x" id="challenge-x-btn" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+        <div class="ch-swords"><svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="chBl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f6ff"/><stop offset=".5" stop-color="#b6c6e4"/><stop offset="1" stop-color="#7f93b8"/></linearGradient>
+          <linearGradient id="chHl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#d98d0c"/></linearGradient></defs>
+          <path d="M60 4 L66 12 L60 18 L54 12Z" fill="url(#chHl)"/><path d="M48 14 L60 4 L72 14 L70 20 L50 20Z" fill="url(#chHl)" stroke="#b97708" stroke-width="1.2" stroke-linejoin="round"/>
+          <g transform="translate(60 58)">
+            <g transform="rotate(-42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#chBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#chHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#chHl)" stroke="#b97708" stroke-width="1"/></g>
+            <g transform="rotate(42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#chBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#chHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#chHl)" stroke="#b97708" stroke-width="1"/></g>
+          </g>
+        </svg></div>
+        <div class="ch-ttl">
+          <svg viewBox="0 0 300 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="chBr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd84f"/><stop offset="1" stop-color="#f6a712"/></linearGradient></defs>
+            <path d="M4 44 L22 38 L8 33 L44 26 L120 17 L204 15 L262 8 L296 12 L286 20 L298 27 L276 33 L292 42 L270 49 L284 58 L238 59 L150 66 L62 70 L18 67 L36 59 L6 55Z" fill="url(#chBr)"/></svg>
+          <span>اختار نوع التحدي</span>
+        </div>
+        <p class="ch-desc">${fee>0 ? 'تحدي هتدفع فيه '+fee+' نقطة وهتاخد مكافآت' : 'تحدي من غير رسوم دخول وهتاخد مكافآت'}،<br>وتحدي مجاني تلعبه من غير أي نقاط</p>
+        <button type="button" class="ch-opt coin" id="challenge-coin-btn">
+          <span class="ch-coins"><svg viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="chCn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#e09a10"/></linearGradient></defs>
+            <g stroke="#a86a06" stroke-width="1.4"><ellipse cx="38" cy="52" rx="22" ry="9" fill="#d68e0c"/><rect x="16" y="40" width="44" height="12" fill="#e5a216"/><ellipse cx="38" cy="40" rx="22" ry="9" fill="url(#chCn)"/>
+            <rect x="16" y="28" width="44" height="12" fill="#e5a216"/><ellipse cx="38" cy="28" rx="22" ry="9" fill="url(#chCn)"/><rect x="16" y="16" width="44" height="12" fill="#e5a216"/><ellipse cx="38" cy="16" rx="22" ry="9" fill="url(#chCn)"/></g>
+            <circle cx="22" cy="54" r="15" fill="url(#chCn)" stroke="#a86a06" stroke-width="1.6"/><circle cx="22" cy="54" r="10.5" fill="none" stroke="#c98a0e" stroke-width="1.4"/><path d="M16 58 L16 50 L19.5 53 L22 48 L24.5 53 L28 50 L28 58Z" fill="#c98a0e"/>
+          </svg></span>
+          <span class="ot"><b>تحدي بكوين</b><em>(اختياري)</em></span>
+          <span class="ch-crown"><svg viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#1b1328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M9 29 H31" stroke="#1b1328" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+        </button>
+        <button type="button" class="ch-opt free" id="challenge-free-btn">
+          <span class="ch-free-tk"><svg viewBox="0 0 80 52" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="chTk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6bb8ff"/><stop offset="1" stop-color="#2f78f0"/></linearGradient></defs>
+            <path d="M8 6 H72 Q76 6 76 10 V18 Q70 22 70 26 Q70 30 76 34 V42 Q76 46 72 46 H8 Q4 46 4 42 V34 Q10 30 10 26 Q10 22 4 18 V10 Q4 6 8 6Z" fill="url(#chTk)" stroke="#bfe0ff" stroke-width="2"/>
+            <text x="40" y="35" text-anchor="middle" font-family="Cairo,Arial,sans-serif" font-weight="900" font-size="22" fill="#fff" stroke="#1d54b8" stroke-width=".8">FREE</text></svg></span>
+          <span class="ot"><b>تحدي مجاني</b></span>
+          <span class="ch-dash"><svg viewBox="0 0 24 24"><path d="M5 18 L17 6" stroke="#2f7bff" stroke-width="3.2" stroke-linecap="round"/><path d="M12 22 L21 13" stroke="#2f7bff" stroke-width="3" stroke-linecap="round" opacity=".7"/></svg></span>
+        </button>
+        <div class="ch-priv">
+          <button type="button" class="ch-priv-btn" id="challenge-priv-btn">🔒 غرفة خاصة <small>(اختياري)</small></button>
+          <div class="ch-pw" id="challenge-pw-box" hidden>
+            <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="اكتب كلمة سر للغرفة">
+            <div class="hint">لو كتبت كلمة سر، محدش هيدخل غير اللي تديهاله.</div>
+          </div>
+        </div>
+        <svg class="ch-swoosh" viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M2 10 Q60 2 120 6 L198 3 Q130 9 70 12 Z" fill="#f6b21c"/></svg>
       </div>
-      <button type="button" class="ch-opt coin" id="challenge-coin-btn">
-        <span class="ch-ribbon">🔥 الأكثر إثارة</span>
-        <span class="oi">🪙</span>
-        <span class="ot"><b>تحدي بكوين</b><small>العب على النقط واكسب مكافآت</small>
-          <span class="ch-tags"><span class="ch-tag">${fee>0 ? 'رسوم '+fee+' نقطة' : 'بدون رسوم دخول'}</span><span class="ch-tag">🏆 مكافآت للفايز</span></span></span>
-        <span class="og">${ICO.chev}</span>
-      </button>
-      <button type="button" class="ch-opt free" id="challenge-free-btn">
-        <span class="oi">🎮</span>
-        <span class="ot"><b>تحدي مجاني</b><small>للمتعة بس — من غير أي نقط</small>
-          <span class="ch-tags"><span class="ch-tag">🆓 بدون نقط</span><span class="ch-tag">😄 ودّي</span></span></span>
-        <span class="og">${ICO.chev}</span>
-      </button>
-      <button type="button" class="ch-cancel" id="challenge-cancel-btn">إلغاء</button>
     </div>
   `;
   document.body.appendChild(overlay);
   overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeChallengeTypeModal(); });
   document.getElementById('challenge-x-btn').addEventListener('click', closeChallengeTypeModal);
-  document.getElementById('challenge-cancel-btn').addEventListener('click', closeChallengeTypeModal);
+  document.getElementById('challenge-priv-btn').addEventListener('click', ()=>{
+    const box = document.getElementById('challenge-pw-box');
+    box.hidden = !box.hidden;
+    if(!box.hidden){ const i = document.getElementById('challenge-pw'); if(i) i.focus(); }
+  });
   document.getElementById('challenge-coin-btn').addEventListener('click', ()=>{
     ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
