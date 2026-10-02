@@ -2983,11 +2983,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vpay-corner.tr{ top:0; right:0; border-top-width:2px; border-right-width:2px; border-top-right-radius:9px; }
   .vpay-corner.bl{ bottom:0; left:0; border-bottom-width:2px; border-left-width:2px; border-bottom-left-radius:9px; }
   .vpay-corner.br{ bottom:0; right:0; border-bottom-width:2px; border-right-width:2px; border-bottom-right-radius:9px; }
+  .vpay-wave{ position:absolute; left:50%; top:50%; width:78px; height:78px; margin:-39px 0 0 -39px; border-radius:50%; border:1.5px solid rgba(94,234,160,.55); opacity:0; pointer-events:none; }
+  .vpay-overlay.s-ok .vpay-wave{ animation:vpayWave 1.5s .15s cubic-bezier(.2,.7,.3,1) both; }
+  .vpay-overlay.s-ok .vpay-wave.w2{ animation-delay:.45s; }
+  @keyframes vpayWave{ 0%{ opacity:.7; transform:scale(.9);} 100%{ opacity:0; transform:scale(2.5);} }
   .vpay-overlay.s-ok .vpay-corner, .vpay-overlay.s-fail .vpay-corner{ opacity:0; transform:scale(1.25); }
   .vpay-ring{ width:78px; height:78px; overflow:visible; }
-  .vpay-ring circle:first-child{ stroke:rgba(94,234,160,.14); }
-  .vpay-overlay.s-ok .vpay-ring circle:first-child{ stroke:#5EEAA0; transition:stroke .4s ease; }
-  .vpay-overlay.s-fail .vpay-ring circle:first-child{ stroke:rgba(255,107,107,.3); }
+  .vpay-ring circle:nth-child(3){ stroke:rgba(94,234,160,.14); }
+  .vpay-overlay.s-ok .vpay-ring circle:nth-child(3){ stroke:#5EEAA0; transition:stroke .4s ease; }
+  .vpay-overlay.s-fail .vpay-ring circle:nth-child(3){ stroke:rgba(255,107,107,.3); }
   .vpay-ring circle{ fill:none; stroke:#5EEAA0; stroke-width:2.6; stroke-linecap:round; transform-origin:center; transform:rotate(-90deg); }
   .vpay-ring .arc{ stroke-dasharray:60 160; animation:vpaySpin 1s linear infinite; transform-box:fill-box; }
   @keyframes vpaySpin{ to{ transform:rotate(270deg); } }
@@ -3015,6 +3019,38 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .vpay-foot{ position:absolute; z-index:2; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 22px calc(env(safe-area-inset-bottom,0px) + 18px); transform:translateY(46px); opacity:0; pointer-events:none; transition:transform .6s cubic-bezier(.2,.9,.25,1), opacity .45s ease; }
   .vpay-overlay.s-btn .vpay-foot{ transform:none; opacity:1; pointer-events:auto; }
   .vpay-done{ width:100%; max-width:390px; padding:16px; border-radius:99px; background:#F5F7FA; color:#0b0d12; font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; transition:transform .12s ease, background .15s ease; }
+
+  /* ---- لمسات الاحتراف: عدّاد دوّار + كارت تفاصيل + شرارات ---- */
+  .vpay-overlay::before{ content:''; position:absolute; inset:-20%; pointer-events:none; opacity:.55; background:radial-gradient(40% 30% at 20% 85%, rgba(60,140,255,.10), transparent 70%), radial-gradient(45% 32% at 85% 15%, rgba(94,234,160,.08), transparent 70%); animation:vpayDrift 14s ease-in-out infinite alternate; }
+  @keyframes vpayDrift{ to{ transform:translate3d(3%,-2%,0) scale(1.06); } }
+  .vpay-ring .disc{ fill:rgba(94,234,160,0); stroke:none; transition:fill .6s .3s ease; transform:none; }
+  .vpay-overlay.s-ok .vpay-ring .disc{ fill:rgba(94,234,160,.10); }
+  .vpay-overlay.s-fail .vpay-ring .disc{ fill:rgba(255,107,107,.10); }
+  .vpay-ring .arc{ stroke:url(#vpg); }
+  .vpay-overlay.s-fail .vpay-ring .arc{ stroke:#FF6B6B; }
+  .vpay-sp{ position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px; border-radius:50%; background:#8CF5BC; opacity:0; pointer-events:none; }
+  .vpay-sp:nth-child(3n){ background:#F4D58A; width:4px; height:4px; } .vpay-sp:nth-child(4n){ background:#fff; width:3px; height:3px; }
+  .vpay-overlay.s-ok .vpay-sp{ animation:vpaySp .95s .2s cubic-bezier(.15,.7,.3,1) both; }
+  @keyframes vpaySp{ 0%{ opacity:1; transform:translate(0,0) scale(1);} 100%{ opacity:0; transform:translate(var(--dx),var(--dy)) scale(.2);} }
+  .vpay-amt{ display:flex; align-items:baseline; justify-content:center; gap:2px; }
+  .od{ display:inline-block; height:1.1em; line-height:1.1em; overflow:hidden; vertical-align:bottom; }
+  .od-strip{ display:block; transform:translateY(0); transition:transform 1.15s cubic-bezier(.16,1,.3,1); transition-delay:calc(var(--i) * 85ms); }
+  .od-strip.go{ transform:translateY(calc(var(--d) * -1.1em)); }
+  .od-strip i{ display:block; height:1.1em; line-height:1.1em; font-style:normal; }
+  .od-sym{ line-height:1.1em; color:#5EEAA0; }
+  .vpay-card{ width:100%; max-width:340px; margin-top:20px; border-radius:22px; padding:4px 16px; text-align:start; background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.09); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    opacity:0; transform:translateY(14px) scale(.98); transition:opacity .55s ease, transform .6s cubic-bezier(.2,.9,.25,1); }
+  .vpay-overlay.s-txt .vpay-card{ opacity:1; transform:none; }
+  .vpay-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; font-size:12.5px; color:rgba(245,247,250,.5); }
+  .vpay-row + .vpay-row{ border-top:1px solid rgba(255,255,255,.07); }
+  .vpay-row b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:#F5F7FA; direction:ltr; unicode-bidi:plaintext; }
+  .vpay-row b.rtl{ direction:rtl; }
+  .vpay-party{ display:flex; align-items:center; gap:10px; }
+  .vpay-av{ width:34px; height:34px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:13px; color:#06130d; background:linear-gradient(145deg,#8CF5BC,#35c488); }
+  .vpay-party span{ display:block; font-size:11px; color:rgba(245,247,250,.45); line-height:1.2; }
+  .vpay-party strong{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#F5F7FA; line-height:1.4; }
+  .vpay-ref{ cursor:pointer; background:none; border:0; padding:0; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#F5F7FA; direction:ltr; letter-spacing:.3px; }
+  .vpay-ref em{ font-style:normal; font-size:10.5px; color:#5EEAA0; margin-inline-start:8px; letter-spacing:0; }
   .vpay-done, .vpay-rcpt, .vpay-x{ border:0; outline:0; font-family:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
   .vpay-rcpt{ background:none; } .vpay-x{ border:0; }
   .vpay-done:active{ transform:scale(.98); background:#9aa0aa; }
@@ -6384,13 +6420,15 @@ function visaPosBegin(opts){
     <div class="vpay-top"><button type="button" class="vpay-x" id="vpay-x" aria-label="إغلاق">✕</button><span class="vpay-head">جاري تنفيذ العملية</span></div>
     <div class="vpay-body">
       <div class="vpay-stage">
+        <i class="vpay-wave"></i><i class="vpay-wave w2"></i>
         <i class="vpay-corner tl"></i><i class="vpay-corner tr"></i><i class="vpay-corner bl"></i><i class="vpay-corner br"></i>
-        <svg class="vpay-ring" viewBox="0 0 78 78" aria-hidden="true"><circle cx="39" cy="39" r="32"/><circle class="arc" cx="39" cy="39" r="32"/></svg>
+        <svg class="vpay-ring" viewBox="0 0 78 78" aria-hidden="true"><defs><linearGradient id="vpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9CFFC8"/><stop offset="1" stop-color="#2FC58A"/></linearGradient></defs><circle class="disc" cx="39" cy="39" r="32"/><circle cx="39" cy="39" r="32"/><circle class="arc" cx="39" cy="39" r="32"/></svg>
+        ${Array.from({length:14},(_,i)=>{ const ang = (i/14)*Math.PI*2 + (i%2?.18:0), d = 70 + (i%3)*22; return `<i class="vpay-sp" style="--dx:${Math.round(Math.cos(ang)*d)}px;--dy:${Math.round(Math.sin(ang)*d)}px"></i>`; }).join('')}
         <svg class="vpay-mark good" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12.8l4.2 4.2L18.6 8"/></svg>
         <svg class="vpay-mark bad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>
       </div>
       <div class="vpay-amt" id="vpay-amt">${opts.amount ? escapeHtml(String(opts.amount)) : ''}</div>
-      <div class="vpay-t" id="vpay-t"></div><div class="vpay-s" id="vpay-s"></div><div class="vpay-chip" id="vpay-chip" hidden></div>
+      <div class="vpay-t" id="vpay-t"></div><div class="vpay-s" id="vpay-s"></div><div class="vpay-card" id="vpay-card" hidden></div>
       <div class="vpay-wait">لحظات من فضلك…</div>
     </div>
     <div class="vpay-foot"><button type="button" class="vpay-done" id="vpay-done">تمام</button><button type="button" class="vpay-rcpt" id="vpay-rcpt">🧾 عرض الإيصال</button></div>`;
@@ -6413,6 +6451,8 @@ function visaPosFx(title, text, opts){
   if(!window.__vpos) visaPosBegin({ amount: opts.amount });
   const v = window.__vpos; if(v.finishing) return; v.finishing = true;
   if(window.__lastTx && Date.now() - window.__lastTx.at < 20000) v.ref = window.__lastTx.ref;
+  if(opts.ref) v.ref = opts.ref;
+  window.__vposShownAt = Date.now();
   v.receipt = vposBuildReceipt(v, title, opts.rows);
   const rows = opts.rows || [];
   const rowOf = re => rows.find(r=>re.test(vposText(r[0])));
@@ -6420,33 +6460,51 @@ function visaPosFx(title, text, opts){
   let amtNum = (v.amt!=null) ? Number(v.amt) : NaN;
   if(!Number.isFinite(amtNum) && amtRow){ const m = String(normalizeDigits(vposText(amtRow[1]))).match(/[\d.,]+/); if(m) amtNum = parseFloat(m[0].replace(/,/g,'')); }
   const sign = (v.kind && VPOS_KIND_SIGN[v.kind]) || '';
-  const toRow = rowOf(/^المستلم/), fromRow = rowOf(/^من$/), balRow = rowOf(/رصيد/);
-  const sub = toRow ? 'إلى ' + vposText(toRow[1]) : (fromRow ? 'من ' + vposText(fromRow[1]) : vposText(text||''));
+  const toRow = rowOf(/^المستلم/), fromRow = rowOf(/^من$/);
+  const partyRow = toRow || fromRow, partyLab = toRow ? 'المستلم' : 'المرسل';
+  const partyName = partyRow ? vposText(partyRow[1]) : '';
+  const sub = partyName ? '' : vposText(text||'');
   const wait = Math.max(0, 900 - (Date.now() - v.t0));
   const ov = v.ov, q = id => ov.querySelector(id);
   const calm = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const at = (ms, fn)=>{ const t = setTimeout(()=>{ if(window.__vpos===v) fn(); }, calm ? 0 : ms); v.tms.push(t); };
+  /* كارت التفاصيل */
+  const when = new Date().toLocaleString('ar-EG-u-nu-latn', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+  const skip = new Set([amtRow, partyRow].filter(Boolean));
+  let card = '';
+  if(partyName) card += `<div class="vpay-row"><div class="vpay-party"><div class="vpay-av">${escapeHtml(partyName.trim().charAt(0))}</div><div><span>${partyLab}</span><strong>${escapeHtml(partyName)}</strong></div></div></div>`;
+  rows.forEach(r=>{ if(skip.has(r)) return; card += `<div class="vpay-row"><span>${escapeHtml(vposText(r[0]))}</span><b class="rtl">${escapeHtml(vposText(r[1]))}</b></div>`; });
+  card += `<div class="vpay-row"><span>التاريخ</span><b class="rtl">${escapeHtml(when)}</b></div>`;
+  card += `<div class="vpay-row"><span>رقم العملية</span><button type="button" class="vpay-ref" id="vpay-ref">${escapeHtml(v.ref)}<em>نسخ</em></button></div>`;
   at(wait, ()=>{
-    q('.vpay-head').textContent = 'اكتملت العملية';
+    q('.vpay-head').textContent = opts.head || 'اكتملت العملية';
     q('#vpay-t').textContent = vposText(title);
-    q('#vpay-s').textContent = sub;
-    q('#vpay-s').hidden = !sub;
-    if(balRow){ const c = q('#vpay-chip'); c.hidden = false; c.innerHTML = vposText(balRow[0]) + ' <b>' + escapeHtml(vposText(balRow[1])) + '</b>'; }
+    q('#vpay-s').textContent = sub; q('#vpay-s').hidden = !sub;
+    const c = q('#vpay-card'); c.innerHTML = card; c.hidden = false;
+    const rf = c.querySelector('#vpay-ref');
+    rf.addEventListener('click', async ()=>{
+      let ok = false; try{ await navigator.clipboard.writeText(v.ref); ok = true; }catch(e){ try{ const ta = document.createElement('textarea'); ta.value = v.ref; ta.style.cssText='position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); }catch(_){} }
+      const em = rf.querySelector('em'); if(em){ em.textContent = ok ? 'تم النسخ ✓' : 'تعذّر'; setTimeout(()=>{ if(em.isConnected) em.textContent = 'نسخ'; }, 1600); }
+    });
     ov.classList.add('s-ok');
-    try{ vposBeep('ok'); vibrate([18,40,18]); }catch(e){}
+    try{ vposBeep('ok'); vibrate([14,30,14,30,40]); }catch(e){}
   });
-  at(wait+560, ()=>{
+  at(wait+520, ()=>{
     const el = q('#vpay-amt'); ov.classList.add('s-amt');
     if(Number.isFinite(amtNum)){
-      const dec = String(amtNum).includes('.') ? 2 : 0;
-      const unit = '<small>نقطة</small>';
-      const paint = n => { el.innerHTML = (sign && n>0 ? sign : '') + (dec ? n.toFixed(dec) : Math.round(n)) + unit; };
-      if(calm){ paint(amtNum); }
-      else { const t0 = performance.now(), D = 950; const step = now=>{ if(window.__vpos!==v) return; const p = Math.min(1,(now-t0)/D), e = 1-Math.pow(1-p,3); paint(amtNum*e); if(p<1) requestAnimationFrame(step); else paint(amtNum); }; requestAnimationFrame(step); }
+      const str = String(amtNum % 1 ? amtNum.toFixed(2) : Math.round(amtNum));
+      let i = 0;
+      const html = (sign ? `<span class="od-sym">${sign}</span>` : '') + str.split('').map(ch=>{
+        if(/\d/.test(ch)){ const idx = i++; return `<span class="od"><span class="od-strip" style="--d:${ch};--i:${idx}">${'0123456789'.split('').map(d=>`<i>${d}</i>`).join('')}</span></span>`; }
+        return `<span class="od-sym" style="color:inherit">${ch}</span>`;
+      }).join('') + '<small>نقطة</small>';
+      el.innerHTML = html;
+      if(calm){ el.querySelectorAll('.od-strip').forEach(x=>{ x.style.transition='none'; x.classList.add('go'); }); }
+      else { void el.offsetWidth; requestAnimationFrame(()=>requestAnimationFrame(()=>el.querySelectorAll('.od-strip').forEach(x=>x.classList.add('go')))); }
     }
   });
-  at(wait+1050, ()=>ov.classList.add('s-txt'));
-  at(wait+1500, ()=>{ ov.classList.add('s-btn'); });
+  at(wait+1000, ()=>ov.classList.add('s-txt'));
+  at(wait+1650, ()=>{ ov.classList.add('s-btn'); });
   const close = ()=>{ visaPosKill(); if(opts.onClose) opts.onClose(); };
   q('#vpay-done').addEventListener('click', close);
   q('#vpay-x').addEventListener('click', close);
@@ -28607,6 +28665,20 @@ function ensureVisaTxListener(){
   _vtxFn = (snap)=>{ try{ handleVisaTxSnapshot(pid, snap && snap.exists() ? vtxParse(snap.val()) : []); }catch(e){ console.error('vtx listener', e); } };
   _vtxRef.on('value', _vtxFn, ()=>{});
 }
+/* ===== المستلم: شاشة النجاح بتظهر عنده لحظيًا أول ما التحويل يوصل (حتى لو مش فاتح صفحة الفيزا) ===== */
+function vpayIncoming(e){
+  if(document.hidden || window.__vpos) return false;
+  if(Date.now() - (window.__vposShownAt||0) < 30000) return false; /* لسه شايف شاشة النجاح بتاعة نفس العملية */
+  const amt = Number(e.amount)||0; if(amt<=0) return false;
+  visaPosBegin({ amount: amt+' نقطة', kind:'receive', amt });
+  const v = window.__vpos; if(!v) return false;
+  v.t0 = Date.now() - 1200; /* من غير دائرة تحميل: المستلم ماكانش بيستنى حاجة */
+  const nm = e.note ? escapeHtml(e.note) : '';
+  const rows = []; if(nm) rows.push(['من', nm]); rows.push(['المبلغ', amt+' نقطة']);
+  if(e.balAfter!=null) rows.push(['رصيدك الآن', Number(e.balAfter)+' نقطة']);
+  visaPosFx('وصلك تحويل', '', { head:'تحويل وارد', ref:'GF-'+String(e.id||'').slice(-8).toUpperCase(), rows });
+  return true;
+}
 function handleVisaTxSnapshot(pid, arr){
   if(pid !== state.pid) return;
   VISA_TX[pid] = vtxMerge(arr, VISA_TX[pid] || []);
@@ -28617,7 +28689,12 @@ function handleVisaTxSnapshot(pid, arr){
   if(!fresh.length){ if(state.view==='visa-history') render(); return; }
   vtxSeenSet(pid, fresh.map(e=>e.id).concat(seen));
   vtxAfterNewTx();
-  const others = fresh.filter(e=>e.dev !== VTX_DEV).reverse();
+  let others = fresh.filter(e=>e.dev !== VTX_DEV).reverse();
+  const incoming = others.filter(e=>e.type==='transfer_in');
+  if(incoming.length){
+    const last = incoming[incoming.length-1];
+    if(vpayIncoming(last)) others = others.filter(e=>e.type!=='transfer_in');
+  }
   if(others.length > 3){
     vtxShowBanner(others[others.length-1], { title:'عمليات جديدة على فيزتك 💳', body:'وصلك '+others.length+' عمليات جديدة — اضغط لعرض الكشف' });
   } else {
