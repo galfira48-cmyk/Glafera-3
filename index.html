@@ -2908,6 +2908,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .aa-tile small{ font-size:11px; font-weight:600; color:var(--text-muted); line-height:1.4; }
   .aa-tile.add{ border-style:dashed; background:rgba(255,255,255,.04); }
   .aa-tile.add .aa-tile-ico{ background:rgba(255,255,255,.08); box-shadow:none; font-size:30px; color:var(--text-muted); }
+  .aa-tile-wrap{ position:relative; }
+  .aa-tile-wrap > .aa-tile{ width:100%; }
+  .aa-tile-del{ position:absolute; top:8px; inset-inline-start:8px; z-index:2; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; line-height:1; cursor:pointer; color:#fff; background:rgba(255,92,92,.88); border:1px solid rgba(255,255,255,.3); box-shadow:0 4px 12px -4px rgba(0,0,0,.6); }
+  .aa-tile-del:active{ transform:scale(.9); }
   .aa-newday{ width:100%; margin-bottom:14px; }
   .aa-qr-box{ display:flex; justify-content:center; margin:18px 0 6px; }
   .aa-hero .aa-qr-box #att-admin-qr{ background:#fff; border-radius:16px; }
@@ -23286,8 +23290,16 @@ const ATT_ICONS = ['⛪','👥','🎶','📖','🙏','✝️','🕊️','🎓','
 const ATT_COLORS = ['linear-gradient(145deg,#5FE0A4,#2A9D78)','linear-gradient(145deg,#7C9CFF,#5A67D8)','linear-gradient(145deg,#FF9EC7,#D6618F)','linear-gradient(145deg,#C9A27A,#8A6A4A)'];
 function attApplyTypes(arr){
   let added = false;
-  (Array.isArray(arr)?arr:[]).forEach(ct=>{
-    if(!ct || !ct.key || ATT_TYPES[ct.key]) return;
+  const list = Array.isArray(arr)?arr:[];
+  /* أنشطة محذوفة (علامة حذف {key, deleted:true}) */
+  list.forEach(ct=>{
+    if(!ct || !ct.key || !ct.deleted) return;
+    const i = ATT_KEYS.indexOf(ct.key);
+    if(i>=0){ ATT_KEYS.splice(i,1); added = true; }
+    if(ATT_TYPES[ct.key] && ATT_TYPES[ct.key].custom) delete ATT_TYPES[ct.key];
+  });
+  list.forEach(ct=>{
+    if(!ct || !ct.key || ct.deleted || ATT_TYPES[ct.key]) return;
     ATT_TYPES[ct.key] = { label:ct.label, full:'حضور '+ct.label, icon:ct.icon||'⭐', pre:ct.pre||'CST', pts:0, color:ct.color||ATT_COLORS[0], custom:true };
     ATT_KEYS.push(ct.key); added = true;
   });
@@ -23757,11 +23769,11 @@ function renderAdminAttendanceTab(){
   }
   /* ---------- الصفحة الرئيسية: مربعات الأنشطة ---------- */
   const type = nav.type, t = ATT_TYPES[type];
-  if(!type || !t){
+  if(!type || !t || !ATT_KEYS.includes(type)){
     const tiles = ATT_KEYS.map(k=>{
       const tt = ATT_TYPES[k], cc = attCfg(k);
       const sub = cc ? `${cc.open?'🟢 مفتوح':'مقفول'} · ${cntOf(k,cc)} حضروا` : 'جاهز';
-      return `<button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico" style="background:${tt.color}">${tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button>`;
+      return `<div class="aa-tile-wrap"><button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico" style="background:${tt.color}">${tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button><button type="button" class="aa-tile-del" data-action="att-admin-deltype" data-type="${k}" aria-label="حذف ${escapeHtml(tt.label)}" title="حذف النشاط">🗑️</button></div>`;
     }).join('');
     return `<div class="aa-grid">${tiles}<button type="button" class="aa-tile add" data-action="att-admin-addtype"><span class="aa-tile-ico">＋</span><b>نشاط جديد</b><small>أضف نوع حضور</small></button></div>`;
   }
@@ -23865,6 +23877,7 @@ function renderAdminAttendanceTab(){
     </div>
     ${hist ? `<div class="aa-sec"><b>الأيام السابقة</b></div><div class="card">${hist}</div>` : ''}
     <button type="button" class="btn btn-ghost" style="margin-top:18px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">مسح كل سجلات ${escapeHtml(t.label)}</button>
+    <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;color:var(--danger);" data-action="att-admin-deltype" data-type="${type}">🗑️ حذف نشاط ${escapeHtml(t.label)} بالكامل</button>
   `;
 }
 var _attQrShown = false; /* الكيو آر مخفي افتراضياً ويظهر بزر "إظهار الكيو آر" */
@@ -23928,6 +23941,23 @@ async function attAdminAction(action, el){
     state.attNav = {type:ct.key, page:'home'}; showToast('تمت إضافة '+nm); render(); try{ window.scrollTo(0,0); }catch(e){} return;
   }
   if(action==='att-admin-toggle-qr'){ attToggleAdminQr(el); return; }
+  if(action==='att-admin-deltype'){
+    const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type).length;
+    showConfirmDialog('هتحذف نشاط «'+t.label+'» بالكامل من الحضور'+(n>0?' مع '+n+' تسجيل حضور مرتبط بيه':'')+'. الخطوة دي مش بترجع.', async ()=>{
+      const tomb = { key:type, deleted:true };
+      const res = await window.storage.update(ATT_TYPES_KEY, cur=>{
+        let a=[]; try{ a = cur ? JSON.parse(cur) : []; }catch(e){ a=[]; } if(!Array.isArray(a)) a=[];
+        a = a.filter(x=>x && x.key!==type); a.push(tomb); return JSON.stringify(a);
+      }, true);
+      if(!(res && res.value)){ showToast('تعذر الحذف — تحقق من الاتصال وحاول مرة أخرى', true); return; }
+      await attRecUpdate(o=>{ Object.keys(o).forEach(k=>{ if(o[k] && o[k].type===type) delete o[k]; }); });
+      await attCfgUpdate(o=>{ delete o[type]; });
+      attApplyTypes([tomb]);
+      state.attNav = {type:null, page:'home'};
+      showToast('تم حذف النشاط'); render(); try{ window.scrollTo(0,0); }catch(e){}
+    }, {icon:'🗑️', confirmLabel:'حذف'});
+    return;
+  }
   if(action==='att-admin-init'){
     _attInitBusy = true; _attInitFailedAt = 0; render();
     const ok = await attCfgUpdate(()=>{});
