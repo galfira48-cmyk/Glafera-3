@@ -2962,6 +2962,38 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .gs-sc small{ display:block; font-size:10px; font-weight:700; color:var(--text-muted); }
   .gs-tools{ display:flex; gap:8px; margin:0 0 12px; }
   .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
+  /* ---------- ترتيب الأبطال: منصة تتويج متصلة + قائمة نظيفة ---------- */
+  .gs-stage.gsx{ padding:20px 12px 0; }
+  .gs-stage.gsx .gs-rays{ opacity:.28; }
+  .gsx-chip{ display:inline-block; margin-top:8px; padding:4px 12px; border-radius:99px; font-size:10.5px; font-weight:700; color:#E3D8C6; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); }
+  .gsp-wrap{ display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:6px; align-items:end; direction:ltr; margin:20px -2px 0; }
+  .gsp{ direction:rtl; display:flex; flex-direction:column; align-items:center; min-width:0; }
+  .gsp-crown{ font-size:24px; line-height:1; filter:drop-shadow(0 3px 8px rgba(244,183,64,.7)); margin-bottom:-4px; position:relative; z-index:1; }
+  .gsp-av{ padding:3px; border-radius:50%; }
+  .gsp1 .gsp-av{ background:conic-gradient(from 200deg,#FFE9A8,#D9A02B,#8A5A12,#F8D277,#FFE9A8); box-shadow:0 0 26px rgba(244,183,64,.45); }
+  .gsp2 .gsp-av{ background:linear-gradient(145deg,#FFFFFF,#A9AFC0); }
+  .gsp3 .gsp-av{ background:linear-gradient(145deg,#FFC9A8,#C8693F); }
+  .gsp-av .avatar{ border:2px solid #1a1433; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; background-size:cover; background-position:center; font-weight:800; width:52px; height:52px; font-size:16px; }
+  .gsp1 .gsp-av .avatar{ width:68px; height:68px; font-size:22px; }
+  .gsp-nm{ margin-top:8px; font-size:12px; font-weight:800; line-height:1.3; max-width:100%; text-align:center; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; padding:0 2px; }
+  .gsp1 .gsp-nm{ font-size:13.5px; font-family:'Cairo',sans-serif; font-weight:900; }
+  .gsp-pt{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; line-height:1.15; color:#FFD36B; font-variant-numeric:tabular-nums; margin:3px 0 9px; }
+  .gsp1 .gsp-pt{ font-size:26px; }
+  .gsp-pt small{ font-size:9.5px; font-weight:700; color:#E3D8C6; margin-inline-start:3px; }
+  .gsp-step{ width:100%; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:9px; border-radius:12px 12px 0 0; color:rgba(32,20,0,.78); box-shadow:inset 0 2px 0 rgba(255,255,255,.45); }
+  .gsp-step b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; line-height:1; }
+  .gsp-step span{ font-size:10px; font-weight:800; margin-top:4px; opacity:.85; }
+  .gsp1 .gsp-step{ height:104px; background:linear-gradient(180deg,#F8D277,#C98418); }
+  .gsp2 .gsp-step{ height:78px; background:linear-gradient(180deg,#E6E9F2,#8F96AB); }
+  .gsp3 .gsp-step{ height:60px; background:linear-gradient(180deg,#F0B08A,#B0572C); }
+  .gsp.me .gsp-nm{ color:#FFE9A8; } .gsp-empty{ visibility:hidden; }
+  .gs-me::before{ display:none; } .gs-me{ border-color:rgba(244,183,64,.45); background:linear-gradient(90deg,rgba(244,183,64,.10),var(--surface) 70%); }
+  .gs-dl{ font-style:normal; font-size:10px; font-weight:800; padding:1px 6px; border-radius:99px; display:inline-block; vertical-align:middle; }
+  .gs-dl.up{ color:#2fbf71; background:rgba(47,191,113,.14); } .gs-dl.dn{ color:#ee4b4b; background:rgba(238,75,75,.14); }
+  .gs-you{ font-style:normal; font-size:9.5px; font-weight:800; padding:1px 7px; border-radius:99px; color:var(--gold); background:rgba(244,183,64,.16); margin-inline-start:5px; vertical-align:middle; }
+  .gs-meta{ font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+  .gs-row .gs-bar{ margin-top:5px; height:3px; }
+  .gs-rows-head{ display:flex; justify-content:space-between; padding:0 10px 6px; font-size:10.5px; font-weight:700; color:var(--text-muted); }
   @media (prefers-reduced-motion:reduce){ .gs-rays{ animation:none; } .gs-bar i{ animation:none; } .gs-me-ring .fg{ transition:none; } }
   .gh-tile .gh-badge{ position:absolute; top:10px; inset-inline-end:10px; font-size:10px; font-weight:800; padding:3px 8px; border-radius:99px; background:rgba(0,0,0,.35); color:#FFE9A8; }
 
@@ -11043,58 +11075,81 @@ async function gsRefresh(opts){
     }
     try{ r = await window.storage.get(GS_KEY, true); }catch(e){}
     let o = {}; try{ o = (r && r.value) ? (JSON.parse(r.value)||{}) : {}; }catch(e){ o = {}; }
+    try{ WALLET = await loadWallet(); }catch(e){} /* الترتيب بالرصيد الحالي في الفيزا */
     GS.data = o; GS.ready = true; GS.at = Date.now();
+    if(!GS.snapDone){ GS.snapDone = true; gsSnap(gsRows()); }
   }catch(e){ GS.ready = true; }
   GS.loading = false;
   if(state.view==='game-leaderboard') render();
 }
+/* لقطة الترتيب السابقة (عشان نعرض ▲▼ التغيّر) — بتتجدد كل 3 ساعات */
+function gsSnap(rows){
+  try{
+    const K = 'glavera-gs-rank', now = Date.now();
+    let s = null; try{ s = JSON.parse(localStorage.getItem(K) || 'null'); }catch(e){}
+    GS.prev = (s && s.ranks) ? s.ranks : null;
+    if(!s || now - (s.at||0) > 3*3600*1000){
+      const m = {}; rows.forEach(x=>{ m[x.p.id] = x.rank; });
+      localStorage.setItem(K, JSON.stringify({ at: now, ranks: m }));
+    }
+  }catch(e){}
+}
+/* الترتيب بالنقاط الحالية (رصيد الفيزا) مش إجمالي اللي اتجمع — فلو حوّل نقاط ترتيبه بينزل */
 function gsRows(){
-  const rows = PARTICIPANTS.map(p=>{ const r = GS.data[p.id] || {}; return {p, pts:Number(r.pts)||0, wins:Number(r.wins)||0, ts:r.ts||0}; })
-    .filter(x=>x.pts>0)
-    .sort((a,b)=> (b.pts-a.pts) || (b.wins-a.wins) || ((a.ts||0)-(b.ts||0)));
+  const rows = PARTICIPANTS.map(p=>{ const r = GS.data[p.id] || {}; return {p, pts: Math.max(0, Number(WALLET[p.id])||0), wins:Number(r.wins)||0, tot:Number(r.pts)||0, ts:r.ts||0}; })
+    .filter(x=>x.wins>0 || x.tot>0)
+    .sort((a,b)=> (b.pts-a.pts) || (b.wins-a.wins) || (b.tot-a.tot) || ((a.ts||0)-(b.ts||0)));
   let last = null, lastRank = 0;
   rows.forEach((x,i)=>{ if(last && x.pts===last.pts && x.wins===last.wins){ x.rank = lastRank; } else { x.rank = i+1; lastRank = x.rank; } last = x; });
   return rows;
 }
 function gsAvatar(p){ return avatarHtml(p) || `<div class="avatar" style="background:${AVATAR_COLOR}">${escapeHtml(initials(p.name||'?'))}</div>`; }
+function gsDelta(x){
+  const pv = GS.prev && GS.prev[x.p.id]; if(pv==null) return '';
+  const d = pv - x.rank; if(!d) return '';
+  return d>0 ? `<i class="gs-dl up">▲ ${d}</i>` : `<i class="gs-dl dn">▼ ${-d}</i>`;
+}
 function renderGameLeaderboard(){
   const rows = gsRows(), top = rows.length ? rows[0].pts : 0;
   const meIdx = rows.findIndex(x=>x.p.id===state.pid), me = meIdx>=0 ? rows[meIdx] : null;
   const lim = state.gsLimit || 30, seen = !!state._gsSeen;
+  const wn = n => n===1 ? 'فوز' : 'انتصارات';
   const cnt = v => `<span class="gs-count" data-to="${v}">${seen ? v : 0}</span>`;
-  const duo = (x, n)=> x ? `<div class="gs-medal m${n}"><span class="gs-medal-n">${n}</span>${gsAvatar(x.p)}<div class="gs-medal-t"><div class="gs-medal-nm">${escapeHtml(x.p.name||'')}</div><div class="gs-medal-pt">${cnt(x.pts)}<small>نقطة</small></div></div></div>` : '<div></div>';
-  let stage = `<div class="gs-stage"><div class="gs-rays" aria-hidden="true"></div><div class="gs-stage-t">ترتيب الأبطال</div><div class="gs-stage-s">نقاط جوائز الألعاب فقط</div>`;
+  const pod = (x, n)=> x ? `<div class="gsp gsp${n}${x.p.id===state.pid?' me':''}">${n===1?'<div class="gsp-crown">👑</div>':''}<div class="gsp-av">${gsAvatar(x.p)}</div><div class="gsp-nm">${escapeHtml(x.p.name||'')}</div><div class="gsp-pt">${cnt(x.pts)}<small>نقطة</small></div><div class="gsp-step"><b>${x.rank}</b><span>${x.wins} ${wn(x.wins)}</span></div></div>` : '<div class="gsp gsp-empty"></div>';
+  let stage = `<div class="gs-stage gsx"><div class="gs-rays" aria-hidden="true"></div><div class="gs-stage-t">ترتيب الأبطال</div><div class="gsx-chip">حسب النقاط الحالية في الفيزا</div>`;
   if(rows.length){
-    const c = rows[0];
-    stage += `<div class="gs-champ"><div class="gs-crown">👑</div><div class="gs-ring">${gsAvatar(c.p)}</div><div class="gs-champ-name">${escapeHtml(c.p.name||'')}</div><div class="gs-champ-pts">${cnt(c.pts)}</div><div class="gs-champ-sub">نقطة · ${c.wins} ${c.wins===1?'فوز':'انتصارات'}</div></div>`;
-    if(rows[1] || rows[2]) stage += `<div class="gs-duo">${duo(rows[1],2)}${duo(rows[2],3)}</div>`;
+    stage += `<div class="gsp-wrap">${pod(rows[1],2)}${pod(rows[0],1)}${pod(rows[2],3)}</div>`;
   } else {
-    stage += `<div class="gs-champ"><div class="gs-crown" style="opacity:.5">👑</div><div class="gs-champ-name" style="margin-top:14px;">الصدارة فاضية</div><div class="gs-champ-sub" style="margin-top:4px;">افز في أي لعبة وخد مكانك الأول</div></div>`;
+    stage += `<div class="gs-champ" style="padding-bottom:22px"><div class="gs-crown" style="opacity:.5">👑</div><div class="gs-champ-name" style="margin-top:14px;">الصدارة فاضية</div><div class="gs-champ-sub" style="margin-top:4px;">افز في أي لعبة وخد مكانك الأول</div></div>`;
   }
   stage += `</div>`;
   let meCard;
   if(me){
     const above = meIdx>0 ? rows.slice(0,meIdx).reverse().find(x=>x.pts>me.pts) : null;
+    const below = rows.slice(meIdx+1).find(x=>x.pts<me.pts);
     const goal = above ? above.pts : Math.max(me.pts,1);
     const R = 29, C = 2*Math.PI*R, frac = Math.min(1, me.pts/Math.max(goal,1));
-    const msg = above ? `فاضل <strong>${above.pts-me.pts+1}</strong> نقطة وتتخطى ${escapeHtml(above.p.name||'')}` : (rows.filter(x=>x.pts===me.pts).length>1 ? 'متعادل على الصدارة — فوزة كمان تحسمها' : 'أنت في الصدارة، حافظ على مركزك');
-    meCard = `<div class="gs-me"><div class="gs-me-ring"><svg viewBox="0 0 68 68"><circle class="bg" cx="34" cy="34" r="${R}"/><circle class="fg" cx="34" cy="34" r="${R}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}"/></svg><b>${me.rank}<small>ترتيبك</small></b></div><div class="gs-me-txt"><strong>${me.pts} نقطة</strong> · ${me.wins} ${me.wins===1?'فوز':'انتصارات'}<br>${msg}</div></div>`;
+    let msg;
+    if(above) msg = `فاضل <strong>${above.pts-me.pts+1}</strong> نقطة وتتخطى ${escapeHtml(above.p.name||'')}`;
+    else if(rows.filter(x=>x.pts===me.pts).length>1) msg = 'متعادل على الصدارة — فوزة كمان تحسمها';
+    else msg = below ? `أنت في الصدارة بفارق <strong>${me.pts-below.pts}</strong> نقطة عن ${escapeHtml(below.p.name||'')}` : 'أنت في الصدارة، حافظ على مركزك';
+    meCard = `<div class="gs-me"><div class="gs-me-ring"><svg viewBox="0 0 68 68"><circle class="bg" cx="34" cy="34" r="${R}"/><circle class="fg" cx="34" cy="34" r="${R}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}"/></svg><b>${me.rank}<small>ترتيبك</small></b></div><div class="gs-me-txt"><strong>${me.pts} نقطة</strong> · ${me.wins} ${wn(me.wins)} ${gsDelta(me)}<br>${msg}</div></div>`;
   } else {
     meCard = `<div class="gs-me"><div class="gs-me-ring"><svg viewBox="0 0 68 68"><circle class="bg" cx="34" cy="34" r="29"/></svg><b>—<small>ترتيبك</small></b></div><div class="gs-me-txt">لسه ما كسبتش نقاط من الألعاب. أول فوز بيدخلك الترتيب.</div></div>`;
   }
   const rest = rows.slice(3, Math.max(3,lim));
   const list = rest.map(x=>{
     const mine = x.p.id===state.pid;
-    return `<div class="gs-row ${mine?'me':''} ${x.rank<=10?'top10':''}"><div class="gs-rk">${x.rank}</div>${gsAvatar(x.p)}<div class="gs-mid"><div class="gs-nm">${escapeHtml(x.p.name||'')}${mine?' (أنت)':''}</div><div class="gs-bar"><i style="width:${top?Math.max(3,Math.round(x.pts/top*100)):0}%"></i></div></div><div class="gs-sc">${x.pts}<small>${x.wins} ${x.wins===1?'فوز':'انتصارات'}</small></div></div>`;
+    return `<div class="gs-row ${mine?'me':''} ${x.rank<=10?'top10':''}"><div class="gs-rk">${x.rank}</div>${gsAvatar(x.p)}<div class="gs-mid"><div class="gs-nm">${escapeHtml(x.p.name||'')}${mine?'<em class="gs-you">أنت</em>':''}</div><div class="gs-meta">${x.wins} ${wn(x.wins)} ${gsDelta(x)}</div><div class="gs-bar"><i style="width:${top?Math.max(3,Math.round(x.pts/top*100)):0}%"></i></div></div><div class="gs-sc">${x.pts}<small>نقطة</small></div></div>`;
   }).join('');
   const more = rows.length > lim ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:10px;" data-action="gs-more">عرض المزيد (${rows.length-lim})</button>` : '';
   const adminBtn = state.adminUnlocked ? `<button type="button" class="btn btn-ghost" data-action="gs-rebuild">إعادة حساب من السجلات</button>` : '';
   return `
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">ترتيب الأبطال</div></div>
     ${GS.ready ? stage + meCard : '<div class="empty-note">جاري تحميل الترتيب…</div>'}
-    ${list ? `<div class="gs-sec">باقي المتسابقين<span>${rows.length} لاعب</span></div><div class="card">${list}</div>${more}` : ''}
+    ${list ? `<div class="gs-sec">باقي المتسابقين<span>${rows.length} لاعب</span></div><div class="card" style="padding:12px 6px">${list}</div>${more}` : ''}
     <div class="gs-tools" style="margin-top:12px;"><button type="button" class="btn btn-outline" data-action="gs-refresh">تحديث</button>${adminBtn}</div>
-    <div class="hint" style="text-align:center;">عند التعادل يتقدّم صاحب أكتر انتصارات${GS.at ? ' · آخر تحديث '+new Date(GS.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}) : ''}</div>`;
+    <div class="hint" style="text-align:center;">الترتيب بالرصيد الحالي، فأي تحويل بيخصم من نقاطك · عند التعادل يتقدّم صاحب أكتر انتصارات${GS.at ? ' · آخر تحديث '+new Date(GS.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}) : ''}</div>`;
 }
 setInterval(()=>{ if(state.view==='game-leaderboard' && !document.querySelector('.modal-overlay') && !document.hidden) gsRefresh(); }, 25000);
 /* ============================= GAMES: ROOM LOBBY (انضمام بكود + الغرف المتاحة) ============================= */
@@ -11401,7 +11456,7 @@ function renderGamesHub(){
     <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#F4B740,#B8651B); --i:6" data-action="open-gs">
       <span class="gh-ico">🏆</span>
       <span class="gh-title">ترتيب الأبطال</span>
-      <span class="gh-sub">مين الأعلى في نقاط الألعاب؟</span>
+      <span class="gh-sub">مين الأعلى في النقاط الحالية؟</span>
     </button>`;
   return `
     <div class="back-row">
