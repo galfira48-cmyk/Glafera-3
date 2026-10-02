@@ -1692,6 +1692,63 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ch-pw .field{ margin:0; text-align:center; letter-spacing:2px; direction:ltr; }
   .ch-pw .hint{ margin-top:6px; font-size:11px; line-height:1.7; color:#9fb0e6; }
   .ch-swoosh{ display:block; width:46%; height:14px; margin:8px auto 0; }
+
+  /* ---- تطويرات إضافية ---- */
+  #challenge-type-overlay{ -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); animation:vmsgFade .22s ease both; }
+  .confirm-overlay.leaving{ animation:vmsgFadeOut .2s ease forwards; }
+  .confirm-overlay.leaving .ch-wrap{ animation:chOut .2s ease forwards; }
+  @keyframes chOut{ to{ transform:translateY(18px) scale(.95); opacity:0; } }
+  .ch-card{ overflow:visible; }
+  .ch-card::before{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; padding:1.5px;
+    background:linear-gradient(135deg,rgba(255,200,60,.65),transparent 30%,transparent 70%,rgba(70,120,255,.7));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+  .ch-bg{ position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; }
+  .ch-bg i{ position:absolute; bottom:-12px; width:6px; height:6px; border-radius:50%; background:radial-gradient(circle,#ffe58a,rgba(255,200,60,0) 70%); opacity:0; animation:chRise 6s linear infinite; }
+  .ch-bg i:nth-child(1){ left:10%; animation-delay:0s; } .ch-bg i:nth-child(2){ left:28%; animation-delay:1.6s; width:4px; height:4px; }
+  .ch-bg i:nth-child(3){ left:52%; animation-delay:3s; } .ch-bg i:nth-child(4){ left:72%; animation-delay:.8s; width:5px; height:5px; } .ch-bg i:nth-child(5){ left:90%; animation-delay:4.2s; }
+  @keyframes chRise{ 0%{ transform:translateY(0) scale(.6); opacity:0; } 15%{ opacity:.9; } 100%{ transform:translateY(-330px) scale(1.2); opacity:0; } }
+  .ch-card > *:not(.ch-bg){ position:relative; }
+  .ch-card > .ch-x{ position:absolute; }
+  /* دخول متتابع */
+  .ch-swords{ animation:chPopIn .55s cubic-bezier(.2,1.4,.3,1) .12s both; }
+  .ch-ttl svg{ animation:chWipe .55s cubic-bezier(.3,.8,.3,1) .22s both; }
+  .ch-ttl span{ animation:chFadeUp .45s ease .4s both; }
+  .ch-desc{ animation:chFadeUp .45s ease .5s both; }
+  .ch-opt.coin{ animation:chFadeUp .5s cubic-bezier(.2,1,.3,1) .6s both; }
+  .ch-opt.free{ animation:chFadeUp .5s cubic-bezier(.2,1,.3,1) .72s both, chGlow 2.8s ease-in-out 1.3s infinite; }
+  .ch-priv{ animation:chFadeUp .45s ease .85s both; }
+  .ch-bubble{ animation:chBubble .6s cubic-bezier(.2,1.5,.3,1) .5s both; transform-origin:12% 100%; }
+  .ch-bubble-crown{ animation:chPopIn .5s cubic-bezier(.2,1.5,.3,1) .75s both, chTwinkle 2.4s ease-in-out 1.4s infinite; }
+  @keyframes chFadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @keyframes chPopIn{ from{ opacity:0; transform:scale(.4) rotate(-12deg); } to{ opacity:1; transform:none; } }
+  @keyframes chWipe{ from{ clip-path:inset(0 0 0 100%); opacity:.4; } to{ clip-path:inset(0 0 0 0); opacity:1; } }
+  @keyframes chBubble{ from{ opacity:0; transform:rotate(3deg) scale(.2); } to{ opacity:1; transform:rotate(3deg) scale(1); } }
+  @keyframes chGlow{ 0%,100%{ box-shadow:0 0 0 1px rgba(60,120,255,.25), 0 0 18px rgba(47,123,255,.35), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -10px 18px rgba(0,0,0,.25); } 50%{ box-shadow:0 0 0 1px rgba(80,140,255,.45), 0 0 32px rgba(47,123,255,.65), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -10px 18px rgba(0,0,0,.25); } }
+  @keyframes chTwinkle{ 0%,100%{ transform:rotate(14deg) scale(1); filter:drop-shadow(0 0 0 rgba(255,200,60,0)); } 50%{ transform:rotate(8deg) scale(1.18); filter:drop-shadow(0 0 6px rgba(255,200,60,.9)); } }
+  /* حركات الأيقونات */
+  .ch-swords svg{ animation:chClash 3.6s ease-in-out 1.2s infinite; transform-origin:50% 60%; }
+  @keyframes chClash{ 0%,86%,100%{ transform:none; } 90%{ transform:scale(1.1) rotate(-3deg); } 94%{ transform:scale(.97) rotate(2deg); } }
+  .ch-coins svg{ animation:chCoin 2.6s ease-in-out infinite; transform-origin:50% 90%; }
+  @keyframes chCoin{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-4px) rotate(3deg); } }
+  .ch-crown svg{ animation:chTwinkle 2.6s ease-in-out infinite; }
+  .ch-free-tk{ animation:chWiggle 3s ease-in-out infinite; }
+  @keyframes chWiggle{ 0%,100%{ transform:rotate(-8deg); } 50%{ transform:rotate(-2deg) scale(1.06); } }
+  .ch-dash svg{ animation:chTwinkle 1.8s ease-in-out infinite; }
+  /* شرارات حوالين العنوان والسيوف */
+  .ch-sp{ position:absolute; z-index:1; width:5px; height:20px; border-radius:4px; background:linear-gradient(#ffd84f,#f6a712); box-shadow:0 0 10px rgba(255,190,40,.7); pointer-events:none; animation:chSpark 2.2s ease-in-out infinite; }
+  .ch-sp.a{ top:44px; right:20px; transform:rotate(-55deg); } .ch-sp.b{ top:70px; right:8px; transform:rotate(-80deg); animation-delay:.5s; }
+  .ch-sp.c{ top:44px; left:20px; transform:rotate(55deg); animation-delay:.9s; } .ch-sp.d{ top:70px; left:8px; transform:rotate(80deg); animation-delay:1.3s; }
+  @keyframes chSpark{ 0%,100%{ opacity:.25; scale:.7; } 50%{ opacity:1; scale:1.1; } }
+  /* لمعة الضغط */
+  .ch-opt{ overflow:hidden; }
+  .ch-rip{ position:absolute; border-radius:50%; width:12px; height:12px; margin:-6px 0 0 -6px; background:rgba(255,255,255,.55); pointer-events:none; animation:chRip .55s ease-out forwards; }
+  @keyframes chRip{ to{ transform:scale(22); opacity:0; } }
+  /* المسكوت: رمشة */
+  .ch-mascot .ch-eyes{ transform-origin:112px 90px; animation:chBlink 4.5s infinite; }
+  @keyframes chBlink{ 0%,92%,100%{ transform:scaleY(1); } 95%{ transform:scaleY(.15); } }
+  .ch-mascot .ch-hl{ transform-origin:46px 136px; animation:chWave 2.8s ease-in-out infinite; } .ch-mascot .ch-hr{ transform-origin:174px 136px; animation:chWave 2.8s ease-in-out .5s infinite; }
+  @keyframes chWave{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+  @media (prefers-reduced-motion:reduce){ .ch-wrap *, .ch-wrap{ animation:none !important; } }
   .confirm-actions{display:flex; gap:10px; margin-top:20px;}
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
@@ -17601,12 +17658,16 @@ async function showRoomFeeModal(kind, onPaid){
     onPaid();
   });
 }
-function closeChallengeTypeModal(){
+function closeChallengeTypeModal(instant){
   const el = document.getElementById('challenge-type-overlay');
-  if(el) el.remove();
+  if(!el) return;
+  if(instant===true){ el.remove(); return; }
+  el.removeAttribute('id');
+  el.classList.add('leaving');
+  setTimeout(()=>el.remove(), 210);
 }
 function showChallengeTypeModal(gameType){
-  closeChallengeTypeModal();
+  closeChallengeTypeModal(true);
   const fee = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.roomCreateFee) || 0;
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay confirm-overlay';
@@ -17625,18 +17686,20 @@ function showChallengeTypeModal(gameType){
           <circle cx="66" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="112" cy="10" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="158" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/>
           <path d="M72 56 Q112 64 152 56" stroke="#fff3b0" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
         </g>
-        <path d="M54 82 Q56 70 70 72 L104 76 Q112 78 120 76 L154 72 Q168 70 170 82 Q170 104 148 104 L132 104 Q118 104 114 94 Q112 90 110 94 Q106 104 92 104 L76 104 Q54 104 54 82Z" fill="#050408"/>
+        <g class="ch-eyes"><path d="M54 82 Q56 70 70 72 L104 76 Q112 78 120 76 L154 72 Q168 70 170 82 Q170 104 148 104 L132 104 Q118 104 114 94 Q112 90 110 94 Q106 104 92 104 L76 104 Q54 104 54 82Z" fill="#050408"/>
         <path d="M64 80 Q80 76 98 82" stroke="#fff" stroke-width="3" opacity=".25" fill="none" stroke-linecap="round"/>
-        <path d="M128 80 Q142 76 156 80" stroke="#fff" stroke-width="3" opacity=".2" fill="none" stroke-linecap="round"/>
+        <path d="M128 80 Q142 76 156 80" stroke="#fff" stroke-width="3" opacity=".2" fill="none" stroke-linecap="round"/></g>
         <path d="M88 118 Q112 130 136 118" stroke="#050408" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
         <g fill="#fff" stroke="#c9ccd8" stroke-width="1.5">
-          <ellipse cx="46" cy="136" rx="26" ry="15"/><ellipse cx="174" cy="136" rx="26" ry="15"/>
+          <g class="ch-hl"><ellipse cx="46" cy="136" rx="26" ry="15"/></g><g class="ch-hr"><ellipse cx="174" cy="136" rx="26" ry="15"/></g>
         </g>
         <g stroke="#c9ccd8" stroke-width="1.6" stroke-linecap="round"><path d="M38 124 V134 M48 122 V134 M58 124 V134"/><path d="M162 124 V134 M172 122 V134 M182 124 V134"/></g>
       </svg></div>
       <svg class="ch-bubble-crown" viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#f7b92a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
       <div class="ch-bubble">اختيارك يحدد أسلوب اللعبة!</div>
       <div class="ch-card">
+        <div class="ch-bg"><i></i><i></i><i></i><i></i><i></i></div>
+        <span class="ch-sp a"></span><span class="ch-sp b"></span><span class="ch-sp c"></span><span class="ch-sp d"></span>
         <button type="button" class="ch-x" id="challenge-x-btn" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
         <div class="ch-swords"><svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
           <defs><linearGradient id="chBl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f6ff"/><stop offset=".5" stop-color="#b6c6e4"/><stop offset="1" stop-color="#7f93b8"/></linearGradient>
@@ -17659,7 +17722,7 @@ function showChallengeTypeModal(gameType){
             <rect x="16" y="28" width="44" height="12" fill="#e5a216"/><ellipse cx="38" cy="28" rx="22" ry="9" fill="url(#chCn)"/><rect x="16" y="16" width="44" height="12" fill="#e5a216"/><ellipse cx="38" cy="16" rx="22" ry="9" fill="url(#chCn)"/></g>
             <circle cx="22" cy="54" r="15" fill="url(#chCn)" stroke="#a86a06" stroke-width="1.6"/><circle cx="22" cy="54" r="10.5" fill="none" stroke="#c98a0e" stroke-width="1.4"/><path d="M16 58 L16 50 L19.5 53 L22 48 L24.5 53 L28 50 L28 58Z" fill="#c98a0e"/>
           </svg></span>
-          <span class="ot"><b>تحدي بكوين</b><em>(اختياري)</em></span>
+          <span class="ot"><b>تحدي بكوين</b></span>
           <span class="ch-crown"><svg viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#1b1328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M9 29 H31" stroke="#1b1328" stroke-width="2.6" stroke-linecap="round"/></svg></span>
         </button>
         <button type="button" class="ch-opt free" id="challenge-free-btn">
@@ -17670,7 +17733,7 @@ function showChallengeTypeModal(gameType){
           <span class="ch-dash"><svg viewBox="0 0 24 24"><path d="M5 18 L17 6" stroke="#2f7bff" stroke-width="3.2" stroke-linecap="round"/><path d="M12 22 L21 13" stroke="#2f7bff" stroke-width="3" stroke-linecap="round" opacity=".7"/></svg></span>
         </button>
         <div class="ch-priv">
-          <button type="button" class="ch-priv-btn" id="challenge-priv-btn">🔒 غرفة خاصة <small>(اختياري)</small></button>
+          <button type="button" class="ch-priv-btn" id="challenge-priv-btn">🔒 غرفة خاصة</button>
           <div class="ch-pw" id="challenge-pw-box" hidden>
             <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="اكتب كلمة سر للغرفة">
             <div class="hint">لو كتبت كلمة سر، محدش هيدخل غير اللي تديهاله.</div>
@@ -17682,7 +17745,13 @@ function showChallengeTypeModal(gameType){
   `;
   document.body.appendChild(overlay);
   overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeChallengeTypeModal(); });
-  document.getElementById('challenge-x-btn').addEventListener('click', closeChallengeTypeModal);
+  overlay.querySelectorAll('.ch-opt').forEach(b=>b.addEventListener('pointerdown', (e)=>{
+    const r = b.getBoundingClientRect(), d = document.createElement('span');
+    d.className = 'ch-rip'; d.style.left = (e.clientX-r.left)+'px'; d.style.top = (e.clientY-r.top)+'px';
+    b.appendChild(d); setTimeout(()=>d.remove(), 600);
+    try{ if(navigator.vibrate) navigator.vibrate(12); }catch(_){}
+  }));
+  document.getElementById('challenge-x-btn').addEventListener('click', ()=>closeChallengeTypeModal());
   document.getElementById('challenge-priv-btn').addEventListener('click', ()=>{
     const box = document.getElementById('challenge-pw-box');
     box.hidden = !box.hidden;
