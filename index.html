@@ -2908,6 +2908,45 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .aa-tile small{ font-size:11px; font-weight:600; color:var(--text-muted); line-height:1.4; }
   .aa-tile.add{ border-style:dashed; background:rgba(255,255,255,.04); }
   .aa-tile.add .aa-tile-ico{ background:rgba(255,255,255,.08); box-shadow:none; font-size:30px; color:var(--text-muted); }
+
+  /* ---------- ترتيب الألعاب (نقاط الألعاب فقط) ---------- */
+  .gs-hero{ text-align:center; padding:18px 12px 14px; border-radius:26px; margin-bottom:14px; background:linear-gradient(160deg, rgba(244,183,64,.18), rgba(132,94,194,.12)); border:1px solid rgba(244,183,64,.28); }
+  .gs-kicker{ font-size:11px; font-weight:800; letter-spacing:.4px; color:var(--gold); }
+  .gs-title{ font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; margin:2px 0; }
+  .gs-sub{ font-size:11.5px; color:var(--text-muted); line-height:1.6; }
+  .gs-podium{ display:grid; grid-template-columns:1fr 1.15fr 1fr; align-items:end; gap:8px; margin:18px 0 4px; }
+  .gs-pod{ display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; min-width:0; }
+  .gs-pod .avatar{ width:52px; height:52px; font-size:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto; }
+  .gs-pod.p1 .avatar{ width:66px; height:66px; font-size:20px; box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--gold), 0 0 22px rgba(244,183,64,.55); }
+  .gs-pod.p2 .avatar{ box-shadow:0 0 0 3px var(--surface), 0 0 0 4px #D8D8E8; }
+  .gs-pod.p3 .avatar{ box-shadow:0 0 0 3px var(--surface), 0 0 0 4px var(--coral); }
+  .gs-crown{ font-size:22px; line-height:1; margin-bottom:-2px; }
+  .gs-pod-name{ font-size:12px; font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gs-pod-pts{ font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:var(--gold); }
+  .gs-pod-pts small{ font-size:10px; font-weight:700; color:var(--text-muted); margin-inline-start:2px; }
+  .gs-step{ width:100%; border-radius:14px 14px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:6px; font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:rgba(0,0,0,.55); }
+  .gs-pod.p1 .gs-step{ height:74px; background:linear-gradient(180deg,#F8D277,#D9A02B); }
+  .gs-pod.p2 .gs-step{ height:54px; background:linear-gradient(180deg,#EEF0F6,#B4B9C8); }
+  .gs-pod.p3 .gs-step{ height:40px; background:linear-gradient(180deg,#FFB08F,#D9704A); }
+  .gs-me{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:20px; margin-bottom:14px; background:var(--surface); border:1px solid var(--gold); box-shadow:0 8px 24px -14px rgba(244,183,64,.7); }
+  .gs-me-rank{ font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--gold); min-width:44px; text-align:center; line-height:1.1; }
+  .gs-me-rank small{ display:block; font-size:9.5px; font-weight:700; color:var(--text-muted); }
+  .gs-me-txt{ flex:1; min-width:0; font-size:12px; line-height:1.6; }
+  .gs-me-txt b{ font-family:'Cairo',sans-serif; font-size:15px; }
+  .gs-row{ display:flex; align-items:center; gap:10px; padding:10px 6px; border-bottom:1px solid var(--border); position:relative; }
+  .gs-row:last-child{ border-bottom:none; }
+  .gs-row.me{ background:linear-gradient(90deg, rgba(244,183,64,.14), transparent 80%); border-radius:14px; }
+  .gs-row .avatar{ width:36px; height:36px; font-size:12px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto; }
+  .gs-rk{ width:28px; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; color:var(--text-muted); flex:0 0 auto; }
+  .gs-mid{ flex:1; min-width:0; }
+  .gs-nm{ font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gs-bar{ height:5px; border-radius:99px; background:var(--border); margin-top:5px; overflow:hidden; }
+  .gs-bar i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-2)); }
+  .gs-sc{ text-align:end; flex:0 0 auto; font-family:'Cairo',sans-serif; font-weight:900; font-size:14px; color:var(--gold); line-height:1.2; }
+  .gs-sc small{ display:block; font-size:10px; font-weight:700; color:var(--text-muted); }
+  .gs-tools{ display:flex; gap:8px; margin:0 0 12px; }
+  .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
+  .gh-tile .gh-badge{ position:absolute; top:10px; inset-inline-end:10px; font-size:10px; font-weight:800; padding:3px 8px; border-radius:99px; background:rgba(0,0,0,.35); color:#FFE9A8; }
   .aa-tile-wrap{ position:relative; }
   .aa-tile-wrap > .aa-tile{ width:100%; }
   .aa-tile-del{ position:absolute; top:8px; inset-inline-start:8px; z-index:2; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; line-height:1; cursor:pointer; color:#fff; background:rgba(255,92,92,.88); border:1px solid rgba(255,255,255,.3); box-shadow:0 4px 12px -4px rgba(0,0,0,.6); }
@@ -6014,6 +6053,7 @@ async function logVisaTx(entries){
       if(window.storage && window.storage.update){ await window.storage.update(vtxKey(e.pid), apply, true); }
       else { const c = await window.storage.get(vtxKey(e.pid), true); await window.storage.set(vtxKey(e.pid), apply(c ? c.value : null), true); }
     }catch(err){}
+    if(e.type==='game_win' && entry.amount>0){ try{ gsAdd(e.pid, entry.amount); }catch(_){} }
   }));
 }
 function vtxLogSafe(entries){ try{ const _p = logVisaTx(entries); (entries||[]).forEach(e=>{ if(e && e.pid===state.pid && /^game_/.test(e.type)) visaGameToast(e); }); _p.then(()=>{ if((entries||[]).some(e=>e && e.pid===state.pid && e.type==='game_win')){ ACH.loading=false; achRefresh(true); } }).catch(()=>{}); }catch(e){} }
@@ -10800,6 +10840,122 @@ function renderGameAchievements(){
     <div class="hint" style="text-align:center;margin:14px 0 4px;">الأوسمة بتتحسب من جوائز الألعاب في كشف حساب الفيزا</div>
   `;
 }
+
+/* ============================= GAMES: ترتيب الأبطال (نقاط جوائز الألعاب فقط) =============================
+   المصدر: كشف حساب الفيزا (game_win فقط) — مش بيدخل فيه نقاط الفقرات/الحضور/إضافات المنظمين ولا تعويض الانسحاب.
+   التخزين المشترك: glavera-game-score = { pid: {pts, wins, ts} } */
+const GS_KEY = 'glavera-game-score';
+const GS = {ready:false, loading:false, data:{}, at:0};
+async function gsAdd(pid, amt){
+  try{
+    await window.storage.update(GS_KEY, cur=>{
+      let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+      const r = o[pid] || {pts:0, wins:0};
+      r.pts = (r.pts||0) + amt; r.wins = (r.wins||0) + 1; r.ts = Date.now();
+      o[pid] = r; return JSON.stringify(o);
+    }, true);
+  }catch(e){}
+}
+function gsFromTx(tx){
+  const w = (tx||[]).filter(t=>t && t.type==='game_win');
+  return { pts:w.reduce((a,t)=>a+(Number(t.amount)||0),0), wins:w.length, ts:w.reduce((a,t)=>Math.max(a,t.ts||0),0) };
+}
+/* بيدمج القيم بدون ما ينقّص أي رقم موجود (الأعلى هو الأصح لأن السجل ممكن يتقصّ بعد 400 حركة) */
+async function gsMerge(map){
+  try{
+    await window.storage.update(GS_KEY, cur=>{
+      let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+      Object.keys(map).forEach(pid=>{
+        const n = map[pid], r = o[pid] || {pts:0, wins:0, ts:0};
+        if((n.pts||0) > (r.pts||0)) r.pts = n.pts;
+        if((n.wins||0) > (r.wins||0)) r.wins = n.wins;
+        if((n.ts||0) > (r.ts||0)) r.ts = n.ts;
+        o[pid] = r;
+      });
+      return JSON.stringify(o);
+    }, true);
+  }catch(e){}
+}
+async function gsSyncMine(){
+  if(!state.pid) return;
+  const tx = (await loadVisaTx())[state.pid] || [];
+  const m = gsFromTx(tx);
+  if(m.pts>0 || m.wins>0) await gsMerge({[state.pid]: m});
+}
+/* بيقرأ كشف حساب كل المشاركين ويبني الترتيب (مرة أولى أو بزرار الأدمن) */
+async function gsRebuildAll(){
+  const out = {}; let legacy = {};
+  try{ const r = await window.storage.get('glavera-visa-tx', true); if(r && r.value) legacy = JSON.parse(r.value) || {}; }catch(e){}
+  const ids = PARTICIPANTS.map(p=>p.id);
+  for(let i=0;i<ids.length;i+=12){
+    await Promise.all(ids.slice(i,i+12).map(async pid=>{
+      let mine = [];
+      try{ const r = await window.storage.get(vtxKey(pid), true); if(r && r.value) mine = vtxParse(r.value); }catch(e){}
+      const m = gsFromTx(vtxMerge(mine, Array.isArray(legacy[pid])?legacy[pid]:[]));
+      if(m.pts>0 || m.wins>0) out[pid] = m;
+    }));
+  }
+  await gsMerge(out);
+}
+async function gsRefresh(opts){
+  if(GS.loading) return; GS.loading = true;
+  try{
+    let r = null;
+    try{ r = await window.storage.get(GS_KEY, true); }catch(e){}
+    if(!r || !r.value || (opts && opts.rebuild)){
+      await gsRebuildAll();
+    } else {
+      await gsSyncMine();
+    }
+    try{ r = await window.storage.get(GS_KEY, true); }catch(e){}
+    let o = {}; try{ o = (r && r.value) ? (JSON.parse(r.value)||{}) : {}; }catch(e){ o = {}; }
+    GS.data = o; GS.ready = true; GS.at = Date.now();
+  }catch(e){ GS.ready = true; }
+  GS.loading = false;
+  if(state.view==='game-leaderboard') render();
+}
+function gsRows(){
+  const rows = PARTICIPANTS.map(p=>{ const r = GS.data[p.id] || {}; return {p, pts:Number(r.pts)||0, wins:Number(r.wins)||0, ts:r.ts||0}; })
+    .filter(x=>x.pts>0)
+    .sort((a,b)=> (b.pts-a.pts) || (b.wins-a.wins) || ((a.ts||0)-(b.ts||0)));
+  let last = null, lastRank = 0;
+  rows.forEach((x,i)=>{ if(last && x.pts===last.pts && x.wins===last.wins){ x.rank = lastRank; } else { x.rank = i+1; lastRank = x.rank; } last = x; });
+  return rows;
+}
+function gsAvatar(p){ return avatarHtml(p) || `<div class="avatar" style="background:${AVATAR_COLOR}">${escapeHtml(initials(p.name||'?'))}</div>`; }
+function renderGameLeaderboard(){
+  const rows = gsRows(), top = rows.length ? rows[0].pts : 0;
+  const meIdx = rows.findIndex(x=>x.p.id===state.pid), me = meIdx>=0 ? rows[meIdx] : null;
+  const lim = state.gsLimit || 30;
+  const podOf = (x, n)=> x ? `<div class="gs-pod p${n}">${n===1?'<div class="gs-crown">👑</div>':''}${gsAvatar(x.p)}<div class="gs-pod-name">${escapeHtml(x.p.name||'')}</div><div class="gs-pod-pts">${x.pts}<small>نقطة</small></div><div class="gs-step">${n}</div></div>` : `<div class="gs-pod p${n}"></div>`;
+  const podium = rows.length ? `<div class="gs-podium">${podOf(rows[1],2)}${podOf(rows[0],1)}${podOf(rows[2],3)}</div>` : '';
+  let meCard;
+  if(me){
+    const above = meIdx>0 ? rows.slice(0,meIdx).reverse().find(x=>x.pts>me.pts) : null;
+    meCard = `<div class="gs-me"><div class="gs-me-rank">#${me.rank}<small>ترتيبك</small></div><div class="gs-me-txt"><b>${me.pts} نقطة</b> · ${me.wins} ${me.wins===1?'فوز':'انتصارات'}<br>${above ? `فاضل <b>${above.pts-me.pts+1}</b> نقطة عشان تتخطى ${escapeHtml(above.p.name||'')}` : (rows.filter(x=>x.pts===me.pts).length>1 ? 'متعادل على الصدارة — كسب واحدة كمان 💪' : 'أنت في الصدارة! حافظ على مركزك 👑')}</div></div>`;
+  } else {
+    meCard = `<div class="gs-me"><div class="gs-me-rank">—<small>ترتيبك</small></div><div class="gs-me-txt">لسه ما كسبتش نقاط من الألعاب. افز في أي لعبة وادخل الترتيب 🎮</div></div>`;
+  }
+  const list = rows.slice(3, Math.max(3,lim)).map(x=>{
+    const mine = x.p.id===state.pid;
+    return `<div class="gs-row ${mine?'me':''}"><div class="gs-rk">${x.rank}</div>${gsAvatar(x.p)}<div class="gs-mid"><div class="gs-nm">${escapeHtml(x.p.name||'')}${mine?' (أنت)':''}</div><div class="gs-bar"><i style="width:${top?Math.max(3,Math.round(x.pts/top*100)):0}%"></i></div></div><div class="gs-sc">${x.pts}<small>${x.wins} فوز</small></div></div>`;
+  }).join('');
+  const more = rows.length > lim ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:10px;" data-action="gs-more">عرض المزيد (${rows.length-lim})</button>` : '';
+  const adminBtn = state.adminUnlocked ? `<button type="button" class="btn btn-ghost" data-action="gs-rebuild">🛠️ إعادة حساب من السجلات</button>` : '';
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">ترتيب الأبطال</div></div>
+    <div class="gs-hero">
+      <div class="gs-kicker">لوحة الصدارة</div>
+      <div class="gs-title">🏆 أبطال الألعاب</div>
+      <div class="gs-sub">الترتيب بنقاط جوائز الألعاب بس — من غير نقاط الفقرات أو الحضور</div>
+      ${podium}
+    </div>
+    ${GS.ready ? meCard : '<div class="empty-note">جاري تحميل الترتيب…</div>'}
+    ${list ? `<div class="card">${list}</div>${more}` : (GS.ready && !rows.length ? '<div class="empty-note">لسه محدش كسب نقاط من الألعاب — كن الأول! 🥇</div>' : '')}
+    <div class="gs-tools" style="margin-top:12px;"><button type="button" class="btn btn-outline" data-action="gs-refresh">🔄 تحديث</button>${adminBtn}</div>
+    <div class="hint" style="text-align:center;">عند التعادل بيتقدّم صاحب أكتر انتصارات · ${GS.at ? 'آخر تحديث '+new Date(GS.at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}) : ''}</div>`;
+}
+setInterval(()=>{ if(state.view==='game-leaderboard' && !document.querySelector('.modal-overlay') && !document.hidden) gsRefresh(); }, 25000);
 /* ============================= GAMES: ROOM LOBBY (انضمام بكود + الغرف المتاحة) ============================= */
 let ROOM_PW = '';
 const ROOM_LOBBY = {ready:false};
@@ -11100,6 +11256,12 @@ function renderGamesHub(){
       <span class="gh-title">إنجازاتي</span>
       <span class="gh-sub">${ACH.ready?`${achC.open} من ${achC.total} وسام — تابع مستواك`:'أوسمة ومستويات وتحديات'}</span>
     </button>`;
+  const gsTile = `
+    <button type="button" class="gh-tile" style="--g:linear-gradient(145deg,#F4B740,#B8651B); --i:6" data-action="open-gs">
+      <span class="gh-ico">🏆</span>
+      <span class="gh-title">ترتيب الأبطال</span>
+      <span class="gh-sub">مين الأعلى في نقاط الألعاب؟</span>
+    </button>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -11118,7 +11280,7 @@ function renderGamesHub(){
     </div>
     ${liveCount ? `<button type="button" class="gx-live" data-action="open-watch"><i></i><span>${liveCount} ${liveCount===1?'مباراة':'مباريات'} مباشرة الآن — انضم للمشاهدة</span>${ICO.chev}</button>` : ''}
     <div class="gx-label">اختر طريقة اللعب</div>
-    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${hasVisa(state.pid) ? visaTile : ''}${achTile}</div>
+    <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${hasVisa(state.pid) ? visaTile : ''}${achTile}${gsTile}</div>
   `;
 }
 /* ============================= SHOP (المتجر) — استيكرات / كروت / مخصص ============================= */
@@ -22190,6 +22352,7 @@ function render(){
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='game-achievements') html = renderGameAchievements();
+  else if(state.view==='game-leaderboard') html = renderGameLeaderboard();
   else if(state.view==='room-lobby') html = renderRoomLobby();
   else if(state.view==='visa') html = renderVisaPage();
   else if(state.view==='visa-history') html = renderVisaHistoryPage();
@@ -24486,6 +24649,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
   else if(action==='open-solo-cat'){ go('games-solo-cat', {soloCatKey: el.dataset.cat}); }
   else if(action==='open-achievements'){ state.friendTile = null; state.achFilter='all'; go('game-achievements'); achRefresh(false); }
+  else if(action==='open-gs'){ state.friendTile = null; state.gsLimit = 30; go('game-leaderboard'); gsRefresh(); }
+  else if(action==='gs-more'){ state.gsLimit = (state.gsLimit||30)+30; render(); }
+  else if(action==='gs-refresh'){ gsRefresh(); showToast('جاري التحديث…'); }
+  else if(action==='gs-rebuild'){ if(state.adminUnlocked){ showToast('جاري إعادة الحساب من كل السجلات…'); gsRefresh({rebuild:true}).then(()=>showToast('تم تحديث الترتيب')); } }
   else if(action==='ach-filter'){ state.achFilter = el.dataset.f; render(); }
   else if(action==='open-solo'){ state.friendTile = null; go('games-solo'); }
   else if(action==='open-watch'){ state.friendTile = null; go('watch-rooms'); loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; render(); }); }
