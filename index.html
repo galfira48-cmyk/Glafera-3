@@ -6155,7 +6155,7 @@ async function logVisaTx(entries){
   const now = Date.now();
   await Promise.all((entries||[]).map(async (e, i)=>{
     if(!e || !e.pid) return;
-    const entry = { id:'tx'+now+i+Math.random().toString(36).slice(2,6), type:e.type, amount:Math.abs(Number(e.amount)||0), balAfter:Number(e.balAfter)||0, note:e.note||'', ts:now, dev:VTX_DEV };
+    const entry = { id:'tx'+now+i+Math.random().toString(36).slice(2,6), type:e.type, amount:Math.abs(Number(e.amount)||0), balAfter:Number(e.balAfter)||0, note:e.note||'', ts:now, dev:VTX_DEV, via:e.via||'' };
     e.__id = entry.id; if(e.pid===state.pid) window.__lastTx = { ref:'GF-'+String(entry.id).slice(-8).toUpperCase(), at:Date.now() };
     const apply = (cur)=>{ const arr = cur ? vtxParse(cur) : []; arr.unshift(entry); return JSON.stringify(arr.slice(0, VTX_MAX)); };
     try{
@@ -6409,6 +6409,7 @@ function visaPosKill(instant){
 }
 function visaPosBegin(opts){
   opts = opts || {};
+  if(!opts.chip) return; /* الشاشة دي بتظهر بس في تحويل/استلام الشريحة والإسكان */
   visaPosKill(true);
   const pid = state.pid, last4 = vposLast4(pid), kind = opts.kind || 'deposit';
   const ref = 'GF-' + Math.random().toString(36).slice(2,10).toUpperCase();
@@ -6558,7 +6559,7 @@ function visaGameToast(e){
 function visaMsg(kind, title, text, opts){
   opts = opts || {};
   if(window.__vpos && !(kind==='success' && opts.pos)){ const _a = arguments; return visaPosAbort(()=>visaMsg.apply(null,_a)); }
-  if(kind==='success' && opts.pos){ return visaPosFx(title, text, opts); }
+  if(kind==='success' && opts.pos && window.__vpos){ return visaPosFx(title, text, opts); }
   const old = document.getElementById('vmsg-overlay'); if(old) old.remove();
   const ov = document.createElement('div');
   ov.className = 'modal-overlay vmsg-overlay'; ov.id = 'vmsg-overlay';
@@ -7679,7 +7680,7 @@ function visaChipShowCode(made){
       if(!_vcs || _vcs !== v) return;
       if(r && r.status === 'claimed'){
         v.pending = null; clearInterval(v.poll); clearInterval(v.tick); visaChipClose();
-        visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt });
+        visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt, chip:true });
         visaChipWatchDone(key, rec, pid0());
       } else if(r && r.status === 'done'){
         v.pending = null; clearInterval(v.poll); clearInterval(v.tick); visaChipClose(); visaChipSenderDone(key, rec, r);
@@ -7707,7 +7708,7 @@ async function visaChipSenderDone(key, rec, r){
   const pid = state.pid;
   try{ WALLET = await loadWallet(); }catch(e){}
   render();
-  if(!window.__vpos) visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt });
+  if(!window.__vpos) visaPosBegin({ amount: rec.amt+' نقطة', kind:'transfer', amt: rec.amt, chip:true });
   const toName = escapeHtml(r.toName || '—');
   visaMsg('success','تم التحويل بنجاح',`تم تحويل ${rec.amt} نقطة إلى ${toName}.`,{ pos:true, rows:[['المستلم', toName], ['المبلغ', rec.amt+' نقطة'], ['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
   window.storage.delete(key, true).catch(()=>{});
@@ -7847,7 +7848,7 @@ function chipWaitForSender(key, rec, from, fromName){
       if(r.ref) window.__lastTx = { ref: r.ref, at: Date.now() };
       render(); cleanup();
       const nm = escapeHtml(r.fromName || fromName || '—');
-      visaPosBegin({ amount: rec.amt+' نقطة', kind:'receive', amt: rec.amt });
+      visaPosBegin({ amount: rec.amt+' نقطة', kind:'receive', amt: rec.amt, chip:true });
       visaMsg('success','تم استلام التحويل', `وصلك ${rec.amt} نقطة من ${nm}.`, { pos:true, rows:[['من', nm], ['المبلغ', rec.amt+' نقطة'], ['رصيدك الآن', (WALLET[me]||0)+' نقطة']] });
     } else if(r.status === 'declined'){ stop(); cleanup(); cool(); visaMsg('warn','صاحبك رفض التحويل','لم يتم تحويل أي نقاط.'); }
     else if(r.status === 'failed'){ stop(); cleanup(); cool(); const sh = r.reason === 'short'; visaMsg(sh ? 'warn' : 'error', sh ? 'رصيد صاحبك مش كفاية' : 'تعذّر إتمام التحويل', 'لم يتم تحويل أي نقاط.'); }
@@ -7937,7 +7938,7 @@ async function chipHandleIncoming(r){
   }
   const claimed = await window.storage.update(key, c=>(c && c.id === r.id && (c.status === 'pending' || c.status === 'seen') && Date.now() < r.exp + 2500) ? Object.assign({}, c, { status:'approved' }) : undefined, true);
   if(!claimed){ visaMsg('warn','الطلب انتهى','مدة الطلب خلصت قبل التأكيد. لم يتم خصم أي نقاط.'); return; }
-  visaPosBegin({ amount: amt+' نقطة', kind:'transfer', amt });
+  visaPosBegin({ amount: amt+' نقطة', kind:'transfer', amt, chip:true });
   const res = await transferWallet(me, r.to, amt);
   if(res !== 'ok'){
     await setStatus('failed', { reason: res });
@@ -7948,8 +7949,8 @@ async function chipHandleIncoming(r){
   const myName = chipNameOf(me);
   try{
     await logVisaTx([
-      { pid: me, type:'transfer_out', amount: amt, balAfter: (WALLET[me]||0), note: toName },
-      { pid: r.to, type:'transfer_in', amount: amt, balAfter: (WALLET[r.to]||0), note: myName }
+      { pid: me, type:'transfer_out', amount: amt, balAfter: (WALLET[me]||0), note: toName, via:'chip' },
+      { pid: r.to, type:'transfer_in', amount: amt, balAfter: (WALLET[r.to]||0), note: myName, via:'chip' }
     ]);
     pushNotification(me, `📤 تم تحويل ${amt} نقطة إلى ${toName}`, '📤');
     pushNotification(r.to, `📥 وصلك ${amt} نقطة في فيزتك من ${myName}`, '📥');
@@ -28669,8 +28670,8 @@ function ensureVisaTxListener(){
 function vpayIncoming(e){
   if(document.hidden || window.__vpos) return false;
   if(Date.now() - (window.__vposShownAt||0) < 30000) return false; /* لسه شايف شاشة النجاح بتاعة نفس العملية */
-  const amt = Number(e.amount)||0; if(amt<=0) return false;
-  visaPosBegin({ amount: amt+' نقطة', kind:'receive', amt });
+  const amt = Number(e.amount)||0; if(amt<=0 || e.via!=='chip') return false;
+  visaPosBegin({ amount: amt+' نقطة', kind:'receive', amt, chip:true });
   const v = window.__vpos; if(!v) return false;
   v.t0 = Date.now() - 1200; /* من غير دائرة تحميل: المستلم ماكانش بيستنى حاجة */
   const nm = e.note ? escapeHtml(e.note) : '';
