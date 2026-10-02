@@ -4983,6 +4983,25 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     52%{ background-position:-50% 0; opacity:0; }
     100%{ background-position:-50% 0; opacity:0; }
   }
+  /* ============================= GAMES: BOWLING (لعبة البولينج) ============================= */
+  .bwl-overlay{z-index:250; background:linear-gradient(180deg,#1b1233,#0b0716);}
+   .bwl-shake{animation:bwlShake .45s;}
+   @keyframes bwlShake{0%,100%{transform:none}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(3px,1px)}}
+  .bwl-card{flex-shrink:0; margin-top:6px; direction:ltr; border-radius:12px; overflow:hidden; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);}
+  .bwl-card table{width:100%; border-collapse:collapse; table-layout:fixed;}
+  .bwl-card th{font:800 9px 'Cairo',sans-serif; color:rgba(255,255,255,.45); padding:2px 0; text-align:center;}
+  .bwl-card td{border-left:1px solid rgba(255,255,255,.08); text-align:center; padding:0; vertical-align:top;}
+  .bwl-card .bwl-lbl{width:36px; font:800 9px 'Cairo',sans-serif; color:rgba(255,255,255,.8); vertical-align:middle;}
+  .bwl-row.you .bwl-lbl{color:#8fd0ff;}
+  .bwl-row.bot .bwl-lbl{color:#ff9d9d;}
+  .bwl-row + .bwl-row td{border-top:1px solid rgba(255,255,255,.08);}
+  .bwl-m{display:flex; justify-content:flex-end; height:14px; border-bottom:1px solid rgba(255,255,255,.1);}
+  .bwl-m span{flex:1; min-width:0; font:800 9.5px 'Cairo',sans-serif; line-height:14px; color:#fff; border-left:1px solid rgba(255,255,255,.14);}
+  .bwl-m span:first-child{border-left:0;}
+  .bwl-m span.m-x{color:#FF8A8A;}
+  .bwl-m span.m-s{color:#7CF0B4;}
+  .bwl-t{font:900 11px 'Cairo',sans-serif; color:#FFDE94; height:15px; line-height:15px;}
+  .bwl-f.cur{background:rgba(244,183,64,.18);}
   /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
     background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
@@ -8988,7 +9007,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloNumGuessReward:100, soloNumGuessMaxTries:3,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
   soloSnlReward:30, soloSnlWinsNeeded:3,
-  soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35};
+  soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
     ? `<img src="${CONF_SETTINGS.logo}" alt="لوجو المؤتمر" class="conf-logo-img" />`
@@ -11265,7 +11284,7 @@ const ACH_GROUPS = [
   {cat:'تحديات خاصة', m:null, items:[['played',1,'b','بداية الرحلة','🚀','خض أول مباراة لك'],['comp',1,'s','الصامد','🛡️','كمّلت المباراة بعد انسحاب خصمك'],['dayWins',3,'s','ليلة الحظ','🌙','حقق 3 انتصارات في يوم واحد'],['bigwin',100,'g','الضربة الكبرى','💥','اكسب 100 نقطة أو أكثر في فوز واحد']]}
 ];
 const ACH_LEVELS = [[0,'مبتدئ'],[30,'لاعب'],[90,'محترف'],[180,'خبير'],[300,'أسطورة']];
-const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['darts',/النشان/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
+const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['darts',/النشان/],['bowling',/البولينج/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
 function achDefs(){
   const out=[];
   ACH_GROUPS.forEach(g=>{
@@ -11608,7 +11627,7 @@ const GAME_CATEGORIES = [
 ];
 const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', backgammon:'board', snakes:'board',
-  reflex:'skill', billiards:'skill', darts:'skill', stack:'skill',
+  reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', numguess:'mind', math:'mind', millionaire:'mind',
   uno:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party',
@@ -11652,6 +11671,7 @@ const GAMES_CATALOG = [
   {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
   {id:'darts', icon:'🎯', title:'لعبة النشان', sub:'اسحب السهم وصوّبه على اللوحة وسيبه يطير — ضد الجهاز', color:'linear-gradient(145deg,#C23B3B,#2b0e0e)'},
+  {id:'bowling', icon:'🎳', title:'لعبة البولينج', sub:'10 فريمات واسترايك وسبير — ضد الجهاز', color:'linear-gradient(145deg,#6C4DFF,#1a1040)'},
   {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'Stack', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
   {id:'chess', icon:'♟️', logo:'chess-logo.png', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
@@ -11676,6 +11696,7 @@ const GH_SOLO_SUB = {
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
   darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
+  bowling:'حرّك الكورة يمين وشمال واسحبها لفوق بسرعة وسيبها — 10 فريمات، الاسترايك والسبير بيدّوك نقط زيادة، وأعلى مجموع يكسب',
   stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
@@ -12166,9 +12187,9 @@ const AI_LEVELS = [
   {id:'hard',   name:'صعب',   icon:'🔥', color:'#FF9F43', mult:1,   stars:3, desc:'تفكير قوي وغلطات نادرة'},
   {id:'expert', name:'خبير',  icon:'👑', color:'#F4B740', mult:1.6, stars:4, desc:'أقوى مستوى — أعلى مكافأة'}
 ];
-const AI_GAME_NAMES = {xo:'إكس أو', c4:'كونكت فور', chess:'الشطرنج', ck:'الداما', bg:'طاولة الزهر', domino:'دومينو', ludo:'لودو', uno:'أونو', bil:'بلياردو', darts:'النشان', reflex:'أسرع واحد'};
+const AI_GAME_NAMES = {xo:'إكس أو', c4:'كونكت فور', chess:'الشطرنج', ck:'الداما', bg:'طاولة الزهر', domino:'دومينو', ludo:'لودو', uno:'أونو', bil:'بلياردو', darts:'النشان', bowling:'البولينج', reflex:'أسرع واحد'};
 function aiLevelOf(key){ const id=(state.aiLvl||{})[key]; return AI_LEVELS.find(l=>l.id===id)||null; }
-function aiBaseReward(key){ const s=GAME_POINTS_SETTINGS||{}; return ({xo:s.soloXoReward, c4:s.soloC4Reward, reflex:s.soloReflexReward, bil:s.soloBilliardsReward, darts:(s.soloDartsReward==null?35:s.soloDartsReward)})[key]||0; }
+function aiBaseReward(key){ const s=GAME_POINTS_SETTINGS||{}; return ({xo:s.soloXoReward, c4:s.soloC4Reward, reflex:s.soloReflexReward, bil:s.soloBilliardsReward, darts:(s.soloDartsReward==null?35:s.soloDartsReward), bowling:(s.soloBowlingReward==null?40:s.soloBowlingReward)})[key]||0; }
 function aiLv(key){ return (aiLevelOf(key)||{id:'hard'}).id; }
 function aiShuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 const REFLEX_LVL = {easy:{cpuMin:480,cpuMax:950}, medium:{cpuMin:340,cpuMax:720}, hard:{cpuMin:220,cpuMax:570}, expert:{cpuMin:150,cpuMax:340}};
@@ -12190,6 +12211,7 @@ function aiPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function aiChipHtml(key){ const l=aiLevelOf(key); return l ? `<button type="button" class="lvl-chip" data-action="ai-level" data-game="${key}">${l.icon} ${l.name} · تغيير</button>` : ''; }
 /* بعد اختيار المستوى: ابدأ معركة جديدة بالمستوى ده */
 function aiApplyLevel(key){
+  if(key==='bowling'){ try{ bwlUpdateChip(); }catch(e){} return; }
   if(key==='reflex') aiApplyReflex();
   if(key!=='xo' && key!=='c4'){ render(); return; }
   if(key==='xo'){ const g=state.xo; if(g){ xoFreshBoard(g,true); } render(); xoAiTurn(); }
@@ -14961,6 +14983,699 @@ function dartsResetGame(){
   dartsStartTurnTimer();
   SND.click();
 }
+/* ============================= GAMES: BOWLING (لعبة البولينج) ============================= */
+/* ---------- constants (lane units: lane width = 100, foul line y=0, head pin y=PIN_Y) ---------- */
+const BWL = {
+  W:400, H:640,
+  LANE:50, BALL_R:10.2, PIN_R:5.7, PIN_R_DOWN:6.8,
+  PIN_Y:520, PIN_DX:14.45, PIN_DY:25,
+  PIT_Y:628, END_Y:668, GUT_OUT:74,
+  FOOT_Y:590, HZ:-582, D:800, PX:2.7,
+  BALL_M:4.6, PIN_M:1,
+  MAX_FRAMES:10
+};
+const BWL_LEVEL = {
+  easy:  {sig:13,  slip:.16, spd:55, pocket:.35},
+  medium:{sig:6.2,  slip:.06, spd:32, pocket:.7},
+  hard:  {sig:2.8, slip:.015,spd:16, pocket:.95},
+  expert:{sig:1.5, slip:0,   spd:7,  pocket:1}
+};
+function bwlRack(){
+  const rows = [[0],[-1,1],[-2,0,2],[-3,-1,1,3]], out = [];
+  rows.forEach((r,ri)=> r.forEach(k=> out.push({ id:out.length, x:k*BWL.PIN_DX, y:BWL.PIN_Y+ri*BWL.PIN_DY })));
+  return out;
+}
+function bwlNewSim(pins, ballX, vx, vy, ax){
+  return {
+    t:0, done:false, hits:0,
+    ball:{ x:ballX, y:0, vx, vy, ax:ax||0, gutter:false, gone:false, rot:0 },
+    pins: pins.map(p=>({ id:p.id, x:p.x, y:p.y, vx:0, vy:0, down:false, gone:false, ang:0, spin:0 })),
+    ev:[]
+  };
+}
+function bwlCollide(a, b, ra, rb, ma, mb, e, onImpact){
+  let dx = b.x-a.x, dy = b.y-a.y;
+  const d2 = dx*dx+dy*dy, rr = ra+rb;
+  if(d2 >= rr*rr || d2 === 0) return false;
+  const d = Math.sqrt(d2); dx/=d; dy/=d;
+  const pen = rr-d, im = 1/ma + 1/mb;
+  a.x -= dx*pen*(1/ma)/im; a.y -= dy*pen*(1/ma)/im;
+  b.x += dx*pen*(1/mb)/im; b.y += dy*pen*(1/mb)/im;
+  const vrel = (b.vx-a.vx)*dx + (b.vy-a.vy)*dy;
+  if(vrel < 0){
+    const j = -(1+e)*vrel/im;
+    a.vx -= j*dx/ma; a.vy -= j*dy/ma;
+    b.vx += j*dx/mb; b.vy += j*dy/mb;
+    onImpact(-vrel, dx, dy);
+  }
+  return true;
+}
+/* one fixed physics step */
+function bwlStep(sim, dt){
+  const B = sim.ball;
+  sim.t += dt;
+  if(!B.gone){
+    B.x += B.vx*dt; B.y += B.vy*dt; B.rot += B.vy*dt*0.05;
+    B.vy *= (1 - 0.012*dt);
+    if(B.ax && !B.gutter && B.y>110 && B.y<BWL.PIN_Y-40) B.vx += B.ax*dt; /* دوران الكورة (هوك) */
+    if(!B.gutter && Math.abs(B.x) > BWL.LANE - 1){
+      B.gutter = true; B.gside = B.x>0 ? 1 : -1; B.vx = 0;
+    }
+    if(B.gutter){
+      const tx = B.gside*(BWL.LANE+10);
+      B.x += (tx - B.x)*Math.min(1, dt*14);
+    }
+    if(B.y > BWL.END_Y) B.gone = true;
+  }
+  const P = sim.pins;
+  for(let i=0;i<P.length;i++){
+    const p = P[i]; if(p.gone) continue;
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    const sp = Math.hypot(p.vx,p.vy);
+    const k = p.down ? 4.2 : 6.5;
+    const f = Math.exp(-k*dt); p.vx*=f; p.vy*=f;
+    if(p.down){ p.ang += p.spin*dt; p.spin *= Math.exp(-3*dt); }
+    if(p.y > BWL.PIT_Y || Math.abs(p.x) > BWL.LANE+3){ p.down = true; if(p.y>BWL.PIT_Y+8 || Math.abs(p.x)>BWL.GUT_OUT-8) p.gone = true; }
+    if(p.y < BWL.PIN_Y-60){ p.y = BWL.PIN_Y-60; p.vy = Math.abs(p.vy)*.3; }
+  }
+  /* ball vs pins */
+  if(!B.gutter && !B.gone){
+    for(let i=0;i<P.length;i++){
+      const p = P[i]; if(p.gone) continue;
+      const pr = p.down ? BWL.PIN_R_DOWN : BWL.PIN_R;
+      bwlCollide(B, p, BWL.BALL_R, pr, BWL.BALL_M, BWL.PIN_M, 0.7, (v,nx,ny)=>{
+        sim.hits++;
+        if(!p.down && v > 9){ p.down = true; p.spin = (Math.random()<.5?-1:1)*(4+Math.random()*8); p.ang = Math.atan2(p.vy,p.vx); }
+        sim.ev.push({k:'bp', v});
+      });
+    }
+  }
+  /* pins vs pins */
+  for(let i=0;i<P.length;i++){
+    const a = P[i]; if(a.gone) continue;
+    for(let j=i+1;j<P.length;j++){
+      const b = P[j]; if(b.gone) continue;
+      const ra = a.down?BWL.PIN_R_DOWN:BWL.PIN_R, rb = b.down?BWL.PIN_R_DOWN:BWL.PIN_R;
+      bwlCollide(a, b, ra, rb, 1, 1, 0.66, (v)=>{
+        const sa = Math.hypot(a.vx,a.vy), sb = Math.hypot(b.vx,b.vy);
+        if(v > 13){
+          if(!a.down){ a.down = true; a.spin=(Math.random()<.5?-1:1)*(4+Math.random()*8); a.ang=Math.atan2(a.vy,a.vx); }
+          if(!b.down){ b.down = true; b.spin=(Math.random()<.5?-1:1)*(4+Math.random()*8); b.ang=Math.atan2(b.vy,b.vx); }
+        }
+        sim.ev.push({k:'pp', v});
+      });
+    }
+  }
+  /* finished? */
+  let moving = false;
+  for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.gone && Math.hypot(p.vx,p.vy) > 6) { moving = true; break; } }
+  if((B.gone || (B.gutter && B.y>BWL.PIN_Y+120)) && !moving) sim.done = true;
+  if(sim.t > 5.5) sim.done = true;
+}
+function bwlRunAll(sim){ let n=0; while(!sim.done && n<4000){ bwlStep(sim, 1/240); n++; } return sim; }
+/* result of a finished sim: ids of pins still standing, with their final positions */
+function bwlRemaining(sim){ return sim.pins.filter(p=>!p.down && !p.gone).map(p=>({ id:p.id, x:p.x, y:p.y })); }
+
+/* ---------- rolls → frame state / scoring ---------- */
+/* state of the game for one player's rolls array: which frame, which ball, how many pins stand and whether rack resets */
+function bwlFrameState(rolls){
+  let i = 0;
+  for(let f=0; f<9; f++){
+    if(i >= rolls.length) return { frame:f, ball:0, fresh:true, done:false };
+    if(rolls[i] === 10){ i += 1; continue; }
+    if(i+1 >= rolls.length) return { frame:f, ball:1, fresh:false, done:false };
+    i += 2;
+  }
+  /* 10th frame */
+  const r = rolls.slice(i);
+  if(r.length === 0) return { frame:9, ball:0, fresh:true, done:false };
+  if(r.length === 1) return { frame:9, ball:1, fresh:r[0]===10, done:false };
+  if(r.length === 2){
+    if(r[0]===10) return { frame:9, ball:2, fresh:r[1]===10, done:false };
+    if(r[0]+r[1]===10) return { frame:9, ball:2, fresh:true, done:false };
+    return { frame:9, ball:2, fresh:false, done:true };
+  }
+  return { frame:9, ball:3, fresh:false, done:true };
+}
+function bwlMark(n, prev){ return n===10 ? 'X' : (n===0 ? '-' : String(n)); }
+function bwlScoreCard(rolls){
+  const frames = []; let i = 0, cum = 0, ok = true;
+  for(let f=0; f<10; f++){
+    const fr = { marks:[], total:null };
+    if(f<9){
+      if(i < rolls.length && rolls[i]===10){
+        fr.marks = ['X'];
+        if(rolls[i+1]!==undefined && rolls[i+2]!==undefined){ cum += 10 + rolls[i+1] + rolls[i+2]; } else ok = false;
+        if(ok) fr.total = cum;
+        i += 1;
+      } else if(i < rolls.length){
+        const a = rolls[i], b = rolls[i+1];
+        fr.marks.push(bwlMark(a));
+        if(b === undefined){ ok = false; }
+        else {
+          fr.marks.push(a+b===10 ? '/' : bwlMark(b));
+          if(a+b===10){ if(rolls[i+2]!==undefined) cum += 10+rolls[i+2]; else ok = false; }
+          else cum += a+b;
+          if(ok) fr.total = cum;
+        }
+        i += 2;
+      } else ok = false;
+    } else {
+      const r = rolls.slice(i);
+      if(r.length){
+        const m = [];
+        m.push(bwlMark(r[0]));
+        if(r.length>1){ m.push(r[0]===10 ? bwlMark(r[1]) : (r[0]+r[1]===10 ? '/' : bwlMark(r[1]))); }
+        if(r.length>2){
+          if(r[0]===10 && r[1]!==10) m.push(r[1]+r[2]===10 ? '/' : bwlMark(r[2]));
+          else m.push(bwlMark(r[2]));
+        }
+        fr.marks = m;
+        const st = bwlFrameState(rolls);
+        if(st.done){ cum += r.reduce((s,x)=>s+x,0); if(ok) fr.total = cum; } else ok = false;
+      } else ok = false;
+    }
+    frames.push(fr);
+  }
+  let shown = 0; frames.forEach(fr=>{ if(fr.total!=null) shown = fr.total; });
+  return { frames, total:shown };
+}
+
+/* ---------- bot ---------- */
+function bwlGauss(){ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function bwlBotPlan(lvl, standing, fresh){
+  const L = BWL_LEVEL[lvl] || BWL_LEVEL.hard;
+  let tx, ty = BWL.PIN_Y, sx;
+  const full = standing.length === 10;
+  if(full){
+    const side = Math.random()<.5 ? -1 : 1;
+    tx = side * 6.2; sx = side * (18 + Math.random()*4);
+  } else {
+    /* aim at the standing pin closest to the middle of what is left */
+    const cx = standing.reduce((s,p)=>s+p.x,0)/standing.length;
+    let best = standing[0];
+    standing.forEach(p=>{ if(Math.abs(p.x-cx) < Math.abs(best.x-cx)) best = p; });
+    tx = best.x; ty = best.y;
+    sx = Math.max(-30, Math.min(30, tx*0.6));
+  }
+  let sig = L.sig;
+  if(Math.random() < L.slip) sig *= 2.6;
+  const noisyTx = tx + bwlGauss()*sig;
+  const vy = Math.max(240, Math.min(470, 345 + bwlGauss()*L.spd));
+  const vx = vy * (noisyTx - sx) / ty;
+  /* الجهاز كمان بيلف الكورة: بنختار دوران ونظبط الزاوية بالمحاكاة عشان توصل للهدف */
+  const ax = (L.sig<=6.5 && full) ? -Math.sign(sx||1)*(10+Math.random()*14) : 0;
+  let vx2 = vx;
+  if(ax){
+    for(let it=0; it<4; it++){
+      const sm = bwlNewSim([], sx, vx2, vy, ax);
+      for(let n=0; n<900 && sm.ball.y<BWL.PIN_Y && !sm.ball.gutter; n++) bwlStep(sm, 1/120);
+      vx2 += (noisyTx - sm.ball.x) * vy / BWL.PIN_Y;
+    }
+  }
+  return { x0:sx, vx:vx2, vy, ax };
+}
+
+/* ---------- UI / game flow ---------- */
+let BWL_CANVAS = null, BWL_CTX = null;
+function bwlProj(x, y){
+  const sc = BWL.D/(y+BWL.D);
+  return { sx: BWL.W/2 + x*BWL.PX*sc, sy: BWL.HZ + (BWL.FOOT_Y-BWL.HZ)*sc, sc };
+}
+function bwlClamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function initBowlGame(){
+  const old = state.bowl;
+  if(old){ old.dead = true; if(old.raf) cancelAnimationFrame(old.raf); (old.timers||[]).forEach(clearTimeout); }
+  BWL_CANVAS = null; BWL_CTX = null;
+  state.bowl = {
+    turn:'you', rolls:{you:[], bot:[]}, tb:null, pins:bwlRack(), phase:'aim', ballX:0,
+    aiming:false, locked:false, trail:null, sx0:0, sy0:0, lx:0, ly:0, upDist:0, ang:0,
+    sim:null, raf:null, last:0, acc:0, over:false, winner:null, timers:[], lastSnd:0, dead:false
+  };
+}
+function bwlLater(fn, ms){
+  const g = state.bowl; if(!g) return;
+  const id = setTimeout(()=>{ if(state.bowl===g && !g.dead) fn(); }, ms);
+  g.timers.push(id);
+}
+function bwlRollsOf(g, who){ return g.tb ? g.tb.rolls[who] : g.rolls[who]; }
+function bwlStateOf(g, who){
+  if(g.tb){
+    const r = g.tb.rolls[who];
+    if(r.length===0) return { frame:0, ball:0, fresh:true, done:false };
+    if(r.length===1) return r[0]===10 ? { frame:0, ball:1, fresh:true, done:true } : { frame:0, ball:1, fresh:false, done:false };
+    return { frame:0, ball:2, fresh:false, done:true };
+  }
+  return bwlFrameState(g.rolls[who]);
+}
+
+/* ---------- drawing ---------- */
+const BWL_PROF = [[4.3,0],[5.5,3.5],[5.7,8],[4.6,12.5],[3,16],[2.4,18.8],[3,21.2],[3.2,23.4],[2.2,25.2],[0,25.8]];
+function bwlPinPath(c, u, lying){
+  const pts = BWL_PROF.map(p=>[p[1],p[0]]);
+  for(let i=BWL_PROF.length-2;i>=0;i--) pts.push([BWL_PROF[i][1], -BWL_PROF[i][0]]);
+  const m = pts.map(([a,w])=> lying ? [(a-13)*u, w*u*0.62] : [w*u, -a*u*0.92]);
+  c.beginPath();
+  c.moveTo((m[0][0]+m[m.length-1][0])/2, (m[0][1]+m[m.length-1][1])/2);
+  for(let i=0;i<m.length;i++){ const a=m[i], b=m[(i+1)%m.length]; c.quadraticCurveTo(a[0], a[1], (a[0]+b[0])/2, (a[1]+b[1])/2); }
+  c.closePath();
+}
+function bwlPaintPin(c, u, lying){
+  bwlPinPath(c, u, lying);
+  const gr = lying ? c.createLinearGradient(0,-5*u,0,5*u) : c.createLinearGradient(-5.5*u,0,5.5*u,0);
+  gr.addColorStop(0,'#c9ced9'); gr.addColorStop(.45,'#ffffff'); gr.addColorStop(1,'#d5d9e4');
+  c.fillStyle = gr; c.fill();
+  c.save(); c.clip();
+  c.fillStyle = '#d32f2f';
+  [[15.6,17.2],[18.4,19.6]].forEach(([a,b])=>{
+    if(lying) c.fillRect((a-13)*u, -8*u, (b-a)*u, 16*u);
+    else c.fillRect(-8*u, -b*u*0.92, 16*u, (b-a)*u*0.92);
+  });
+  c.restore();
+  bwlPinPath(c, u, lying);
+  c.strokeStyle = 'rgba(40,30,60,.45)'; c.lineWidth = Math.max(.6, u*.22); c.stroke();
+}
+function bwlDrawPin(c, p){
+  const q = bwlProj(p.x, p.y), u = BWL.PX*q.sc;
+  if(!p.down){
+    c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(q.sx+u*1.4, q.sy+u*.5, u*5.6, u*2.2, 0, 0, 6.2832); c.fill();
+    c.save(); c.translate(q.sx, q.sy); bwlPaintPin(c, u, false); c.restore();
+  } else {
+    const sa = Math.atan2(-Math.sin(p.ang)*0.45, Math.cos(p.ang));
+    c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(q.sx+u*.8, q.sy+u*.2, u*10.5, u*3.2, sa, 0, 6.2832); c.fill();
+    c.save(); c.translate(q.sx, q.sy - u*2.4); c.rotate(sa); bwlPaintPin(c, u, true); c.restore();
+  }
+}
+const BWL_BALLS = [['#9db9ff','#3a63e0','#0a1450'],['#ff9d9d','#e03a3a','#500a0a'],['#9dffc8','#27b36a','#0a502c'],['#e0b0ff','#9b3ae0','#33105a'],['#ffe29d','#e0a33a','#503a0a']];
+let BWL_BALL_IDX = 0; try{ BWL_BALL_IDX = (+localStorage.getItem('bwl_ball')||0) % BWL_BALLS.length; }catch(e){}
+function bwlCycleBall(){
+  BWL_BALL_IDX = (BWL_BALL_IDX+1) % BWL_BALLS.length;
+  try{ localStorage.setItem('bwl_ball', String(BWL_BALL_IDX)); }catch(e){}
+  const b = document.getElementById('bwl-ball-btn'); if(b) b.style.background = BWL_BALLS[BWL_BALL_IDX][1];
+  bwlDraw();
+}
+function bwlDrawBall(c, x, y, rot){
+  const q = bwlProj(x, y), r = BWL.BALL_R*BWL.PX*q.sc, cx = q.sx, cy = q.sy - r*0.55;
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(cx+r*.22, q.sy+r*.2, r*.95, r*.34, 0, 0, 6.2832); c.fill();
+  const gr = c.createRadialGradient(cx-r*.38, cy-r*.42, r*.08, cx, cy, r*1.05);
+  const BC = BWL_BALLS[BWL_BALL_IDX]; gr.addColorStop(0,BC[0]); gr.addColorStop(.35,BC[1]); gr.addColorStop(1,BC[2]);
+  c.fillStyle = gr; c.beginPath(); c.arc(cx, cy, r, 0, 6.2832); c.fill();
+  for(let k=0;k<3;k++){
+    const a = rot + k*2.1;
+    const hx = cx - r*.18 + Math.cos(a)*r*.3, hy = cy - r*.3 + Math.sin(a)*r*.2;
+    c.fillStyle = 'rgba(5,8,40,.85)'; c.beginPath(); c.arc(hx, hy, r*.1, 0, 6.2832); c.fill();
+  }
+  c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(cx-r*.38, cy-r*.45, r*.2, r*.11, -.6, 0, 6.2832); c.fill();
+}
+function bwlDraw(){
+  const g = state.bowl, c = BWL_CTX; if(!g || !c) return;
+  const W = BWL.W, H = BWL.H, P = bwlProj;
+  c.clearRect(0,0,W,H);
+  const bg = c.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#0c0818'); bg.addColorStop(1,'#2a1d44');
+  c.fillStyle = bg; c.fillRect(0,0,W,H);
+  const quad = (x1,x2,y1,y2,fill)=>{
+    const a=P(x1,y1), b=P(x2,y1), d=P(x2,y2), e=P(x1,y2);
+    c.beginPath(); c.moveTo(a.sx,a.sy); c.lineTo(b.sx,b.sy); c.lineTo(d.sx,d.sy); c.lineTo(e.sx,e.sy); c.closePath(); c.fillStyle = fill; c.fill();
+  };
+  const topY = P(0, BWL.END_Y).sy;
+  const wall = c.createLinearGradient(0,0,0,topY+4); wall.addColorStop(0,'#05030c'); wall.addColorStop(1,'#1b1230');
+  c.fillStyle = wall; c.fillRect(0,0,W,topY+4);
+  /* approach area (below the foul line) */
+  const foot = P(0,0).sy;
+  const ap = c.createLinearGradient(0,foot,0,H); ap.addColorStop(0,'#a8733a'); ap.addColorStop(1,'#6d4521');
+  c.fillStyle = ap; c.fillRect(0,foot,W,H-foot);
+  /* gutters + pit */
+  quad(-BWL.GUT_OUT,-BWL.LANE,0,BWL.PIT_Y+8,'#1b1b26'); quad(BWL.LANE,BWL.GUT_OUT,0,BWL.PIT_Y+8,'#1b1b26');
+  quad(-BWL.GUT_OUT,-BWL.LANE-8,0,BWL.PIT_Y+8,'rgba(255,255,255,.04)'); quad(BWL.LANE+8,BWL.GUT_OUT,0,BWL.PIT_Y+8,'rgba(255,255,255,.04)');
+  /* lane */
+  const ly1 = P(0,BWL.PIT_Y).sy;
+  const lg = c.createLinearGradient(0,ly1,0,foot); lg.addColorStop(0,'#b98a4f'); lg.addColorStop(1,'#e6bf84');
+  quad(-BWL.LANE,BWL.LANE,0,BWL.PIT_Y,lg);
+  c.lineWidth = 1; c.strokeStyle = 'rgba(110,65,20,.22)';
+  for(let i=-4;i<=4;i++){ const x = i*11; const a=P(x,0), b=P(x,BWL.PIT_Y); c.beginPath(); c.moveTo(a.sx,a.sy); c.lineTo(b.sx,b.sy); c.stroke(); }
+  const dk = c.createLinearGradient(0,P(0,BWL.PIT_Y).sy,0,P(0,430).sy); dk.addColorStop(0,'rgba(255,255,255,.1)'); dk.addColorStop(1,'rgba(255,255,255,0)');
+  quad(-BWL.LANE,BWL.LANE,430,BWL.PIT_Y,dk);
+  /* arrows + dots */
+  c.fillStyle = 'rgba(90,50,15,.55)';
+  for(let i=-3;i<=3;i++){
+    const x = i*12.5, y = 215 - Math.abs(i)*22, a = P(x,y), b = P(x-3.2,y-26), d = P(x+3.2,y-26);
+    c.beginPath(); c.moveTo(a.sx,a.sy); c.lineTo(b.sx,b.sy); c.lineTo(d.sx,d.sy); c.closePath(); c.fill();
+  }
+  for(let i=-3;i<=3;i++){ const a = P(i*12.5, 48); c.beginPath(); c.arc(a.sx,a.sy,2.2*a.sc+.6,0,6.2832); c.fill(); }
+  /* foul line */
+  const f1 = P(-BWL.GUT_OUT,0), f2 = P(BWL.GUT_OUT,0);
+  c.strokeStyle = '#c0392b'; c.lineWidth = 3; c.beginPath(); c.moveTo(f1.sx,f1.sy); c.lineTo(f2.sx,f2.sy); c.stroke();
+  /* pit */
+  quad(-BWL.GUT_OUT,BWL.GUT_OUT,BWL.PIT_Y,BWL.END_Y,'#040208');
+  /* things to depth-sort: pins + ball */
+  const items = [];
+  const showSim = g.sim && (g.phase==='roll' || g.phase==='wait');
+  if(showSim){
+    g.sim.pins.forEach(p=>{ if(!p.gone) items.push({ y:p.y, draw:()=>bwlDrawPin(c,p) }); });
+    const B = g.sim.ball;
+    if(!B.gone) items.push({ y:B.y, draw:()=>bwlDrawBall(c, B.x, B.y, B.rot) });
+  } else {
+    g.pins.forEach(p=> items.push({ y:p.y, draw:()=>bwlDrawPin(c, { x:p.x, y:p.y, down:false }) }));
+    if(g.phase==='aim' && !g.over) items.push({ y:0, draw:()=>bwlDrawBall(c, g.ballX, 0, 0) });
+  }
+  items.sort((a,b)=> b.y - a.y);
+  items.forEach(it=> it.draw());
+  /* aim guide */
+  if(g.aiming && g.locked && g.phase==='aim'){
+    const pts = bwlPredict(g), a = P(g.ballX, 0), b = P(pts[pts.length-1].x, pts[pts.length-1].y);
+    c.setLineDash([7,7]); c.lineWidth = 2.5; c.strokeStyle = 'rgba(255,255,255,.6)';
+    c.beginPath(); c.moveTo(a.sx, a.sy - 30);
+    pts.forEach(q=>{ const r = P(q.x, q.y); c.lineTo(r.sx, r.sy); }); c.stroke(); c.setLineDash([]);
+    c.fillStyle = 'rgba(255,222,148,.9)'; c.beginPath(); c.arc(b.sx, b.sy, 4, 0, 6.2832); c.fill();
+    /* مقياس القوة */
+    const fr = bwlClamp(bwlReleaseSpeed(g)/1.2, 0, 1), bx = 12, by = H-200, bh = 130;
+    c.fillStyle = 'rgba(255,255,255,.14)'; c.fillRect(bx, by, 10, bh);
+    c.fillStyle = fr>.75 ? '#FF6B6B' : (fr>.4 ? '#F4B740' : '#2FC58A'); c.fillRect(bx, by+bh*(1-fr), 10, bh*fr);
+    c.fillStyle = 'rgba(255,255,255,.7)'; c.font = '700 10px Cairo,sans-serif'; c.fillText('قوة', bx-1, by-5);
+  }
+  const vg = c.createLinearGradient(0,0,0,70); vg.addColorStop(0,'rgba(0,0,0,.35)'); vg.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle = vg; c.fillRect(0,0,W,70);
+}
+
+/* ---------- canvas / shell ---------- */
+function bwlFitCanvas(){
+  const wrap = document.getElementById('bwl-canvas-wrap'), canvas = document.getElementById('bwl-canvas');
+  if(!wrap || !canvas) return;
+  const availW = Math.max(60, wrap.clientWidth), availH = Math.max(60, wrap.clientHeight);
+  const ratio = BWL.W/BWL.H;
+  let dw = availW, dh = dw/ratio;
+  if(dh > availH){ dh = availH; dw = dh*ratio; }
+  dw = Math.floor(dw); dh = Math.floor(dh);
+  canvas.style.width = dw+'px'; canvas.style.height = dh+'px';
+  const dpr = Math.min(window.devicePixelRatio||1, 3);
+  canvas.width = Math.max(1, Math.round(BWL.W*dpr)); canvas.height = Math.max(1, Math.round(BWL.H*dpr));
+  if(BWL_CTX) BWL_CTX.setTransform(dpr,0,0,dpr,0,0);
+  bwlDraw();
+}
+function bwlOnResize(){ if(document.getElementById('bwl-overlay')) bwlFitCanvas(); }
+function bwlMarkBoxes(fr, idx){
+  let m = fr.marks.slice();
+  if(idx<9){ if(m.length===1 && m[0]==='X') m = ['','X']; while(m.length<2) m.push(''); }
+  else while(m.length<3) m.push('');
+  return m.map(x=>`<span class="${x==='X'?'m-x':(x==='/'?'m-s':'')}">${x}</span>`).join('');
+}
+function bwlCardHtml(g){
+  const head = Array.from({length:10},(_,i)=>`<th>${i+1}</th>`).join('');
+  const row = (who,label)=>{
+    const sc = bwlScoreCard(g.rolls[who]);
+    const cur = (!g.over && !g.tb && g.turn===who) ? bwlFrameState(g.rolls[who]).frame : -1;
+    const cells = sc.frames.map((fr,i)=>`<td class="bwl-f${i===cur?' cur':''}"><div class="bwl-m">${bwlMarkBoxes(fr,i)}</div><div class="bwl-t">${fr.total==null?'':fr.total}</div></td>`).join('');
+    return `<tr class="bwl-row ${who}"><td class="bwl-lbl">${label}</td>${cells}</tr>`;
+  };
+  return `<table><tr><th class="bwl-lbl"></th>${head}</tr>${row('you','أنت')}${row('bot','الجهاز')}</table>`;
+}
+function bwlUpdateCard(){
+  const g = state.bowl; if(!g) return;
+  const card = document.getElementById('bwl-card'); if(card) card.innerHTML = bwlCardHtml(g);
+  const ys = document.getElementById('bwl-score-you'), bs = document.getElementById('bwl-score-bot');
+  if(ys) ys.textContent = bwlScoreCard(g.rolls.you).total;
+  if(bs) bs.textContent = bwlScoreCard(g.rolls.bot).total;
+  const a = document.getElementById('bwl-side-you'), b = document.getElementById('bwl-side-bot');
+  if(a) a.classList.toggle('active', g.turn==='you' && !g.over);
+  if(b) b.classList.toggle('active', g.turn==='bot' && !g.over);
+}
+function bwlUpdateChip(){ const el = document.getElementById('bwl-chip'); if(el) el.innerHTML = aiChipHtml('bowling'); }
+function bwlSetHint(t){ const el = document.getElementById('bwl-hint'); if(el) el.textContent = t||''; }
+function bwlTurnHint(g){
+  if(g.over) return '';
+  const st = bwlStateOf(g, g.turn);
+  const fr = g.tb ? 'جولة فاصلة' : `الفريم ${st.frame+1} من 10`;
+  if(g.turn==='bot') return `${fr} — دور الجهاز...`;
+  return `${fr} — حرّك الكورة يمين وشمال وبعدين اسحبها لفوق بسرعة وسيبها 🎳 — وميّل إيدك يمين/شمال وقت الإفلات عشان الكورة تلف 🌀`;
+}
+function bwlResultHtml(g){
+  const iWon = g.winner==='you', reward = aiRewardFor('bowling');
+  let xs = 0, ss = 0; bwlScoreCard(g.rolls.you).frames.forEach(f=>f.marks.forEach(m=>{ if(m==='X') xs++; else if(m==='/') ss++; }));
+  const ys = bwlScoreCard(g.rolls.you).total, bs = bwlScoreCard(g.rolls.bot).total;
+  return `
+    <div class="match-result-card ${iWon?'win':'lose'}" style="position:absolute; inset:8px; margin:auto; align-self:center; z-index:5;">
+      <div class="match-result-ico">${iWon?'🏆':gameAvatar(state.pid,'😭','xl')}</div>
+      <div class="match-result-title">${iWon?'مبروك! كسبت اللعبة':'خسرت اللعبة'}</div>
+      <div class="match-result-sub">أنت ${ys} • الجهاز ${bs}${g.tb?' (بعد جولة فاصلة)':''}</div>
+      <div class="match-result-sub">🎳 ${xs} استرايك • ${ss} سبير • أفضل نتيجة ليك ${g.best||0}${g.newBest?' 🔥 رقم قياسي جديد':''}</div>
+      ${iWon ? `<div class="match-result-points win">+${reward} نقطة 🎉</div>` : `<div class="match-result-points lose">😢 حظ أوفر المرة الجاية</div>`}
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" data-action="bowling-reset">🔄 لعبة جديدة</button>
+    </div>`;
+}
+function bwlPopup(mult, num, who, kind){
+  const el = document.getElementById('bwl-hit-popup'); if(!el) return;
+  const isYou = who==='you';
+  let hc = isYou ? '#FFDE94' : '#FFB199', hc2 = isYou ? '#F4B740' : '#FF6B6B', hg = isYou ? 'rgba(244,183,64,.55)' : 'rgba(255,107,107,.5)';
+  if(kind==='strike'){ hc = '#FFF1B8'; hc2 = '#FFB300'; hg = 'rgba(255,179,0,.65)'; }
+  else if(kind==='spare'){ hc = '#B8FFDC'; hc2 = '#2FC58A'; hg = 'rgba(47,197,138,.55)'; }
+  el.style.setProperty('--drt-hc', hc); el.style.setProperty('--drt-hc2', hc2); el.style.setProperty('--drt-hg', hg);
+  el.classList.remove('show','bust'); void el.offsetWidth;
+  el.innerHTML = `${mult?`<div class="drt-hit-mult">${mult}</div>`:''}<div class="drt-hit-num">${num}</div><div class="drt-hit-who">${isYou?'أنت':'الجهاز'}</div>`;
+  requestAnimationFrame(()=> el.classList.add('show'));
+}
+function bwlBuildShell(){
+  const shell = document.getElementById('bwl-shell'); if(!shell) return;
+  shell.innerHTML = `
+    <div class="darts-topbar">
+      <button class="icon-btn darts-back" data-action="bowling-close">${ICO.back}</button>
+      <div class="darts-title">🎳 لعبة البولينج</div>
+      <span style="display:flex;align-items:center;gap:6px"><button type="button" id="bwl-ball-btn" title="لون الكورة" style="width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:${BWL_BALLS[BWL_BALL_IDX][1]}"></button><span id="bwl-chip">${aiChipHtml('bowling')}</span></span>
+    </div>
+    <div class="darts-score-row">
+      <div class="drt-side" id="bwl-side-you">${gameAvatar(state.pid)}<div class="drt-side-info"><div class="drt-side-name">أنت</div><div class="drt-side-score" id="bwl-score-you">0</div></div></div>
+      <div class="drt-vs">VS</div>
+      <div class="drt-side" id="bwl-side-bot">${gameAiAvatar()}<div class="drt-side-info"><div class="drt-side-name">الجهاز</div><div class="drt-side-score" id="bwl-score-bot">0</div></div></div>
+    </div>
+    <div class="bwl-card" id="bwl-card"></div>
+    <div class="darts-canvas-wrap" id="bwl-canvas-wrap">
+      <canvas id="bwl-canvas"></canvas>
+      <div class="drt-hit-popup" id="bwl-hit-popup"></div>
+      <div id="bwl-result"></div>
+    </div>
+    <div class="hint" id="bwl-hint" style="text-align:center;margin-top:6px;min-height:34px;"></div>`;
+  BWL_CANVAS = document.getElementById('bwl-canvas');
+  BWL_CTX = BWL_CANVAS.getContext('2d');
+  BWL_CANVAS.onpointerdown = bwlPointerDown;
+  BWL_CANVAS.onpointermove = bwlPointerMove;
+  BWL_CANVAS.onpointerup = bwlPointerUp;
+  BWL_CANVAS.onpointercancel = bwlPointerUp;
+  const bb = document.getElementById('bwl-ball-btn'); if(bb) bb.onclick = bwlCycleBall;
+  bwlFitCanvas();
+  requestAnimationFrame(bwlFitCanvas);
+  bwlUpdateCard();
+}
+
+/* ---------- input ---------- */
+function bwlEvt(e){
+  const r = BWL_CANVAS.getBoundingClientRect();
+  return { x:(e.clientX-r.left)*(BWL.W/r.width), y:(e.clientY-r.top)*(BWL.H/r.height), t:performance.now() };
+}
+function bwlMaxX(){ return BWL.LANE - BWL.BALL_R - 1; }
+function bwlPointerDown(e){
+  const g = state.bowl;
+  if(!g || g.over || g.turn!=='you' || g.phase!=='aim') return;
+  e.preventDefault();
+  try{ BWL_CANVAS.setPointerCapture(e.pointerId); }catch(err){}
+  const p = bwlEvt(e);
+  g.aiming = true; g.locked = false; g.upDist = 0; g.tan = 0;
+  g.sx0 = p.x; g.sy0 = p.y; g.trail = [p];
+  g.ballX = bwlClamp((p.x-BWL.W/2)/BWL.PX, -bwlMaxX(), bwlMaxX());
+  bwlDraw();
+}
+function bwlPointerMove(e){
+  const g = state.bowl;
+  if(!g || !g.aiming) return;
+  e.preventDefault();
+  const p = bwlEvt(e);
+  g.trail.push(p); if(g.trail.length>12) g.trail.shift();
+  const up = g.sy0 - p.y;
+  if(!g.locked){
+    if(up > 22){ g.locked = true; g.lx = p.x; g.ly = p.y; }
+    else g.ballX = bwlClamp((p.x-BWL.W/2)/BWL.PX, -bwlMaxX(), bwlMaxX());
+  }
+  if(g.locked){
+    g.upDist = Math.max(g.upDist, g.sy0 - p.y);
+    const dx = p.x - g.lx, dy = g.ly - p.y;
+    g.tan = dy > 6 ? bwlClamp(0.1*dx/dy, -0.2, 0.2) : 0;
+  }
+  bwlDraw();
+}
+function bwlReleaseSpeed(g){
+  const t = g.trail; if(!t || t.length<2) return 0;
+  const last = t[t.length-1]; let ref = t[0];
+  for(let k=t.length-1;k>=0;k--){ if(last.t - t[k].t <= 90) ref = t[k]; else break; }
+  const dt = Math.max(8, last.t - ref.t);
+  return (ref.y - last.y)/dt;
+}
+function bwlReleaseSide(g){
+  const t = g.trail; if(!t || t.length<2) return 0;
+  const last = t[t.length-1]; let ref = t[0];
+  for(let k=t.length-1;k>=0;k--){ if(last.t - t[k].t <= 90) ref = t[k]; else break; }
+  const dt = Math.max(8, last.t - ref.t);
+  return bwlClamp((last.x - ref.x)/dt*1000/BWL.PX*0.25, -45, 45);
+}
+function bwlLaunchParams(g){
+  const sp = bwlReleaseSpeed(g), vy = sp>=0.3 ? bwlClamp(200+sp*110, 210, 470) : 345;
+  return { sp, vy, vx:vy*g.tan, ax:bwlReleaseSide(g) };
+}
+function bwlPredict(g){
+  const L = bwlLaunchParams(g), s = bwlNewSim([], g.ballX, L.vx, L.vy, L.ax), pts = [];
+  for(let n=0; n<900 && s.ball.y<BWL.PIN_Y && !s.ball.gutter; n++){ bwlStep(s, 1/120); if(n%8===0) pts.push({x:s.ball.x, y:s.ball.y}); }
+  pts.push({x:s.ball.x, y:Math.min(s.ball.y, BWL.PIN_Y)});
+  return pts;
+}
+function bwlPointerUp(e){
+  const g = state.bowl;
+  if(!g || !g.aiming) return;
+  e.preventDefault();
+  g.aiming = false;
+  const sp = bwlReleaseSpeed(g);
+  if(!g.locked){ bwlDraw(); return; }
+  if(g.upDist < 40 || sp < 0.3){
+    g.locked = false; bwlSetHint('اسحب لفوق بسرعة أكبر عشان الكورة تتحرك 💨'); bwlDraw(); return;
+  }
+  const L = bwlLaunchParams(g);
+  g.locked = false;
+  bwlLaunch(g, g.ballX, L.vx, L.vy, L.ax);
+}
+
+/* ---------- flow ---------- */
+function bwlLaunch(g, x0, vx, vy, ax){
+  g.phase = 'roll'; g.aiming = false;
+  g.stBefore = bwlStateOf(g, g.turn); g.pinsBefore = g.pins.length;
+  g.sim = bwlNewSim(g.pins, x0, vx, vy, ax); g.acc = 0; g.last = 0;
+  bwlSetHint('');
+  try{ SND.whoosh(); }catch(e){}
+  g.raf = requestAnimationFrame(bwlLoop);
+}
+function bwlHitSound(g){
+  const ev = g.sim.ev; if(!ev.length) return;
+  let mx = 0; ev.forEach(x=>{ if(x.v>mx) mx = x.v; }); ev.length = 0;
+  const now = performance.now();
+  if(mx > 12 && now - g.lastSnd > 55){
+    g.lastSnd = now;
+    try{ luxTone(150 + Math.random()*260, .08, 'triangle', Math.min(.07, .02 + mx/4000), { wet:.04 }); }catch(e){}
+  }
+}
+function bwlLoop(ts){
+  const g = state.bowl;
+  if(!g || g.dead || g.phase!=='roll' || !g.sim) return;
+  if(!g.last) g.last = ts;
+  const dt = Math.min(0.05, (ts-g.last)/1000); g.last = ts; g.acc += dt;
+  const STEP = 1/240; let n = 0;
+  while(g.acc >= STEP && n < 30){ bwlStep(g.sim, STEP); g.acc -= STEP; n++; if(g.sim.done) break; }
+  bwlHitSound(g);
+  bwlDraw();
+  if(g.sim.done){ bwlRollEnd(g); return; }
+  g.raf = requestAnimationFrame(bwlLoop);
+}
+function bwlRollEnd(g){
+  const sim = g.sim, rem = bwlRemaining(sim), knocked = g.pinsBefore - rem.length;
+  bwlRollsOf(g, g.turn).push(knocked);
+  g.pins = rem; g.phase = 'wait';
+  const who = g.turn, gut = sim.ball.gutter, was10 = g.pinsBefore===10;
+  bwlDraw();
+  let mult = '', num = String(knocked), kind = '';
+  if(knocked===g.pinsBefore && knocked>0){
+    if(was10){ mult = '💥 استرايك'; num = 'X'; kind = 'strike'; try{ SND.cheer(); }catch(e){} if(who==='you'){ vibrate([20,20,30]); try{ launchConfetti(); }catch(e){} const w = document.getElementById('bwl-canvas-wrap'); if(w){ w.classList.remove('bwl-shake'); void w.offsetWidth; w.classList.add('bwl-shake'); } } }
+    else { mult = '✨ سبير'; num = '/'; kind = 'spare'; try{ SND.success(); }catch(e){} }
+  } else if(knocked===0){ mult = gut ? 'في المجرى' : 'ولا كرسي'; num = gut ? '😅' : '0'; }
+  else mult = knocked===1 ? 'كرسي واحد' : 'كراسي';
+  bwlPopup(mult, num, who, kind);
+  bwlUpdateCard();
+  const before = g.stBefore, after = bwlStateOf(g, who);
+  const ended = after.done || after.frame > before.frame;
+  const needReset = !ended && after.fresh;
+  bwlLater(()=>{
+    g.sim = null;
+    if(ended){ bwlNextTurn(g); }
+    else {
+      if(needReset) g.pins = bwlRack();
+      bwlBeginTurn(g);
+    }
+  }, 1500);
+}
+function bwlBeginTurn(g){
+  g.phase = 'aim'; g.aiming = false; g.locked = false; g.ballX = 0; g.sim = null;
+  bwlUpdateCard(); bwlSetHint(bwlTurnHint(g)); bwlUpdateChip(); bwlDraw();
+  if(g.turn==='bot') bwlLater(()=>bwlBotThrow(g), 900);
+}
+function bwlBotThrow(g){
+  if(g.over || g.turn!=='bot') return;
+  const st = bwlStateOf(g, 'bot');
+  const plan = bwlBotPlan(aiLv('bowling'), g.pins, st.fresh);
+  g.phase = 'botaim'; g.ballX = plan.x0; bwlDraw();
+  bwlLater(()=> bwlLaunch(g, plan.x0, plan.vx, plan.vy, plan.ax), 650);
+}
+function bwlNextTurn(g){
+  if(g.tb){
+    if(g.turn==='you'){ g.turn = 'bot'; g.pins = bwlRack(); bwlBeginTurn(g); return; }
+    const sc = w=>{ const r = g.tb.rolls[w]; return r.reduce((s,x)=>s+x,0) + (r[0]===10?1:0); };
+    if(sc('you') !== sc('bot')){ g.winner = sc('you')>sc('bot') ? 'you' : 'bot'; bwlFinish(g); return; }
+    g.tb.round++; g.tb.rolls = { you:[], bot:[] }; g.turn = 'you'; g.pins = bwlRack();
+    bwlPopup('تعادل تاني', '⚖️', 'you', ''); bwlBeginTurn(g); return;
+  }
+  if(g.turn==='you'){ g.turn = 'bot'; g.pins = bwlRack(); bwlBeginTurn(g); return; }
+  if(bwlStateOf(g,'bot').done && bwlStateOf(g,'you').done){
+    const ys = bwlScoreCard(g.rolls.you).total, bs = bwlScoreCard(g.rolls.bot).total;
+    if(ys !== bs){ g.winner = ys>bs ? 'you' : 'bot'; bwlFinish(g); return; }
+    g.tb = { round:1, rolls:{ you:[], bot:[] } }; g.turn = 'you'; g.pins = bwlRack();
+    bwlPopup('تعادل!', '⚖️', 'you', ''); bwlSetHint('جولة فاصلة — اللي يوقّع كراسي أكتر يكسب');
+    bwlLater(()=>bwlBeginTurn(g), 900); return;
+  }
+  g.turn = 'you'; g.pins = bwlRack(); bwlBeginTurn(g);
+}
+function bwlFinish(g){
+  g.over = true; g.phase = 'over'; g.sim = null; g.pins = [];
+  try{ const y0 = bwlScoreCard(g.rolls.you).total; g.best = +localStorage.getItem('bwl_best')||0; g.newBest = y0 > g.best; if(g.newBest){ g.best = y0; localStorage.setItem('bwl_best', String(y0)); } }catch(e){ g.best = 0; g.newBest = false; }
+  bwlUpdateCard(); bwlSetHint(''); bwlDraw();
+  const res = document.getElementById('bwl-result'); if(res) res.innerHTML = bwlResultHtml(g);
+  if(g.winner==='you'){
+    vibrate([20,20,30]); launchConfetti();
+    const reward = aiRewardFor('bowling');
+    if(reward>0) setTimeout(()=>awardSoloGamePoints(reward, 'مبروك! كسبت لعبة البولينج'), 400); else SND.coinChime();
+  } else { SND.error(); }
+}
+function openBowlingGame(){
+  initBowlGame();
+  const old = document.getElementById('bwl-overlay'); if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'bwl-overlay'; overlay.className = 'darts-overlay bwl-overlay';
+  overlay.innerHTML = `<div id="bwl-shell" class="darts-shell"></div>`;
+  document.body.appendChild(overlay);
+  bwlBuildShell();
+  bwlBeginTurn(state.bowl);
+  window.addEventListener('resize', bwlOnResize);
+  window.addEventListener('orientationchange', bwlOnResize);
+  overlay.addEventListener('gesturestart', dartsBlockPinch);
+  overlay.addEventListener('gesturechange', dartsBlockPinch);
+  overlay.addEventListener('touchmove', dartsBlockMultiTouch, { passive:false });
+  overlay.addEventListener('touchend', dartsBlockDoubleTapZoom, { passive:false });
+  SND.click();
+  /* اختيار مستوى الجهاز — بنبدأ بـ "صعب" كاختيار افتراضي عشان زرار الرجوع يقفل الرسالة بس */
+  state.aiLvl = state.aiLvl || {};
+  if(!state.aiLvl.bowling) state.aiLvl.bowling = 'hard';
+  bwlUpdateChip();
+  setTimeout(()=>{ if(state.bowl && !state.bowl.dead && !document.getElementById('lvl-overlay')) showAiLevelDialog('bowling'); }, 250);
+}
+function closeBowlingGame(){
+  const g = state.bowl;
+  if(g){ g.dead = true; if(g.raf) cancelAnimationFrame(g.raf); g.timers.forEach(clearTimeout); }
+  BWL_CANVAS = null; BWL_CTX = null;
+  window.removeEventListener('resize', bwlOnResize);
+  window.removeEventListener('orientationchange', bwlOnResize);
+  const overlay = document.getElementById('bwl-overlay'); if(overlay) overlay.remove();
+  SND.back();
+}
+function bowlingResetGame(){
+  const keepLvl = (state.aiLvl||{}).bowling;
+  initBowlGame();
+  if(keepLvl){ state.aiLvl = state.aiLvl||{}; state.aiLvl.bowling = keepLvl; }
+  bwlBuildShell();
+  bwlBeginTurn(state.bowl);
+  SND.click();
+}
+
 /* ============================= GAMES: MILLIONAIRE — "من سيربح المليون" (أسئلة مسيحية) ============================= */
 
 const MIL_TIMER_SEC = 15; // تايمر ثابت 15 ثانية لكل الأسئلة
@@ -25299,6 +26014,7 @@ document.addEventListener('click', (e)=>{
     if(isGameDisabled(gid)){ showToast('🔒 اللعبة دي مقفولة دلوقتي من المنظمين'); return; }
     if(gid==='billiards'){ openBilliardsGame(); return; }
     if(gid==='darts'){ openDartsGame(); return; }
+    if(gid==='bowling'){ openBowlingGame(); return; }
     if(gid==='stack'){ openStackGame(); return; }
     if(gid==='millionaire'){ openMillionaireGame(); return; }
     if(gid==='xo'){ initXoGame(); xoStartPick(450); }
@@ -25324,6 +26040,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='stack-reset'){ stkResetGame(); }
   else if(action==='darts-close'){ closeDartsGame(); }
   else if(action==='darts-reset'){ dartsResetGame(); }
+  else if(action==='bowling-close'){ closeBowlingGame(); }
+  else if(action==='bowling-reset'){ bowlingResetGame(); }
   else if(action==='mil-close'){ closeMillionaireGame(); }
   else if(action==='mil-reset'){ milResetGame(); }
   else if(action==='mil-start'){ initMillionaireGame(); milRenderShell(); milStartTimer(); SND.click(); }
