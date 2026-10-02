@@ -1640,6 +1640,45 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .confirm-icon{font-size:34px; text-align:center; margin-bottom:10px;}
   .confirm-msg{font-family:'Cairo',sans-serif; font-weight:800; font-size:15.5px; text-align:center; color:var(--text); line-height:1.6;}
   .confirm-sub{font-size:12.5px; color:var(--text-muted); text-align:center; margin-top:8px; line-height:1.7;}
+
+  /* ---------- نافذة اختيار نوع التحدي ---------- */
+  .ch-card{ position:relative; max-width:360px; padding:28px 16px 14px; overflow:hidden; border-radius:30px; text-align:center;
+    border:1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+    background:radial-gradient(circle at 50% -8%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 58%), var(--bg-2);
+    box-shadow:0 26px 64px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); animation:chPop .34s cubic-bezier(.2,1,.3,1); font-family:'Cairo',sans-serif; }
+  @keyframes chPop{ from{ transform:translateY(26px) scale(.95); opacity:0; } to{ transform:none; opacity:1; } }
+  .ch-x{ position:absolute; top:12px; left:12px; width:34px; height:34px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px;
+    color:var(--text-muted); background:rgba(255,255,255,.06); border:1px solid var(--border); -webkit-tap-highlight-color:transparent; }
+  .ch-emblem{ position:relative; width:78px; height:78px; margin:0 auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:38px;
+    background:radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--gold-2) 38%, transparent), color-mix(in srgb, var(--gold) 8%, transparent) 70%);
+    border:1.5px solid color-mix(in srgb, var(--gold) 70%, transparent); box-shadow:0 10px 26px rgba(0,0,0,.4), 0 0 0 7px color-mix(in srgb, var(--gold) 9%, transparent); }
+  .ch-emblem span{ display:block; animation:chFloat 3s ease-in-out infinite; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+  @keyframes chFloat{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-4px) rotate(3deg); } }
+  .ch-title{ font-weight:900; font-size:21px; color:var(--text); line-height:1.3; }
+  .ch-sub{ margin:6px auto 0; max-width:270px; font-size:12.5px; line-height:1.8; color:var(--text-muted); font-weight:600; }
+  .ch-pw{ margin-top:16px; padding:10px 12px 12px; border-radius:18px; text-align:right; background:rgba(255,255,255,.04); border:1px dashed var(--border); }
+  .ch-pw label{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; font-weight:800; color:var(--text); }
+  .ch-pw label small{ font-size:10.5px; font-weight:700; color:var(--text-muted); padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.07); }
+  .ch-pw .field{ margin:8px 0 0; text-align:center; letter-spacing:2px; direction:ltr; }
+  .ch-pw .hint{ margin-top:6px; font-size:11px; line-height:1.7; color:var(--text-muted); }
+  .ch-opt{ position:relative; display:flex; align-items:center; gap:12px; width:100%; margin-top:12px; padding:14px 14px; border-radius:22px; text-align:right; cursor:pointer;
+    font-family:'Cairo',sans-serif; color:var(--text); border:1px solid var(--border); background:rgba(255,255,255,.05); -webkit-tap-highlight-color:transparent; transition:transform .16s ease, box-shadow .16s ease; }
+  .ch-opt:active{ transform:scale(.97); }
+  .ch-opt .oi{ flex:0 0 auto; width:50px; height:50px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px; background:rgba(255,255,255,.08); }
+  .ch-opt .ot{ flex:1; min-width:0; }
+  .ch-opt .ot b{ display:block; font-weight:900; font-size:16.5px; line-height:1.3; }
+  .ch-opt .ot small{ display:block; margin-top:3px; font-size:11.5px; font-weight:700; line-height:1.6; opacity:.78; }
+  .ch-opt .og{ flex:0 0 auto; display:flex; opacity:.7; }
+  .ch-opt .og svg{ width:18px; height:18px; }
+  .ch-opt.coin{ color:#1a1633; border-color:transparent; background:linear-gradient(100deg, var(--gold-2), var(--gold)); box-shadow:0 14px 30px color-mix(in srgb, var(--gold) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.55); }
+  .ch-opt.coin .oi{ background:rgba(26,22,51,.13); }
+  .ch-opt.coin::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.38) 50%, transparent 65%); transform:translateX(-130%); animation:hgSheen 4.5s ease-in-out 1s infinite; }
+  .ch-tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+  .ch-tag{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(26,22,51,.14); }
+  .ch-opt.free .ch-tag{ background:rgba(255,255,255,.09); color:var(--text); }
+  .ch-ribbon{ position:absolute; top:-9px; left:16px; padding:3px 11px; border-radius:999px; font-size:10.5px; font-weight:900; color:#fff; background:linear-gradient(90deg,#ff6b6b,#ff9f43); box-shadow:0 6px 14px rgba(255,107,107,.4); }
+  .ch-cancel{ display:block; width:100%; margin-top:6px; padding:11px; background:none; border:0; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--text-muted); }
   .confirm-actions{display:flex; gap:10px; margin-top:20px;}
   .confirm-actions .btn{padding:12px; margin:0;}
   .trash-empty-btn{margin-bottom:12px;}
@@ -17560,18 +17599,36 @@ function showChallengeTypeModal(gameType){
   overlay.className = 'modal-overlay confirm-overlay';
   overlay.id = 'challenge-type-overlay';
   overlay.innerHTML = `
-    <div class="confirm-card">
-      <div class="confirm-icon">⚔️</div>
-      <div class="confirm-msg">اختار نوع التحدي</div>
-      <div class="confirm-sub">تحدي بكوين هتدفع فيه ${fee} نقطة وهتاخد مكافآت، وتحدي مجاني تلعبه من غير أي نقط</div>
-      <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="🔒 كلمة سر للغرفة (اختياري)" style="margin:2px 0 14px;text-align:center;">
-      <div class="confirm-actions" style="flex-direction:column;">
-        <button type="button" class="btn btn-primary" id="challenge-coin-btn" style="width:100%;">🪙 تحدي بكوين</button>
-        <button type="button" class="btn btn-ghost" id="challenge-free-btn" style="width:100%;">🆓 تحدي مجاني</button>
+    <div class="confirm-card ch-card" role="dialog" aria-modal="true" aria-label="اختار نوع التحدي">
+      <button type="button" class="ch-x" id="challenge-x-btn" aria-label="إغلاق">✕</button>
+      <div class="ch-emblem"><span>⚔️</span></div>
+      <div class="ch-title">جاهز للتحدي؟</div>
+      <div class="ch-sub">اختار طريقة اللعب وابعت الكود لصاحبك — الغرفة بتتفتح في ثواني</div>
+      <div class="ch-pw">
+        <label for="challenge-pw"><span>🔒 غرفة خاصة</span><small>اختياري</small></label>
+        <input type="text" id="challenge-pw" class="field" maxlength="12" autocomplete="off" placeholder="اكتب كلمة سر للغرفة">
+        <div class="hint">لو كتبت كلمة سر، محدش هيدخل غير اللي تديهاله.</div>
       </div>
+      <button type="button" class="ch-opt coin" id="challenge-coin-btn">
+        <span class="ch-ribbon">🔥 الأكثر إثارة</span>
+        <span class="oi">🪙</span>
+        <span class="ot"><b>تحدي بكوين</b><small>العب على النقط واكسب مكافآت</small>
+          <span class="ch-tags"><span class="ch-tag">${fee>0 ? 'رسوم '+fee+' نقطة' : 'بدون رسوم دخول'}</span><span class="ch-tag">🏆 مكافآت للفايز</span></span></span>
+        <span class="og">${ICO.chev}</span>
+      </button>
+      <button type="button" class="ch-opt free" id="challenge-free-btn">
+        <span class="oi">🎮</span>
+        <span class="ot"><b>تحدي مجاني</b><small>للمتعة بس — من غير أي نقط</small>
+          <span class="ch-tags"><span class="ch-tag">🆓 بدون نقط</span><span class="ch-tag">😄 ودّي</span></span></span>
+        <span class="og">${ICO.chev}</span>
+      </button>
+      <button type="button" class="ch-cancel" id="challenge-cancel-btn">إلغاء</button>
     </div>
   `;
   document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeChallengeTypeModal(); });
+  document.getElementById('challenge-x-btn').addEventListener('click', closeChallengeTypeModal);
+  document.getElementById('challenge-cancel-btn').addEventListener('click', closeChallengeTypeModal);
   document.getElementById('challenge-coin-btn').addEventListener('click', ()=>{
     ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
