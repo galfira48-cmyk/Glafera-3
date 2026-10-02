@@ -2437,6 +2437,49 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .notif-txt{font-size:13px; line-height:1.55; font-weight:600; color:var(--text);}
   .notif-time{font-size:10.5px; color:var(--text-muted); margin-top:4px; font-weight:500;}
 
+  /* ---------- مركز الإشعارات (نسخة احترافية) ---------- */
+  .notif-overlay{ background:rgba(4,3,16,.55); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .notif-panel{ max-height:82vh; padding:8px 16px calc(14px + env(safe-area-inset-bottom,0px)); border-radius:28px 28px 0 0; border:0; border-top:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(180deg, color-mix(in srgb,var(--surface) 96%,#fff 4%), var(--bg-2)); box-shadow:0 -18px 50px rgba(0,0,0,.4); }
+  .notif-panel-handle{ margin:0 auto 6px; opacity:.5; }
+  .np-head{ display:flex; align-items:center; justify-content:space-between; flex-direction:row-reverse; padding:6px 2px 12px; }
+  .np-ttl{ text-align:start; }
+  .np-ttl b{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:18px; line-height:1.2; }
+  .np-ttl span{ display:block; font-size:11px; color:var(--text-muted); margin-top:2px; font-weight:600; }
+  .np-x{ width:32px; height:32px; border-radius:50%; border:0; display:flex; align-items:center; justify-content:center; color:var(--text-muted); background:rgba(255,255,255,.07); cursor:pointer; }
+  .np-x svg{ width:15px; height:15px; } .np-x:active{ background:rgba(255,255,255,.14); }
+  .nr-sec{ display:flex; align-items:center; gap:8px; margin:12px 4px 7px; font-size:11px; font-weight:800; letter-spacing:.2px; color:var(--text-muted); }
+  .nr-sec em{ font-style:normal; min-width:18px; height:18px; padding:0 5px; border-radius:99px; display:inline-flex; align-items:center; justify-content:center; font-family:'Cairo',sans-serif; font-size:10.5px; font-weight:900; color:#2a1c00; background:var(--gold); }
+  .nr-group{ border-radius:20px; overflow:hidden; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.07); }
+  .nr{ --t:#9aa0c8; display:flex; align-items:center; gap:12px; padding:12px 14px; position:relative; animation:nrIn .38s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i)*38ms); }
+  .nr + .nr::before{ content:''; position:absolute; top:0; inset-inline-start:66px; inset-inline-end:0; height:1px; background:rgba(255,255,255,.07); }
+  @keyframes nrIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .nr.k-in{ --t:#34c77b; } .nr.k-out{ --t:#f0705f; } .nr.k-gold{ --t:#f4b740; } .nr.k-card{ --t:#6f9bff; } .nr.k-ok{ --t:#3fd0c0; }
+  .nr-ico{ flex:0 0 auto; width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:18px;
+    background:color-mix(in srgb,var(--t) 16%,transparent); border:1px solid color-mix(in srgb,var(--t) 26%,transparent); }
+  .nr-mid{ flex:1; min-width:0; }
+  .nr-txt{ font-size:13px; line-height:1.6; font-weight:600; color:var(--text); }
+  .nr:not(.unread) .nr-txt{ font-weight:500; opacity:.92; }
+  .nr-meta{ display:flex; align-items:center; gap:6px; margin-top:2px; font-size:10.5px; font-weight:600; color:var(--text-muted); }
+  .nr-dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
+  .nr-amt{ flex:0 0 auto; text-align:center; min-width:48px; padding:5px 9px; border-radius:12px; direction:ltr; line-height:1.1; }
+  .nr-amt b{ display:block; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; font-variant-numeric:tabular-nums; }
+  .nr-amt small{ display:block; font-size:9px; font-weight:700; opacity:.8; margin-top:1px; direction:rtl; }
+  .nr-amt.pos{ color:#34c77b; background:rgba(52,199,123,.12); } .nr-amt.neg{ color:#f0705f; background:rgba(240,112,95,.12); }
+  .np-empty{ text-align:center; padding:40px 10px 30px; font-size:13.5px; font-weight:700; }
+  .np-empty span{ display:block; font-size:30px; margin-bottom:10px; }
+  .np-empty small{ display:block; font-size:11px; font-weight:500; color:var(--text-muted); margin-top:4px; }
+  .np-hist{ display:flex; align-items:center; justify-content:center; gap:5px; margin:12px auto 2px; padding:6px 12px; background:none; border:0; font-family:inherit; font-size:10.5px; font-weight:600; color:var(--text-muted); opacity:.7; cursor:pointer; }
+  .np-hist:active{ opacity:1; }
+  .notif-btn.has-unread{ animation:none; } .notif-dot{ animation:none; }
+  @media (prefers-reduced-motion:reduce){ .nr{ animation:none; } }
+  /* بانر الإشعار اللحظي: زجاجي وأنحف */
+  .vtx-banner{ padding:11px 13px; border-radius:22px; border:1px solid rgba(255,255,255,.12); border-inline-start:1px solid rgba(255,255,255,.12);
+    background:color-mix(in srgb,var(--surface) 78%,transparent); -webkit-backdrop-filter:blur(22px) saturate(1.5); backdrop-filter:blur(22px) saturate(1.5);
+    box-shadow:0 16px 40px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08); }
+  .vtx-banner.neg{ border-inline-start-color:rgba(255,255,255,.12); }
+  .vtx-b-ico{ width:38px; height:38px; border-radius:12px; }
+  .vtx-b-mid b{ font-size:13px; } .vtx-b-mid span{ font-size:11.5px; }
 
   /* ---------- admin analytics ---------- */
   .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px;}
@@ -9043,12 +9086,18 @@ function pushNotification(pid, text, icon){
   const extra = myExtra(pid);
   if(!extra.notifs) extra.notifs = [];
   extra.notifs.unshift({ id:'n'+Date.now()+Math.random().toString(36).slice(2,6), text, icon:icon||'✨', ts:Date.now(), read:false });
-  if(extra.notifs.length>40) extra.notifs.length = 40;
+  /* السجل بيحتفظ بآخر 30 يوم (حد أقصى 50 إشعار) — واللوحة الأساسية بتعرض آخر 24 ساعة بس */
+  const _now = Date.now();
+  extra.notifs = extra.notifs.filter(n=>_now - (n.ts||0) < NOTIF_KEEP_MS).slice(0, 50);
   saveProfileExtra(PROFILE_EXTRA);
 }
+const NOTIF_TTL_MS = 24*3600*1000, NOTIF_KEEP_MS = 30*24*3600*1000;
+function recentNotifs(pid){
+  const now = Date.now();
+  return (myExtra(pid).notifs||[]).filter(n=>now - (n.ts||0) < NOTIF_TTL_MS);
+}
 function unreadNotifCount(pid){
-  const extra = myExtra(pid);
-  return (extra.notifs||[]).filter(n=>!n.read).length;
+  return recentNotifs(pid).filter(n=>!n.read).length;
 }
 function timeAgoAr(ts){
   const diff = Math.max(0, Date.now()-ts);
@@ -24743,6 +24792,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='share-card'){ doShareCard(); }
   else if(action==='open-notifs'){ openNotifPanel(); }
   else if(action==='close-notifs'){ closeNotifPanel(); }
+  else if(action==='notif-history'){ notifShow('history'); }
+  else if(action==='notif-back'){ notifShow('recent'); }
   else if(action==='invite-friend'){ doInviteFriend(); }
   else if(action==='claim-quest'){ doClaimQuest(el, el.dataset.claim, parseInt(el.dataset.reward,10)||0); }
   else if(action==='toggle-reminder'){ doToggleReminder(el, el.dataset.session); }
@@ -27102,29 +27153,97 @@ async function doClaimQuest(el, claimKey, reward){
 }
 
 /* ============================= NOTIFICATION PANEL ============================= */
+function notifDayLabel(ts){
+  const d = new Date(ts), n = new Date();
+  const sd = x=>new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((sd(n) - sd(d)) / 86400000);
+  if(diff<=0) return 'اليوم';
+  if(diff===1) return 'أمس';
+  return d.toLocaleDateString('ar-EG', { day:'numeric', month:'long' });
+}
+const NOTIF_KIND = { '📥':'in', '📤':'out', '🎯':'gold', '⚡':'gold', '🏆':'gold', '🎁':'gold', '🌟':'gold', '⭐':'gold', '💳':'card', '✅':'ok', '🛍️':'card' };
+function notifKind(n){ return NOTIF_KIND[n.icon] || 'neutral'; }
+/* بيطلع المبلغ من نص الإشعار (لو فيه) عشان يتعرض كرقم واضح على الجنب */
+function notifAmount(n){
+  const m = String(n.text||'').match(/(\d+)\s*نقطة/); if(!m) return null;
+  const txt = n.text, v = m[1];
+  if(n.icon==='📤') return { s:'−', v, c:'neg' };
+  if(n.icon==='📥') return { s:'+', v, c:'pos' };
+  if(/\+\s*\d+/.test(txt)) return { s:'+', v, c:'pos' };
+  if(/(خصم|دفع|سحب|اشتري|شراء|تجديد|طلب)/.test(txt)) return { s:'−', v, c:'neg' };
+  if(/(حصلت|ربحت|كسبت|مكافأة|وصلك|استلام|استلمت)/.test(txt)) return { s:'+', v, c:'pos' };
+  return null;
+}
+function notifShort(ts){
+  const mins = Math.floor(Math.max(0, Date.now()-ts)/60000);
+  if(mins<1) return 'الآن';
+  if(mins<60) return mins+' د';
+  const h = Math.floor(mins/60);
+  return h<24 ? h+' س' : Math.floor(h/24)+' ي';
+}
+function notifRowHtml(n, hist, i){
+  const time = hist ? new Date(n.ts).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : notifShort(n.ts);
+  const am = notifAmount(n);
+  return `<div class="nr k-${notifKind(n)} ${n.read?'':'unread'}" style="--i:${i||0}">
+      <div class="nr-ico">${n.icon}</div>
+      <div class="nr-mid">
+        <div class="nr-txt">${escapeHtml(n.text)}</div>
+        <div class="nr-meta">${n.read?'':'<i class="nr-dot"></i>'}${time}</div>
+      </div>
+      ${am ? `<div class="nr-amt ${am.c}"><b>${am.s}${am.v}</b><small>نقطة</small></div>` : ''}
+    </div>`;
+}
+function notifGroup(label, list, hist, extra){
+  if(!list.length) return '';
+  let i = 0;
+  return `<div class="nr-sec"><span>${label}</span>${extra||''}</div><div class="nr-group">${list.map(n=>notifRowHtml(n, hist, i++)).join('')}</div>`;
+}
+function notifPanelInner(mode){
+  const pid = state.pid;
+  const X = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  if(mode==='history'){
+    const all = (myExtra(pid).notifs||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const days = [], map = {};
+    all.forEach(n=>{ const d = notifDayLabel(n.ts); if(!map[d]){ map[d] = []; days.push(d); } map[d].push(n); });
+    const body = days.map(d=>notifGroup(d, map[d], true)).join('');
+    return `
+      <div class="np-head">
+        <button type="button" class="np-x" data-action="notif-back" aria-label="رجوع">${ICO.chev}</button>
+        <div class="np-ttl"><b>سجل الإشعارات</b><span>${all.length} إشعار · آخر 30 يوم</span></div>
+      </div>
+      ${body || '<div class="np-empty"><span>🗂️</span>السجل فاضي</div>'}`;
+  }
+  const rec = recentNotifs(pid).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const fresh = rec.filter(n=>!n.read), older = rec.filter(n=>n.read);
+  let body = '';
+  if(fresh.length) body += notifGroup('جديد', fresh, false, `<em>${fresh.length}</em>`) + notifGroup('سابقًا اليوم', older, false);
+  else body += notifGroup('آخر 24 ساعة', older, false);
+  if(!rec.length) body = `<div class="np-empty"><span>🌿</span>مفيش إشعارات جديدة<small>هتظهر هنا لمدة 24 ساعة</small></div>`;
+  const hasAny = (myExtra(pid).notifs||[]).length > 0;
+  return `
+      <div class="np-head">
+        <button type="button" class="np-x" data-action="close-notifs" aria-label="إغلاق">${X}</button>
+        <div class="np-ttl"><b>الإشعارات</b><span>${fresh.length ? fresh.length+' جديد · ' : ''}آخر 24 ساعة</span></div>
+      </div>
+      ${body}
+      ${hasAny ? '<button type="button" class="np-hist" data-action="notif-history"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>سجل الإشعارات</button>' : ''}`;
+}
+function notifShow(mode){
+  const inner = document.getElementById('notif-inner'); if(!inner) return;
+  inner.innerHTML = notifPanelInner(mode);
+  const panel = inner.closest('.notif-panel'); if(panel) panel.scrollTop = 0;
+}
 function openNotifPanel(){
   if(!state.pid) return;
   const extra = myExtra(state.pid);
   const notifs = extra.notifs || [];
-  const rows = notifs.length ? notifs.map(n=>`
-    <div class="notif-row ${n.read?'':'unread'}">
-      <div class="notif-ico">${n.icon}</div>
-      <div style="flex:1;">
-        <div class="notif-txt">${escapeHtml(n.text)}</div>
-        <div class="notif-time">${timeAgoAr(n.ts)}</div>
-      </div>
-    </div>`).join('') : `<div class="empty-note">لا توجد إشعارات بعد</div>`;
   const overlay = document.createElement('div');
   overlay.className = 'notif-overlay';
   overlay.id = 'notif-overlay';
   overlay.innerHTML = `
     <div class="notif-panel">
       <div class="notif-panel-handle"></div>
-      <div class="notif-panel-head">
-        <div class="notif-panel-title"><span class="notif-title-badge">${ICO.bell}</span> الإشعارات</div>
-        <button type="button" class="icon-btn" data-action="close-notifs">${ICO.chev}</button>
-      </div>
-      <div class="notif-list">${rows}</div>
+      <div id="notif-inner">${notifPanelInner('recent')}</div>
     </div>`;
   overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeNotifPanel(); });
   document.body.appendChild(overlay);
