@@ -893,6 +893,53 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .retreat-note{ width:100%; min-height:200px; resize:vertical; line-height:1.9; font-family:'Cairo',sans-serif; }
   .rt-saved{ margin-top:8px; text-align:center; font-size:11.5px; color:var(--text-muted); }
 
+  /* ---------- الخلوة: تصميم جديد + التذكير اليومي ---------- */
+  .rt-hero .rt-greet{ font-size:12.5px; font-weight:800; color:var(--gold-2); opacity:.9; margin-bottom:4px; letter-spacing:.2px; }
+  .rt-chip{ display:inline-flex; align-items:center; gap:6px; margin-top:14px; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:800; font-family:'Cairo',sans-serif;
+    background:rgba(255,255,255,.07); border:1px solid var(--border); color:var(--text-muted); }
+  .rt-chip.ok{ background:rgba(76,201,130,.14); border-color:rgba(76,201,130,.55); color:#7fe3ab; }
+  .rt-chip.due{ background:rgba(244,183,64,.16); border-color:rgba(244,183,64,.65); color:var(--gold-2); animation:rtPulse 2.2s ease-in-out infinite; }
+  @keyframes rtPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(244,183,64,.35); } 50%{ box-shadow:0 0 0 7px rgba(244,183,64,0); } }
+  .rt-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:0 0 16px; }
+  .rt-stat{ text-align:center; padding:12px 4px 10px; border-radius:18px; background:var(--card, rgba(255,255,255,.04)); border:1px solid var(--border); }
+  .rt-stat b{ display:block; font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; color:var(--gold-2); line-height:1.2; }
+  .rt-stat small{ display:block; margin-top:2px; font-size:10.5px; font-weight:700; color:var(--text-muted); }
+  .rt-main-cta{ display:flex; align-items:center; gap:14px; width:100%; margin:0 0 12px; padding:18px 16px; border-radius:24px; text-align:right; cursor:pointer; border:0;
+    font-family:'Cairo',sans-serif; color:#1a1633; -webkit-tap-highlight-color:transparent; transition:transform .18s ease;
+    background:linear-gradient(100deg, var(--gold-2), var(--gold)); box-shadow:0 14px 30px rgba(244,183,64,.32), inset 0 1px 0 rgba(255,255,255,.5); }
+  .rt-main-cta:active{ transform:scale(.98); }
+  .rt-main-cta .bi{ flex:0 0 auto; width:56px; height:56px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:30px; background:rgba(26,22,51,.12); }
+  .rt-main-cta .bt{ font-weight:900; font-size:18px; }
+  .rt-main-cta .bd{ font-size:12px; font-weight:700; opacity:.75; margin-top:2px; }
+  .rt-main-cta .bc{ margin-inline-start:auto; display:flex; }
+  .rt-main-cta .bc svg{ width:20px; height:20px; }
+  .rt-rem{ margin:0 0 18px; padding:14px; border-radius:22px; background:var(--card, rgba(255,255,255,.04)); border:1px solid var(--border); font-family:'Cairo',sans-serif; }
+  .rt-rem-top{ display:flex; align-items:center; gap:12px; }
+  .rt-rem-top .ri{ flex:0 0 auto; width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:23px; background:rgba(244,183,64,.12); border:1px solid rgba(244,183,64,.5); }
+  .rt-rem-txt{ flex:1; min-width:0; }
+  .rt-rem-txt .t{ font-weight:900; font-size:14.5px; }
+  .rt-rem-txt .d{ font-size:12px; color:var(--text-muted); margin-top:2px; font-weight:600; line-height:1.6; }
+  .rt-sw{ flex:0 0 auto; position:relative; width:52px; height:30px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.1); cursor:pointer; padding:0; transition:background .2s ease; -webkit-tap-highlight-color:transparent; }
+  .rt-sw i{ position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.35); transition:transform .2s ease; }
+  .rt-sw.on{ background:linear-gradient(90deg, var(--gold-2), var(--gold)); border-color:transparent; }
+  .rt-sw.on i{ transform:translateX(-22px); }
+  .rt-rem-body{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--border); }
+  .rt-rem-time{ display:flex; align-items:center; justify-content:space-between; gap:12px; font-weight:800; font-size:13.5px; }
+  .rt-rem-time input{ width:auto; min-width:140px; text-align:center; direction:ltr; }
+  .rt-rem-btns{ display:flex; gap:8px; margin-top:12px; }
+  .rt-rem-btns button{ flex:1; padding:10px 6px; border-radius:14px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; cursor:pointer; color:var(--text); background:rgba(255,255,255,.06); border:1px solid var(--border); }
+  .rt-rem-btns button:active{ transform:scale(.97); }
+  .rt-rem-note{ margin-top:10px; font-size:11.5px; line-height:1.8; color:var(--text-muted); }
+  .rt-tl{ position:relative; display:flex; flex-direction:column; gap:10px; margin-bottom:8px; }
+  .rt-tl::before{ content:''; position:absolute; top:20px; bottom:20px; right:30px; width:2px; background:linear-gradient(180deg, var(--gold), rgba(244,183,64,.08)); }
+  .rt-tl .rt-step{ position:relative; }
+  .rt-recent{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  .rt-rc{ padding:12px 14px; border-radius:16px; background:var(--card, rgba(255,255,255,.04)); border:1px solid var(--border); border-inline-start:3px solid var(--gold); }
+  .rt-rc .h{ display:flex; justify-content:space-between; gap:8px; font-size:12px; font-weight:800; color:var(--gold-2); }
+  .rt-rc .h span:last-child{ color:var(--text-muted); font-weight:600; }
+  .rt-rc .c{ margin-top:5px; font-size:12.5px; line-height:1.8; color:var(--text); }
+  .home-retreat.is-due{ border-color:rgba(244,183,64,.9); box-shadow:0 16px 36px rgba(0,0,0,.34), 0 0 0 3px rgba(244,183,64,.18), inset 0 1px 0 rgba(255,255,255,.18); }
+
   /* ---------- الكتاب المقدس داخل الخلوة ---------- */
   .rt-bible-card{ display:flex; align-items:center; gap:14px; width:100%; margin:0 0 16px; padding:16px; border-radius:22px; text-align:right; cursor:pointer; color:var(--text);
     font-family:'Cairo',sans-serif; border:1px solid rgba(244,183,64,.5); -webkit-tap-highlight-color:transparent; transition:transform .18s ease;
@@ -9848,13 +9895,13 @@ const BIBLE_SVG = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org
 </svg>`;
 function homeRetreatCardHtml(){
   return `
-    <button type="button" class="home-retreat ${featureLockedForMe('retreat')?'is-locked':''}" data-action="tile-nav" data-page="retreat" aria-label="خلوة فردية">
+    <button type="button" class="home-retreat ${featureLockedForMe('retreat')?'is-locked':''} ${(!featureLockedForMe('retreat') && khDue())?'is-due':''}" data-action="tile-nav" data-page="retreat" aria-label="خلوة فردية">
       <svg class="hr-mark" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 2h3v7.5H22v3h-8.5V22h-3v-9.5H2v-3h8.5z"/></svg>
       <div class="hr-row">
         <span class="hr-ico">${BIBLE_SVG}</span>
         <span class="hr-txt">
           <div class="hr-title">خلوة فردية</div>
-          <div class="hr-sub">${featureLockedForMe('retreat') ? '🔧 جاري التحديث — هترجع قريب' : 'وقت هادي مع كلمة ربنا — اقرأ، تأمّل، وسجّل ملاحظاتك'}</div>
+          <div class="hr-sub">${featureLockedForMe('retreat') ? '🔧 جاري التحديث — هترجع قريب' : khHomeSub()}</div>
         </span>
       </div>
       <div class="hr-cta">${featureLockedForMe('retreat') ? 'جاري التحديث 🔧' : 'ادخل خلوتك '+ICO.chev}</div>
@@ -9862,12 +9909,30 @@ function homeRetreatCardHtml(){
 }
 function renderRetreatPage(){
   const extra = myExtra(state.pid);
+  const d = bbData();
+  const h = new Date().getHours();
+  const greet = h<5 ? 'مساء الخير 🌙' : h<12 ? 'صباح النور ☀️' : h<18 ? 'نهارك سعيد 🌤' : 'مساء الخير 🌙';
+  const doneToday = khDoneToday();
+  const chip = doneToday ? '<div class="rt-chip ok">✅ خلصت خلوتك النهارده</div>'
+    : khDue() ? '<div class="rt-chip due">⏰ ميعاد خلوتك جه — ابدأ دلوقتي</div>'
+    : '<div class="rt-chip">🕊 لسه ما بدأتش خلوة النهارده</div>';
+  const stats = [
+    [bbAr(bbStreak()), '🔥 أيام متتالية'],
+    [bbAr(d.sess.length), 'خلوة موجّهة'],
+    [bbAr(Object.keys(d.done).length), 'أصحاح مقروء'],
+    [bbAr(Object.keys(d.hl).length), 'آية محفوظة'],
+  ].map(x=>`<div class="rt-stat"><b>${x[0]}</b><small>${x[1]}</small></div>`).join('');
   const steps = [
     ['١','صلاة','ابدأ بدقيقة صلاة واطلب إرشاد الروح القدس'],
     ['٢','قراءة','اقرأ الإنجيل ببطء، وكرّر الآية اللي لمستك'],
     ['٣','تأمّل','اسأل: ربنا بيقولي إيه؟ وإيه اللي محتاج أغيّره؟'],
     ['٤','التزام','اكتب خطوة عملية واحدة هتعملها النهارده'],
   ].map(x=>`<div class="rt-step"><span class="n">${x[0]}</span><div><div class="t">${x[1]}</div><div class="d">${x[2]}</div></div></div>`).join('');
+  const recent = d.sess.slice(0,3).map(s=>{
+    const dt = new Date(s.ts).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'});
+    const body = s.commit ? '🎯 '+escapeHtml(s.commit) : (s.refl ? '💭 '+escapeHtml(s.refl.slice(0,110)) : '');
+    return `<div class="rt-rc"><div class="h"><span>${s.ref ? '📖 '+escapeHtml(s.ref) : '🕊 خلوة'}</span><span>${dt}</span></div>${body?`<div class="c">${body}</div>`:''}</div>`;
+  }).join('');
   const saved = extra.retreatNoteTs ? 'آخر حفظ: '+new Date(extra.retreatNoteTs).toLocaleString('ar-EG',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'long'}) : '';
   return `
     <div class="back-row">
@@ -9876,21 +9941,26 @@ function renderRetreatPage(){
     </div>
     <div class="rt-hero">
       <span class="rt-bible">${BIBLE_SVG.replace('<svg ','<svg class="rt-bible" ').replace('id="bbg"','id="bbg2"').replace('url(#bbg)','url(#bbg2)')}</span>
+      <div class="rt-greet">${greet}</div>
       <h2>خلوة فردية</h2>
       <p>اقعد لوحدك مع الإنجيل المقدس، واهدى قدّام ربنا. الملاحظات دي ليك إنت بس.</p>
+      ${chip}
     </div>
+    <div class="rt-stats">${stats}</div>
+    <button type="button" class="rt-main-cta" data-action="bible-guide" aria-label="ابدأ خلوة موجّهة">
+      <span class="bi">🕊️</span>
+      <span><div class="bt">ابدأ خلوة موجّهة</div><div class="bd">صلاة ← قراءة ← تأمل ← التزام — خطوة بخطوة</div></span>
+      <span class="bc">${ICO.chev}</span>
+    </button>
     <button type="button" class="rt-bible-card" data-action="bible-open" aria-label="الكتاب المقدس">
       <span class="bi">📖</span>
       <span><div class="bt">الكتاب المقدس</div><div class="bd">العهد القديم والعهد الجديد — اقرأ بين يدي ربنا</div></span>
       <span class="bc">${ICO.chev}</span>
     </button>
-    <button type="button" class="rt-bible-card" data-action="bible-guide" aria-label="خلوة موجّهة">
-      <span class="bi">🕊️</span>
-      <span><div class="bt">ابدأ خلوة موجّهة</div><div class="bd">صلاة ← قراءة ← تأمل ← التزام — خطوة بخطوة</div></span>
-      <span class="bc">${ICO.chev}</span>
-    </button>
+    <div class="rt-rem" id="kh-rem">${khRemHtml()}</div>
     <div class="section-title">خطوات الخلوة</div>
-    <div class="rt-steps">${steps}</div>
+    <div class="rt-tl">${steps}</div>
+    ${recent ? `<div class="section-title">آخر خلواتك</div><div class="rt-recent">${recent}</div>` : ''}
     <div class="section-title">ملاحظاتي</div>
     <textarea id="retreat-note" class="field retreat-note" placeholder="اكتب الآية، وتأمّلك، والخطوة اللي هتلتزم بيها...">${escapeHtml(extra.retreatNote||'')}</textarea>
     <button type="button" class="btn btn-primary" style="margin-top:14px;" data-action="retreat-save">حفظ الملاحظات</button>
@@ -9907,6 +9977,91 @@ async function saveRetreatNote(){
   const sv = document.getElementById('retreat-saved');
   if(sv) sv.textContent = 'آخر حفظ: '+new Date(ex.retreatNoteTs).toLocaleString('ar-EG',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'long'});
   showToast('تم حفظ ملاحظاتك ✝️');
+}
+
+/* ============================= تذكير الخلوة اليومي ============================= */
+function khRem(){ const ex = myExtra(state.pid); if(!ex.khRem || typeof ex.khRem!=='object') ex.khRem = {on:false, time:'07:00'}; if(!/^\d{1,2}:\d{2}$/.test(ex.khRem.time||'')) ex.khRem.time = '07:00'; return ex.khRem; }
+function khFmt(t){ const p = String(t).split(':'), h = parseInt(p[0],10)||0, m = parseInt(p[1],10)||0; return bbAr(h%12||12)+':'+bbAr(String(m).padStart(2,'0'))+' '+(h<12?'ص':'م'); }
+function khMin(t){ const p = String(t).split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
+function khDoneToday(){ if(!state.pid) return false; const d = bbData(), k = bbDayKey(Date.now()); return d.sess.some(x=>bbDayKey(x.ts)===k) || Object.values(d.done).some(ts=>bbDayKey(ts)===k); }
+function khDue(){ if(!state.pid) return false; const r = khRem(); return !!r.on && nowMinutes()>=khMin(r.time) && !khDoneToday(); }
+function khHomeSub(){
+  try{ if(state.pid){ if(khDoneToday()) return '✅ خلصت خلوتك النهارده — ربنا يبارك'; if(khDue()) return '⏰ ميعاد خلوتك جه — خدلك دقايق دلوقتي'; } }catch(e){}
+  return 'وقت هادي مع كلمة ربنا — اقرأ، تأمّل، وسجّل ملاحظاتك';
+}
+function khRemHtml(){
+  const r = khRem();
+  const perm = (typeof Notification!=='undefined') ? Notification.permission : 'unsupported';
+  const note = perm==='denied' || perm==='unsupported'
+    ? 'إشعارات المتصفح مش شغّالة، فالتنبيه هيظهرلك جوه الموقع بس. ضيفه للتقويم عشان يرن في موبايلك.'
+    : 'التنبيه بيطلع لما الموقع يكون مفتوح. عشان يرن حتى والموقع مقفول، ضيفه لتقويم موبايلك.';
+  return `<div class="rt-rem-top"><span class="ri">⏰</span>
+    <div class="rt-rem-txt"><div class="t">تذكير الخلوة اليومي</div><div class="d">${r.on ? 'هنفكّرك كل يوم الساعة '+khFmt(r.time) : 'اختار ميعاد ثابت وخلّي الخلوة عادة'}</div></div>
+    <button type="button" class="rt-sw ${r.on?'on':''}" data-action="kh-rem-toggle" role="switch" aria-checked="${r.on?'true':'false'}" aria-label="تفعيل تذكير الخلوة"><i></i></button></div>
+    ${r.on ? `<div class="rt-rem-body">
+      <label class="rt-rem-time"><span>الميعاد</span><input type="time" id="kh-time" class="field" value="${r.time}"></label>
+      <div class="rt-rem-btns"><button type="button" data-action="kh-ics">📅 ضيفه للتقويم</button><button type="button" data-action="kh-test">🔔 جرّب التذكير</button></div>
+      <div class="rt-rem-note">${note}</div></div>` : ''}`;
+}
+function khRefreshRem(){ const el = document.getElementById('kh-rem'); if(el) el.innerHTML = khRemHtml(); }
+async function khToggleRem(){
+  if(!state.pid) return;
+  const r = khRem(); r.on = !r.on;
+  if(r.on && typeof Notification!=='undefined' && Notification.permission==='default'){ try{ await Notification.requestPermission(); }catch(e){} }
+  bbLSset('glv_kh_fired_'+state.pid, '');
+  khRefreshRem();
+  await saveProfileExtra(PROFILE_EXTRA);
+  showToast(r.on ? '⏰ تمام — هفكّرك الساعة '+khFmt(r.time) : 'تم إيقاف تذكير الخلوة');
+}
+async function khSetTime(v){
+  if(!state.pid || !/^\d{1,2}:\d{2}$/.test(v||'')) return;
+  const r = khRem(); r.time = v;
+  bbLSset('glv_kh_fired_'+state.pid, '');
+  khRefreshRem();
+  await saveProfileExtra(PROFILE_EXTRA);
+  showToast('✓ اتحفظ — هنفكّرك الساعة '+khFmt(v));
+}
+function khNotify(title, body){
+  try{
+    if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
+    const opts = { body, icon:'icon-192.png', tag:'khalwa-daily', lang:'ar', dir:'rtl' };
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(reg=>{ if(reg && reg.showNotification) reg.showNotification(title, opts); else new Notification(title, opts); }).catch(()=>{});
+    } else { new Notification(title, opts); }
+  }catch(e){}
+}
+function khTest(){ showToast('🕊 ميعاد خلوتك — خدلك دقايق مع كلمة ربنا'); khNotify('🕊 ميعاد خلوتك', 'خدلك دقايق هادية مع كلمة ربنا'); }
+function khCheck(){
+  try{
+    if(typeof state==='undefined' || !state.pid) return;
+    const r = khRem(); if(!r.on) return;
+    if(nowMinutes() < khMin(r.time)) return;
+    const key = 'glv_kh_fired_'+state.pid, today = String(bbDayKey(Date.now()));
+    if(bbLS(key,'')===today) return;
+    bbLSset(key, today);
+    if(khDoneToday()) return;
+    showToast('🕊 ميعاد خلوتك — خدلك دقايق مع كلمة ربنا');
+    khNotify('🕊 ميعاد خلوتك', 'خدلك دقايق هادية مع كلمة ربنا');
+  }catch(e){}
+}
+function khIcs(){
+  const r = khRem(), p = r.time.split(':'), hh = String(parseInt(p[0],10)||0).padStart(2,'0'), mm = String(parseInt(p[1],10)||0).padStart(2,'0');
+  const n = new Date(), ymd = n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0');
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Glafera//Khalwa//AR','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+    'UID:khalwa-daily-'+(state.pid||'me')+'@glafera','DTSTAMP:'+ymd+'T000000Z','DTSTART:'+ymd+'T'+hh+mm+'00','DURATION:PT20M','RRULE:FREQ=DAILY',
+    'SUMMARY:\uD83D\uDD4A \u062E\u0644\u0648\u0629 \u0641\u0631\u062F\u064A\u0629','DESCRIPTION:\u062E\u062F\u0644\u0643 \u062F\u0642\u0627\u064A\u0642 \u0647\u0627\u062F\u064A\u0629 \u0645\u0639 \u0643\u0644\u0645\u0629 \u0631\u0628\u0646\u0627',
+    'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:\u062E\u0644\u0648\u0629 \u0641\u0631\u062F\u064A\u0629','END:VALARM','END:VEVENT','END:VCALENDAR'];
+  try{
+    const blob = new Blob([lines.join('\r\n')], {type:'text/calendar;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'khalwa-daily.ics';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); a.remove(); }catch(e){} }, 1500);
+    showToast('📅 افتح الملف وضيفه لتقويمك');
+  }catch(e){ showToast('معرفتش أجهّز ملف التقويم', true); }
+}
+if(typeof window!=='undefined'){
+  setInterval(khCheck, 30000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) khCheck(); });
+  setTimeout(khCheck, 4000);
 }
 
 /* ============================= الكتاب المقدس (داخل الخلوة) ============================= */
@@ -24926,6 +25081,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='rate-session'){ doRateSession(el.dataset.session, parseInt(el.dataset.star,10)); }
   else if(action==='open-gift'){ openGiftBox(); }
   else if(action==='retreat-save'){ saveRetreatNote(); }
+  else if(action==='kh-rem-toggle'){ khToggleRem(); }
+  else if(action==='kh-ics'){ khIcs(); }
+  else if(action==='kh-test'){ khTest(); }
   else if(action==='bible-open'){ openBibleSheet(); }
   else if(action==='bible-guide'){ bbGuideOpen(); }
   else if(action==='edit-logistics'){ state.editingLogisticsId = el.dataset.pid; render(); }
@@ -25250,6 +25408,7 @@ document.addEventListener('click', (e)=>{
 });
 
 document.addEventListener('change', (e)=>{
+  if(e.target.id==='kh-time'){ khSetTime(e.target.value); return; }
   if(e.target.id==='pulse-session-select'){
     state.pulseSessionId = e.target.value || null;
     render();
