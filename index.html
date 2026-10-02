@@ -2964,6 +2964,62 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
   @media (prefers-reduced-motion:reduce){ .gs-rays{ animation:none; } .gs-bar i{ animation:none; } .gs-me-ring .fg{ transition:none; } }
   .gh-tile .gh-badge{ position:absolute; top:10px; inset-inline-end:10px; font-size:10px; font-weight:800; padding:3px 8px; border-radius:99px; background:rgba(0,0,0,.35); color:#FFE9A8; }
+
+  /* ===== شاشة إتمام العملية (دائرة تحميل ← ✓ ← المبلغ ← زرار تمام) ===== */
+  .vpay-overlay{ position:fixed; inset:0; z-index:100001; display:flex; flex-direction:column; align-items:center; background:#06070b; color:#F5F7FA; direction:rtl; overflow:hidden; animation:vpayIn .28s ease both; }
+  .vpay-overlay.leaving{ animation:vpayOut .22s ease forwards; }
+  @keyframes vpayIn{ from{ opacity:0; } } @keyframes vpayOut{ to{ opacity:0; } }
+  .vpay-glow{ position:absolute; left:50%; top:36%; width:520px; height:520px; margin:-260px 0 0 -260px; border-radius:50%; pointer-events:none; opacity:0; transform:scale(.4);
+    background:radial-gradient(circle, rgba(94,234,160,.30) 0%, rgba(94,234,160,.08) 38%, transparent 66%); transition:opacity .7s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+  .vpay-overlay.s-ok .vpay-glow{ opacity:1; transform:scale(1); }
+  .vpay-overlay.s-fail .vpay-glow{ opacity:1; transform:scale(1); background:radial-gradient(circle, rgba(255,107,107,.28) 0%, rgba(255,107,107,.07) 38%, transparent 66%); }
+  .vpay-top{ position:relative; z-index:1; width:100%; max-width:430px; display:flex; align-items:center; justify-content:center; padding:calc(env(safe-area-inset-top,0px) + 16px) 18px 0; min-height:52px; font-size:13px; font-weight:700; color:rgba(245,247,250,.55); }
+  .vpay-x{ position:absolute; inset-inline-start:16px; top:calc(env(safe-area-inset-top,0px) + 12px); width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; color:rgba(245,247,250,.6); background:rgba(255,255,255,.06); opacity:0; pointer-events:none; transition:opacity .4s ease; }
+  .vpay-overlay.s-btn .vpay-x{ opacity:1; pointer-events:auto; }
+  .vpay-body{ position:relative; z-index:1; flex:1; width:100%; max-width:430px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 24px 90px; text-align:center; }
+  .vpay-stage{ position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center; margin-bottom:26px; }
+  .vpay-corner{ position:absolute; width:26px; height:26px; border:0 solid rgba(255,255,255,.28); transition:opacity .45s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+  .vpay-corner.tl{ top:0; left:0; border-top-width:2px; border-left-width:2px; border-top-left-radius:9px; }
+  .vpay-corner.tr{ top:0; right:0; border-top-width:2px; border-right-width:2px; border-top-right-radius:9px; }
+  .vpay-corner.bl{ bottom:0; left:0; border-bottom-width:2px; border-left-width:2px; border-bottom-left-radius:9px; }
+  .vpay-corner.br{ bottom:0; right:0; border-bottom-width:2px; border-right-width:2px; border-bottom-right-radius:9px; }
+  .vpay-overlay.s-ok .vpay-corner, .vpay-overlay.s-fail .vpay-corner{ opacity:0; transform:scale(1.25); }
+  .vpay-ring{ width:78px; height:78px; overflow:visible; }
+  .vpay-ring circle:first-child{ stroke:rgba(94,234,160,.14); }
+  .vpay-overlay.s-ok .vpay-ring circle:first-child{ stroke:#5EEAA0; transition:stroke .4s ease; }
+  .vpay-overlay.s-fail .vpay-ring circle:first-child{ stroke:rgba(255,107,107,.3); }
+  .vpay-ring circle{ fill:none; stroke:#5EEAA0; stroke-width:2.6; stroke-linecap:round; transform-origin:center; transform:rotate(-90deg); }
+  .vpay-ring .arc{ stroke-dasharray:60 160; animation:vpaySpin 1s linear infinite; transform-box:fill-box; }
+  @keyframes vpaySpin{ to{ transform:rotate(270deg); } }
+  .vpay-overlay.s-ok .vpay-ring .arc, .vpay-overlay.s-fail .vpay-ring .arc{ animation:none; stroke-dasharray:201 201; stroke-dashoffset:0; transition:stroke-dasharray .45s ease; }
+  .vpay-overlay.s-fail .vpay-ring circle{ stroke:#FF6B6B; }
+  .vpay-ring{ transition:transform .5s cubic-bezier(.3,1.6,.4,1); }
+  .vpay-overlay.s-ok .vpay-ring, .vpay-overlay.s-fail .vpay-ring{ animation:vpayPop .6s cubic-bezier(.3,1.5,.4,1); }
+  @keyframes vpayPop{ 0%{ transform:scale(.9);} 55%{ transform:scale(1.12);} 100%{ transform:scale(1);} }
+  .vpay-mark{ position:absolute; width:36px; height:36px; overflow:visible; }
+  .vpay-mark path{ fill:none; stroke:#5EEAA0; stroke-width:2.8; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:34; stroke-dashoffset:34; }
+  .vpay-mark.bad path{ stroke:#FF6B6B; }
+  .vpay-overlay.s-ok .vpay-mark.good path, .vpay-overlay.s-fail .vpay-mark.bad path{ stroke-dashoffset:0; transition:stroke-dashoffset .42s .22s cubic-bezier(.5,0,.2,1); }
+  .vpay-mark.good, .vpay-mark.bad{ display:none; }
+  .vpay-overlay.s-ok .vpay-mark.good{ display:block; } .vpay-overlay.s-fail .vpay-mark.bad{ display:block; }
+  .vpay-amt{ font-family:'Cairo',sans-serif; font-weight:700; font-size:46px; line-height:1.1; letter-spacing:-.5px; direction:ltr; font-variant-numeric:tabular-nums; opacity:.35; filter:blur(7px); transform:translateY(6px); transition:opacity .55s ease, filter .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+  .vpay-amt small{ font-size:15px; font-weight:700; color:rgba(245,247,250,.55); margin-inline-start:8px; letter-spacing:0; }
+  .vpay-overlay.s-amt .vpay-amt{ opacity:1; filter:blur(0); transform:none; }
+  .vpay-t{ margin-top:12px; font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:rgba(245,247,250,.8); opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
+  .vpay-s{ margin-top:5px; font-size:12.5px; font-weight:600; color:rgba(245,247,250,.42); opacity:0; transform:translateY(8px); transition:opacity .5s .08s ease, transform .5s .08s ease; }
+  .vpay-chip{ margin-top:16px; padding:7px 14px; border-radius:99px; font-size:12px; font-weight:700; color:rgba(245,247,250,.6); background:rgba(255,255,255,.06); opacity:0; transform:translateY(8px); transition:opacity .5s .16s ease, transform .5s .16s ease; }
+  .vpay-chip b{ font-family:'Cairo',sans-serif; color:#F5F7FA; direction:ltr; display:inline-block; }
+  .vpay-overlay.s-txt .vpay-t, .vpay-overlay.s-txt .vpay-s, .vpay-overlay.s-txt .vpay-chip{ opacity:1; transform:none; }
+  .vpay-wait{ position:absolute; left:0; right:0; bottom:28%; font-size:12.5px; font-weight:600; color:rgba(245,247,250,.4); transition:opacity .3s ease; }
+  .vpay-overlay.s-ok .vpay-wait, .vpay-overlay.s-fail .vpay-wait{ opacity:0; }
+  .vpay-foot{ position:absolute; z-index:2; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 22px calc(env(safe-area-inset-bottom,0px) + 18px); transform:translateY(46px); opacity:0; pointer-events:none; transition:transform .6s cubic-bezier(.2,.9,.25,1), opacity .45s ease; }
+  .vpay-overlay.s-btn .vpay-foot{ transform:none; opacity:1; pointer-events:auto; }
+  .vpay-done{ width:100%; max-width:390px; padding:16px; border-radius:99px; background:#F5F7FA; color:#0b0d12; font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; transition:transform .12s ease, background .15s ease; }
+  .vpay-done, .vpay-rcpt, .vpay-x{ border:0; outline:0; font-family:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .vpay-rcpt{ background:none; } .vpay-x{ border:0; }
+  .vpay-done:active{ transform:scale(.98); background:#9aa0aa; }
+  .vpay-rcpt{ padding:10px 14px; font-size:12.5px; font-weight:700; color:rgba(245,247,250,.55); }
+  @media (prefers-reduced-motion:reduce){ .vpay-overlay *{ transition-duration:.01s !important; transition-delay:0s !important; animation-duration:.01s !important; animation-iteration-count:1 !important; } .vpay-ring .arc{ animation:none; } }
   .aa-tile-wrap{ position:relative; }
   .aa-tile-wrap > .aa-tile{ width:100%; }
   .aa-tile-del{ position:absolute; top:8px; inset-inline-start:8px; z-index:2; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; line-height:1; cursor:pointer; color:#fff; background:rgba(255,92,92,.88); border:1px solid rgba(255,255,255,.3); box-shadow:0 4px 12px -4px rgba(0,0,0,.6); }
@@ -6311,49 +6367,35 @@ function visaPayConfirm(opts){
 /* ===== الماكينة أثناء التنفيذ ===== */
 function visaPosKill(instant){
   const v = window.__vpos; if(!v) return;
-  clearTimeout(v.timer); window.__vpos = null;
+  clearTimeout(v.timer); (v.tms||[]).forEach(clearTimeout); window.__vpos = null;
   if(instant){ v.ov.remove(); return; }
   v.ov.classList.add('leaving'); setTimeout(()=>v.ov.remove(), 200);
 }
 function visaPosBegin(opts){
   opts = opts || {};
   visaPosKill(true);
-  const pid = state.pid, th = vposThemeOf(pid), last4 = vposLast4(pid), kind = opts.kind || 'deposit';
+  const pid = state.pid, last4 = vposLast4(pid), kind = opts.kind || 'deposit';
   const ref = 'GF-' + Math.random().toString(36).slice(2,10).toUpperCase();
   const ov = document.createElement('div');
-  ov.className = 'vpos-overlay'; ov.id = 'vpos-overlay';
+  ov.className = 'vpay-overlay'; ov.id = 'vpos-overlay';
   ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
   ov.innerHTML = `
-    <div class="vpos-sheet k-${kind}" style="--vc-a:${th.a};--vc-b:${th.b};--vc-c:${th.c}">
-      <div class="vpos-main">
-        <div class="vpos-stage">
-          <div class="vpos-receipt"><i></i><i class="s"></i><i></i><i class="s"></i><i class="g"></i><i></i></div>
-          <div class="vpos-card"><div class="chip"></div><div class="num">•••• ${last4}</div><div class="brand">VISA</div></div>
-          ${kind==='transfer' ? `<div class="vpos-waves"><svg viewBox="0 0 60 30"><path d="M18 22 Q30 12 42 22"/><path d="M10 15 Q30 -2 50 15"/><path d="M3 8 Q30 -16 57 8"/></svg></div>` : ''}
-          <div class="vpos-term">
-            <svg viewBox="0 0 190 150" xmlns="http://www.w3.org/2000/svg">
-              <path d="M30 60 L160 60 L182 132 Q184 142 172 142 L18 142 Q6 142 8 132 Z" fill="#1c1f27"/>
-              <path d="M30 60 L160 60 L166 78 L24 78 Z" fill="#2a2e39"/>
-              <rect x="34" y="82" width="122" height="34" rx="6" fill="#0d1a17" stroke="#3a4050" stroke-width="1.5"/>
-              <g fill="#3b4152">${[0,1,2].map(c=>`<rect x="${60+c*26}" y="120" width="20" height="5" rx="2.5"/>`).join('')}</g>
-              <g fill="#3b4152">${[0,1,2].map(c=>`<rect x="${58+c*28}" y="128" width="22" height="5" rx="2.5"/>`).join('')}</g>
-              <circle class="vpos-led" cx="150" cy="128" r="3.5"/>
-              <rect x="26" y="56" width="138" height="6" rx="3" fill="#0a0c11"/>
-            </svg>
-            <div class="vpos-screen">
-              <div class="vpos-proc">${opts.amount ? `<div class="vpos-amt">${opts.amount}</div>` : ''}<div class="vpos-dots"><span></span><span></span><span></span></div></div>
-              <div class="vpos-ic vpos-ic-ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-              <div class="vpos-ic vpos-ic-fail"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
-            </div>
-          </div>
-        </div>
-        <div class="vpos-status">جاري تنفيذ العملية…</div>
-        <div class="vpos-body"><div class="vpos-body-in"></div></div>
+    <div class="vpay-glow" aria-hidden="true"></div>
+    <div class="vpay-top"><button type="button" class="vpay-x" id="vpay-x" aria-label="إغلاق">✕</button><span class="vpay-head">جاري تنفيذ العملية</span></div>
+    <div class="vpay-body">
+      <div class="vpay-stage">
+        <i class="vpay-corner tl"></i><i class="vpay-corner tr"></i><i class="vpay-corner bl"></i><i class="vpay-corner br"></i>
+        <svg class="vpay-ring" viewBox="0 0 78 78" aria-hidden="true"><circle cx="39" cy="39" r="32"/><circle class="arc" cx="39" cy="39" r="32"/></svg>
+        <svg class="vpay-mark good" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12.8l4.2 4.2L18.6 8"/></svg>
+        <svg class="vpay-mark bad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>
       </div>
-      <div class="vpos-paper-wrap"></div>
-    </div>`;
+      <div class="vpay-amt" id="vpay-amt">${opts.amount ? escapeHtml(String(opts.amount)) : ''}</div>
+      <div class="vpay-t" id="vpay-t"></div><div class="vpay-s" id="vpay-s"></div><div class="vpay-chip" id="vpay-chip" hidden></div>
+      <div class="vpay-wait">لحظات من فضلك…</div>
+    </div>
+    <div class="vpay-foot"><button type="button" class="vpay-done" id="vpay-done">تمام</button><button type="button" class="vpay-rcpt" id="vpay-rcpt">🧾 عرض الإيصال</button></div>`;
   document.body.appendChild(ov);
-  window.__vpos = { ov, sheet: ov.querySelector('.vpos-sheet'), t0: Date.now(), ref, last4, kind: opts.kind || null, amt: (opts.amt!=null ? opts.amt : null), finishing:false,
+  window.__vpos = { ov, sheet: ov, t0: Date.now(), ref, last4, kind: opts.kind || null, amt: (opts.amt!=null ? opts.amt : null), finishing:false, tms:[],
     timer: setTimeout(()=>visaPosKill(), 30000) };
 }
 function vposBuildReceipt(v, title, rows){
@@ -6365,48 +6407,64 @@ function vposBuildReceipt(v, title, rows){
   const sign = v.kind ? VPOS_KIND_SIGN[v.kind] : null;
   return { title, ref:v.ref, ts, lines, amount: (sign && v.amt!=null) ? { sign, value: v.amt } : null };
 }
-/* نجاح: بيكمّل الماكينة اللي فتحت وقت التنفيذ (أو بيفتح واحدة جديدة لو مفيش) */
+/* نجاح: الدائرة بتتحوّل لعلامة ✓ + المبلغ بيعدّ + زرار تمام */
 function visaPosFx(title, text, opts){
   opts = opts || {};
   if(!window.__vpos) visaPosBegin({ amount: opts.amount });
   const v = window.__vpos; if(v.finishing) return; v.finishing = true;
-  /* نفس رقم العملية اللي اتسجل في كشف الحساب */
   if(window.__lastTx && Date.now() - window.__lastTx.at < 20000) v.ref = window.__lastTx.ref;
   v.receipt = vposBuildReceipt(v, title, opts.rows);
-  const wait = Math.max(0, 1600 - (Date.now() - v.t0));
-  setTimeout(()=>{
-    if(window.__vpos !== v) return;
-    const st = v.sheet.querySelector('.vpos-status');
-    v.sheet.classList.add('ok'); st.textContent = '✓ تمت العملية بنجاح';
-    vposBeep('ok');
-    const rows = (opts.rows||[]).map(r=>`<div class="vmsg-row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
-    v.sheet.querySelector('.vpos-body-in').innerHTML = `
-      <div class="vpos-title">${title}</div><div class="vpos-text">${text||''}</div>
-      ${rows ? `<div class="vpos-rows">${rows}</div>` : ''}
-      <div class="vpos-ref">REF · ${v.ref}</div>
-      <div class="vpos-actions"><button type="button" id="vpos-rcpt">🧾 عرض الإيصال</button><button type="button" class="primary" id="vpos-done">تمام</button></div>`;
-    const close = ()=>{ visaPosKill(); if(opts.onClose) opts.onClose(); };
-    v.sheet.querySelector('#vpos-done').addEventListener('click', close);
-    v.sheet.querySelector('#vpos-rcpt').addEventListener('click', ()=>{
-      vposReceiptPanel(v.sheet.querySelector('.vpos-paper-wrap'), v.receipt, ()=>v.sheet.classList.remove('show-receipt'), 'رجوع');
-      v.sheet.classList.add('show-receipt');
-    });
-    v.ov.addEventListener('click', (e)=>{ if(e.target===v.ov && v.sheet.classList.contains('done')) close(); });
-    setTimeout(()=>{ if(window.__vpos===v) v.sheet.classList.add('done'); }, 1000);
-  }, wait);
+  const rows = opts.rows || [];
+  const rowOf = re => rows.find(r=>re.test(vposText(r[0])));
+  const amtRow = rowOf(/المبلغ|القيمة|السعر|الرسوم/);
+  let amtNum = (v.amt!=null) ? Number(v.amt) : NaN;
+  if(!Number.isFinite(amtNum) && amtRow){ const m = String(normalizeDigits(vposText(amtRow[1]))).match(/[\d.,]+/); if(m) amtNum = parseFloat(m[0].replace(/,/g,'')); }
+  const sign = (v.kind && VPOS_KIND_SIGN[v.kind]) || '';
+  const toRow = rowOf(/^المستلم/), fromRow = rowOf(/^من$/), balRow = rowOf(/رصيد/);
+  const sub = toRow ? 'إلى ' + vposText(toRow[1]) : (fromRow ? 'من ' + vposText(fromRow[1]) : vposText(text||''));
+  const wait = Math.max(0, 900 - (Date.now() - v.t0));
+  const ov = v.ov, q = id => ov.querySelector(id);
+  const calm = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const at = (ms, fn)=>{ const t = setTimeout(()=>{ if(window.__vpos===v) fn(); }, calm ? 0 : ms); v.tms.push(t); };
+  at(wait, ()=>{
+    q('.vpay-head').textContent = 'اكتملت العملية';
+    q('#vpay-t').textContent = vposText(title);
+    q('#vpay-s').textContent = sub;
+    q('#vpay-s').hidden = !sub;
+    if(balRow){ const c = q('#vpay-chip'); c.hidden = false; c.innerHTML = vposText(balRow[0]) + ' <b>' + escapeHtml(vposText(balRow[1])) + '</b>'; }
+    ov.classList.add('s-ok');
+    try{ vposBeep('ok'); vibrate([18,40,18]); }catch(e){}
+  });
+  at(wait+560, ()=>{
+    const el = q('#vpay-amt'); ov.classList.add('s-amt');
+    if(Number.isFinite(amtNum)){
+      const dec = String(amtNum).includes('.') ? 2 : 0;
+      const unit = '<small>نقطة</small>';
+      const paint = n => { el.innerHTML = (sign && n>0 ? sign : '') + (dec ? n.toFixed(dec) : Math.round(n)) + unit; };
+      if(calm){ paint(amtNum); }
+      else { const t0 = performance.now(), D = 950; const step = now=>{ if(window.__vpos!==v) return; const p = Math.min(1,(now-t0)/D), e = 1-Math.pow(1-p,3); paint(amtNum*e); if(p<1) requestAnimationFrame(step); else paint(amtNum); }; requestAnimationFrame(step); }
+    }
+  });
+  at(wait+1050, ()=>ov.classList.add('s-txt'));
+  at(wait+1500, ()=>{ ov.classList.add('s-btn'); });
+  const close = ()=>{ visaPosKill(); if(opts.onClose) opts.onClose(); };
+  q('#vpay-done').addEventListener('click', close);
+  q('#vpay-x').addEventListener('click', close);
+  q('#vpay-rcpt').addEventListener('click', ()=>{ try{ visaReceiptOpen(v.receipt); }catch(e){} });
 }
-/* فشل/تحذير أثناء التنفيذ: الماكينة تبيّن ✕ وبعدها تظهر الرسالة العادية */
+/* فشل/تحذير أثناء التنفيذ: الدائرة تتحوّل لـ ✕ حمراء وبعدها تظهر الرسالة العادية */
 function visaPosAbort(cb){
   const v = window.__vpos;
   if(!v){ if(cb) cb(); return; }
   if(v.finishing){ visaPosKill(); if(cb) cb(); return; }
   v.finishing = true;
-  const wait = Math.max(0, 900 - (Date.now() - v.t0));
+  const wait = Math.max(0, 700 - (Date.now() - v.t0));
   setTimeout(()=>{
     if(window.__vpos !== v){ if(cb) cb(); return; }
-    v.sheet.classList.add('fail'); v.sheet.querySelector('.vpos-status').textContent = 'تعذّرت العملية';
-    vposBeep('fail');
-    setTimeout(()=>{ visaPosKill(); if(cb) cb(); }, 950);
+    v.ov.querySelector('.vpay-head').textContent = 'تعذّرت العملية';
+    v.ov.classList.add('s-fail');
+    try{ vposBeep('fail'); vibrate([25,15,25]); }catch(e){}
+    setTimeout(()=>{ visaPosKill(); if(cb) cb(); }, 1000);
   }, wait);
 }
 
