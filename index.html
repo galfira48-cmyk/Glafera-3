@@ -2438,14 +2438,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .notif-time{font-size:10.5px; color:var(--text-muted); margin-top:4px; font-weight:500;}
 
   /* ---------- مركز الإشعارات (نسخة احترافية) ---------- */
-  .notif-overlay{ background:rgba(4,3,16,.55); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .notif-overlay{ z-index:120; background:rgba(4,3,16,.55); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
   .notif-panel{ max-height:82vh; padding:8px 16px calc(14px + env(safe-area-inset-bottom,0px)); border-radius:28px 28px 0 0; border:0; border-top:1px solid rgba(255,255,255,.10);
     background:linear-gradient(180deg, color-mix(in srgb,var(--surface) 96%,#fff 4%), var(--bg-2)); box-shadow:0 -18px 50px rgba(0,0,0,.4); }
   .notif-panel-handle{ margin:0 auto 6px; opacity:.5; }
   .np-head{ display:flex; align-items:center; justify-content:space-between; flex-direction:row-reverse; padding:6px 2px 12px; }
   .np-ttl{ text-align:start; }
   .np-ttl b{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:18px; line-height:1.2; }
-  .np-ttl span{ display:block; font-size:11px; color:var(--text-muted); margin-top:2px; font-weight:600; }
+  .np-ttl span{ display:block; font-size:11px; color:var(--text-muted); margin-top:4px; font-weight:600; }
   .np-x{ width:32px; height:32px; border-radius:50%; border:0; display:flex; align-items:center; justify-content:center; color:var(--text-muted); background:rgba(255,255,255,.07); cursor:pointer; }
   .np-x svg{ width:15px; height:15px; } .np-x:active{ background:rgba(255,255,255,.14); }
   .nr-sec{ display:flex; align-items:center; gap:8px; margin:12px 4px 7px; font-size:11px; font-weight:800; letter-spacing:.2px; color:var(--text-muted); }
@@ -2454,11 +2454,12 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .nr{ --t:#9aa0c8; display:flex; align-items:center; gap:12px; padding:12px 14px; position:relative; animation:nrIn .38s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i)*38ms); }
   .nr + .nr::before{ content:''; position:absolute; top:0; inset-inline-start:66px; inset-inline-end:0; height:1px; background:rgba(255,255,255,.07); }
   @keyframes nrIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
-  .nr.k-in{ --t:#34c77b; } .nr.k-out{ --t:#f0705f; } .nr.k-gold{ --t:#f4b740; } .nr.k-card{ --t:#6f9bff; } .nr.k-ok{ --t:#3fd0c0; }
-  .nr-ico{ flex:0 0 auto; width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:18px;
-    background:color-mix(in srgb,var(--t) 16%,transparent); border:1px solid color-mix(in srgb,var(--t) 26%,transparent); }
+  .nr.k-in{ --t:#34c77b; } .nr.k-out{ --t:#f0705f; } .nr.k-gold{ --t:#f4b740; } .nr.k-card{ --t:#6f9bff; } .nr.k-ok{ --t:#3fd0c0; } .nr.k-warn{ --t:#f0a14a; } .nr.k-violet{ --t:#a78bfa; }
+  .nr-ico{ flex:0 0 auto; width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:var(--t);
+    background:color-mix(in srgb,var(--t) 15%,transparent); border:1px solid color-mix(in srgb,var(--t) 24%,transparent); }
+  .nr-ico svg{ width:20px; height:20px; }
   .nr-mid{ flex:1; min-width:0; }
-  .nr-txt{ font-size:13px; line-height:1.6; font-weight:600; color:var(--text); }
+  .nr-txt{ text-wrap:pretty; font-size:13px; line-height:1.65; font-weight:600; color:var(--text); }
   .nr:not(.unread) .nr-txt{ font-weight:500; opacity:.92; }
   .nr-meta{ display:flex; align-items:center; gap:6px; margin-top:2px; font-size:10.5px; font-weight:600; color:var(--text-muted); }
   .nr-dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
@@ -27161,8 +27162,39 @@ function notifDayLabel(ts){
   if(diff===1) return 'أمس';
   return d.toLocaleDateString('ar-EG', { day:'numeric', month:'long' });
 }
-const NOTIF_KIND = { '📥':'in', '📤':'out', '🎯':'gold', '⚡':'gold', '🏆':'gold', '🎁':'gold', '🌟':'gold', '⭐':'gold', '💳':'card', '✅':'ok', '🛍️':'card' };
-function notifKind(n){ return NOTIF_KIND[n.icon] || 'neutral'; }
+/* أيقونات خطية موحدة بدل الإيموجي (kind = اللون، g = الرسمة) */
+const NI = {
+  in:    'M17 7L7 17M7 9v8h8',
+  out:   'M7 17L17 7M9 7h8v8',
+  gift:  'M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H8a2.5 2.5 0 110-5c3 0 4 5 4 5zM12 7h4a2.5 2.5 0 100-5c-3 0-4 5-4 5z',
+  coin:  'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v10M9.5 9.8h3.8a1.6 1.6 0 010 3.2h-2.6a1.6 1.6 0 000 3.2h3.9',
+  trophy:'M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3',
+  clock: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2',
+  check: 'M12 21a9 9 0 100-18 9 9 0 000 18zM8 12.5l2.7 2.7L16 9.5',
+  card:  'M3 6h18v12H3zM3 10h18M7 15h3',
+  warn:  'M12 4l9.5 16h-19zM12 10v4M12 17h.01',
+  target:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 17a5 5 0 100-10 5 5 0 000 10zM12 13a1 1 0 100-2 1 1 0 000 2z',
+  game:  'M7 7h10a4 4 0 014 4v2a3 3 0 01-5.4 1.8L14 13h-4l-1.6 1.8A3 3 0 013 13v-2a4 4 0 014-4zM8 10v3M6.5 11.5h3M15.5 11.5h.01M17.5 10h.01',
+  key:   'M14 10a4 4 0 11-8 0 4 4 0 018 0zM12.8 12.8L20 20M17 17l2-2',
+  mega:  'M4 10v4h3l8 4V6L7 10zM18 9a4 4 0 010 6',
+  chat:  'M4 5h16v11H9l-5 4z',
+  sun:   'M12 16a4 4 0 100-8 4 4 0 000 8zM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4',
+  chart: 'M3 17l6-6 4 4 8-8M15 7h6v6',
+  star:  'M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.3l-5.5 3 1-6.2L3 9.7l6.2-.9z',
+  door:  'M5 21V4a1 1 0 011-1h9a1 1 0 011 1v17M3 21h18M12 12h.01',
+  bell:  'M6 16V11a6 6 0 1112 0v5l2 2H4zM10 21h4'
+};
+const NOTIF_ICON = {
+  '📥':['in','in'], '📤':['out','out'], '🎁':['gift','gold'], '💰':['coin','out'], '🏆':['trophy','gold'], '🏅':['trophy','gold'], '👑':['trophy','gold'],
+  '⏰':['clock','card'], '⏳':['clock','card'], '✅':['check','ok'], '💳':['card','card'], '🛍️':['card','card'], '⚠️':['warn','warn'], '🚪':['door','warn'], '😭':['warn','warn'],
+  '🎯':['target','gold'], '🎮':['game','violet'], '🔑':['key','card'], '📢':['mega','card'], '💬':['chat','card'], '☀️':['sun','gold'], '📈':['chart','ok'], '🕵️':['star','gold'], '⭐':['star','gold'], '🌟':['star','gold'], '⚡':['star','gold']
+};
+function notifIcon(n){ const m = NOTIF_ICON[n.icon] || ['bell','neutral']; return { g:NI[m[0]], k:m[1] }; }
+/* بيشيل الإيموجي من أول/آخر النص لأن الأيقونة بتغني عنه */
+function notifClean(text){
+  try{ return String(text||'').replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u,'').replace(/[\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u,'').trim() || String(text||''); }
+  catch(e){ return String(text||''); }
+}
 /* بيطلع المبلغ من نص الإشعار (لو فيه) عشان يتعرض كرقم واضح على الجنب */
 function notifAmount(n){
   const m = String(n.text||'').match(/(\d+)\s*نقطة/); if(!m) return null;
@@ -27183,11 +27215,11 @@ function notifShort(ts){
 }
 function notifRowHtml(n, hist, i){
   const time = hist ? new Date(n.ts).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : notifShort(n.ts);
-  const am = notifAmount(n);
-  return `<div class="nr k-${notifKind(n)} ${n.read?'':'unread'}" style="--i:${i||0}">
-      <div class="nr-ico">${n.icon}</div>
+  const am = notifAmount(n), ic = notifIcon(n);
+  return `<div class="nr k-${ic.k} ${n.read?'':'unread'}" style="--i:${i||0}">
+      <div class="nr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${ic.g}"/></svg></div>
       <div class="nr-mid">
-        <div class="nr-txt">${escapeHtml(n.text)}</div>
+        <div class="nr-txt">${escapeHtml(notifClean(n.text))}</div>
         <div class="nr-meta">${n.read?'':'<i class="nr-dot"></i>'}${time}</div>
       </div>
       ${am ? `<div class="nr-amt ${am.c}"><b>${am.s}${am.v}</b><small>نقطة</small></div>` : ''}
@@ -27196,7 +27228,7 @@ function notifRowHtml(n, hist, i){
 function notifGroup(label, list, hist, extra){
   if(!list.length) return '';
   let i = 0;
-  return `<div class="nr-sec"><span>${label}</span>${extra||''}</div><div class="nr-group">${list.map(n=>notifRowHtml(n, hist, i++)).join('')}</div>`;
+  return `${label ? `<div class="nr-sec"><span>${label}</span>${extra||''}</div>` : ''}<div class="nr-group">${list.map(n=>notifRowHtml(n, hist, i++)).join('')}</div>`;
 }
 function notifPanelInner(mode){
   const pid = state.pid;
@@ -27217,7 +27249,7 @@ function notifPanelInner(mode){
   const fresh = rec.filter(n=>!n.read), older = rec.filter(n=>n.read);
   let body = '';
   if(fresh.length) body += notifGroup('جديد', fresh, false, `<em>${fresh.length}</em>`) + notifGroup('سابقًا اليوم', older, false);
-  else body += notifGroup('آخر 24 ساعة', older, false);
+  else body += notifGroup('', older, false);
   if(!rec.length) body = `<div class="np-empty"><span>🌿</span>مفيش إشعارات جديدة<small>هتظهر هنا لمدة 24 ساعة</small></div>`;
   const hasAny = (myExtra(pid).notifs||[]).length > 0;
   return `
