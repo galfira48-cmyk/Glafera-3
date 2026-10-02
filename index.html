@@ -1661,6 +1661,19 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ch-spark i:nth-child(1){ top:70px; left:18%; animation-delay:.2s; } .ch-spark i:nth-child(2){ top:40px; left:78%; animation-delay:1.4s; width:3px; height:3px; }
   .ch-spark i:nth-child(3){ top:120px; left:90%; animation-delay:2.4s; } .ch-spark i:nth-child(4){ top:110px; left:9%; animation-delay:3.1s; width:3px; height:3px; }
   @keyframes chTwinkle{ 0%,100%{ opacity:0; transform:scale(.4); } 50%{ opacity:.9; transform:scale(1); } }
+  /* نقش عربي (نجمة ثمانية) بلون الثيم */
+  .ch-arab{ position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.16; background:var(--gold);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M10 10h28v28H10zM24 3.500L44.500 24 24 44.500 3.500 24z'/%3E%3Ccircle cx='24' cy='24' r='5'/%3E%3Cpath d='M0 0l10 10M48 0L38 10M0 48l10-10M48 48L38 38'/%3E%3C/svg%3E"), linear-gradient(180deg,#000 0,rgba(0,0,0,.35) 45%,#000 100%);
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M10 10h28v28H10zM24 3.500L44.500 24 24 44.500 3.500 24z'/%3E%3Ccircle cx='24' cy='24' r='5'/%3E%3Cpath d='M0 0l10 10M48 0L38 10M0 48l10-10M48 48L38 38'/%3E%3C/svg%3E"), linear-gradient(180deg,#000 0,rgba(0,0,0,.35) 45%,#000 100%);
+    -webkit-mask-size:48px 48px, 100% 100%; mask-size:48px 48px, 100% 100%; -webkit-mask-composite:source-in; mask-composite:intersect; }
+  .ch-corner{ position:absolute; width:46px; height:46px; z-index:-1; pointer-events:none; color:var(--gold); opacity:.55; }
+  .ch-corner.r{ top:12px; right:12px; } .ch-corner.b1{ bottom:12px; left:12px; transform:rotate(180deg); } .ch-corner.b2{ bottom:12px; right:12px; transform:scaleY(-1); }
+  html:not([data-theme="light"]):not([data-palette="crystal"]):not([data-palette="sandgold"]):not([data-palette="pearl"]) .ch-card{
+    background:
+      radial-gradient(110% 55% at 50% -6%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 62%) padding-box,
+      radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0,0,0,.45)) padding-box,
+      linear-gradient(180deg, color-mix(in srgb, var(--bg-2) 55%, #000 45%), color-mix(in srgb, var(--bg) 62%, #000 38%)) padding-box,
+      linear-gradient(160deg, var(--gold-2), color-mix(in srgb, var(--gold) 55%, transparent) 28%, color-mix(in srgb, var(--gold) 10%, transparent) 55%, var(--gold) 100%) border-box; }
   .ch-x{ position:absolute; top:14px; left:14px; width:36px; height:36px; border-radius:13px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2;
     color:var(--text-muted); background:rgba(255,255,255,.06); border:1px solid var(--border); backdrop-filter:blur(8px); -webkit-tap-highlight-color:transparent; transition:transform .15s, color .15s; }
   .ch-x svg{ width:14px; height:14px; } .ch-x:active{ transform:scale(.9); color:var(--text); }
@@ -17635,6 +17648,27 @@ async function showRoomFeeModal(kind, onPaid){
     onPaid();
   });
 }
+/* أصوات النافذة (Web Audio — من غير ملفات) */
+function chSnd(kind){
+  try{
+    const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    const ctx = window.__chAC = window.__chAC || new AC(); if(ctx.state==='suspended') ctx.resume();
+    const t0 = ctx.currentTime;
+    const note = (f, at, dur, type, vol)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0+at);
+      g.gain.exponentialRampToValueAtTime(vol||0.06, t0+at+0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+at+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0+at); o.stop(t0+at+dur+0.02);
+    };
+    if(kind==='open'){ note(523.25,0,.35,'sine',.05); note(783.99,.09,.5,'sine',.05); note(1046.5,.18,.6,'triangle',.03); }
+    else if(kind==='coin'){ note(1318.5,0,.12,'triangle',.06); note(1760,.07,.5,'triangle',.06); note(2637,.14,.45,'sine',.025); }
+    else if(kind==='free'){ note(587.33,0,.18,'sine',.06); note(880,.08,.3,'sine',.05); }
+    else if(kind==='lock'){ note(1900,0,.04,'square',.025); note(1200,.05,.07,'square',.02); }
+    else { note(330,0,.09,'sine',.05); }
+  }catch(e){}
+}
 function closeChallengeTypeModal(){
   const el = document.getElementById('challenge-type-overlay');
   if(el) el.remove();
@@ -17648,6 +17682,10 @@ function showChallengeTypeModal(gameType){
   overlay.innerHTML = `
     <div class="confirm-card ch-card" role="dialog" aria-modal="true" aria-label="اختار نوع التحدي">
       <div class="ch-rays"></div>
+      <div class="ch-arab"></div>
+      <svg class="ch-corner r" viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 44V14a12 12 0 0 1 12-12h30"/><path d="M9 44V17a8 8 0 0 1 8-8h27" opacity=".5"/><circle cx="14" cy="14" r="2.200" fill="currentColor"/></svg>
+      <svg class="ch-corner b1" viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 44V14a12 12 0 0 1 12-12h30"/><path d="M9 44V17a8 8 0 0 1 8-8h27" opacity=".5"/><circle cx="14" cy="14" r="2.200" fill="currentColor"/></svg>
+      <svg class="ch-corner b2" viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 44V14a12 12 0 0 1 12-12h30"/><path d="M9 44V17a8 8 0 0 1 8-8h27" opacity=".5"/><circle cx="14" cy="14" r="2.200" fill="currentColor"/></svg>
       <div class="ch-spark"><i></i><i></i><i></i><i></i></div>
       <button type="button" class="ch-x" id="challenge-x-btn" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <div class="ch-emblem"><div class="ch-disc">
@@ -17685,20 +17723,23 @@ function showChallengeTypeModal(gameType){
     </div>
   `;
   document.body.appendChild(overlay);
+  chSnd('open');
   overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeChallengeTypeModal(); });
   (function(){
     const pwEl = document.getElementById('challenge-pw'), box = document.getElementById('challenge-pw-box'), hint = document.getElementById('challenge-pw-hint');
-    const base = hint.textContent;
-    pwEl.addEventListener('input', ()=>{ const on = !!pwEl.value.trim(); box.classList.toggle('on', on); hint.textContent = on ? 'الغرفة هتتقفل — شارك الكلمة مع صاحبك بس.' : base; });
+    const base = hint.textContent; let was = false;
+    pwEl.addEventListener('input', ()=>{ const on = !!pwEl.value.trim(); if(on!==was){ was=on; chSnd('lock'); } box.classList.toggle('on', on); hint.textContent = on ? 'الغرفة هتتقفل — شارك الكلمة مع صاحبك بس.' : base; });
   })();
-  document.getElementById('challenge-x-btn').addEventListener('click', closeChallengeTypeModal);
-  document.getElementById('challenge-cancel-btn').addEventListener('click', closeChallengeTypeModal);
+  document.getElementById('challenge-x-btn').addEventListener('click', ()=>{ chSnd('tap'); closeChallengeTypeModal(); });
+  document.getElementById('challenge-cancel-btn').addEventListener('click', ()=>{ chSnd('tap'); closeChallengeTypeModal(); });
   document.getElementById('challenge-coin-btn').addEventListener('click', ()=>{
+    chSnd('coin');
     ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
     showRoomFeeModal('create', ()=>createGameRoom(gameType, true));
   });
   document.getElementById('challenge-free-btn').addEventListener('click', ()=>{
+    chSnd('free');
     ROOM_PW = ((document.getElementById('challenge-pw')||{}).value||'').trim();
     closeChallengeTypeModal();
     createGameRoom(gameType, false);
