@@ -830,7 +830,63 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ms-adm-row.is-locked .ms-adm-name{ opacity:.6; }
   .ms-adm-row.is-locked .ms-adm-av{ filter:grayscale(.35); cursor:not-allowed; }
   .ms-adm-del{ margin-top:6px; padding:2px 0; background:none; border:0; color:var(--danger); font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+
+  /* ---- family page (animated) ---- */
+  .ms-famhead{ cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .18s cubic-bezier(.34,1.56,.64,1); }
+  .ms-famhead:active{ transform:rotate(-1deg) scale(.97); }
+  .ms-fchev{ position:absolute; top:50%; inset-inline-end:14px; width:20px; height:20px; z-index:3; transform:translateY(-50%); animation:ms-nudge 1.6s ease-in-out infinite; }
+  .ms-fchev svg, .ms-fam-more svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; display:block; }
+  @keyframes ms-nudge{ 0%,100%{ transform:translate(0,-50%); } 50%{ transform:translate(-4px,-50%); } }
+  .ms-fam-more{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:20px; padding:12px 14px; border:0; border-radius:18px; background:linear-gradient(135deg,var(--r),var(--rd)); color:#fff; font-family:inherit; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 8px 18px rgba(20,30,70,.22); -webkit-tap-highlight-color:transparent; }
+  .ms-fam-more b{ min-width:26px; height:26px; padding:0 7px; border-radius:13px; display:inline-grid; place-items:center; background:rgba(255,255,255,.25); font-size:13px; }
+  .ms-fam-more svg{ width:16px; height:16px; }
+  .ms-fam-more:active{ transform:scale(.97); }
+
+  @keyframes ms-fp-open{ from{ clip-path:circle(0 at var(--ox) var(--oy)); } to{ clip-path:circle(150% at var(--ox) var(--oy)); } }
+  @keyframes ms-fp-close{ from{ clip-path:circle(150% at var(--ox) var(--oy)); } to{ clip-path:circle(0 at var(--ox) var(--oy)); } }
+  @keyframes ms-fp-hero{ from{ transform:translateY(-70%); opacity:0; } to{ transform:none; opacity:1; } }
+  @keyframes ms-fp-pop{ from{ opacity:0; transform:scale(.3) rotate(-25deg); } to{ opacity:1; transform:none; } }
+  @keyframes ms-fp-ring{ from{ transform:scale(1); opacity:.8; } to{ transform:scale(1.9); opacity:0; } }
+  @keyframes ms-fp-word{ from{ opacity:0; transform:translateY(22px); filter:blur(8px); } to{ opacity:1; transform:none; filter:none; } }
+  @keyframes ms-fp-rise{ 0%{ transform:translateY(0); opacity:0; } 15%{ opacity:.8; } 100%{ transform:translateY(-200px); opacity:0; } }
+  @keyframes ms-fp-line{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+  @keyframes ms-fp-in{ from{ opacity:0; transform:translateY(70px) rotateX(-22deg) scale(.78); filter:blur(7px); } to{ opacity:1; transform:none; filter:none; } }
+  @keyframes ms-fp-float{ from{ transform:translateY(0); } to{ transform:translateY(-5px); } }
+  .ms-fp{ position:fixed; inset:0; z-index:99990; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:'Cairo',sans-serif; color:#16275A;
+    background:linear-gradient(170deg,#FFFEFB 0%,#F8F4EC 55%,#EFEBE2 100%); animation:ms-fp-open .7s cubic-bezier(.65,0,.2,1) both; }
+  .ms-fp.is-closing{ animation:ms-fp-close .45s cubic-bezier(.6,0,.4,1) forwards; pointer-events:none; }
+  .ms-fp-hero{ position:relative; overflow:hidden; padding:calc(26px + env(safe-area-inset-top,0px)) 20px 34px; border-radius:0 0 44px 44px; text-align:center; color:#fff;
+    background:linear-gradient(160deg,var(--r),var(--rd)); box-shadow:0 18px 40px rgba(20,30,70,.28); animation:ms-fp-hero .8s cubic-bezier(.2,.9,.3,1) .2s both; }
+  .ms-fp-hero::before, .ms-fp-hero::after{ content:''; position:absolute; border-radius:50%; background:rgba(255,255,255,.10); pointer-events:none; }
+  .ms-fp-hero::before{ width:220px; height:220px; top:-90px; inset-inline-end:-60px; }
+  .ms-fp-hero::after{ width:160px; height:160px; bottom:-70px; inset-inline-start:-40px; }
+  .ms-fp-dots i{ position:absolute; bottom:-10px; left:var(--x); width:var(--s); height:var(--s); border-radius:50%; background:rgba(255,255,255,.55); animation:ms-fp-rise var(--t) linear var(--dl) infinite; pointer-events:none; }
+  .ms-fp-back{ position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); inset-inline-start:16px; z-index:3; width:42px; height:42px; border-radius:14px; border:1.5px solid rgba(255,255,255,.45); background:rgba(255,255,255,.18); display:grid; place-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .ms-fp-back svg{ width:22px; height:22px; fill:none; stroke:#fff; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+  .ms-fp-back:active{ transform:scale(.92); }
+  .ms-fp-ico{ position:relative; z-index:1; width:78px; height:78px; margin:8px auto 14px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.2); border:2px solid rgba(255,255,255,.55); animation:ms-fp-pop .8s cubic-bezier(.34,1.56,.64,1) .55s both; }
+  .ms-fp-ico svg{ width:38px; height:38px; fill:#fff; }
+  .ms-fp-ico::before, .ms-fp-ico::after{ content:''; position:absolute; inset:-2px; border-radius:50%; border:2px solid rgba(255,255,255,.55); animation:ms-fp-ring 2.6s ease-out 1.2s infinite; }
+  .ms-fp-ico::after{ animation-delay:2.5s; }
+  .ms-fp-title{ position:relative; z-index:1; font-weight:900; font-size:28px; line-height:1.35; text-shadow:0 2px 0 rgba(0,0,0,.14); }
+  .ms-fp-title span{ display:inline-block; animation:ms-fp-word .7s cubic-bezier(.2,.9,.3,1) calc(.75s + var(--w)*.12s) both; }
+  .ms-fp-count{ position:relative; z-index:1; display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:6px 16px; border-radius:999px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); font-weight:800; font-size:13.5px; animation:ms-fp-word .6s ease 1s both; }
+  .ms-fp-count b{ font-size:16px; min-width:14px; }
+  .ms-fp-body{ max-width:520px; margin:0 auto; padding:26px 18px calc(44px + env(safe-area-inset-bottom,0px)); }
+  .ms-fp-div{ display:flex; align-items:center; gap:12px; margin-bottom:30px; font-weight:800; font-size:13px; color:rgba(22,39,90,.6); }
+  .ms-fp-div i{ flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,var(--r)); transform-origin:center; animation:ms-fp-line .8s ease 1s both; }
+  .ms-fp-div i:last-child{ background:linear-gradient(270deg,transparent,var(--r)); }
+  .ms-fp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:28px 14px; perspective:900px; }
+  .ms-fp-cell{ --dl:calc(1.15s + var(--i)*.15s); animation:ms-fp-in .85s cubic-bezier(.2,.9,.3,1.15) var(--dl) both, ms-fp-float 5.5s ease-in-out calc(var(--dl) + .9s) infinite alternate; }
+  .ms-fp-cell:last-child:nth-child(odd){ grid-column:1/-1; width:calc(50% - 7px); justify-self:center; }
+  .ms-fp .ms-item{ cursor:pointer; }
+  /* admin extra members */
+  .ms-adm-role{ width:100%; margin-bottom:6px; font-weight:800; }
+  .ms-adm-addrow{ display:flex; gap:8px; align-items:center; padding:12px 0 6px; border-top:1px dashed var(--border); }
+  .ms-adm-addrow input{ flex:1; min-width:0; }
+  .ms-adm-addrow .btn{ flex:0 0 auto; white-space:nowrap; }
   @media (prefers-reduced-motion: reduce){
+    .ms-fp, .ms-fp *, .ms-fchev{ animation:none !important; }
     .ms-reveal{ opacity:1; transform:none; animation:none !important; }
     .ms-cross, .ms-cross .ray, .ms-banner, .ms-spark, .ms-sheet-bg, .ms-sheet-card{ animation:none !important; }
     .ms-underline path{ animation:none !important; stroke-dashoffset:0; }
@@ -10189,6 +10245,15 @@ function msResolve(key, m){
   const c = sl.pv ? MS_PHOTO_CACHE[key] : null;
   return Object.assign({}, m, {name:(sl.name||'').trim(), photo:(c && c.url) || ''});
 }
+const MS_CHEV_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+function msExtras(gi){ return (MS_DATA.extra && MS_DATA.extra[gi]) || []; }
+function msFamMembers(gi){
+  const f = MEETING_STRUCTURE.families[gi]; if(!f) return [];
+  const base = f.members.map((m,pi)=>({key:`F${gi}-${pi}`, base:m, tone:MS_MEMBER_TONES[pi%2]}));
+  const ex = msExtras(gi).map((e,i)=>({key:`X${gi}-${e.id}`, base:{role:e.role||'عضو', g:'m'}, tone:MS_MEMBER_TONES[i%2], id:e.id}));
+  return base.concat(ex);
+}
+function msCountLabel(n){ return n===1 ? 'عضو واحد' : n===2 ? 'عضوان' : (n<=10 ? 'أعضاء' : 'عضوًا'); }
 function msPhotoCss(url){ return String(url).replace(/'/g,"%27"); }
 const MS_LEADER_TONES = [
   {a:'#FFDD55', b:'#F6AE1B', r:'#F6B51E', t:'#16275A', bd:'#16275A'},
@@ -10236,8 +10301,9 @@ function renderMeetingStructurePage(){
   const fams = S.families.map((f,gi)=>{
     const t = MS_FAM_TONES[f.tone] || MS_FAM_TONES.purple;
     return `<div class="ms-fam ms-reveal" style="--r:${t.r};--rd:${t.rd};--fbg:${t.bg};--fl:${t.l}">
-      <div class="ms-famhead"><span class="ms-ficon">${MS_ICONS[f.icon]||MS_ICONS.group}</span><span class="ribbon">${escapeHtml(f.title)}</span></div>
+      <div class="ms-famhead" data-ms-fam="${gi}" role="button" tabindex="0" aria-label="عرض أعضاء ${escapeHtml(f.title)}"><span class="ms-ficon">${MS_ICONS[f.icon]||MS_ICONS.group}</span><span class="ribbon">${escapeHtml(f.title)}</span><span class="ms-fchev">${MS_CHEV_SVG}</span></div>
       <div class="ms-leaders">${f.members.map((m,pi)=>msItemHtml(msResolve(`F${gi}-${pi}`,m), MS_MEMBER_TONES[pi%2], 'group', {key:`F${gi}-${pi}`})).join('')}</div>
+      <button type="button" class="ms-fam-more" data-ms-fam="${gi}"><span>عرض كل أعضاء الأسرة</span><b>${msFamMembers(gi).length}</b>${MS_CHEV_SVG}</button>
     </div>`;
   }).join('');
   return `
@@ -10287,6 +10353,11 @@ function msInitReveal(){
 function msFindPerson(key){
   const S = MEETING_STRUCTURE;
   if(key[0]==='L'){ const i = +key.slice(1), m = S.leaders[i]; return m ? {m:msResolve(key,m), tone:MS_LEADER_TONES[i%2], icon:'crown', fam:'قيادة الاجتماع'} : null; }
+  if(key[0]==='X'){
+    const gi = +key.slice(1).split('-')[0], f = S.families[gi]; if(!f) return null;
+    const x = msFamMembers(gi).find(z=>z.key===key); if(!x) return null;
+    return {m:msResolve(key,x.base), tone:x.tone, icon:'group', fam:f.title};
+  }
   const [gi,pi] = key.slice(1).split('-').map(Number);
   const f = S.families[gi]; if(!f) return null;
   const m = f.members[pi]; return m ? {m:msResolve(key,m), tone:MS_MEMBER_TONES[pi%2], icon:'group', fam:f.title} : null;
@@ -10305,36 +10376,92 @@ function msOpenPerson(key){
     </div>`;
   document.body.appendChild(o);
 }
+function msOpenFamily(gi, ev){
+  const f = MEETING_STRUCTURE.families[gi]; if(!f) return;
+  msCloseFamily(true);
+  const t = MS_FAM_TONES[f.tone] || MS_FAM_TONES.purple;
+  const list = msFamMembers(gi), n = list.length;
+  let ox = '50%', oy = '42%';
+  if(ev && typeof ev.clientX==='number' && (ev.clientX||ev.clientY)){ ox = ev.clientX+'px'; oy = ev.clientY+'px'; }
+  const cells = list.map((x,i)=>`<div class="ms-fp-cell" style="--i:${i}">${msItemHtml(msResolve(x.key,x.base), x.tone, 'group', {key:x.key})}</div>`).join('');
+  const words = String(f.title).split(' ').map((w,i)=>`<span style="--w:${i}">${escapeHtml(w)}</span>`).join(' ');
+  const dots = Array.from({length:10},(_,i)=>`<i style="--x:${(i*10+6)%100}%;--s:${5+(i*5)%9}px;--t:${5+(i*7)%5}s;--dl:${(i*0.55).toFixed(2)}s"></i>`).join('');
+  const o = document.createElement('div');
+  o.className = 'ms-fp'; o.id = 'ms-fp';
+  o.style.cssText = `--r:${t.r};--rd:${t.rd};--ox:${ox};--oy:${oy};`;
+  o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
+  o.innerHTML = `
+    <div class="ms-fp-hero">
+      <div class="ms-fp-dots" aria-hidden="true">${dots}</div>
+      <button type="button" class="ms-fp-back" data-ms-fpclose="1" aria-label="رجوع"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="ms-fp-ico">${MS_ICONS[f.icon]||MS_ICONS.group}</div>
+      <div class="ms-fp-title">${words}</div>
+      <div class="ms-fp-count"><b class="ms-fp-num" data-to="${n}">0</b><span>${msCountLabel(n)}</span></div>
+    </div>
+    <div class="ms-fp-body">
+      <div class="ms-fp-div"><i></i><span>أعضاء الأسرة</span><i></i></div>
+      <div class="ms-fp-grid">${cells}</div>
+    </div>`;
+  document.body.appendChild(o);
+  o.__ov = document.body.style.overflow; document.body.style.overflow = 'hidden';
+  const num = o.querySelector('.ms-fp-num');
+  if(num && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)){
+    const t0 = performance.now() + 1000, dur = 700;
+    const step = now=>{
+      if(!num.isConnected) return;
+      const k = Math.min(1, Math.max(0, (now - t0) / dur));
+      num.textContent = Math.round(n * (1 - Math.pow(1-k, 3))).toLocaleString('ar-EG');
+      if(k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  } else if(num){ num.textContent = n.toLocaleString('ar-EG'); }
+  o.scrollTop = 0;
+}
+function msCloseFamily(now){
+  const o = document.getElementById('ms-fp'); if(!o) return;
+  if(o.classList.contains('is-closing') && !now) return;
+  document.body.style.overflow = o.__ov || '';
+  if(now){ o.remove(); return; }
+  o.classList.add('is-closing'); setTimeout(()=>o.remove(), 470);
+}
 function msClosePerson(now){
   const o = document.getElementById('ms-sheet'); if(!o) return;
   if(now){ o.remove(); return; }
   o.classList.add('is-closing'); setTimeout(()=>o.remove(), 240);
 }
 document.addEventListener('click', e=>{
+  const fc = e.target.closest && e.target.closest('[data-ms-fpclose]');
+  if(fc){ msCloseFamily(); return; }
+  const fo = e.target.closest && e.target.closest('[data-ms-fam]');
+  if(fo){ msOpenFamily(+fo.dataset.msFam, e); return; }
   const c = e.target.closest && e.target.closest('[data-ms-close]');
   if(c){ msClosePerson(); return; }
   const p = e.target.closest && e.target.closest('[data-ms-p]');
   if(p) msOpenPerson(p.dataset.msP);
 }, true);
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') msClosePerson(); });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ if(document.getElementById('ms-sheet')) msClosePerson(); else msCloseFamily(); }
+  if((e.key==='Enter' || e.key===' ') && e.target && e.target.matches && e.target.matches('.ms-famhead[data-ms-fam]')){ e.preventDefault(); msOpenFamily(+e.target.dataset.msFam, null); }
+});
 
 /* ============================= أدمن: تعديل هيكلة الاجتماع ============================= */
 const MS_FAM_EMOJI = {mic:'🎤', heart:'❤️', video:'🎥'};
 function msIsLocked(key){ const sl = MS_DATA.slots && MS_DATA.slots[key]; return !!(sl && sl.locked); }
 function renderAdminStructureTab(){
   const S = MEETING_STRUCTURE;
-  const row = (key, m, tone)=>{
+  const row = (key, m, tone, ex)=>{
     const r = msResolve(key, m);
     const lk = msIsLocked(key);
     const art = r.photo ? `<span class="ph" style="background-image:url('${msPhotoCss(r.photo)}')"></span>` : msAvatar(m.g||'m');
     return `<div class="ms-adm-row${lk?' is-locked':''}">
       <button type="button" class="ms-adm-av" style="--a:${tone.a};--b:${tone.b}" data-ms-adm="pick" data-key="${key}" aria-label="تغيير الصورة"${lk?' disabled':''}>${art}<span class="cam">${lk?'🔒':'📷'}</span></button>
       <div class="ms-adm-f">
-        <label>${escapeHtml(m.role)}</label>
+        ${ex ? `<input type="text" class="ms-adm-role" data-fam="${ex.gi}" data-id="${ex.id}" value="${escapeHtml(m.role)}" placeholder="المسمى" maxlength="30"${lk?' disabled':''} />` : `<label>${escapeHtml(m.role)}</label>`}
         <input type="text" class="ms-adm-name" data-key="${key}" value="${escapeHtml(r.name)}" placeholder="اكتب الاسم" maxlength="60"${lk?' disabled':''} />
         <div class="ms-adm-tools">
           ${(r.photo && !lk) ? `<button type="button" class="ms-adm-del" data-ms-adm="delphoto" data-key="${key}">حذف الصورة</button>` : ''}
           <button type="button" class="ms-adm-lock${lk?' on':''}" data-ms-adm="lock" data-key="${key}">${lk?'🔒 الخانة مقفولة — دوس للفتح':'🔓 قفل الخانة'}</button>
+          ${ex ? `<button type="button" class="ms-adm-del" data-ms-adm="delmember" data-fam="${ex.gi}" data-id="${ex.id}">🗑 حذف العضو</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -10342,9 +10469,10 @@ function renderAdminStructureTab(){
   const lead = S.leaders.map((m,i)=>row('L'+i, m, MS_LEADER_TONES[i%2])).join('');
   const fams = S.families.map((f,gi)=>`
     <div class="admin-section-title"><span>${MS_FAM_EMOJI[f.icon]||'👥'}</span><span>${escapeHtml(f.title)}</span></div>
-    <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}</div>`).join('');
+    <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}${msExtras(gi).map((e,i)=>row(`X${gi}-${e.id}`, {role:e.role||'عضو', g:'m'}, MS_MEMBER_TONES[i%2], {gi, id:e.id})).join('')}
+      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30" /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة عضو</button></div></div>`).join('');
   return `
-    <div class="hint" style="margin:0 0 14px;">الأسماء والصور اللي هتحطها هنا بتظهر لكل المشاركين في صفحة «هيكلة الاجتماع» (من خانة المزيد). دوس على الصورة عشان تغيّرها.</div>
+    <div class="hint" style="margin:0 0 14px;">الأسماء والصور اللي هتحطها هنا بتظهر لكل المشاركين في صفحة «هيكلة الاجتماع» (من خانة المزيد). دوس على الصورة عشان تغيّرها. وتقدر تضيف أعضاء لأي أسرة، وهيظهروا لما المشارك يدوس على اسم الأسرة.</div>
     <div class="admin-section-title"><span>👑</span><span>القيادة</span></div>
     <div class="card ms-adm-card">${lead}</div>
     ${fams}
@@ -10355,6 +10483,10 @@ function renderAdminStructureTab(){
 }
 function msAdmCollectNames(){
   if(!MS_DATA.slots) MS_DATA.slots = {};
+  document.querySelectorAll('.ms-adm-role').forEach(i=>{
+    const e = msExtras(i.dataset.fam).find(x=>x.id===i.dataset.id);
+    if(e) e.role = i.value.trim() || 'عضو';
+  });
   document.querySelectorAll('.ms-adm-name').forEach(i=>{
     const k = i.dataset.key; if(!k) return;
     (MS_DATA.slots[k] = MS_DATA.slots[k] || {}).name = i.value.trim();
@@ -10393,6 +10525,34 @@ function msCropPhoto(file){
     };
     reader.readAsDataURL(file);
   });
+}
+async function msAdmAddMember(gi){
+  msAdmCollectNames();
+  const inp = document.querySelector(`.ms-adm-newrole[data-fam="${gi}"]`);
+  const role = (inp && inp.value.trim()) || 'عضو';
+  if(!MS_DATA.extra) MS_DATA.extra = {};
+  const arr = (MS_DATA.extra[gi] = MS_DATA.extra[gi] || []);
+  if(arr.length >= 30){ showToast('وصلت للحد الأقصى للأعضاء', true); return; }
+  arr.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5), role});
+  const ok = await saveMeetingStructureData();
+  if(!ok) arr.pop();
+  showToast(ok ? 'اتضاف العضو ✅' : 'حصلت مشكلة في الحفظ، جرّب تاني', !ok);
+  render();
+}
+async function msAdmDeleteMember(gi, id){
+  const key = `X${gi}-${id}`;
+  if(msIsLocked(key)){ showToast('الخانة مقفولة، افتحها الأول', true); return; }
+  if(!window.confirm('تحذف العضو ده؟')) return;
+  msAdmCollectNames();
+  const arr = msExtras(gi), idx = arr.findIndex(x=>x.id===id); if(idx<0) return;
+  const removed = arr.splice(idx,1)[0];
+  const had = MS_DATA.slots[key]; delete MS_DATA.slots[key];
+  const ok = await saveMeetingStructureData();
+  if(!ok){ arr.splice(idx,0,removed); if(had) MS_DATA.slots[key] = had; showToast('حصلت مشكلة في الحفظ، جرّب تاني', true); render(); return; }
+  try{ await window.storage.delete('glavera-ms-photo-'+key, true); }catch(e){}
+  delete MS_PHOTO_CACHE[key];
+  showToast('اتحذف العضو');
+  render();
 }
 async function msAdmToggleLock(key){
   msAdmCollectNames();
@@ -10444,6 +10604,8 @@ document.addEventListener('click', e=>{
   } else if(act==='save'){ msAdmSaveNames(); }
   else if(act==='delphoto'){ msAdmDeletePhoto(key); }
   else if(act==='lock'){ msAdmToggleLock(key); }
+  else if(act==='addmember'){ msAdmAddMember(el.dataset.fam); }
+  else if(act==='delmember'){ msAdmDeleteMember(el.dataset.fam, el.dataset.id); }
 }, true);
 function homeRetreatCardHtml(){
   return `
@@ -24165,7 +24327,7 @@ const ADMIN_HUB_ITEMS = [
   {group:'content',tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
   {group:'content',tab:'cardshop', short:"ثيمات وطلبات الكروت", desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
   {group:'content',tab:'quizq', short:"أسئلة تحدي الأسئلة", desc:"إضافة وتعديل وحذف أسئلة لعبة تحدي الأسئلة",    icon:'❓', label:'أسئلة التحدي',        color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
-  {group:'content',tab:'structure', short:"أسماء وصور الأمناء والأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
+  {group:'content',tab:'structure', short:"أسماء وصور الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
   {group:'system', tab:'settings', short:"التوقيت والهوية والأمان", desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات المؤتمر',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
   {group:'system', tab:'trash', short:"استرجاع أو حذف نهائي", desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
