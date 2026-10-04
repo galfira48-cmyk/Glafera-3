@@ -827,6 +827,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ms-adm-tools{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:6px; }
   .ms-adm-lock{ padding:5px 11px; border-radius:999px; border:1.5px solid var(--border); background:transparent; color:inherit; font-family:inherit; font-size:11.5px; font-weight:800; cursor:pointer; }
   .ms-adm-lock.on{ background:rgba(244,183,64,.16); border-color:#F4B740; color:#F4B740; }
+  .ms-adm-lock:disabled{ opacity:.7; cursor:not-allowed; }
+  .ms-adm-lockall{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 14px; margin:0 0 14px; border-radius:16px; border:1.5px solid var(--border); background:rgba(127,127,127,.06); }
+  .ms-adm-lockall.on{ background:rgba(244,183,64,.14); border-color:#F4B740; }
+  .ms-adm-lockall .t{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .ms-adm-lockall .t b{ font-size:14px; font-weight:900; }
+  .ms-adm-lockall .t small{ font-size:11.5px; opacity:.75; line-height:1.5; }
+  .ms-adm-lockall-btn{ flex:none; padding:9px 16px; border-radius:999px; border:0; background:linear-gradient(145deg,#F4B740,#FF6A88); color:#16275A; font-family:inherit; font-size:13px; font-weight:900; cursor:pointer; }
   .ms-adm-row.is-locked .ms-adm-name{ opacity:.6; }
   .ms-adm-row.is-locked .ms-adm-av{ filter:grayscale(.35); cursor:not-allowed; }
   .ms-adm-del{ margin-top:6px; padding:2px 0; background:none; border:0; color:var(--danger); font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
@@ -10446,7 +10453,8 @@ document.addEventListener('keydown', e=>{
 
 /* ============================= أدمن: تعديل هيكلة الاجتماع ============================= */
 const MS_FAM_EMOJI = {mic:'🎤', heart:'❤️', video:'🎥'};
-function msIsLocked(key){ const sl = MS_DATA.slots && MS_DATA.slots[key]; return !!(sl && sl.locked); }
+function msAllLocked(){ return !!MS_DATA.allLocked; }
+function msIsLocked(key){ if(msAllLocked()) return true; const sl = MS_DATA.slots && MS_DATA.slots[key]; return !!(sl && sl.locked); }
 function renderAdminStructureTab(){
   const S = MEETING_STRUCTURE;
   const row = (key, m, tone, ex)=>{
@@ -10460,8 +10468,8 @@ function renderAdminStructureTab(){
         <input type="text" class="ms-adm-name" data-key="${key}" value="${escapeHtml(r.name)}" placeholder="اكتب الاسم" maxlength="60"${lk?' disabled':''} />
         <div class="ms-adm-tools">
           ${(r.photo && !lk) ? `<button type="button" class="ms-adm-del" data-ms-adm="delphoto" data-key="${key}">حذف الصورة</button>` : ''}
-          <button type="button" class="ms-adm-lock${lk?' on':''}" data-ms-adm="lock" data-key="${key}">${lk?'🔒 الخانة مقفولة — دوس للفتح':'🔓 قفل الخانة'}</button>
-          ${ex ? `<button type="button" class="ms-adm-del" data-ms-adm="delmember" data-fam="${ex.gi}" data-id="${ex.id}">🗑 حذف العضو</button>` : ''}
+          <button type="button" class="ms-adm-lock${lk?' on':''}" data-ms-adm="lock" data-key="${key}"${msAllLocked()?' disabled':''}>${msAllLocked()?'🔒 مقفولة بالقفل العام':(lk?'🔒 الخانة مقفولة — دوس للفتح':'🔓 قفل الخانة')}</button>
+          ${ex ? `<button type="button" class="ms-adm-del" data-ms-adm="delmember" data-fam="${ex.gi}" data-id="${ex.id}"${lk?' disabled':''}>🗑 حذف العضو</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -10470,8 +10478,13 @@ function renderAdminStructureTab(){
   const fams = S.families.map((f,gi)=>`
     <div class="admin-section-title"><span>${MS_FAM_EMOJI[f.icon]||'👥'}</span><span>${escapeHtml(f.title)}</span></div>
     <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}${msExtras(gi).map((e,i)=>row(`X${gi}-${e.id}`, {role:e.role||'عضو', g:'m'}, MS_MEMBER_TONES[i%2], {gi, id:e.id})).join('')}
-      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30" /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة عضو</button></div></div>`).join('');
+      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30"${msAllLocked()?' disabled':''} /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}"${msAllLocked()?' disabled':''}>➕ إضافة عضو</button></div></div>`).join('');
+  const gl = msAllLocked();
   return `
+    <div class="ms-adm-lockall${gl?' on':''}">
+      <div class="t"><b>${gl?'🔒 هيكلة الاجتماع مقفولة':'🔓 هيكلة الاجتماع مفتوحة'}</b><small>${gl?'مفيش حد يقدر يعدّل الأسماء أو الصور أو الأعضاء لحد ما تفتحها.':'اقفلها كلها مرة واحدة عشان محدش يغيّر حاجة بالغلط.'}</small></div>
+      <button type="button" class="ms-adm-lockall-btn" data-ms-adm="lockall">${gl?'🔓 فتح الكل':'🔒 قفل الكل'}</button>
+    </div>
     <div class="hint" style="margin:0 0 14px;">الأسماء والصور اللي هتحطها هنا بتظهر لكل المشاركين في صفحة «هيكلة الاجتماع» (من خانة المزيد). دوس على الصورة عشان تغيّرها. وتقدر تضيف أعضاء لأي أسرة، وهيظهروا لما المشارك يدوس على اسم الأسرة.</div>
     <div class="admin-section-title"><span>👑</span><span>القيادة</span></div>
     <div class="card ms-adm-card">${lead}</div>
@@ -10493,6 +10506,7 @@ function msAdmCollectNames(){
   });
 }
 async function msAdmSaveNames(){
+  if(msAllLocked()){ showToast('الهيكلة كلها مقفولة، افتحها الأول', true); return; }
   msAdmCollectNames();
   const ok = await saveMeetingStructureData();
   showToast(ok ? 'اتحفظت الأسماء ✅' : 'حصلت مشكلة في الحفظ، جرّب تاني', !ok);
@@ -10527,6 +10541,7 @@ function msCropPhoto(file){
   });
 }
 async function msAdmAddMember(gi){
+  if(msAllLocked()){ showToast('الهيكلة كلها مقفولة، افتحها الأول', true); return; }
   msAdmCollectNames();
   const inp = document.querySelector(`.ms-adm-newrole[data-fam="${gi}"]`);
   const role = (inp && inp.value.trim()) || 'عضو';
@@ -10554,7 +10569,17 @@ async function msAdmDeleteMember(gi, id){
   showToast('اتحذف العضو');
   render();
 }
+async function msAdmToggleAll(){
+  if(!MS_DATA.slots) MS_DATA.slots = {};
+  if(!MS_DATA.allLocked) msAdmCollectNames();
+  MS_DATA.allLocked = !MS_DATA.allLocked;
+  const ok = await saveMeetingStructureData();
+  if(!ok) MS_DATA.allLocked = !MS_DATA.allLocked;
+  showToast(ok ? (MS_DATA.allLocked ? 'اتقفلت هيكلة الاجتماع كلها 🔒' : 'اتفتحت هيكلة الاجتماع 🔓') : 'حصلت مشكلة في الحفظ، جرّب تاني', !ok);
+  render();
+}
 async function msAdmToggleLock(key){
+  if(msAllLocked()){ showToast('الهيكلة كلها مقفولة، افتحها الأول', true); return; }
   msAdmCollectNames();
   const sl = (MS_DATA.slots[key] = MS_DATA.slots[key] || {});
   sl.locked = !sl.locked;
@@ -10604,6 +10629,7 @@ document.addEventListener('click', e=>{
   } else if(act==='save'){ msAdmSaveNames(); }
   else if(act==='delphoto'){ msAdmDeletePhoto(key); }
   else if(act==='lock'){ msAdmToggleLock(key); }
+  else if(act==='lockall'){ msAdmToggleAll(); }
   else if(act==='addmember'){ msAdmAddMember(el.dataset.fam); }
   else if(act==='delmember'){ msAdmDeleteMember(el.dataset.fam, el.dataset.id); }
 }, true);
