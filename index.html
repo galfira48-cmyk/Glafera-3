@@ -256,6 +256,29 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ---------- login page ---------- */
   .login-page{animation:pageIn .5s ease;}
   @keyframes pageIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- saved account cards (quick login) ---------- */
+  .sa-wrap{margin-top:18px; animation:pageIn .5s ease;}
+  .sa-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--text-muted); text-align:center; margin-bottom:10px;}
+  .sa-card{position:relative; display:flex; align-items:center; gap:14px; padding:16px; border-radius:20px; cursor:pointer; margin-bottom:10px;
+    background:linear-gradient(145deg,var(--surface-2),var(--surface)); border:1.5px solid rgba(244,183,64,.5);
+    box-shadow:0 10px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:transform .15s ease, box-shadow .2s ease; -webkit-tap-highlight-color:transparent; user-select:none;}
+  .sa-card:active{transform:scale(.975);}
+  .sa-av{width:58px; height:58px; border-radius:50%; flex:0 0 auto; background-size:cover; background-position:center;
+    border:2px solid var(--gold); box-shadow:0 0 0 4px rgba(244,183,64,.14);}
+  .sa-av-ini{display:flex; align-items:center; justify-content:center; background:#3B4A7A; color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:20px;}
+  .sa-info{flex:1; min-width:0;}
+  .sa-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .sa-sub{font-size:12px; color:var(--text-muted); margin-top:3px;}
+  .sa-go{flex:0 0 auto; display:flex; align-items:center; gap:4px; margin-top:12px; padding:7px 12px 7px 9px; border-radius:999px;
+    background:var(--gold); color:#1a1633; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px;}
+  .sa-go svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;}
+  .sa-x{position:absolute; top:5px; left:6px; width:22px; height:22px; border-radius:50%; border:0; padding:0; cursor:pointer;
+    background:rgba(128,128,160,.16); color:var(--text-muted); font-size:10px; line-height:22px; text-align:center;}
+  .sa-other, .sa-back{display:block; width:100%; margin-top:4px; padding:12px; background:transparent; border:1.5px dashed var(--border);
+    border-radius:14px; color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:700; font-size:13px; cursor:pointer;}
+  .sa-back{margin:14px 0 0; border-style:solid;}
   .login-hero{text-align:center; padding:18px 6px 8px;}
   .login-hero .logo-wrap{margin:0 auto 14px; width:100px; height:100px; border-radius:50%; position:relative;}
   .login-hero .logo-wrap svg{width:40px; height:40px;}
@@ -10477,14 +10500,16 @@ function renderLogin(){
         <div class="brand-title">اجتماع جامعة وخريجين الأنبا كاراس</div>
         <div class="tag">بوابة المشاركين — سجّل حضورك وتابع نقاطك</div>
       </div>
-      <div class="card otp-card" style="margin-top:18px;">
+      ${savedAccountsHtml()}
+      ${loginFormOpen() ? `<div class="card otp-card" style="margin-top:18px;">
         <div class="otp-lock">🔐</div>
         <div class="otp-title">تسجيل الدخول</div>
         <div class="otp-sub">ادخل برقم موبايلك والباسورد اللي اخترته</div>
         <input type="tel" id="login-phone" class="field" inputmode="tel" autocomplete="tel" placeholder="رقم الموبايل" style="margin-top:14px;text-align:center;" dir="ltr" />
         <input type="password" id="login-pass" class="field" autocomplete="current-password" placeholder="الباسورد" style="margin-top:10px;text-align:center;" dir="ltr" />
         <button type="button" class="btn btn-primary" id="otp-submit-btn" data-action="submit-login" style="margin-top:16px;width:100%;">دخول</button>
-      </div>
+        ${(state._loginOther && savedAccountsGet().length) ? `<button type="button" class="sa-back" data-action="login-back-cards">رجوع لحسابك المحفوظ</button>` : ''}
+      </div>` : ''}
       ${CONF_SETTINGS.signupClosed ? '' : `<div class="signup-cta"><span>أول مرة تدخل؟</span><button type="button" class="btn btn-outline" data-action="go-signup" style="width:100%;margin-top:8px;">✨ أنشئ حسابك بنفسك</button></div>`}
       <div class="designer-credit">صُمم بواسطة <span class="designer-credit-name">Te epistoly</span></div>
     </div>
@@ -28131,6 +28156,10 @@ document.addEventListener('click', (e)=>{
   if(action==='fill-code'){ fillOtpBoxes(el.dataset.code); }
   else if(action==='go-admin'){ go('admin'); }
   else if(action==='submit-login'){ doLogin(); }
+  else if(action==='saved-login'){ savedAccountLogin(el.dataset.pid); }
+  else if(action==='saved-remove'){ savedAccountRemove(el.dataset.pid); }
+  else if(action==='login-other'){ state._loginOther = true; render(); }
+  else if(action==='login-back-cards'){ state._loginOther = false; render(); }
   else if(action==='go-signup'){ SU.step = 1; SU.dir = 1; SU._entered = false; SU._pct = null; SU._prev = null; state.view='signup'; render(); }
   else if(action==='signup-back'){ state.view='login'; render(); }
   else if(action==='submit-signup'){ doSignup(); }
@@ -32066,7 +32095,87 @@ async function sha256Hex(str){
 const AUTH_SALT = 'meeting-auth-v1';
 function phoneKeyHash(phone){ return sha256Hex(AUTH_SALT+':ph:'+phone); }
 function passHash(phone, pass){ return sha256Hex(AUTH_SALT+':pw:'+phone+':'+pass); }
-function rememberLogin(pid){ try{ localStorage.setItem('meeting-pid', String(pid)); }catch(e){} }
+function rememberLogin(pid){ try{ localStorage.setItem('meeting-pid', String(pid)); }catch(e){} try{ savedAccountUpsert(pid); }catch(e){} }
+
+/* ============================= حسابات الجهاز المحفوظة (كارت دخول سريع) ============================= */
+const SAVED_ACC_KEY = 'meeting-accounts';
+function savedAccountsGet(){ try{ const a = JSON.parse(localStorage.getItem(SAVED_ACC_KEY)||'[]'); return Array.isArray(a) ? a.filter(x=>x && x.id) : []; }catch(e){ return []; } }
+function savedAccountsSet(a){ try{ localStorage.setItem(SAVED_ACC_KEY, JSON.stringify(a.slice(0,5))); }catch(e){} }
+function savedThumb(src){
+  return new Promise(res=>{
+    if(!src){ res(''); return; }
+    try{
+      const img = new Image();
+      img.onload = ()=>{
+        try{
+          const s = 96, c = document.createElement('canvas'); c.width = c.height = s;
+          const m = Math.min(img.width, img.height);
+          c.getContext('2d').drawImage(img, (img.width-m)/2, (img.height-m)/2, m, m, 0, 0, s, s);
+          res(c.toDataURL('image/jpeg', 0.8));
+        }catch(e){ res(/^data:/.test(src) && src.length < 60000 ? src : ''); }
+      };
+      img.onerror = ()=>res('');
+      img.src = src;
+    }catch(e){ res(''); }
+  });
+}
+function savedAccountSetThumb(pid, photo){
+  savedThumb(photo).then(t=>{
+    if(!t) return;
+    const l = savedAccountsGet(); const a = l.find(x=>x.id===String(pid));
+    if(a && a.thumb !== t){ a.thumb = t; savedAccountsSet(l); }
+  });
+}
+function savedAccountUpsert(pid){
+  const p = PARTICIPANTS.find(x=>x.id===String(pid)); if(!p) return;
+  const list = savedAccountsGet().filter(x=>x.id!==String(pid));
+  const old = savedAccountsGet().find(x=>x.id===String(pid));
+  list.unshift({ id:String(pid), name:p.name||'', thumb:(old&&old.thumb)||'', ts:Date.now() });
+  savedAccountsSet(list);
+  if(p.photo) savedAccountSetThumb(pid, p.photo);
+}
+function savedAccountsRefresh(){
+  const list = savedAccountsGet(); let changed = false;
+  list.forEach(a=>{
+    const p = PARTICIPANTS.find(x=>x.id===a.id); if(!p) return;
+    if(p.name && p.name !== a.name){ a.name = p.name; changed = true; }
+    if(p.photo) savedAccountSetThumb(a.id, p.photo);
+  });
+  if(changed) savedAccountsSet(list);
+}
+function savedAccountRemove(pid){
+  savedAccountsSet(savedAccountsGet().filter(x=>x.id!==String(pid)));
+  if(!savedAccountsGet().length) state._loginOther = false;
+  showToast('اتشال الحساب من الجهاز ده');
+  render();
+}
+function savedAccountLogin(pid){
+  if(!pid) return;
+  const p = PARTICIPANTS.find(x=>x.id===String(pid));
+  if(!p && __loginDataReady){ showToast('مش لاقي الحساب ده — ادخل بالرقم والباسورد', true); state._loginOther = true; render(); return; }
+  doLoginWithCode(String(pid));
+}
+function loginFormOpen(){ return !savedAccountsGet().length || !!state._loginOther; }
+function savedAccountsHtml(){
+  const list = savedAccountsGet();
+  if(!list.length || state._loginOther) return '';
+  const chev = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+  const cards = list.map(a=>{
+    const live = PARTICIPANTS.find(x=>x.id===a.id);
+    const name = (live && live.name) || a.name || 'حسابي';
+    const photo = a.thumb || (live && live.photo) || '';
+    const av = photo
+      ? `<div class="sa-av" style="background-image:url('${String(photo).replace(/'/g,'%27')}')"></div>`
+      : `<div class="sa-av sa-av-ini">${escapeHtml(initials(name))}</div>`;
+    return `<div class="sa-card" role="button" tabindex="0" data-action="saved-login" data-pid="${escapeHtml(a.id)}">
+      ${av}
+      <div class="sa-info"><div class="sa-name">${escapeHtml(name)}</div><div class="sa-sub">اضغط للدخول مباشرة</div></div>
+      <div class="sa-go">دخول ${chev}</div>
+      <button type="button" class="sa-x" data-action="saved-remove" data-pid="${escapeHtml(a.id)}" aria-label="إزالة الحساب من الجهاز">✕</button>
+    </div>`;
+  }).join('');
+  return `<div class="sa-wrap"><div class="sa-title">حسابك على الجهاز ده</div>${cards}<button type="button" class="sa-other" data-action="login-other">تسجيل الدخول بحساب آخر</button></div>`;
+}
 function forgetLogin(){ try{ localStorage.removeItem('meeting-pid'); }catch(e){} }
 async function doLogin(){
   if(state._loggingIn) return;
@@ -32757,6 +32866,7 @@ function loginWaitAndRetry(retry){
     const sp = localStorage.getItem('meeting-pid');
     if(sp && PARTICIPANTS.some(x=>x.id===sp) && (state.view==='splash' || state.view==='login')){ doLoginWithCode(sp); }
   }catch(e){}
+  try{ savedAccountsRefresh(); }catch(e){}
   render();
   startLivePolling();
   startPresenceAndInviteLoop();
