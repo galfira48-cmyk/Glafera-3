@@ -9,8 +9,8 @@
 <meta name="theme-color" content="#171449">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-title" content="اجتماع جامعة وخريجين الأنبا كاراس">
-<title>اجتماع جامعة وخريجين الأنبا كاراس</title>
+<meta name="apple-mobile-web-app-title" content="اجتماع جامعة">
+<title>اجتماع جامعة</title>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://firebaseio.com">
@@ -6959,6 +6959,24 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .sp-slot,.sp-chip,.sp-strwrap *,.su-eye::after,.sp-rip,.su-card.sp-alert,.su-page .su-nav .su-next::after,.sp-spark,.sp-flash,.sp-row,.sp-prog,.sp-prog *,.sp-crop,.sp-crop *{animation:none!important;transition:none!important}
 }
 </style>
+<style id="login-glow-up">
+/* ===== Saved account card only ===== */
+.sa-card{padding:20px 16px; border-radius:26px; border:1.5px solid rgba(244,183,64,.6); overflow:hidden;
+  background:radial-gradient(120% 150% at 100% 0%, rgba(244,183,64,.2), transparent 55%),
+             radial-gradient(90% 120% at 0% 100%, rgba(45,212,191,.12), transparent 60%),
+             linear-gradient(145deg,var(--surface-2),var(--surface));
+  box-shadow:0 18px 38px -12px rgba(0,0,0,.5), 0 0 30px rgba(244,183,64,.14), inset 0 1px 0 rgba(255,255,255,.1);}
+.sa-card::before{content:''; position:absolute; top:0; right:18%; left:18%; height:2px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:.8;}
+.sa-av{width:68px; height:68px; border:2.5px solid var(--gold);
+  box-shadow:0 0 0 5px rgba(244,183,64,.16), 0 0 22px rgba(244,183,64,.3), 0 8px 18px rgba(0,0,0,.35);}
+.sa-name{font-size:18px; font-weight:900;}
+.sa-sub{font-size:12.5px; margin-top:4px;}
+.sa-go{margin-top:12px; padding:10px 16px 10px 12px; font-size:14px; gap:5px;
+  background:linear-gradient(95deg,var(--gold),var(--gold-2)); box-shadow:0 8px 18px -6px rgba(244,183,64,.6);}
+.sa-card:active .sa-go{transform:scale(.95);}
+.sa-x{width:24px; height:24px; line-height:24px; top:8px; left:8px;}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -7308,7 +7326,7 @@ function vposLast4(pid){ return String(visaNumber(pid)).replace(/\s/g,'').slice(
 function vposPaperHtml(r){
   const a = r.amount ? `<div class="rp-amt ${r.amount.sign==='+'?'pos':'neg'}" dir="ltr">${r.amount.sign}${r.amount.value}</div><div class="rp-amt-u">نقطة</div>` : '';
   return `<div class="vpos-paper">
-    <div class="rp-brand">اجتماع جامعة وخريجين الأنبا كاراس</div><div class="rp-sub">إيصال عملية · فيزا Games</div>
+    <div class="rp-brand">اجتماع جامعة</div><div class="rp-sub">إيصال عملية · فيزا Games</div>
     <div class="rp-ok">✓ عملية ناجحة</div>
     <div class="rp-title">${r.title}</div>${a}
     ${r.lines.map(x=>`<div class="rp-line"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}
@@ -7316,7 +7334,7 @@ function vposPaperHtml(r){
   </div>`;
 }
 function vposReceiptPlain(r){
-  const head = ['اجتماع جامعة وخريجين الأنبا كاراس — إيصال عملية', vposText(r.title)];
+  const head = ['اجتماع جامعة — إيصال عملية', vposText(r.title)];
   if(r.amount) head.push('المبلغ: ' + r.amount.sign + r.amount.value + ' نقطة');
   return head.concat(r.lines.map(x=>vposText(x[0])+': '+vposText(x[1])), ['REF: '+r.ref]).join('\n');
 }
@@ -7336,7 +7354,7 @@ function vposDrawReceipt(r){
   x.closePath(); x.fillStyle = '#fff'; x.fill(); x.restore();
   const T = (t, px, py, font, col, al, dir, mw)=>{ x.font = font; x.fillStyle = col; x.textAlign = al; x.direction = dir || 'rtl'; if(mw) x.fillText(t, px, py, mw); else x.fillText(t, px, py); };
   const cx = x0 + W/2; let y = y0;
-  T('اجتماع جامعة وخريجين الأنبا كاراس', cx, y+40*S, '800 24px '+F, '#1d2230', 'center');
+  T('اجتماع جامعة', cx, y+40*S, '800 24px '+F, '#1d2230', 'center');
   T('إيصال عملية · فيزا Games', cx, y+62*S, '500 12px '+F, '#7b8194', 'center');
   x.fillStyle = '#e7f8f0'; x.beginPath(); x.roundRect ? x.roundRect(cx-62*S, y+76*S, 124*S, 26*S, 13*S) : x.rect(cx-62*S, y+76*S, 124*S, 26*S); x.fill();
   T('✓ عملية ناجحة', cx, y+94*S, '800 12px '+F, '#18a06b', 'center');
@@ -8361,7 +8379,7 @@ function visaChipNumberOpen(){
   const old = document.getElementById('vch-overlay'); if(old) old.remove();
   const vc = (VISA_CARDS && VISA_CARDS[pid]) || {}, th = vposThemeOf(pid);
   const num = visaNumber(pid), holder = String(vc.holder || '').trim();
-  const shareText = 'فيزا اجتماع جامعة وخريجين الأنبا كاراس' + (holder ? ' — ' + holder : '') + '\n' + num + '\nحوّل لي من صفحة الفيزا ← تحويل';
+  const shareText = 'فيزا اجتماع جامعة' + (holder ? ' — ' + holder : '') + '\n' + num + '\nحوّل لي من صفحة الفيزا ← تحويل';
   const ov = document.createElement('div');
   ov.className = 'vpos-overlay'; ov.id = 'vch-overlay'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
   ov.innerHTML = `
@@ -9810,7 +9828,7 @@ function dailyVerseCardHtml(pid){
     const b=e.target.closest && e.target.closest('[data-vd]'); if(!b) return;
     const c=b.closest('.vd-card'); if(!c) return;
     const v=(c.querySelector('.vd-verse')||{}).textContent||'', r=(c.querySelector('.vd-ref')||{}).textContent||'';
-    const txt=v+(r?'\n— '+r:'')+'\n\nاجتماع جامعة وخريجين الأنبا كاراس';
+    const txt=v+(r?'\n— '+r:'')+'\n\nاجتماع جامعة';
     if(b.dataset.vd==='share' && navigator.share){ navigator.share({text:txt}).catch(function(){}); return; }
     copyTxt(txt).then(function(){ const h=b.innerHTML; b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'; setTimeout(function(){ b.innerHTML=h; },1400); try{ showToast('تم نسخ الآية'); }catch(_){} },function(){ try{ showToast('تعذّر النسخ',true); }catch(_){} });
   });
@@ -9848,12 +9866,12 @@ function checkConfTimeAlerts(){
   let changed = false;
   if(now >= start-3600000 && now < start && !extra.confAlertsSent.beforeStart){
     pushNotification(state.pid, 'باقي ساعة على بداية الاجتماع — يلا نستعد! 🎉', '⏰');
-    notifyNative('اجتماع جامعة وخريجين الأنبا كاراس', 'باقي ساعة على بداية الاجتماع');
+    notifyNative('اجتماع جامعة', 'باقي ساعة على بداية الاجتماع');
     extra.confAlertsSent.beforeStart = true; changed = true;
   }
   if(now >= end-3600000 && now < end && !extra.confAlertsSent.beforeEnd){
     pushNotification(state.pid, 'باقي ساعة على ختام الاجتماع — متفوتش آخر الفقرات 💫', '⏰');
-    notifyNative('اجتماع جامعة وخريجين الأنبا كاراس', 'باقي ساعة على ختام الاجتماع');
+    notifyNative('اجتماع جامعة', 'باقي ساعة على ختام الاجتماع');
     extra.confAlertsSent.beforeEnd = true; changed = true;
   }
   if(changed) saveProfileExtra(PROFILE_EXTRA);
@@ -9924,7 +9942,7 @@ function myExtra(pid){ return PROFILE_EXTRA[pid] || (PROFILE_EXTRA[pid] = {}); }
 const TRANSLATIONS = {
   ar: {
     nav_badges:'الأوسمة', nav_quests:'التحديات', nav_quests_sub:'مهام يومية بمكافآت فورية',
-    nav_wall:'حائط اجتماع جامعة وخريجين الأنبا كاراس', nav_wall_sub:'شارك رأيك عن الاجتماع',
+    nav_wall:'حائط اجتماع جامعة', nav_wall_sub:'شارك رأيك عن الاجتماع',
     nav_opinion:'رأيك', nav_opinion_sub:'إيجابيات، سلبيات، واقتراحاتك',
     nav_structure:'هيكلة الاجتماع', nav_structure_sub:'الأمناء وأسر الخدمة',
     opinion_title:'رأيك', opinion_hint:'رأيك بيهمنا فعلاً — اكتب اللي حابب تقوله وهيوصل للمنظمين مباشرة',
@@ -10015,7 +10033,7 @@ function checkSessionReminders(){
         const label = info.name || s.name;
         showToast(`⏰ فقرة "${label}" هتبدأ بعد ${diff} دقيقة`);
         if(typeof Notification !== 'undefined' && Notification.permission==='granted'){
-          try{ new Notification('اجتماع جامعة وخريجين الأنبا كاراس', { body:`فقرة "${label}" هتبدأ بعد ${diff} دقيقة`, icon:'icon-192.png' }); }catch(e){}
+          try{ new Notification('اجتماع جامعة', { body:`فقرة "${label}" هتبدأ بعد ${diff} دقيقة`, icon:'icon-192.png' }); }catch(e){}
         }
       }
     });
@@ -10474,7 +10492,7 @@ function renderSplash(){
         <div class="splash-ring-inner"></div>
         <div class="splash-logo ${CONF_SETTINGS.logo?'has-custom-logo':''}">${confLogoHtml()}</div>
       </div>
-      <div class="splash-title">اجتماع جامعة وخريجين الأنبا كاراس</div>
+      <div class="splash-title">اجتماع جامعة</div>
       <div class="splash-sub">بوابة المشاركين</div>
       <div class="splash-lamp-wrap">
         <div class="splash-lamp-shade"></div>
@@ -10497,7 +10515,7 @@ function renderLogin(){
     <div class="login-page">
       <div class="login-hero">
         <div class="logo-wrap ${CONF_SETTINGS.logo?'has-custom-logo':''}" id="login-logo-gesture">${confLogoHtml()}</div>
-        <div class="brand-title">اجتماع جامعة وخريجين الأنبا كاراس</div>
+        <div class="brand-title">اجتماع جامعة</div>
         <div class="tag">بوابة المشاركين — سجّل حضورك وتابع نقاطك</div>
       </div>
       ${savedAccountsHtml()}
@@ -10617,7 +10635,7 @@ function renderSignup(){
       <div class="su-band">
         <div class="su-deco" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="su-logo-halo"><div class="logo-wrap ${CONF_SETTINGS.logo?'has-custom-logo':''}">${confLogoHtml()}</div></div>
-        <div class="su-church">كنيسة الأنبا كاراس السائح — اجتماع الجامعة والخريجين</div>
+        <div class="su-church">اجتماع الجامعة</div>
         <div class="su-gline"></div>
         <h1 class="su-title">إنشاء حساب مخدوم</h1>
         <div class="su-quote">« لأنك مميز عند ربنا »</div>
@@ -11921,7 +11939,7 @@ function bbCardDraw(cv, text, ref, th){
   const lh = fs*1.75, total = lines.length*lh, y0 = Math.max(400, (H-total)/2+40);
   c.fillStyle = th.fg; lines.forEach((l,i)=>c.fillText(l, W/2, y0+i*lh));
   c.font = '800 40px Cairo, sans-serif'; c.fillStyle = th.accent; c.fillText(ref, W/2, y0+total+60);
-  c.font = '700 30px Cairo, sans-serif'; c.globalAlpha = .7; c.fillText('اجتماع جامعة وخريجين الأنبا كاراس', W/2, H-90); c.globalAlpha = 1;
+  c.font = '700 30px Cairo, sans-serif'; c.globalAlpha = .7; c.fillText('اجتماع جامعة', W/2, H-90); c.globalAlpha = 1;
 }
 async function bbCardOpen(){
   if(!BB.sel.size) return;
@@ -12192,7 +12210,7 @@ function renderProfile(){
         <div class="tb-me" data-action="tile-nav" data-page="me" role="button" aria-label="ملفي الشخصي">
           ${meAvatarHtml(p,'tb-av')}
         </div>
-        <div class="brand-title" style="font-size:18px;">اجتماع جامعة وخريجين الأنبا كاراس</div>
+        <div class="brand-title" style="font-size:18px;">اجتماع جامعة</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <button class="icon-btn theme-toggle-btn" data-action="toggle-theme" title="الوضع الليلي/النهاري"><span class="tt-ico">${(extra.mode==='light')?'☀️':'🌙'}</span></button>
@@ -12217,7 +12235,7 @@ function renderProfile(){
 
 
     <div class="brand-signature">te-epistoly</div>
-    <div class="brand-signature-sub">اجتماع جامعة وخريجين الأنبا كاراس — بإدارة تي إبستولي</div>
+    <div class="brand-signature-sub">اجتماع جامعة — بإدارة تي إبستولي</div>
     <div class="social-dock">
       ${SOCIAL_LINKS.map(s=>`<a class="social-tile ${s.cls}" href="${s.url}" target="_blank" rel="noopener" aria-label="${s.label}">${s.svg}</a>`).join('')}
     </div>
@@ -12688,7 +12706,7 @@ async function doDownloadGalleryPhoto(){
   }
 }
 
-/* ============================= RENDER: WALL PAGE (حائط اجتماع جامعة وخريجين الأنبا كاراس) ============================= */
+/* ============================= RENDER: WALL PAGE (حائط اجتماع جامعة) ============================= */
 function renderWallPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const posts = WALL_POSTS.slice().sort((a,b)=>b.ts-a.ts);
@@ -12702,11 +12720,11 @@ function renderWallPage(){
       </div>
       ${state.adminUnlocked ? `<button type="button" class="icon-btn" style="width:28px;height:28px;flex:0 0 auto;" data-action="admin-delete-wall-post" data-id="${post.id}">✕</button>` : ''}
     </div>`;
-  }).join('') : `<div class="empty-note">💬 لسه محدش كتب رأيه — كن أول من يشارك تجربته في اجتماع جامعة وخريجين الأنبا كاراس</div>`;
+  }).join('') : `<div class="empty-note">💬 لسه محدش كتب رأيه — كن أول من يشارك تجربته في اجتماع جامعة</div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">حائط اجتماع جامعة وخريجين الأنبا كاراس</div>
+      <div class="back-title">حائط اجتماع جامعة</div>
     </div>
     <div class="hint" style="margin-top:-4px;">شارك رأيك أو انطباعك عن الاجتماع ليشوفه كل المشاركين</div>
     <div class="wall-compose">
@@ -12728,7 +12746,7 @@ function renderSharePage(){
     <div class="section-title">شارك التجربة</div>
     <div class="card invite-card">
       <div class="invite-ico">🤝</div>
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14.5px;margin-bottom:4px;">ادعُ زملاءك لاجتماع جامعة وخريجين الأنبا كاراس</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14.5px;margin-bottom:4px;">ادعُ زملاءك لاجتماع جامعة</div>
       <div class="hint" style="margin:0 0 12px;">شارك التجربة مع أصدقائك وخليهم يعيشوا نفس الأجواء</div>
       <button type="button" class="btn btn-primary" style="max-width:260px;margin:0 auto;" data-action="invite-friend">${ICO.invite} دعوة صديق</button>
     </div>
@@ -21409,9 +21427,9 @@ function renderRoomUnoLobby(room){
     </div>`;
 }
 async function doRoomUnoShare(code){
-  const text = `تعال العب أونو معايا في اجتماع جامعة وخريجين الأنبا كاراس! 🃏 كود الغرفة: ${code}`;
+  const text = `تعال العب أونو معايا في اجتماع جامعة! 🃏 كود الغرفة: ${code}`;
   if(navigator.share){
-    try{ await navigator.share({ title:'اجتماع جامعة وخريجين الأنبا كاراس — أونو', text }); return; }catch(e){}
+    try{ await navigator.share({ title:'اجتماع جامعة — أونو', text }); return; }catch(e){}
   }
   try{
     await navigator.clipboard.writeText(text);
@@ -29893,7 +29911,7 @@ async function doDownloadAllQR(){
       <div class="pc-code">#${escapeHtml(p.id)}</div>
     </div>`;
   }).join('');
-  w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>أكواد QR للمشاركين — اجتماع جامعة وخريجين الأنبا كاراس</title>
+  w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>أكواد QR للمشاركين — اجتماع جامعة</title>
   <style>
     body{font-family:'Tajawal',Arial,sans-serif; background:#f3efe4; margin:0; padding:26px;}
     .doc-title{text-align:center; font-family:'Cairo',Arial,sans-serif; font-weight:900; font-size:24px; margin-bottom:4px; color:#221900;}
@@ -29908,7 +29926,7 @@ async function doDownloadAllQR(){
   </style></head><body>
   <button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
   <div class="doc-title">أكواد QR للمشاركين</div>
-  <div class="doc-sub">اجتماع جامعة وخريجين الأنبا كاراس — ${PARTICIPANTS.length} مشارك</div>
+  <div class="doc-sub">اجتماع جامعة — ${PARTICIPANTS.length} مشارك</div>
   <div class="grid">${cardsHtml}</div>
   <script>${QR_LIB_SRC}<\/script>
   <script>
@@ -30455,7 +30473,7 @@ async function doSubmitAdminAlert(){
     await saveProfileExtra(PROFILE_EXTRA);
     ADMIN_ALERTS.push({ id:'al'+Date.now(), text, sendAt:Date.now(), sent:true, hLabel:'الآن' });
     await saveAdminAlerts(ADMIN_ALERTS);
-    try{ await window.storage.set('site-announcement', { id:'a'+Date.now(), icon:'📢', title:'اجتماع جامعة وخريجين الأنبا كاراس', body:text, ts:Date.now() }, true); }catch(e){}
+    try{ await window.storage.set('site-announcement', { id:'a'+Date.now(), icon:'📢', title:'اجتماع جامعة', body:text, ts:Date.now() }, true); }catch(e){}
     showToast('تم إرسال التنبيه لكل المشاركين');
   } else {
     const hourEl = document.getElementById('alert-hour');
@@ -30833,10 +30851,10 @@ async function doCopyRoomCode(btn){
 
 /* ============================= INVITE A FRIEND ============================= */
 async function doInviteFriend(){
-  const text = 'انضم لتجربة اجتماع جامعة وخريجين الأنبا كاراس — سجّل حضورك واجمع نقاطك واستبدلها بمكافآت حصرية! 🌟';
+  const text = 'انضم لتجربة اجتماع جامعة — سجّل حضورك واجمع نقاطك واستبدلها بمكافآت حصرية! 🌟';
   const url = (typeof location!=='undefined' && location.href) ? location.href : '';
   if(navigator.share){
-    try{ await navigator.share({ title:'اجتماع جامعة وخريجين الأنبا كاراس', text, url }); return; }catch(e){}
+    try{ await navigator.share({ title:'اجتماع جامعة', text, url }); return; }catch(e){}
   }
   try{
     await navigator.clipboard.writeText(text + (url?(' '+url):''));
@@ -30862,7 +30880,7 @@ function doShareCard(){
 
   ctx.textAlign='center';
   ctx.fillStyle='#F4B740'; ctx.font='900 40px Cairo, sans-serif';
-  ctx.fillText('اجتماع جامعة وخريجين الأنبا كاراس', canvas.width/2, 90);
+  ctx.fillText('اجتماع جامعة', canvas.width/2, 90);
   ctx.fillStyle='#9D9BC4'; ctx.font='500 16px Tajawal, sans-serif';
   ctx.fillText('بطاقة رحلة المشارك', canvas.width/2, 122);
 
@@ -30921,15 +30939,15 @@ function doExportJourneyPdf(){
     rowsHtml += `</table>`;
   });
   w.document.write(`
-    <html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>رحلتي — اجتماع جامعة وخريجين الأنبا كاراس</title>
+    <html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>رحلتي — اجتماع جامعة</title>
     <style>body{font-family:Tajawal,Arial,sans-serif;padding:32px;color:#222;} h1{color:#c98a1f;} h3{color:#333;margin-top:22px;}</style>
     </head><body>
-    <h1>اجتماع جامعة وخريجين الأنبا كاراس — رحلة المشارك</h1>
+    <h1>اجتماع جامعة — رحلة المشارك</h1>
     <p><strong>${escapeHtml(p.name)}</strong> · كود <span dir="ltr" style="unicode-bidi:isolate;">${p.id}</span></p>
     <p>مجموع النقاط: <strong>${total}</strong> — الترتيب الفردي: <strong>#${rank}</strong></p>
     <hr/>
     ${rowsHtml}
-    <p style="margin-top:30px;color:#888;font-size:12px;">تم الإنشاء تلقائيًا من تطبيق اجتماع جامعة وخريجين الأنبا كاراس</p>
+    <p style="margin-top:30px;color:#888;font-size:12px;">تم الإنشاء تلقائيًا من تطبيق اجتماع جامعة</p>
     </body></html>
   `);
   w.document.close();
@@ -30977,7 +30995,7 @@ function checkDailyMessage(){
     saveProfileExtra(PROFILE_EXTRA);
     pushNotification(state.pid, DAILY_MESSAGE.text, '☀️');
     showToast('📩 وصلتك رسالة صباحية جديدة');
-    notifyNative('اجتماع جامعة وخريجين الأنبا كاراس — رسالة صباحية', DAILY_MESSAGE.text);
+    notifyNative('اجتماع جامعة — رسالة صباحية', DAILY_MESSAGE.text);
     render();
   }
 }
@@ -31149,7 +31167,7 @@ async function doDownloadAllDayPointCodes(dayId){
   w.document.open();
   w.document.write(`<!DOCTYPE html>
 <html dir="rtl" lang="ar"><head><meta charset="utf-8">
-<title>كل أكواد QR — ${escapeHtml(day.label)} — اجتماع جامعة وخريجين الأنبا كاراس</title>
+<title>كل أكواد QR — ${escapeHtml(day.label)} — اجتماع جامعة</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Cormorant+Garamond:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
@@ -31374,7 +31392,7 @@ async function doPrintPointCodes(value, sessionId){
   w.document.open();
   w.document.write(`<!DOCTYPE html>
 <html dir="rtl" lang="ar"><head><meta charset="utf-8">
-<title>أكواد ${value} نقطة — اجتماع جامعة وخريجين الأنبا كاراس</title>
+<title>أكواد ${value} نقطة — اجتماع جامعة</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Cormorant+Garamond:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
@@ -33087,7 +33105,7 @@ function aiMarkSvg(variant){
         _fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey('site-announcement')).on('value', function(snap){
           const v = snap && snap.exists() ? snap.val() : null;
           if(v && v.id && v.body){
-            current = { id:String(v.id), icon:v.icon||'📢', title:v.title||'اجتماع جامعة وخريجين الأنبا كاراس', body:String(v.body) };
+            current = { id:String(v.id), icon:v.icon||'📢', title:v.title||'اجتماع جامعة', body:String(v.body) };
             deliver(current);
           }
         }, function(){});
@@ -34227,7 +34245,7 @@ function drawCard(name,photo,id){
     rr(g,0,0,W,H,48); g.fillStyle=bg; g.fill();
     rr(g,14,14,W-28,H-28,38); g.strokeStyle='#F4B740'; g.lineWidth=4; g.stroke();
     g.direction='rtl'; g.textAlign='center';
-    g.fillStyle='#FFDE94'; g.font=F(800,30); g.fillText('اجتماع جامعة وخريجين الأنبا كاراس',W/2,88);
+    g.fillStyle='#FFDE94'; g.font=F(800,30); g.fillText('اجتماع جامعة',W/2,88);
     g.fillStyle='#fff'; g.font=F(900,54); g.fillText('كارت الدخول',W/2,162);
     var cx=W/2, cy=300, R=100;
     g.save(); g.beginPath(); g.arc(cx,cy,R,0,Math.PI*2); g.closePath(); g.clip();
@@ -34247,10 +34265,9 @@ function drawCard(name,photo,id){
 function saveCard(c,id){
   c.toBlob(function(b){
     if(!b){ toast('تعذّر حفظ الكارت', true); return; }
-    var f=new File([b],'card-'+id+'.png',{type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f],title:'كارت الدخول'}).catch(function(){}); return; }
-    var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=f.name; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); },4000); toast('✅ اتحفظ الكارت');
+    var fname='card-'+id+'.png';
+    var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=fname; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },8000); toast('✅ اتحفظ الكارت على جهازك');
   },'image/png');
 }
 function sheet(inner){
@@ -34343,7 +34360,7 @@ var PAL={
 };
 drawCard=function(name,photo,id){
   var P=PAL[(CONF_SETTINGS&&CONF_SETTINGS.glxCardStyle)||'dark']||PAL.dark;
-  var title=(CONF_SETTINGS&&CONF_SETTINGS.glxCardTitle)||'اجتماع جامعة وخريجين الأنبا كاراس';
+  var title=(CONF_SETTINGS&&CONF_SETTINGS.glxCardTitle)||'اجتماع جامعة';
   var fonts=(document.fonts&&document.fonts.load)?Promise.all([document.fonts.load('800 40px Cairo'),document.fonts.load('900 40px Cairo')]).catch(function(){}):Promise.resolve();
   return Promise.all([fonts,photo?loadImg(photo):Promise.resolve(null)]).then(function(r){
     var img=r[1],W=720,H=1080,c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
@@ -34438,7 +34455,7 @@ window.glxAdminCards=function(){
   return adminSectionTitle('📊','إحصائيات التسجيل الذاتي')+'<div class="card" style="margin-bottom:16px"><div class="glx-tiles">'+tile(cps.length,'إجمالي')+tile(days[td]||0,'النهارده')+tile(cps.filter(function(x){ return x.createdAt>wk; }).length,'آخر ٧ أيام')+tile(S.avatar||0,'اختاروا أفاتار')+tile(S.photo||0,'صورة حقيقية')+tile(S.none||0,'من غير صورة')+'</div><div class="hint" style="margin:10px 0 0;text-align:start">ناقص: '+nobirth+' من غير ميلاد • '+nostage+' من غير مرحلة • '+nophoto+' من غير صورة (الأفاتار/الصورة بتتحسب من وقت التحديث ده)</div></div>'
    +adminSectionTitle('⚠️','علامات أمان')+'<div class="card" style="margin-bottom:16px">'+fl+'<div class="hint" style="margin-top:8px;text-align:start">الحد الأقصى ٣ تسجيلات لكل جهاز في اليوم</div></div>'
    +adminSectionTitle('🔐','طلبات استرجاع الحساب')+'<div class="card" style="margin-bottom:16px">'+req+'</div>'
-   +adminSectionTitle('🎫','شكل كارت الدخول')+'<div class="card" style="margin-bottom:16px"><div class="avx-row" style="margin-bottom:12px">'+chip('dark','داكن')+chip('light','فاتح')+chip('gold','ذهبي')+'</div><div class="hint" style="margin:0 0 6px;text-align:start">العنوان اللي بيظهر فوق الكارت</div><input type="text" id="glx-ctitle" class="field" maxlength="50" value="'+esc2((CONF_SETTINGS&&CONF_SETTINGS.glxCardTitle)||'')+'" placeholder="اجتماع جامعة وخريجين الأنبا كاراس"></div>';
+   +adminSectionTitle('🎫','شكل كارت الدخول')+'<div class="card" style="margin-bottom:16px"><div class="avx-row" style="margin-bottom:12px">'+chip('dark','داكن')+chip('light','فاتح')+chip('gold','ذهبي')+'</div><div class="hint" style="margin:0 0 6px;text-align:start">العنوان اللي بيظهر فوق الكارت</div><input type="text" id="glx-ctitle" class="field" maxlength="50" value="'+esc2((CONF_SETTINGS&&CONF_SETTINGS.glxCardTitle)||'')+'" placeholder="اجتماع جامعة"></div>';
 };
 document.addEventListener('click',async function(e){
   var s=e.target.closest&&e.target.closest('[data-glxs]');
@@ -34498,7 +34515,7 @@ var _rs=window.renderSignup;
 window.renderSignup=function(){
   var C=CONF_SETTINGS||{};
   if(!(C.signupClosed||C.glxLoginLock||schedOn())) return _rs.apply(this,arguments);
-  return '<div class="login-page"><div class="login-hero"><div class="logo-wrap '+(C.logo?'has-custom-logo':'')+'">'+confLogoHtml()+'</div><div class="brand-title">اجتماع جامعة وخريجين الأنبا كاراس</div></div>'+maintHtml()+'<button type="button" class="glx-link" data-glx-back="1">← رجوع لشاشة الدخول</button></div>';
+  return '<div class="login-page"><div class="login-hero"><div class="logo-wrap '+(C.logo?'has-custom-logo':'')+'">'+confLogoHtml()+'</div><div class="brand-title">اجتماع جامعة</div></div>'+maintHtml()+'<button type="button" class="glx-link" data-glx-back="1">← رجوع لشاشة الدخول</button></div>';
 };
 document.addEventListener('click',function(e){
   if(!(e.target.closest&&e.target.closest('[data-glx-back]'))) return;
