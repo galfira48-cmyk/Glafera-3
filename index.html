@@ -25068,7 +25068,7 @@ function renderAdminAnalyticsTab(){
   return tabs + body;
 }
 
-function renderAdminSettingsTab(){
+function _renderAdminSettingsAll(){
   const verseText = CONF_SETTINGS.verseText || '';
   const verseRef = CONF_SETTINGS.verseRef || '';
   const confLogo = CONF_SETTINGS.logo;
@@ -25261,89 +25261,152 @@ function renderAdminSettingsTab(){
 }
 
 
+
+/* ===== تقسيم الإعدادات لخانات حسب الموضوع ===== */
+const ADM_SET_RULES = [
+  ['maint',   /صيانة شاشة الدخول|جدولة الصيانة|معاينة فورية|قفل خانات داخل|قفل الحضور|قفل الخلوة|قفل هيكلة|رسالة الخانات المقفولة/],
+  ['attscan', /ماسح الحضور/],
+  ['gamecfg', /حالة الاجتماع|قفل الألعاب|قفل خانة Games|العب ضد صديق|ألعاب معينة|تحدي الأسبوع/],
+  ['points',  /إعدادات الفيزا/],
+  ['daily',   /آية كل يوم|مهمة اليوم/],
+  ['identity',/الهوية والمظهر|شعار الاجتماع|لوجو الاجتماع|شكل اسم المشارك/],
+  ['security',/الأمان والنسخ|منطقة الخطر|نسخة احتياطية|كود دخول المنظمين|إعادة تعيين بيانات الحضور/],
+  ['reg',     /إنشاء الحسابات|فورم التسجيل|إحصائيات التسجيل|علامات أمان|استرجاع الحساب|كارت الدخول|اقتراحات العنوان|تصدير المسجلين/],
+];
+const ADM_SET_ORDER = {
+  maint:   [/صيانة شاشة الدخول/,/جدولة الصيانة/,/معاينة فورية/,/قفل خانات داخل/],
+  reg:     [/إنشاء الحسابات/,/فورم التسجيل/,/اقتراحات العنوان/,/كارت الدخول/,/إحصائيات التسجيل/,/علامات أمان/,/استرجاع الحساب/,/تصدير المسجلين/],
+  gamecfg: [/حالة الاجتماع|قفل الألعاب|قفل خانة Games/,/العب ضد صديق/,/ألعاب معينة/,/تحدي الأسبوع/],
+  identity:[/الهوية والمظهر/,/شعار الاجتماع/,/شكل اسم المشارك/],
+  security:[/الأمان والنسخ/,/نسخة احتياطية/,/منطقة الخطر/],
+  gamecfg2:[]
+};
+function admSetGroupOf(txt){ for(const r of ADM_SET_RULES){ if(r[1].test(txt)) return r[0]; } return null; }
+function adminSettingsGroup(group){
+  let html = '';
+  try{ html = _renderAdminSettingsAll(); }catch(e){ return '<div class="hint">تعذّر تحميل الإعدادات</div>'; }
+  const doc = new DOMParser().parseFromString('<body>'+html+'</body>','text/html');
+  const secs = []; let cur = null;
+  Array.from(doc.body.children).forEach(n=>{
+    const isTitle = n.classList && n.classList.contains('admin-section-title');
+    const head = (n.textContent||'').replace(/\s+/g,' ').trim().slice(0,42);
+    const g = admSetGroupOf(head);
+    if(isTitle || !cur || (g && g!==cur.group)){
+      cur = {group: g || (cur?cur.group:'reg'), key: head, nodes:[], idx: secs.length};
+      secs.push(cur);
+    }
+    cur.nodes.push(n);
+  });
+  const ord = ADM_SET_ORDER[group] || [];
+  const rank = sec=>{ const i = ord.findIndex(r=>r.test(sec.key)); return i<0 ? 99 : i; };
+  return secs.filter(x=>x.group===group)
+    .sort((a,b)=> rank(a)-rank(b) || a.idx-b.idx)
+    .map(x=>x.nodes.map(n=>{
+      if(n.classList && n.classList.contains('admin-section-title') && /حالة الاجتماع/.test(n.textContent)) n.innerHTML='<span>🔒</span><span>قفل الألعاب</span>';
+      return n.outerHTML;
+    }).join('')).join('');
+}
+function renderAdminSettingsTab(){ return adminSettingsGroup('reg'); }
+function renderAdminPointsTab(){
+  const total = PARTICIPANTS.reduce((a,p)=>a+participantTotal(p.id),0);
+  return `
+    ${adminKpis([{num:PARTICIPANTS.length, lab:'مشارك'},{num:total, lab:'إجمالي النقاط'}])}
+    ${adminSectionTitle('🏆','نقاط الاجتماع')}
+    ${renderAdminBulkPointsCard()}
+    ${renderAdminPointsResetCard()}
+    ${adminSectionTitle('🎮','نقاط الألعاب والفيزا')}
+    ${renderAdminGamePointsCard()}
+    ${renderAdminVisaResetCard()}
+    ${adminSettingsGroup('points')}
+  `;
+}
+
 const ADMIN_HUB_GROUPS = [
-  {id:'live', icon:'🔴', title:'التشغيل المباشر', accent:'var(--coral)'},
-  {id:'people', icon:'👥', title:'المشاركون', accent:'var(--teal)'},
-  {id:'points', icon:'🏆', title:'النقاط والتقييم', accent:'var(--gold)'},
-  {id:'content', icon:'🎨', title:'المحتوى والمتجر', accent:'var(--violet)'},
-  {id:'system', icon:'⚙️', title:'النظام', accent:'var(--text-muted)'},
+  {id:'live',    icon:'🔴', title:'التشغيل المباشر',      accent:'var(--coral)'},
+  {id:'people',  icon:'👥', title:'المشاركون والتسجيل',   accent:'var(--teal)'},
+  {id:'games',   icon:'🎮', title:'الألعاب والنقاط',      accent:'var(--gold)'},
+  {id:'shop',    icon:'🛍️', title:'المتجر',              accent:'var(--violet)'},
+  {id:'content', icon:'🎨', title:'الهوية والمحتوى',      accent:'#3FDCC9'},
+  {id:'system',  icon:'⚙️', title:'النظام والأمان',       accent:'var(--text-muted)'},
 ];
 const ADMIN_HUB_ITEMS = [
   {group:'live',   tab:'attendance', short:"قداس واجتماع وتسبحة", desc:"كود QR وفتح/قفل حضور القداس والاجتماع والتسبحة", icon:'✅', label:'الحضور (QR)', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
-  {group:'live',   tab:'alerts', short:"تنبيهات فورية ومجدولة", desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين",      icon:'📢', label:'إرسال تنبيه',         color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
-  {group:'live',   tab:'reports', short:"مشاكل من المشاركين", desc:"مشاكل بلّغ عنها المشاركون",     icon:'🛠️', label:'الإبلاغات',           color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
-  {group:'people', tab:'participants', short:"الأسماء والنقاط والأكواد", desc:"إضافة وتعديل المشاركين وأدوات النقاط",icon:'👤', label:'المشاركين',           color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
-  {group:'people', tab:'audit', short:"تسجيلات الحضور", desc:"كل تسجيلات الحضور بالتوقيت",       icon:'🕓', label:'سجل الحضور',          color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
-  {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين",    icon:'📝', label:'آراء المشاركين',       color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
-  {group:'points', tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور",   icon:'📊', label:'تحليلات',             color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
-  {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها",     icon:ICO.gallery, label:'معرض الصور',   color:'transparent'},
-  {group:'content',tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين",    icon:'🎨', label:'الاستيكرات',           color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
-  {group:'content',tab:'cardshop', short:"ثيمات وطلبات الكروت", desc:"ثيمات الكروت وطلبات الكروت المخصصة",    icon:'💳', label:'متجر الكروت',          color:'linear-gradient(145deg,#F4B740,#845EC2)'},
-  {group:'content',tab:'quizq', short:"أسئلة تحدي الأسئلة", desc:"إضافة وتعديل وحذف أسئلة لعبة تحدي الأسئلة",    icon:'❓', label:'أسئلة التحدي',        color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
-  {group:'content',tab:'structure', short:"أسماء وصور الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
-  {group:'system', tab:'settings', short:"التوقيت والهوية والأمان", desc:"التوقيت والهوية والأمان والنسخ الاحتياطي",    icon:'⚙️', label:'إعدادات الاجتماع',      color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
-  {group:'system', tab:'trash', short:"استرجاع أو حذف نهائي", desc:"استرجاع أو حذف نهائي للعناصر المحذوفة",       icon:'🗑️', label:'سلة المهملات',         color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
+  {group:'live',   tab:'audit', short:"تسجيلات الحضور بالتوقيت", desc:"كل تسجيلات الحضور بالتوقيت", icon:'🕓', label:'سجل الحضور', color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
+  {group:'live',   tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور", icon:'📊', label:'تحليلات', color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'live',   tab:'alerts', short:"تنبيهات فورية ومجدولة", desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين", icon:'📢', label:'إرسال تنبيه', color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
+  {group:'live',   tab:'reports', short:"مشاكل من المشاركين", desc:"مشاكل بلّغ عنها المشاركون", icon:'🛠️', label:'الإبلاغات', color:'linear-gradient(145deg,#FF7A59,#5FE0A4)'},
+
+  {group:'people', tab:'participants', short:"الأسماء والأكواد والبيانات", desc:"إضافة وتعديل المشاركين وأكواد الدخول والتصدير", icon:'👤', label:'المشاركين', color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
+  {group:'people', tab:'reg', short:"إنشاء الحساب وكارت الدخول", desc:"فتح/قفل إنشاء الحساب، فورم التسجيل، العناوين، إحصائيات وأمان التسجيل، كارت الدخول، التصدير", icon:'📝', label:'التسجيل والدخول', color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'people', tab:'structure', short:"الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
+  {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين", icon:'💬', label:'آراء المشاركين', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
+
+  {group:'games',  tab:'gamecfg', short:"قفل الألعاب وتحدي الأسبوع", desc:"قفل الألعاب، «العب ضد صديق»، فتح/قفل كل لعبة، وتحدي الأسبوع", icon:'🎮', label:'الألعاب والتحديات', color:'linear-gradient(145deg,#845EC2,#3FDCC9)'},
+  {group:'games',  tab:'quizq', short:"أسئلة تحدي الأسئلة", desc:"إضافة وتعديل وحذف أسئلة لعبة تحدي الأسئلة", icon:'❓', label:'أسئلة التحدي', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
+  {group:'games',  tab:'points', short:"إضافة وتصفير النقاط والفيزا", desc:"أدوات النقاط (للجميع)، نقاط الألعاب، تصفير النقاط والفيزا، وإعدادات الفيزا", icon:'🏆', label:'النقاط والفيزا', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+
+  {group:'shop',   tab:'stickers', short:"استيكرات المتجر", desc:"الاستيكرات المتاحة للمشاركين", icon:'🎨', label:'الاستيكرات', color:'linear-gradient(145deg,#FF9AD5,#845EC2)'},
+  {group:'shop',   tab:'cardshop', short:"ثيمات وطلبات الكروت", desc:"ثيمات الكروت وطلبات الكروت المخصصة", icon:'💳', label:'متجر الكروت', color:'linear-gradient(145deg,#F4B740,#845EC2)'},
+
+  {group:'content',tab:'identity', short:"اللوجو والآية العامة وخط الاسم", desc:"لوجو الاجتماع، الشعار (آية)، وشكل اسم المشارك", icon:'🏷️', label:'هوية الاجتماع', color:'linear-gradient(145deg,#3FDCC9,#F4B740)'},
+  {group:'content',tab:'daily', short:"آية ومهمة كل يوم", desc:"الآية اليومية ومهمة اليوم لكل يوم من أيام الرحلة", icon:'📖', label:'المحتوى اليومي', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {group:'content',tab:'gallery', short:"ألبومات وصور", desc:"ألبومات الصور وأغلفتها", icon:ICO.gallery, label:'معرض الصور', color:'transparent'},
+
+  {group:'system', tab:'maint', short:"شاشة الدخول والخانات المقفولة", desc:"صيانة شاشة الدخول والتسجيل وجدولتها، وقفل خانات داخل التطبيق (الحضور والخلوة والهيكلة)", icon:'🚧', label:'الصيانة والقفل', color:'linear-gradient(145deg,#FF7A59,#F4B740)'},
+  {group:'system', tab:'security', short:"كود المنظمين والنسخ الاحتياطي", desc:"تغيير كود المنظمين، النسخة الاحتياطية، ومنطقة الخطر", icon:'🔐', label:'الأمان والبيانات', color:'linear-gradient(145deg,#9B8CFF,#FF7A59)'},
+  {group:'system', tab:'trash', short:"استرجاع أو حذف نهائي", desc:"استرجاع أو حذف نهائي للعناصر المحذوفة", icon:'🗑️', label:'سلة المهملات', color:'linear-gradient(145deg,#8A8A9A,#4B4B5A)'},
 ];
 function renderAdminHub(){
-  const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
+  const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const badgeOf = tab => tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
-  const tileHtml = it=>{
-    const badge = badgeOf(it.tab);
-    return `<button type="button" class="admin-hub-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml((it.label+' '+(it.desc||'')).toLowerCase())}">
+  const tile = it=>{
+    const b = badgeOf(it.tab);
+    return `<button type="button" class="admin-hub-tile adm3-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml((it.label+' '+(it.desc||'')+' '+(it.short||'')).toLowerCase())}">
       <span class="admin-hub-ico" style="background:${it.color}">${it.icon}</span>
-      <span class="admin-hub-txt"><span class="admin-hub-lab">${it.label}</span>${(it.short||it.desc)?`<span class="admin-hub-desc">${it.short||it.desc}</span>`:''}</span>
-      ${badge?`<span class="admin-hub-badge">${badge}</span>`:''}
-      <span class="adm-chev" aria-hidden="true">‹</span>
+      <span class="adm3-lab">${it.label}</span>
+      ${b?`<span class="adm3-badge">${b}</span>`:''}
     </button>`;
   };
   const groups = ADMIN_HUB_GROUPS.map(g=>{
     const items = ADMIN_HUB_ITEMS.filter(it=>it.group===g.id);
     if(!items.length) return '';
-    return `<section class="admin-hub-group" style="--g:${g.accent}">
-      <div class="admin-hub-group-title"><span>${g.icon}</span><span>${g.title}</span><span class="ahg-count">${items.length} أقسام</span></div>
-      <div class="admin-hub-grid adm-list">${items.map(tileHtml).join('')}</div>
+    return `<section class="admin-hub-group adm3-group" style="--g:${g.accent}">
+      <div class="adm3-gh"><span class="gi">${g.icon}</span><span class="gt">${g.title}</span></div>
+      <div class="adm3-grid">${items.map(tile).join('')}</div>
     </section>`;
   }).join('');
-  const strip = `
-    <div class="admin-stat-strip">
-      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="participants"><div class="admin-stat-num">${PARTICIPANTS.length}</div><div class="admin-stat-lab">مشارك</div></button>
-      <button type="button" class="admin-stat-cell" data-action="admin-hub-tile" data-tab="audit"><div class="admin-stat-num">${new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size}</div><div class="admin-stat-lab">سجّلوا حضورًا</div></button>
-      <button type="button" class="admin-stat-cell ${pendingR?'is-alert':'is-ok'}" data-action="admin-hub-tile" data-tab="reports"><div class="admin-stat-num">${pendingR}</div><div class="admin-stat-lab">بلاغات مفتوحة</div></button>
-    </div>`;
+  const checked = new Set(Object.keys(CHECKINS).map(k=>k.split('__')[0])).size;
+  const cell = (tab,num,lab,alert)=>`<button type="button" class="admin-stat-cell ${alert===undefined?'':(alert?'is-alert':'is-ok')}" data-action="admin-hub-tile" data-tab="${tab}"><div class="admin-stat-num">${num}</div><div class="admin-stat-lab">${lab}</div></button>`;
+  const strip = `<div class="admin-stat-strip">${cell('participants',PARTICIPANTS.length,'مشارك')}${cell('audit',checked,'سجّلوا حضورًا')}${cell('reports',pendingR,'بلاغات',pendingR>0)}${cell('cardshop',pendingCC,'طلبات كروت',pendingCC>0)}</div>`;
   const openAtt = ATT_KEYS.filter(k=>{ const c=attCfg(k); return c && c.open; }).map(k=>ATT_TYPES[k].label);
   const attn = [
-    {tab:'reports',   icon:'🛠️', lab:'بلاغات مفتوحة',          n:pendingR},
-    {tab:'cardshop',  icon:'💳', lab:'طلبات كروت مخصصة',       n:pendingCC}
+    {tab:'reports',  icon:'🛠️', lab:'بلاغات مفتوحة',     n:pendingR},
+    {tab:'cardshop', icon:'💳', lab:'طلبات كروت مخصصة', n:pendingCC}
   ].filter(a=>a.n>0);
   const attnHtml = attn.length ? `<section class="adm-attn">
       <div class="adm-sec-head"><span class="adm-pulse"></span>يحتاج انتباهك الآن</div>
       ${attn.map(a=>`<button type="button" class="adm-attn-row" data-action="admin-hub-tile" data-tab="${a.tab}"><span class="adm-attn-ico">${a.icon}</span><span class="adm-attn-lab">${a.lab}</span><b class="adm-attn-n">${a.n}</b><span class="adm-chev">‹</span></button>`).join('')}
     </section>` : '';
-  const quickHtml = `<div class="adm-quick">${['attendance','alerts','participants','audit'].map(t=>{
-      const it = ADMIN_HUB_ITEMS.find(x=>x.tab===t); if(!it) return '';
-      return `<button type="button" class="adm-q" data-action="admin-hub-tile" data-tab="${t}"><span class="adm-q-ico" style="background:${it.color}">${it.icon}</span><span class="adm-q-lab">${it.label}</span></button>`;
-    }).join('')}</div>`;
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لوحة المنظمين</div>
     </div>
-    <div class="adm-hero">
-      <div class="adm-hero-top">
-        <div><div class="adm-hero-kicker">CONTROL CENTER</div><div class="adm-hero-title">مركز التحكم</div></div>
-        <span class="adm-live ${openAtt.length?'on':''}"><i></i>${openAtt.length?'الحضور مفتوح: '+openAtt.join(' · '):'لا يوجد حضور مفتوح'}</span>
+    <div class="adm2" id="adm2">
+      <div class="adm-hero">
+        <div class="adm-hero-top">
+          <div class="adm-hero-title">مركز التحكم</div>
+          <span class="adm-live ${openAtt.length?'on':''}"><i></i>${openAtt.length?'الحضور مفتوح: '+openAtt.join(' · '):'لا يوجد حضور مفتوح'}</span>
+        </div>
+        ${strip}
       </div>
-      ${strip}
+      ${attnHtml}
+      <input type="text" class="field admin-search-input admin-hub-search" data-filter-target=".admin-hub-tile" placeholder="🔍 دوّر على خانة..." />
+      ${groups}
+      <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
     </div>
-    ${attnHtml}
-    <div class="adm-sec-head adm-sec-plain">وصول سريع</div>
-    ${quickHtml}
-    <div class="adm-sec-head adm-sec-plain">كل الأقسام</div>
-    <input type="text" class="field admin-search-input admin-hub-search" data-filter-target=".admin-hub-tile" placeholder="🔍 دوّر على قسم..." />
-    ${groups}
-    <div class="admin-hub-empty" id="admin-hub-empty">مفيش قسم بالاسم ده</div>
   `;
 }
 function adminSubGet(k, def){ return (state.adminSub && state.adminSub[k]) || def; }
@@ -25393,7 +25456,13 @@ function renderAdmin(){
   if(state.adminHub) return renderAdminHub();
   const tab = state.adminTab;
   let body = '';
-  if(tab==='settings') body = renderAdminSettingsTab();
+  if(tab==='settings' || tab==='reg') body = adminSettingsGroup('reg');
+  else if(tab==='maint') body = adminSettingsGroup('maint');
+  else if(tab==='gamecfg') body = adminSettingsGroup('gamecfg');
+  else if(tab==='points') body = renderAdminPointsTab();
+  else if(tab==='identity') body = adminSettingsGroup('identity');
+  else if(tab==='daily') body = adminSettingsGroup('daily');
+  else if(tab==='security') body = adminSettingsGroup('security');
   else if(tab==='gallery') body = renderAdminGalleryTab();
   else if(tab==='audit') body = renderAdminAuditTab();
   else if(tab==='analytics') body = renderAdminAnalyticsTab();
@@ -25406,7 +25475,7 @@ function renderAdmin(){
   else if(tab==='cardshop') body = renderAdminCardShopTab();
   else if(tab==='quizq') body = renderAdminQuizQuestionsTab();
   else if(tab==='structure') body = renderAdminStructureTab();
-  else if(tab==='attendance') body = renderAdminAttendanceTab();
+  else if(tab==='attendance'){ body = renderAdminAttendanceTab(); if(!state.attNav || (!state.attNav.type && state.attNav.page!=='addtype')) body += adminSettingsGroup('attscan'); }
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
   let pageTitle = hubItem ? hubItem.label : 'لوحة المنظمين';
   if(tab==='sessions'){
@@ -25439,7 +25508,7 @@ function renderAdmin(){
   const grp = hubItem ? ADMIN_HUB_GROUPS.find(g=>g.id===hubItem.group) : null;
   const subtitle = inDetail
     ? `<span class="admin-crumb">${escapeHtml(hubItem?hubItem.label:'')}</span> ‹ تفاصيل`
-    : escapeHtml(hubItem&&hubItem.desc ? hubItem.desc : (grp?grp.title:''));
+    : (grp?`<span class="admin-crumb">${grp.icon} ${escapeHtml(grp.title)}</span> ‹ `:'') + escapeHtml(hubItem&&(hubItem.short||hubItem.desc) ? (hubItem.short||hubItem.desc) : '');
   return `
     <div class="admin-page-head">
       <button class="icon-btn" data-action="admin-up" aria-label="رجوع">${ICO.back}</button>
@@ -25449,7 +25518,6 @@ function renderAdmin(){
         <div class="admin-page-sub">${subtitle}</div>
       </div>
     </div>
-    ${inDetail ? '' : renderAdminSiblingNav()}
     ${body}
   `;
 }
@@ -25624,17 +25692,7 @@ function renderAdminParticipantsTab(){
       {num:PARTICIPANTS.reduce((a,p)=>a+participantTotal(p.id),0), lab:'إجمالي النقاط'},
     ])}
     <div class="hint" style="margin:0 0 12px;">المخدومين بينشئوا حساباتهم بنفسهم من شاشة الدخول (اسم + رقم موبايل + باسورد).</div>
-    <button type="button" class="admin-collapse-head ${state.adminToolsOpen?'open':''}" data-action="toggle-admin-tools">
-      <span>🧰</span>
-      <span><span>أدوات النقاط والفيزا (للجميع)</span><span class="ach-sub">إضافة نقاط، نقاط ألعاب، تصفير النقاط والفيزا</span></span>
-      <span class="ach-chev">▾</span>
-    </button>
-    ${state.adminToolsOpen ? `<div class="admin-collapse-body">
-      ${renderAdminBulkPointsCard()}
-      ${renderAdminGamePointsCard()}
-      ${renderAdminPointsResetCard()}
-      ${renderAdminVisaResetCard()}
-    </div>` : ''}
+    <button type="button" class="adm-link-card" data-action="admin-hub-tile" data-tab="points"><span class="alc-ico">🏆</span><span class="alc-txt"><b>النقاط والفيزا</b><small>إضافة نقاط، نقاط الألعاب، التصفير، إعدادات الفيزا</small></span><i>‹</i></button>
     <div class="admin-section-title"><span>👤</span><span>قائمة المشاركين (${PARTICIPANTS.length})</span></div>
     <input type="text" class="field admin-search-input" data-filter-target=".admin-participant-tile" placeholder="🔍 دور بالاسم أو الكود..." style="margin-bottom:10px;" />
     <div class="hint" style="margin-bottom:10px;">اضغط على أي مشارك لعرض وتعديل بياناته</div>
@@ -30284,7 +30342,7 @@ async function doAdminGamePoints(val){
 function renderAdminPointsResetCard(){
   if(!_pointsBackupLoaded){
     _pointsBackupLoaded = true;
-    loadPointsBackup().then(b=>{ POINTS_BACKUP = b; if(state.view==='admin' && state.adminTab==='participants' && !state.editingParticipantId && !state.addingParticipant) render(); });
+    loadPointsBackup().then(b=>{ POINTS_BACKUP = b; if(state.view==='admin' && (state.adminTab==='points' || (state.adminTab==='participants' && !state.editingParticipantId && !state.addingParticipant))) render(); });
   }
   const b = POINTS_BACKUP;
   let when = '';
@@ -30420,7 +30478,7 @@ async function doRestoreVisas(){
 function renderAdminVisaResetCard(){
   if(!_visaBackupLoaded){
     _visaBackupLoaded = true;
-    (async()=>{ try{ const r = await window.storage.get(VISA_BACKUP_KEY, true); VISA_BACKUP = (r && r.value && r.value!=='null') ? JSON.parse(r.value) : null; }catch(e){ VISA_BACKUP = null; } if(state.view==='admin' && state.adminTab==='participants' && !state.editingParticipantId && !state.addingParticipant) render(); })();
+    (async()=>{ try{ const r = await window.storage.get(VISA_BACKUP_KEY, true); VISA_BACKUP = (r && r.value && r.value!=='null') ? JSON.parse(r.value) : null; }catch(e){ VISA_BACKUP = null; } if(state.view==='admin' && (state.adminTab==='points' || (state.adminTab==='participants' && !state.editingParticipantId && !state.addingParticipant))) render(); })();
   }
   const b = VISA_BACKUP;
   let when = '';
@@ -31537,12 +31595,12 @@ function adminMaintCardsHtml(){
       </div>
       <button type="button" class="switch ${on?'on':''}" data-action="toggle-feature-lock" data-feature="${key}"></button>
     </div>`;
-  return `${adminSectionTitle('🔧','جاري التحديث (قفل مؤقت)')}
+  return `${adminSectionTitle('🔧','قفل خانات داخل التطبيق')}
     ${row('✅','قفل الحضور','attendance',!!CONF_SETTINGS.attendanceLocked)}
     ${row('✝️','قفل الخلوة الفردية','retreat',!!CONF_SETTINGS.retreatLocked)}
     ${row('👥','قفل هيكلة الاجتماع','structure',!!CONF_SETTINGS.structureLocked)}
     <div class="card" style="margin-bottom:16px;">
-      <div class="admin-session-name" style="margin-bottom:6px;">💬 الرسالة اللي بتظهر للمشاركين</div>
+      <div class="admin-session-name" style="margin-bottom:6px;">💬 رسالة الخانات المقفولة</div>
       <textarea class="field" id="maint-msg-input" rows="3" placeholder="${escapeHtml(MAINT_DEFAULT_MSG)}" style="min-height:76px;resize:vertical;">${escapeHtml(CONF_SETTINGS.maintMsg||'')}</textarea>
       <div class="hint">سيبها فاضية عشان تظهر الرسالة الافتراضية. الرسالة واحدة لكل الخانات المقفولة. كود ${GAMES_LOCK_REVIEWER_ID} بيقدر يدخل للمراجعة.</div>
       <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;" data-action="save-maint-msg">حفظ الرسالة</button>
@@ -34531,9 +34589,9 @@ var _gac2=window.glxAdminCards;
 window.glxAdminCards=function(){
   var C=CONF_SETTINGS||{};
   var row=function(t,h,on,attr){ return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-family:\'Cairo\',sans-serif;font-weight:800;font-size:13.5px">'+t+'</div><div class="hint" style="margin:2px 0 0;text-align:start">'+h+'</div></div><button type="button" class="switch '+(on?'on':'')+'" '+attr+'></button></div>'; };
-  var card=adminSectionTitle('🚧','وضع الصيانة')+'<div class="card" style="margin-bottom:16px">'+
-    row('تسجيل الدخول',C.glxLoginLock?'مقفول — الخانات مخفية وبتظهر رسالة «انتظرونا»':'مفتوح',!C.glxLoginLock,'data-glx="glxLoginLock"')+
-    row('إنشاء الحساب',C.signupClosed?'مقفول — بتظهر رسالة «انتظرونا» بدل الفورم':'مفتوح',!C.signupClosed,'data-action="toggle-signup-open"')+
+  var card=adminSectionTitle('🚧','صيانة شاشة الدخول والتسجيل')+'<div class="card" style="margin-bottom:16px">'+
+    row('تسجيل الدخول',C.glxLoginLock?'مقفول — الخانات مخفية وبتظهر رسالة التحديث':'مفتوح',!C.glxLoginLock,'data-glx="glxLoginLock"')+
+    row('إنشاء الحساب',C.signupClosed?'مقفول — بتظهر رسالة التحديث بدل الفورم':'مفتوح',!C.signupClosed,'data-action="toggle-signup-open"')+
     '<div class="hint" style="margin:10px 0 6px;text-align:start">عنوان الرسالة</div><input type="text" id="glx-mt-t" class="field" maxlength="60" value="'+esc2(C.glxMaintTitle||'')+'" placeholder="'+MT_T+'">'+
     '<div class="hint" style="margin:10px 0 6px;text-align:start">السطر التحتيه</div><input type="text" id="glx-mt-s" class="field" maxlength="120" value="'+esc2(C.glxMaintSub||'')+'" placeholder="'+MT_S+'">'+
     '<div class="hint" style="margin:10px 0 6px;text-align:start">رقم واتساب أو رابط للدعم (اختياري — بيظهر زر تواصل)</div><input type="text" id="glx-mt-c" class="field" dir="ltr" maxlength="120" value="'+esc2(C.glxMtContact||'')+'" placeholder="01xxxxxxxxx">'+
@@ -36030,5 +36088,39 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   },1000);
 })();
 </script>
+<style id="adm-org-css">
+.adm-link-card{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 14px;padding:12px 14px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:inherit;font-family:inherit;text-align:start;cursor:pointer;transition:transform .15s,border-color .2s}
+.adm-link-card:active{transform:scale(.98)}.adm-link-card:hover{border-color:var(--gold)}
+.adm-link-card .alc-ico{width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:12px;font-size:20px;background:linear-gradient(145deg,#F4B740,#FF7A59)}
+.adm-link-card .alc-txt{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.adm-link-card b{font-size:13.5px;font-weight:800}.adm-link-card small{font-size:11.5px;color:var(--text-muted)}
+.adm-link-card i{font-style:normal;font-size:20px;color:var(--text-muted)}
+</style>
+<style id="adm2-css">
+/* ===== Hub (compact home-grid) ===== */
+#app .adm2 .adm-hero{padding:14px 12px 12px;margin-bottom:12px;border-radius:20px}
+#app .adm2 .adm-hero-top{align-items:center;margin-bottom:10px}
+#app .adm2 .adm-hero-title{font-size:19px}
+#app .adm2 .adm-attn{margin:0 0 12px;padding:10px;border-radius:16px}
+#app .adm2 .admin-hub-search{margin-bottom:6px;border-radius:14px}
+#app .adm2 .adm3-group{margin:0}
+#app .adm2 .adm3-gh{display:flex;align-items:center;gap:8px;margin:20px 2px 10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:12.5px;color:var(--text-muted)}
+#app .adm2 .adm3-gh::before{content:'';width:3px;height:14px;border-radius:3px;background:var(--g)}
+#app .adm2 .adm3-gh::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+#app .adm2 .adm3-gh .gt{color:var(--text)}
+#app .adm2 .adm3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#app .adm2 .adm3-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;min-width:0;height:auto;min-height:0;padding:14px 6px 11px;border-radius:18px;border:1px solid var(--border);background:rgba(255,255,255,.04);box-shadow:none;color:inherit;font-family:inherit;text-align:center;transition:transform .15s,background .2s}
+#app .adm2 .adm3-tile:active{transform:scale(.95);background:rgba(255,255,255,.08)}
+#app .adm2 .adm3-tile .admin-hub-ico{width:50px;height:50px;border-radius:16px;font-size:23px;flex:0 0 auto;box-shadow:0 8px 16px -8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+#app .adm2 .adm3-lab{font-family:'Cairo',sans-serif;font-weight:700;font-size:12px;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+#app .adm2 .adm3-badge{position:absolute;top:8px;inset-inline-start:8px;min-width:20px;height:20px;padding:0 6px;border-radius:99px;display:grid;place-items:center;background:var(--danger,#FF6B6B);color:#fff;font-size:11px;font-weight:900;box-shadow:0 0 0 3px rgba(255,107,107,.18)}
+/* ===== inner admin pages ===== */
+#app.is-admin .admin-siblings{background:rgba(255,255,255,.04);border:1px solid var(--border);padding:4px;border-radius:99px;gap:2px;margin-bottom:14px}
+#app.is-admin .admin-siblings .admin-tab{background:transparent;border-color:transparent;padding:8px 13px}
+#app.is-admin .admin-siblings .admin-tab.active{background:linear-gradient(95deg,var(--gold),var(--gold-2));color:#221900}
+#app.is-admin .admin-section-title{display:flex;align-items:center;gap:8px;margin:24px 2px 10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:var(--gold-2)}
+#app.is-admin .admin-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+#app.is-admin .admin-page-head .admin-page-sub{font-size:11.5px}
+</style>
 </body>
 </html>
