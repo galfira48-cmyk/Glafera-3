@@ -13150,7 +13150,7 @@ const GAME_CATEGORIES = [
 const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', backgammon:'board', snakes:'board',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind',
+  memory:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party',
 };
@@ -13188,6 +13188,7 @@ const GAMES_CATALOG = [
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
+  {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم وحيوان ونبات وجماد وبلاد — 3 جولات و3 مستويات واكسب لحد 50 نقطة', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
@@ -13216,6 +13217,7 @@ const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
+  bus:'حرف عشوائي و5 خانات: اسم وحيوان ونبات وجماد وبلاد — 3 جولات و3 مستويات صعوبة، لو جمعت نقط أكتر من الجهاز تكسب لحد 50 نقطة',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
   darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
@@ -26077,6 +26079,7 @@ function render(){
   else if(state.view==='game-reflex') html = renderReflexGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
   else if(state.view==='game-math') html = renderMathGame();
+  else if(state.view==='game-bus') html = renderBusGame();
   else if(state.view==='game-uno') html = renderUnoGame();
   else if(state.view==='game-chess') html = renderChessGame();
   else if(state.view==='game-checkers') html = renderCheckersGame();
@@ -26129,6 +26132,7 @@ function render(){
   if(state.view==='gallery'){ attachGalleryEvents(); }
   if(state.view==='game-memory'){ startMemoryTicker(); } else { stopMemoryTicker(); }
   if(state.view==='game-math' && state.mathgame && !state.mathgame.finished){ startMathTimer(); } else { stopMathTimer(); }
+  if(typeof busAfterRender==='function'){ busAfterRender(); }
   if(state.view==='room-mystery' && GAME_ROOMS[state.roomCode] && GAME_ROOMS[state.roomCode].mystery && !GAME_ROOMS[state.roomCode].mystery.finished){ startMysteryTimer(); } else { stopMysteryTimer(); }
   if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
   if(state.view==='watch-rooms'){ if(!watchListPollInterval) startWatchListPolling(); } else { stopWatchListPolling(); }
@@ -28365,6 +28369,7 @@ document.addEventListener('click', (e)=>{
     else if(gid==='checkers'){ initCheckersGame(); }
     else if(gid==='backgammon'){ initBackgammonGame(); }
     else if(gid==='snakes'){ initSnakesGame(); }
+    else if(gid==='bus'){ initBusGame(); }
     go('game-'+gid);
   }
   else if(action==='billiards-close'){ closeBilliardsGame(); }
@@ -35467,5 +35472,244 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 })();
 </script>
 
+<style id="bus-css">
+/* ===== أتوبيس كومبليت ===== */
+.bus-letter-wrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 14px;}
+.bus-letter{width:96px;height:96px;border-radius:28px;display:grid;place-items:center;font-family:'Cairo',sans-serif;font-weight:900;font-size:58px;line-height:1;
+  color:#2a1a00;background:linear-gradient(145deg,#FFE08A,#FFB347);box-shadow:0 14px 30px -8px rgba(255,179,71,.55),inset 0 2px 0 rgba(255,255,255,.55);}
+.bus-letter.pop{animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes busPop{from{transform:scale(.4) rotate(-12deg);opacity:0;}to{transform:none;opacity:1;}}
+.bus-cap{font-size:12px;color:var(--text-muted);margin-top:8px;font-weight:700;}
+.bus-bar{height:6px;border-radius:99px;background:rgba(128,128,160,.2);overflow:hidden;margin:0 0 14px;}
+.bus-bar>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal),var(--gold));transform-origin:right center;transition:transform 1s linear;}
+.bus-field{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:9px;border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid var(--border);transition:border-color .2s,box-shadow .2s;}
+.bus-field:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 16%,transparent);}
+.bus-field .ic{font-size:22px;flex:none;width:30px;text-align:center;}
+.bus-field label{flex:none;width:52px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:var(--text-muted);}
+.bus-field input{flex:1;min-width:0;border:0;background:transparent;color:var(--text);font-family:'Cairo',sans-serif;font-weight:700;font-size:17px;padding:8px 2px;outline:none;text-align:start;}
+.bus-field input::placeholder{color:var(--text-muted);opacity:.55;font-weight:600;}
+.bus-tbl{margin:4px 0 12px;}
+.bus-row{display:grid;grid-template-columns:34px 1fr 1fr 46px;align-items:center;gap:8px;padding:9px 10px;border-radius:14px;margin-bottom:6px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--border);font-size:13px;}
+.bus-row.head{background:transparent;border:0;font-size:11px;color:var(--text-muted);font-weight:800;padding-block:2px;}
+.bus-row .w{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bus-row .w small{display:block;font-size:10px;font-weight:700;color:var(--text-muted);}
+.bus-row .w.bad{color:var(--text-muted);text-decoration:line-through;text-decoration-thickness:1px;}
+.bus-row .pt{font-family:'Cairo',sans-serif;font-weight:900;text-align:center;color:var(--gold);}
+.bus-row .pt.z{color:var(--text-muted);}
+.bus-tot{display:flex;justify-content:space-between;gap:10px;margin:8px 0 14px;}
+.bus-tot>div{flex:1;text-align:center;padding:10px;border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);}
+.bus-tot b{display:block;font-family:'Cairo',sans-serif;font-weight:900;font-size:24px;color:var(--gold);}
+.bus-tot span{font-size:11.5px;color:var(--text-muted);font-weight:700;}
+.bus-hero{text-align:center;padding:10px 6px 4px;}
+.bus-hero .big{font-size:64px;}
+.bus-hero h2{font-family:'Cairo',sans-serif;font-weight:900;font-size:24px;margin:6px 0 4px;}
+.bus-hero p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin:0 0 6px;}
+.bus-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 16px;}
+.bus-cats span{padding:7px 12px;border-radius:99px;font-size:12.5px;font-weight:800;background:color-mix(in srgb,var(--gold) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--gold) 30%,var(--border));}
+@media (prefers-reduced-motion:reduce){.bus-letter.pop{animation:none}.bus-bar>i{transition:none}}
+.bus-diff{display:flex;gap:8px;margin:0 0 14px;}
+.bus-diff button{flex:1;padding:11px 6px;border-radius:14px;border:1.5px solid var(--border);background:linear-gradient(180deg,var(--surface),var(--surface-2));font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:var(--text);transition:transform .15s,border-color .2s,box-shadow .2s;}
+.bus-diff button small{display:block;font-size:10.5px;color:var(--text-muted);font-weight:700;margin-top:2px;}
+.bus-diff button.on{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--gold) 16%,var(--surface)),var(--surface));}
+.bus-diff button:active{transform:scale(.96);}
+.bus-letter.spin{animation:busShake .14s linear infinite;}
+@keyframes busShake{0%{transform:translateY(-3px) rotate(-3deg);}50%{transform:translateY(3px) rotate(3deg);}100%{transform:translateY(-3px) rotate(-3deg);}}
+.bus-bar.hot>i{background:linear-gradient(90deg,#ff5d5d,#ff9a5d);}
+.bus-cap b.hot{color:#ff5d5d;animation:busBeat .5s ease-in-out infinite;display:inline-block;}
+@keyframes busBeat{50%{transform:scale(1.25);}}
+.bus-row.in{animation:busRowIn .45s cubic-bezier(.22,.9,.28,1) both;}
+@keyframes busRowIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.bus-bonus{text-align:center;margin:0 0 10px;padding:9px;border-radius:14px;font-weight:900;font-family:'Cairo',sans-serif;font-size:14px;color:#2a1a00;background:linear-gradient(95deg,#FFE08A,#FFB347);animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
+.bus-hint{font-size:11.5px;font-weight:700;color:var(--gold);margin:-3px 4px 8px;}
+.bus-tools{display:flex;gap:8px;margin-top:6px;}
+.bus-tools .btn{margin:0;}
+@media (prefers-reduced-motion:reduce){.bus-letter.spin,.bus-cap b.hot,.bus-row.in,.bus-bonus{animation:none}}
+
+</style>
+<script id="bus-js">
+(function(){
+  var CATS=[['name','اسم','👤'],['animal','حيوان','🐾'],['plant','نبات','🌿'],['thing','جماد','🪑'],['place','بلاد','🌍']];
+  var LETTERS='ابتجحدرسشصطعفقكلمنهوي'.split('');
+  var ROUNDS=3, SECS=60, BONUS=10;
+  var DIFFS={easy:{label:'سهل',sub:'+20 نقطة',p:0.6,reward:20},mid:{label:'عادي',sub:'+30 نقطة',p:0.82,reward:30},hard:{label:'صعب',sub:'+50 نقطة',p:0.97,reward:50}};
+  /* اسم | حيوان | نبات | جماد | بلاد */
+  var DICT={
+    'ا':'أحمد,أمير,أنطون,أيمن|أسد,أرنب,أخطبوط,أفعى|أناناس,أرز,أفوكادو,إجاص|إبريق,أريكة,أباجورة,أسانسير|الأردن,أمريكا,أسوان,الإسكندرية',
+    'ب':'باسم,بيشوي,بولا,بسمة|بطة,بقرة,ببغاء,بومة|بطيخ,برتقال,بصل,باذنجان|باب,بطانية,بالون,بوصلة|بلجيكا,بولندا,بغداد,بورسعيد',
+    'ت':'تامر,تريزا,توفيق,تقى|تمساح,تيس,تونة,ترسة|تفاح,تين,توت,ترمس|تلفزيون,تليفون,تابلت,تسريحة|تونس,تركيا,تايلاند,تنزانيا',
+    'ج':'جورج,جميلة,جيهان,جرجس|جمل,جاموس,جدي,جراد|جزر,جوافة,جرجير,جريب فروت|جرس,جاكيت,جوال,جزمة|الجزائر,جيبوتي,الجيزة,جورجيا',
+    'ح':'حنا,حسام,حنان,حازم|حصان,حمار,حمامة,حوت|حمص,حلبة,حبحب,حمضيات|حقيبة,حذاء,حبل,حاسوب|حلب,الحبشة,حيفا,حلوان',
+    'د':'داود,دينا,دانيال,دميانة|دب,دجاجة,دلفين,دودة|دراق,دوم,دقيق,دخن|دولاب,دفتر,دش,دراجة|دمياط,دبي,دمشق,الدنمارك',
+    'ر':'رامي,رحاب,رفيق,ريم|رنجة,رخمة,راكون,رنة|رمان,ريحان,رجلة,رز|راديو,ريموت,رف,رادار|روسيا,رومانيا,رشيد,رام الله',
+    'س':'سامح,سارة,سمير,سوزان|سمكة,سلحفاة,سنجاب,سلطعون|سبانخ,سفرجل,سمسم,سكر|سرير,ساعة,سيارة,سجادة|السودان,سوريا,سوهاج,السويس',
+    'ش':'شريف,شهد,شنودة,شيماء|شمبانزي,شاهين,شبل,شيهم|شمام,شعير,شبت,شاي|شباك,شنطة,شمعة,شوكة|شيلي,شرم الشيخ,الشرقية,شبرا',
+    'ص':'صموئيل,صفاء,صلاح,صباح|صقر,صرصور,صوص,صرار|صبار,صنوبر,صعتر,صفصاف|صندوق,صابونة,صحن,صنبور|الصين,الصومال,صنعاء,صور',
+    'ط':'طارق,طوني,طلعت,طه|طاووس,طائر,طوقان,طيهوج|طماطم,طرخون,طرطوفة,طلح|طبق,طاولة,طفاية,طابعة|طنطا,طوكيو,طرابلس,طهران',
+    'ع':'عماد,عزة,عادل,عايدة|عصفور,عقرب,عنكبوت,عجل|عنب,عدس,عرقسوس,عيش الغراب|عجلة,علبة,عصاية,عدسة|عمان,العراق,عدن,العريش',
+    'ف':'فادي,فيبي,فريد,فاطمة|فيل,فأر,فرس,فهد|فراولة,فجل,فلفل,فاصوليا|فنجان,فرن,فأس,فرشاة|فرنسا,فلسطين,فنلندا,الفيوم',
+    'ق':'قيصر,قمر,قدري,قسطنطين|قرد,قطة,قنفذ,قندس|قرنبيط,قمح,قلقاس,قصب|قلم,قفل,قدر,قرص|قطر,قبرص,القاهرة,قنا',
+    'ك':'كيرلس,كريم,كمال,كاترين|كلب,كنغر,كوالا,كركدن|كرنب,كمثرى,كزبرة,كرفس|كرسي,كوب,كتاب,كاميرا|الكويت,كندا,كوبا,كينيا',
+    'ل':'ليلى,لوقا,لبنى,لطفي|لقلق,ليمور,ليث,لاما|ليمون,لوبيا,لفت,لوز|لمبة,لوح,لابتوب,لحاف|لبنان,ليبيا,لندن,لشبونة',
+    'م':'مينا,محمد,مريم,ماجد|ماعز,مها,ماموث,محار|موز,مانجو,ملوخية,مشمش|مفتاح,مرآة,مروحة,مقص|مصر,المغرب,المنيا,موريتانيا',
+    'ن':'نادر,نانسي,نبيل,نيفين|نمر,نحلة,نعامة,نسر|نعناع,نخيل,نبق,نارنج|نظارة,نافذة,ناقوس,نجفة|النمسا,نيجيريا,نيويورك,نيوزيلندا',
+    'ه':'هاني,هدى,هبة,هشام|هدهد,هامستر,هرة,هزار|هليون,هيل,هندباء,هندي|هاتف,هرم,هاون,هودج|الهند,هولندا,هونغ كونغ,هاواي',
+    'و':'وليم,وفاء,وجيه,ولاء|وزة,وحيد القرن,وعل,ورل|ورد,ورق عنب,وسمة,ورد نيل|وسادة,وعاء,ورقة,وشاح|واشنطن,وارسو,الوادي الجديد,وهران',
+    'ي':'يوسف,يارا,يحيى,يسرا|يمامة,يعسوب,يربوع,يرقة|يقطين,يانسون,يوسفي,يمنى|يخت,ياقة,يافطة,يد|اليمن,اليابان,يافا,اليونان'
+  };
+  function norm(t){ return String(t||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim(); }
+  function strip(t){ return norm(t).replace(/^ال(?=.{2,})/,''); }
+  function startsWith(w,l){ w=strip(w); return !!w && w.charAt(0)===norm(l); }
+  function dictList(l,ci){ var d=DICT[l]; return d?(d.split('|')[ci]||'').split(',').filter(Boolean):[]; }
+  function lev1(a,b){ if(a===b) return true; if(Math.abs(a.length-b.length)>1) return false;
+    var i=0; while(i<a.length&&i<b.length&&a[i]===b[i]) i++;
+    if(a.length===b.length) return a.slice(i+1)===b.slice(i+1);
+    var l=a.length>b.length?a:b, sh=a.length>b.length?b:a; return l.slice(i+1)===sh.slice(i); }
+  function inDict(w,l,ci){ w=strip(w); return dictList(l,ci).some(function(x){ var y=strip(x); return y===w || (w.length>=4 && y.length>=4 && lev1(w,y)); }); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function vib(n){ try{ vibrate(n); }catch(e){} }
+
+  var B=null, timer=null, spinIv=null;
+
+  window.initBusGame=function(keepDiff){
+    stopTimer(); if(spinIv){ clearInterval(spinIv); spinIv=null; }
+    var d=(keepDiff&&B&&B.diff)||'mid';
+    B={phase:'intro',diff:d,round:0,used:[],letter:'',ans:['','','','',''],res:null,userTotal:0,botTotal:0,left:SECS,rewarded:false,hintI:-1,hintTxt:'',hintUsed:false,won:false};
+  };
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+
+  function startRound(){
+    var pool=LETTERS.filter(function(l){ return B.used.indexOf(l)<0; });
+    B.letter=rnd(pool); B.used.push(B.letter); B.round++;
+    B.ans=['','','','','']; B.res=null; B.hintI=-1; B.hintTxt=''; B.hintUsed=false; B.left=SECS; B.phase='spin';
+    render();
+    var n=0; if(spinIv) clearInterval(spinIv);
+    spinIv=setInterval(function(){
+      if(state.view!=='game-bus'||!B||B.phase!=='spin'){ clearInterval(spinIv); spinIv=null; return; }
+      n++; var el=document.getElementById('bus-spin'); if(el) el.textContent=rnd(LETTERS);
+      if(n%3===0) vib(8);
+      if(n>=15){ clearInterval(spinIv); spinIv=null; B.phase='play'; try{ SND.click(); }catch(e){} render(); setTimeout(function(){ var f=document.querySelector('.bus-in'); if(f) try{ f.focus(); }catch(e){} },80); }
+    },75);
+  }
+  function readInputs(){ document.querySelectorAll('.bus-in').forEach(function(el){ var i=+el.getAttribute('data-i'); if(i>=0&&i<5) B.ans[i]=el.value; }); }
+
+  function finishRound(){
+    if(!B||B.phase!=='play') return;
+    readInputs(); stopTimer();
+    var L=B.letter, rows=[], ut=0, bt=0, valid=0, p=DIFFS[B.diff].p;
+    CATS.forEach(function(c,i){
+      var list=dictList(L,i), bw=(Math.random()<p && list.length)?rnd(list):'';
+      var uw=(B.ans[i]||'').trim();
+      var ok=uw.length>0 && strip(uw).length>=2 && startsWith(uw,L);
+      var known=ok && inDict(uw,L,i);
+      var same=!!(ok && bw && strip(uw)===strip(bw));
+      var up=0; if(ok){ up=known?(same?5:10):5; if(B.hintI===i) up=Math.min(up,5); valid++; }
+      var bp=bw?(same?5:10):0;
+      ut+=up; bt+=bp; rows.push({cat:c,user:uw,ok:ok,known:known,bot:bw,up:up,bp:bp,same:same});
+    });
+    var bonus = valid===5 ? BONUS : 0; ut+=bonus;
+    B.res={rows:rows,ut:ut,bt:bt,bonus:bonus}; B.userTotal+=ut; B.botTotal+=bt;
+    B.phase = B.round>=ROUNDS ? 'final' : 'result';
+    if(B.phase==='final'){
+      B.won=B.userTotal>B.botTotal;
+      try{ var st=myGameStats(state.pid); if(!st.busBest||B.userTotal>st.busBest){ st.busBest=B.userTotal; saveGameStats(GAME_STATS); } }catch(e){}
+      if(B.won && !B.rewarded){ B.rewarded=true; awardSoloGamePoints(DIFFS[B.diff].reward,'مبروك! كسبت أتوبيس كومبليت'); }
+      else { try{ SND.click(); }catch(e){} }
+    } else { try{ SND.cheer(); }catch(e){} }
+    render();
+  }
+  function tick(){
+    if(!B||B.phase!=='play'||state.view!=='game-bus'){ stopTimer(); return; }
+    B.left--;
+    var t=document.getElementById('bus-timer'); if(t){ t.textContent=Math.max(0,B.left)+' ث'; t.classList.toggle('hot',B.left<=10); }
+    var bar=document.getElementById('bus-bar'); if(bar){ bar.style.transform='scaleX('+Math.max(0,B.left/SECS)+')'; var w=bar.parentNode; if(w) w.classList.toggle('hot',B.left<=10); }
+    if(B.left<=5&&B.left>0) vib(15);
+    if(B.left<=0) finishRound();
+  }
+  window.busAfterRender=function(){
+    if(state.view==='game-bus'&&B&&B.phase==='play'){ if(!timer) timer=setInterval(tick,1000); } else stopTimer();
+  };
+  function useHint(){
+    if(!B||B.phase!=='play'||B.hintUsed) return;
+    readInputs();
+    var idx=-1; for(var i=0;i<5;i++){ if(!(B.ans[i]||'').trim()){ idx=i; break; } }
+    if(idx<0){ try{ showToast('كل الخانات مليانة 👌'); }catch(e){} return; }
+    var w=rnd(dictList(B.letter,idx)); if(!w) return;
+    var raw=w.replace(/^ال/,''); 
+    B.hintUsed=true; B.hintI=idx; B.hintTxt=CATS[idx][1]+': كلمة بتبدأ بـ «'+raw.slice(0,2)+'» (الخانة دي هتاخد 5 نقط بالكتير)';
+    render();
+  }
+
+  function head(){ return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">أتوبيس كومبليت</div></div>'; }
+  function scoreRow(){
+    return '<div class="xo-score-row"><div class="xo-score-pill"><span>الجولة</span><b>'+Math.min(B.round||1,ROUNDS)+'/'+ROUNDS+'</b></div>'+
+      '<div class="xo-score-pill draw"><span>نقطك</span><b>'+B.userTotal+'</b></div><div class="xo-score-pill o"><span>الجهاز</span><b>'+B.botTotal+'</b></div></div>';
+  }
+  function resultTable(){
+    var h='<div class="bus-tbl"><div class="bus-row head"><span></span><span>إجابتك</span><span>الجهاز</span><span>نقط</span></div>';
+    B.res.rows.forEach(function(r,i){
+      var u=r.user?'<div class="w'+(r.ok?'':' bad')+'">'+esc(r.user)+(r.ok?(r.known?'<small>✓ كلمة معروفة</small>':'<small>مقبولة</small>'):'<small>مش بالحرف</small>')+'</div>':'<div class="w bad">—</div>';
+      var b=r.bot?'<div class="w">'+esc(r.bot)+(r.same?'<small>نفس إجابتك</small>':'')+'</div>':'<div class="w bad">—</div>';
+      h+='<div class="bus-row in" style="animation-delay:'+(i*0.09).toFixed(2)+'s"><span style="font-size:20px;text-align:center">'+r.cat[2]+'</span>'+u+b+'<span class="pt'+(r.up?'':' z')+'">'+r.up+'</span></div>';
+    });
+    h+='</div>';
+    if(B.res.bonus) h+='<div class="bus-bonus">🚌 كومبليت! كملت الخمس خانات +'+B.res.bonus+' نقط</div>';
+    return h+'<div class="bus-tot"><div><b>'+B.res.ut+'</b><span>نقطك في الجولة</span></div><div><b>'+B.res.bt+'</b><span>نقط الجهاز</span></div></div>';
+  }
+
+  window.renderBusGame=function(){
+    if(!B) initBusGame();
+    var D=DIFFS[B.diff];
+    if(B.phase==='intro'){
+      var best=''; try{ var st=state.pid?myGameStats(state.pid):{}; if(st.busBest) best='أفضل مجموع ليك: '+st.busBest+' نقطة'; }catch(e){}
+      return head()+'<div class="bus-hero"><div class="big">🚌</div><h2>أتوبيس كومبليت</h2><p>هيطلعلك حرف، املا الخمس خانات بكلمات بتبدأ بيه — بأسرع ما تقدر.</p></div>'+
+        '<div class="bus-cats">'+CATS.map(function(c){ return '<span>'+c[2]+' '+c[1]+'</span>'; }).join('')+'</div>'+
+        '<div class="bus-diff">'+Object.keys(DIFFS).map(function(k){ return '<button type="button" data-bus-diff="'+k+'" class="'+(k===B.diff?'on':'')+'">'+DIFFS[k].label+'<small>'+DIFFS[k].sub+'</small></button>'; }).join('')+'</div>'+
+        '<div class="card card-sm" style="font-size:13px;line-height:1.9;color:var(--text-muted)">• '+ROUNDS+' جولات، وقت كل جولة '+SECS+' ثانية.<br>• كلمة معروفة = 10 نقط (5 لو نفس كلمة الجهاز)، وكلمة صح بالحرف بس مش في القاموس = 5 نقط.<br>• كمّل الخمس خانات صح واكسب بونص +'+BONUS+' نقط.<br>• تلميح واحد في الجولة (الخانة اللي بتستخدمه فيها بتاخد 5 بالكتير).<br>• مجموعك أكتر من الجهاز = تكسب '+D.reward+' نقطة 🏅</div>'+
+        '<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px" data-bus="start">يلا نبدأ 🚌</button>'+(best?'<div class="hint" style="text-align:center;margin-top:10px">'+best+'</div>':'');
+    }
+    if(B.phase==='spin'){
+      return head()+scoreRow()+'<div class="bus-letter-wrap" style="margin-top:46px"><div class="bus-letter spin" id="bus-spin">'+esc(rnd(LETTERS))+'</div><div class="bus-cap">بنسحب الحرف…</div></div>';
+    }
+    if(B.phase==='play'){
+      var fields=CATS.map(function(c,i){
+        return '<div class="bus-field"><span class="ic">'+c[2]+'</span><label>'+c[1]+'</label><input class="bus-in" data-i="'+i+'" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="'+(i<4?'next':'done')+'" placeholder="'+c[1]+' بحرف '+esc(B.letter)+'" value="'+esc(B.ans[i])+'"></div>'+(B.hintI===i?'<div class="bus-hint">💡 '+esc(B.hintTxt)+'</div>':'');
+      }).join('');
+      var hot=B.left<=10;
+      return head()+scoreRow()+
+        '<div class="bus-letter-wrap"><div class="bus-letter pop">'+esc(B.letter)+'</div><div class="bus-cap">كل الكلمات لازم تبدأ بالحرف ده · <b id="bus-timer" class="'+(hot?'hot':'')+'">'+Math.max(0,B.left)+' ث</b></div></div>'+
+        '<div class="bus-bar'+(hot?' hot':'')+'"><i id="bus-bar" style="transform:scaleX('+Math.max(0,B.left/SECS)+')"></i></div>'+fields+
+        '<div class="bus-tools"><button type="button" class="btn btn-outline" style="flex:0 0 38%" data-bus="hint" '+(B.hintUsed?'disabled style="flex:0 0 38%;opacity:.5"':'')+'>💡 تلميح</button><button type="button" class="btn btn-primary" style="flex:1" data-bus="finish">أتوبيس كومبليت! 🚌</button></div>';
+    }
+    if(B.phase==='result'){
+      return head()+scoreRow()+'<div class="bus-hero" style="padding-bottom:0"><h2>نتيجة الجولة '+B.round+' — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+'<button type="button" class="btn btn-primary" style="width:100%" data-bus="next">الجولة اللي بعدها ←</button>';
+    }
+    var won=!!B.won, tie=B.userTotal===B.botTotal;
+    return head()+scoreRow()+
+      '<div class="match-result-card '+(won?'win':'lose')+'"><div class="match-result-ico">'+(won?'🏆':(tie?'🤝':'😅'))+'</div><div class="match-result-title">'+(won?'مبروك! كسبت الجهاز':(tie?'تعادل مع الجهاز':'الجهاز كسب المرة دي'))+'</div>'+
+      '<div class="match-result-sub">مجموعك '+B.userTotal+' ضد '+B.botTotal+' للجهاز · مستوى '+D.label+'</div>'+
+      (won?'<div class="match-result-points win">+'+D.reward+' نقطة 🎉</div>':'<div class="match-result-points lose">حاول تاني وهتكسب</div>')+'</div>'+
+      '<div class="bus-hero" style="padding-bottom:0"><h2>الجولة الأخيرة — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+
+      '<button type="button" class="btn btn-primary" style="width:100%" data-bus="again">🔄 لعبة جديدة</button>';
+  };
+
+  document.addEventListener('click',function(e){
+    if(!B||!e.target||!e.target.closest) return;
+    var d=e.target.closest('[data-bus-diff]'); if(d&&B.phase==='intro'){ B.diff=d.getAttribute('data-bus-diff'); render(); return; }
+    var t=e.target.closest('[data-bus]'); if(!t) return;
+    var a=t.getAttribute('data-bus');
+    if(a==='start'||a==='next') startRound();
+    else if(a==='finish') finishRound();
+    else if(a==='hint') useHint();
+    else if(a==='again'){ initBusGame(true); render(); }
+  });
+  document.addEventListener('input',function(e){ var t=e.target; if(B&&t&&t.classList&&t.classList.contains('bus-in')){ var i=+t.getAttribute('data-i'); if(i>=0&&i<5) B.ans[i]=t.value; } });
+  document.addEventListener('keydown',function(e){
+    var t=e.target; if(e.key!=='Enter'||!t||!t.classList||!t.classList.contains('bus-in')) return;
+    e.preventDefault(); var i=+t.getAttribute('data-i'), nx=document.querySelector('.bus-in[data-i="'+(i+1)+'"]');
+    if(nx) nx.focus(); else t.blur();
+  });
+})();
+</script>
 </body>
 </html>
