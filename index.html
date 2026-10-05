@@ -7009,21 +7009,9 @@ function createQR(el, opts){
 const AVATAR_COLOR = '#3B4A7A';
 
 const DAYS = [
-  {id:'d1', label:'اليوم الأول', num:1, sessions:[
-    {id:'d1s1', code:'D1-1', name:'حفل الافتتاح', points:10, type:'opening'},
-    {id:'d1s2', code:'D1-2', name:'الجلسة الأولى', points:15, type:'lecture'},
-    {id:'d1s3', code:'D1-3', name:'ورشة كسر الجليد', points:10, type:'workshop'},
-  ]},
-  {id:'d2', label:'اليوم الثاني', num:2, sessions:[
-    {id:'d2s1', code:'D2-1', name:'الجلسة الصباحية', points:10, type:'lecture'},
-    {id:'d2s2', code:'D2-2', name:'ورشة عمل تفاعلية', points:15, type:'workshop'},
-    {id:'d2s3', code:'D2-3', name:'المسابقة الأولى', points:20, type:'activity'},
-  ]},
-  {id:'d3', label:'اليوم الثالث', num:3, sessions:[
-    {id:'d3s1', code:'D3-1', name:'جلسة إرشادية', points:10, type:'lecture'},
-    {id:'d3s2', code:'D3-2', name:'نشاط جماعي', points:15, type:'activity'},
-    {id:'d3s3', code:'D3-3', name:'أمسية ترفيهية', points:20, type:'activity'},
-  ]},
+  {id:'d1', label:'اليوم الأول', num:1, sessions:[]},
+  {id:'d2', label:'اليوم الثاني', num:2, sessions:[]},
+  {id:'d3', label:'اليوم الثالث', num:3, sessions:[]},
 ];
 const SESSION_TYPE_LABELS = { opening:'افتتاح', lecture:'محاضرة', workshop:'ورشة عمل', activity:'نشاط', closing:'ختام' };
 
@@ -24598,7 +24586,7 @@ function renderStayPage(){
   `;
 }
 
-/* ============================= RENDER: CONFERENCE KIT PAGE ============================= */
+/* ============================= RENDER: KIT PAGE ============================= */
 function renderKitPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const lg = logisticsOf(p.id);
@@ -24615,7 +24603,7 @@ function renderKitPage(){
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">My Conference Kit</div>
+      <div class="back-title">حاجاتي</div>
     </div>
     <div class="card card-sm" style="text-align:center;margin-bottom:16px;">
       <span style="font-family:'Cairo',sans-serif;font-weight:800;font-size:22px;color:var(--gold);">${gotCount}</span>
@@ -35201,6 +35189,14 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 [dir=rtl] .msr-cancel,html[dir=rtl] .msr-cancel{transform:translateX(-8px);}
 .msr-open .msr-cancel{opacity:1;visibility:visible;transform:none;transition:opacity .25s .12s,transform .3s .1s,visibility 0s;}
 
+.top-bar.msr-row{position:relative;}
+.top-bar .icon-btn.msr-btn{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 38%,var(--border));
+  background:linear-gradient(145deg,color-mix(in srgb,var(--gold) 16%,var(--surface)),var(--surface));
+  transition:transform .18s cubic-bezier(.34,1.6,.5,1),box-shadow .2s;box-shadow:0 4px 14px color-mix(in srgb,var(--gold) 16%,transparent);}
+.top-bar .icon-btn.msr-btn:active{transform:scale(.9);}
+.top-bar.msr-row > div:not(.msr-field){transition:opacity .22s ease,transform .3s ease;}
+.top-bar.msr-open > div:not(.msr-field){opacity:0;pointer-events:none;transform:scale(.97);}
+.top-bar.msr-row .msr-field,.top-bar.msr-row .msr-cancel{top:50%;margin-top:-20px;}
 .msr-anchor{display:none;position:relative;height:0;z-index:40;}
 .msr-row.msr-open + .msr-anchor{display:block;}
 .msr-anchor::before{content:'';position:absolute;top:0;left:-16px;right:-16px;height:78vh;background:rgba(6,5,20,.55);
@@ -35406,6 +35402,28 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
       if(h3===h2) return h;
       /* زرار البحث القديم اللي تحت بقى مالوش لازمة */
       return h3.replace(/<button type="button" class="glx-sbar" data-glx-search="1">[\s\S]*?<\/button>/, '');
+    };
+  }
+
+  /* ---- الصفحة الرئيسية للمشارك: زرار البحث مكان زرار الخروج ---- */
+  var prevHome = window.renderProfile;
+  if(typeof prevHome === 'function'){
+    window.renderProfile = function(){
+      var h = prevHome.apply(this, arguments);
+      if(typeof h !== 'string') return h;
+      var logoutRe = /<button class="icon-btn" data-action="logout">[\s\S]*?<\/button>/;
+      if(!logoutRe.test(h) || h.indexOf('<div class="top-bar">')<0) return h;
+      var btn = '<button type="button" class="icon-btn msr-btn" data-me-search aria-label="بحث" aria-expanded="'+(S.open?'true':'false')+'">'+SV_S+'</button>';
+      var field = '<div class="msr-field" role="search">'+SV_S+
+        '<input id="msr-q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="بحث" placeholder="ابحث عن قسم أو جلسة أو زميل…" value="'+E(S.q)+'">'+
+        '<button type="button" class="msr-clear" data-me-search-clear aria-label="مسح"'+(S.q?'':' hidden')+'>'+SV_X+'</button></div>'+
+        '<button type="button" class="msr-cancel" data-me-search-close>إلغاء</button>';
+      var anchor = '<div class="msr-anchor"><div class="msr-panel" id="msr-panel" role="listbox">'+(S.open?panelHtml():'')+'</div></div>';
+      var out = h.replace('<div class="top-bar">','<div class="top-bar msr-row'+(S.open?' msr-open':'')+'">')
+                 .replace(logoutRe, btn)
+                 .replace(/(data-me-search aria-label="بحث"[^>]*>[\s\S]*?<\/button>\s*<\/div>\s*)<\/div>/, function(m,a){ return a+field+'</div>'+anchor; });
+      if(out.indexOf('msr-field')<0) return h;
+      return out.replace(/<button type="button" class="glx-sbar" data-glx-search="1"[^>]*>[\s\S]*?<\/button>/, '');
     };
   }
 
