@@ -13188,7 +13188,7 @@ const GAMES_CATALOG = [
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
-  {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم وحيوان ونبات وجماد وبلاد — 3 جولات و3 مستويات واكسب لحد 50 نقطة', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
+  {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم ولد وبنت وحيوان وجماد ونبات وبلد — رحلة من 3 مراحل، اختار وقت كل مرحلة وكل ما يقل تتضاعف النقط', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
@@ -13217,7 +13217,7 @@ const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
-  bus:'حرف عشوائي و5 خانات: اسم وحيوان ونبات وجماد وبلاد — 3 جولات و3 مستويات صعوبة، لو جمعت نقط أكتر من الجهاز تكسب لحد 50 نقطة',
+  bus:'حرف عشوائي و6 خانات: اسم ولد واسم بنت وحيوان وجماد ونبات وبلد/دولة — رحلة من 3 مراحل، إنت بتختار وقت كل مرحلة: وقت أقل = نقط مضاعفة. لو جمعت أكتر من الجهاز تكسب مكافأة بتكبر مع المخاطرة',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
   darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
@@ -35473,88 +35473,215 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 </script>
 
 <style id="bus-css">
-/* ===== أتوبيس كومبليت ===== */
-.bus-letter-wrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 14px;}
-.bus-letter{width:96px;height:96px;border-radius:28px;display:grid;place-items:center;font-family:'Cairo',sans-serif;font-weight:900;font-size:58px;line-height:1;
-  color:#2a1a00;background:linear-gradient(145deg,#FFE08A,#FFB347);box-shadow:0 14px 30px -8px rgba(255,179,71,.55),inset 0 2px 0 rgba(255,255,255,.55);}
-.bus-letter.pop{animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes busPop{from{transform:scale(.4) rotate(-12deg);opacity:0;}to{transform:none;opacity:1;}}
-.bus-cap{font-size:12px;color:var(--text-muted);margin-top:8px;font-weight:700;}
-.bus-bar{height:6px;border-radius:99px;background:rgba(128,128,160,.2);overflow:hidden;margin:0 0 14px;}
-.bus-bar>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal),var(--gold));transform-origin:right center;transition:transform 1s linear;}
-.bus-field{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:9px;border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid var(--border);transition:border-color .2s,box-shadow .2s;}
-.bus-field:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 16%,transparent);}
-.bus-field .ic{font-size:22px;flex:none;width:30px;text-align:center;}
-.bus-field label{flex:none;width:52px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:var(--text-muted);}
-.bus-field input{flex:1;min-width:0;border:0;background:transparent;color:var(--text);font-family:'Cairo',sans-serif;font-weight:700;font-size:17px;padding:8px 2px;outline:none;text-align:start;}
-.bus-field input::placeholder{color:var(--text-muted);opacity:.55;font-weight:600;}
-.bus-tbl{margin:4px 0 12px;}
-.bus-row{display:grid;grid-template-columns:34px 1fr 1fr 46px;align-items:center;gap:8px;padding:9px 10px;border-radius:14px;margin-bottom:6px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--border);font-size:13px;}
-.bus-row.head{background:transparent;border:0;font-size:11px;color:var(--text-muted);font-weight:800;padding-block:2px;}
-.bus-row .w{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bus-row .w small{display:block;font-size:10px;font-weight:700;color:var(--text-muted);}
-.bus-row .w.bad{color:var(--text-muted);text-decoration:line-through;text-decoration-thickness:1px;}
-.bus-row .pt{font-family:'Cairo',sans-serif;font-weight:900;text-align:center;color:var(--gold);}
-.bus-row .pt.z{color:var(--text-muted);}
-.bus-tot{display:flex;justify-content:space-between;gap:10px;margin:8px 0 14px;}
-.bus-tot>div{flex:1;text-align:center;padding:10px;border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);}
-.bus-tot b{display:block;font-family:'Cairo',sans-serif;font-weight:900;font-size:24px;color:var(--gold);}
-.bus-tot span{font-size:11.5px;color:var(--text-muted);font-weight:700;}
-.bus-hero{text-align:center;padding:10px 6px 4px;}
-.bus-hero .big{font-size:64px;}
-.bus-hero h2{font-family:'Cairo',sans-serif;font-weight:900;font-size:24px;margin:6px 0 4px;}
-.bus-hero p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin:0 0 6px;}
-.bus-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 16px;}
-.bus-cats span{padding:7px 12px;border-radius:99px;font-size:12.5px;font-weight:800;background:color-mix(in srgb,var(--gold) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--gold) 30%,var(--border));}
-@media (prefers-reduced-motion:reduce){.bus-letter.pop{animation:none}.bus-bar>i{transition:none}}
+/* ===== أتوبيس كومبليت — تصميم محسّن ===== */
+.bus-hero{position:relative;text-align:center;padding:18px 12px 14px;margin:2px 0 12px;border-radius:26px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--gold) 26%,transparent),transparent 62%),linear-gradient(180deg,var(--surface),var(--surface-2));
+  border:1px solid color-mix(in srgb,var(--gold) 28%,var(--border));}
+.bus-hero .big{font-size:58px;line-height:1;filter:drop-shadow(0 8px 14px rgba(255,150,60,.45));}
+.bus-hero h2{font-family:'Cairo',sans-serif;font-weight:900;font-size:26px;margin:6px 0 4px;background:linear-gradient(95deg,#FFE08A,#FF9F43 60%,#FF6B6B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.bus-hero p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin:0 0 4px;}
+.bus-hero.sm{padding:10px 8px 8px;border-radius:18px;}
+.bus-hero.sm h2{font-size:17px;margin:0;}
+.bus-road{position:relative;height:34px;margin:2px -12px 0;overflow:hidden;}
+.bus-road::after{content:'';position:absolute;inset-inline:0;bottom:6px;height:3px;border-radius:3px;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--text-muted) 55%,transparent) 0 16px,transparent 16px 30px);animation:busRoad 1s linear infinite;}
+.bus-road i{position:absolute;bottom:7px;font-style:normal;font-size:28px;line-height:1;right:-40px;animation:busDrive 5.5s linear infinite;}
+@keyframes busDrive{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 80px))}}
+@keyframes busRoad{from{background-position:0 0}to{background-position:-30px 0}}
+.bus-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 14px;}
+.bus-cats span{padding:7px 12px;border-radius:99px;font-size:12.5px;font-weight:800;color:var(--text);
+  background:color-mix(in srgb,var(--c) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 45%,var(--border));}
 .bus-diff{display:flex;gap:8px;margin:0 0 14px;}
-.bus-diff button{flex:1;padding:11px 6px;border-radius:14px;border:1.5px solid var(--border);background:linear-gradient(180deg,var(--surface),var(--surface-2));font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:var(--text);transition:transform .15s,border-color .2s,box-shadow .2s;}
-.bus-diff button small{display:block;font-size:10.5px;color:var(--text-muted);font-weight:700;margin-top:2px;}
-.bus-diff button.on{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--gold) 16%,var(--surface)),var(--surface));}
+.bus-diff button{flex:1;padding:12px 6px 10px;border-radius:18px;border:1.5px solid var(--border);background:linear-gradient(180deg,var(--surface),var(--surface-2));font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;color:var(--text);transition:transform .15s,border-color .2s,box-shadow .2s;}
+.bus-diff button em{display:block;font-style:normal;font-size:22px;margin-bottom:2px;}
+.bus-diff button small{display:block;font-size:11px;color:var(--text-muted);font-weight:800;margin-top:2px;}
+.bus-diff button.on{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 20%,transparent),0 10px 20px -10px rgba(244,183,64,.6);background:linear-gradient(145deg,color-mix(in srgb,var(--gold) 20%,var(--surface)),var(--surface));transform:translateY(-2px);}
+.bus-diff button.on small{color:var(--gold);}
 .bus-diff button:active{transform:scale(.96);}
+.bus-rules{padding:6px 12px;border-radius:20px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);}
+.bus-rules div{display:flex;gap:10px;align-items:flex-start;padding:9px 2px;font-size:13px;line-height:1.7;color:var(--text-muted);font-weight:700;}
+.bus-rules div+div{border-top:1px dashed var(--border);}
+.bus-rules b{color:var(--text);font-weight:900;}
+.bus-rules i{font-style:normal;font-size:18px;flex:none;width:26px;text-align:center;}
+.bus-go{width:100%;margin-top:14px;font-size:16px;padding-block:14px;box-shadow:0 14px 26px -10px rgba(244,183,64,.7);}
+
+.bus-letter-wrap{display:flex;flex-direction:column;align-items:center;margin:4px 0 12px;}
+@property --p{syntax:'<number>';inherits:false;initial-value:100;}
+.bus-ring{--rc:#F4B740;width:134px;height:134px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--rc) calc(var(--p,100)*1%),rgba(128,128,160,.22) 0);
+  box-shadow:0 16px 34px -12px color-mix(in srgb,var(--rc) 70%,transparent);transition:--p 1s linear;}
+.bus-ring.hot{--rc:#ff5d5d;}
+.bus-letter{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-family:'Cairo',sans-serif;font-weight:900;font-size:62px;line-height:1;
+  color:#2a1a00;background:linear-gradient(145deg,#FFE08A,#FFB347);box-shadow:inset 0 3px 0 rgba(255,255,255,.6),inset 0 -6px 12px rgba(190,100,0,.25);}
+.bus-letter.pop{animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
 .bus-letter.spin{animation:busShake .14s linear infinite;}
+@keyframes busPop{from{transform:scale(.4) rotate(-12deg);opacity:0;}to{transform:none;opacity:1;}}
 @keyframes busShake{0%{transform:translateY(-3px) rotate(-3deg);}50%{transform:translateY(3px) rotate(3deg);}100%{transform:translateY(-3px) rotate(-3deg);}}
-.bus-bar.hot>i{background:linear-gradient(90deg,#ff5d5d,#ff9a5d);}
-.bus-cap b.hot{color:#ff5d5d;animation:busBeat .5s ease-in-out infinite;display:inline-block;}
-@keyframes busBeat{50%{transform:scale(1.25);}}
+.bus-cap{font-size:12px;color:var(--text-muted);margin-top:10px;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
+.bus-cap b{font-family:'Cairo',sans-serif;font-size:14px;padding:2px 12px;border-radius:99px;background:color-mix(in srgb,var(--gold) 16%,var(--surface));color:var(--gold);}
+.bus-cap b.hot{color:#fff;background:#ff5d5d;animation:busBeat .5s ease-in-out infinite;display:inline-block;}
+@keyframes busBeat{50%{transform:scale(1.18);}}
+.bus-dots{display:flex;justify-content:center;gap:7px;margin:0 0 14px;}
+.bus-dots i{width:26px;height:6px;border-radius:99px;background:rgba(128,128,160,.25);transition:background .25s,transform .25s;}
+.bus-dots i.on{background:linear-gradient(90deg,var(--teal),var(--gold));transform:scaleY(1.4);}
+.bus-dots i.bad{background:#ff5d5d;}
+
+.bus-field{position:relative;display:flex;align-items:center;gap:10px;padding:7px 12px 7px 10px;margin-bottom:9px;border-radius:18px;
+  background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid var(--border);border-inline-start:5px solid var(--c,var(--gold));transition:border-color .2s,box-shadow .2s,background .2s;}
+.bus-field:focus-within{border-color:var(--c,var(--gold));box-shadow:0 0 0 4px color-mix(in srgb,var(--c,var(--gold)) 20%,transparent);}
+.bus-field.filled{background:linear-gradient(180deg,color-mix(in srgb,#3DDC97 10%,var(--surface)),var(--surface-2));}
+.bus-field.wrong{background:linear-gradient(180deg,color-mix(in srgb,#ff5d5d 10%,var(--surface)),var(--surface-2));border-color:#ff5d5d;}
+.bus-field .ic{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:color-mix(in srgb,var(--c,var(--gold)) 22%,transparent);}
+.bus-field label{flex:none;width:66px;white-space:nowrap;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;color:var(--text);}
+.bus-field input{flex:1;min-width:0;border:0;background:transparent;color:var(--text);font-family:'Cairo',sans-serif;font-weight:800;font-size:17px;padding:9px 2px;outline:none;text-align:start;}
+.bus-field input::placeholder{color:var(--text-muted);opacity:.5;font-weight:600;font-size:14px;}
+.bus-field .st{flex:none;width:22px;text-align:center;font-style:normal;font-weight:900;font-size:16px;}
+.bus-field.filled .st{color:#3DDC97;}.bus-field.filled .st::before{content:'✓';}
+.bus-field.wrong .st{color:#ff5d5d;}.bus-field.wrong .st::before{content:'✕';}
+.bus-hint{font-size:12px;font-weight:800;color:var(--gold);margin:-3px 0 9px;padding:8px 12px;border-radius:14px;background:color-mix(in srgb,var(--gold) 12%,var(--surface));border:1px dashed color-mix(in srgb,var(--gold) 45%,transparent);}
+.bus-tools{display:flex;gap:8px;margin-top:8px;}
+.bus-tools .btn{margin:0;}
+
+.bus-tbl{margin:4px 0 12px;}
+.bus-row{display:grid;grid-template-columns:34px 1fr 1fr 48px;align-items:center;gap:8px;padding:9px 10px;border-radius:16px;margin-bottom:7px;font-size:13px;
+  background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);border-inline-start:4px solid var(--c,var(--gold));}
+.bus-row.head{background:transparent;border:0;font-size:11px;color:var(--text-muted);font-weight:800;padding-block:2px;}
+.bus-row .ci{font-size:20px;text-align:center;}
+.bus-row .w{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bus-row .w small{display:block;font-size:10px;font-weight:800;color:var(--text-muted);}
+.bus-row .w small.g{color:#3DDC97;}.bus-row .w small.r{color:#ff7a7a;}
+.bus-row .w.bad{color:var(--text-muted);text-decoration:line-through;text-decoration-thickness:1px;}
+.bus-row .pt{font-family:'Cairo',sans-serif;font-weight:900;text-align:center;font-size:12.5px;padding:3px 0;border-radius:99px;color:#2a1a00;background:linear-gradient(95deg,#FFE08A,#FFB347);}
+.bus-row .pt.z{color:var(--text-muted);background:rgba(128,128,160,.16);}
 .bus-row.in{animation:busRowIn .45s cubic-bezier(.22,.9,.28,1) both;}
 @keyframes busRowIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-.bus-bonus{text-align:center;margin:0 0 10px;padding:9px;border-radius:14px;font-weight:900;font-family:'Cairo',sans-serif;font-size:14px;color:#2a1a00;background:linear-gradient(95deg,#FFE08A,#FFB347);animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
-.bus-hint{font-size:11.5px;font-weight:700;color:var(--gold);margin:-3px 4px 8px;}
-.bus-tools{display:flex;gap:8px;margin-top:6px;}
-.bus-tools .btn{margin:0;}
-@media (prefers-reduced-motion:reduce){.bus-letter.spin,.bus-cap b.hot,.bus-row.in,.bus-bonus{animation:none}}
+.bus-bonus{text-align:center;margin:0 0 10px;padding:10px;border-radius:16px;font-weight:900;font-family:'Cairo',sans-serif;font-size:14px;color:#2a1a00;background:linear-gradient(95deg,#FFE08A,#FFB347);box-shadow:0 10px 20px -10px rgba(255,179,71,.8);animation:busPop .5s cubic-bezier(.34,1.56,.64,1);}
+.bus-tot{display:flex;justify-content:space-between;gap:10px;margin:8px 0 14px;}
+.bus-tot>div{flex:1;text-align:center;padding:12px 10px;border-radius:18px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid var(--border);}
+.bus-tot>div.lead{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent);}
+.bus-tot b{display:block;font-family:'Cairo',sans-serif;font-weight:900;font-size:26px;color:var(--gold);}
+.bus-tot span{font-size:11.5px;color:var(--text-muted);font-weight:800;}
+.bus-confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50;}
+.bus-confetti i{position:absolute;top:-30px;font-style:normal;font-size:22px;animation:busFall 2.8s ease-in forwards;}
+@keyframes busFall{to{transform:translateY(105vh) rotate(540deg);opacity:.9;}}
+@media (prefers-reduced-motion:reduce){.bus-road i,.bus-road::after,.bus-letter.pop,.bus-letter.spin,.bus-cap b.hot,.bus-row.in,.bus-bonus,.bus-confetti i{animation:none}.bus-confetti{display:none}}
 
+/* ===== مراحل + اختيار الوقت ===== */
+.bus-stages{display:flex;align-items:stretch;gap:8px;margin:0 0 12px;}
+.bus-stg{flex:1;position:relative;text-align:center;padding:7px 4px 6px;border-radius:14px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid var(--border);opacity:.7;}
+.bus-stg b{display:grid;place-items:center;width:22px;height:22px;margin:0 auto 3px;border-radius:50%;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;background:rgba(128,128,160,.22);color:var(--text-muted);}
+.bus-stg span{display:block;font-size:11px;font-weight:800;color:var(--text-muted);}
+.bus-stg em{font-style:normal;font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;color:var(--c);}
+.bus-stg.cur{opacity:1;border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 20%,transparent);}
+.bus-stg.cur b{background:var(--c);color:#2a1a00;}
+.bus-stg.done{opacity:1;background:linear-gradient(180deg,color-mix(in srgb,#3DDC97 12%,var(--surface)),var(--surface-2));}
+.bus-stg.done b{background:#3DDC97;color:#06301e;}
+.bus-mult{font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;padding:2px 12px;border-radius:99px;color:#2a1a00;background:var(--c,var(--gold));}
+.bus-presets{display:flex;gap:8px;margin:0 0 12px;}
+.bus-presets button{flex:1;padding:9px 2px;border-radius:14px;border:1.5px solid var(--border);background:linear-gradient(180deg,var(--surface),var(--surface-2));font-family:'Cairo',sans-serif;font-weight:900;font-size:12.5px;color:var(--text);transition:transform .15s,border-color .2s;}
+.bus-presets button em{display:block;font-style:normal;font-size:20px;}
+.bus-presets button:active{transform:scale(.94);border-color:var(--gold);}
+.bus-sc{padding:12px;border-radius:20px;margin-bottom:10px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);}
+.bus-sc-h{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:'Cairo',sans-serif;}
+.bus-sc-h .n{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;font-weight:900;font-size:13px;color:#2a1a00;background:linear-gradient(145deg,#FFE08A,#FFB347);}
+.bus-sc-h b{flex:1;font-weight:900;font-size:14.5px;}
+.bus-sc-m{font-weight:900;font-size:15px;color:var(--gold);padding:2px 12px;border-radius:99px;background:color-mix(in srgb,var(--gold) 14%,var(--surface));}
+.bus-times{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.bus-times button{padding:9px 2px 7px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);font-family:'Cairo',sans-serif;color:var(--text);transition:transform .15s,border-color .2s,box-shadow .2s,background .2s;}
+.bus-times button em{display:block;font-style:normal;font-size:19px;line-height:1.2;}
+.bus-times button b{display:block;font-weight:900;font-size:14px;}
+.bus-times button small{display:block;font-weight:900;font-size:12px;color:var(--c);}
+.bus-times button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,var(--surface));box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent);transform:translateY(-2px);}
+.bus-times button:active{transform:scale(.94);}
+.bus-sum{padding:14px;border-radius:22px;margin:4px 0 4px;background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--gold) 18%,transparent),transparent 70%),linear-gradient(180deg,var(--surface),var(--surface-2));border:1.5px solid color-mix(in srgb,var(--gold) 35%,var(--border));}
+.bus-sum-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:800;color:var(--text-muted);margin-bottom:8px;}
+.bus-sum-row b{font-family:'Cairo',sans-serif;font-size:14px;color:var(--text);}
+.bus-risk{height:8px;border-radius:99px;background:rgba(128,128,160,.22);overflow:hidden;margin-bottom:12px;}
+.bus-risk i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#3DDC97,#F4B740 55%,#ff5d5d);transition:width .35s cubic-bezier(.22,.9,.28,1);}
+.bus-sum-grid{display:flex;gap:8px;}
+.bus-sum-grid>div{flex:1;text-align:center;padding:9px 4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 80%,transparent);border:1px solid var(--border);}
+.bus-sum-grid b{display:block;font-family:'Cairo',sans-serif;font-weight:900;font-size:19px;color:var(--gold);}
+.bus-sum-grid span{font-size:10.5px;font-weight:800;color:var(--text-muted);}
+.bus-fin{margin:2px 0 12px;}
+.bus-fin-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;margin-bottom:7px;background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);border-inline-start:4px solid var(--c);}
+.bus-fin-row .k{font-size:22px;}
+.bus-fin-row>div:nth-child(2){flex:1;}
+.bus-fin-row b{display:block;font-family:'Cairo',sans-serif;font-weight:900;font-size:13.5px;}
+.bus-fin-row small{font-size:11px;font-weight:800;color:var(--text-muted);}
+.bus-fin-row .sc{text-align:center;}
+.bus-fin-row .sc b{font-size:20px;color:var(--gold);}
+
+/* ===== HUD التايمر المتقدم ===== */
+.bus-hud{--e:0;position:relative;margin:0 0 12px;padding:14px 14px 10px;border-radius:24px;overflow:visible;
+  background:radial-gradient(130% 120% at 85% 0%,color-mix(in srgb,var(--tc,#F4B740) 24%,transparent),transparent 60%),linear-gradient(180deg,var(--surface),var(--surface-2));
+  border:1.5px solid color-mix(in srgb,var(--tc,#F4B740) 45%,var(--border));box-shadow:0 16px 30px -18px color-mix(in srgb,var(--tc,#F4B740) 80%,transparent);transition:border-color .3s,box-shadow .3s;}
+.bus-hud.hot{border-color:#ff4d4d;box-shadow:0 0 0 3px rgba(255,77,77,.18),0 16px 34px -14px rgba(255,60,60,.7);}
+.bus-hud.urgent{animation:hudThrob .5s ease-in-out infinite;}
+@keyframes hudThrob{50%{transform:scale(1.012);}}
+.hud-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.bus-hud .bus-letter{flex:none;width:74px;height:74px;font-size:44px;}
+.hud-time{flex:1;min-width:0;}
+.hud-digits{display:flex;align-items:baseline;gap:2px;font-family:'Cairo',sans-serif;font-variant-numeric:tabular-nums;line-height:1;direction:ltr;justify-content:center;}
+.hud-digits b{font-weight:900;font-size:46px;min-width:1.2ch;text-align:right;background:linear-gradient(180deg,var(--text),color-mix(in srgb,var(--text) 65%,var(--tc)));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.hud-digits small{font-weight:900;font-size:22px;color:var(--text-muted);min-width:1.4ch;}
+.hud-digits i{font-style:normal;font-weight:800;font-size:13px;color:var(--text-muted);margin-inline-start:6px;}
+.bus-hud.hot .hud-digits b{background:none;-webkit-text-fill-color:#ff5d5d;color:#ff5d5d;text-shadow:0 0 18px rgba(255,80,80,.55);}
+.bus-hud.urgent .hud-digits b{animation:busBeat .5s ease-in-out infinite;display:inline-block;}
+.hud-sub{font-size:11.5px;font-weight:800;color:var(--text-muted);text-align:center;margin-top:4px;}
+.hud-mult{flex:none;text-align:center;padding:7px 10px;border-radius:16px;color:#2a1a00;background:linear-gradient(145deg,color-mix(in srgb,var(--tc) 75%,#fff),var(--tc));box-shadow:0 8px 16px -8px var(--tc);font-family:'Cairo',sans-serif;}
+.hud-mult b{display:block;font-weight:900;font-size:22px;line-height:1.05;}
+.hud-mult span{display:block;font-weight:900;font-size:10.5px;opacity:.85;}
+.hud-track{position:relative;margin:0 14px;height:26px;}
+.hud-lane{position:absolute;inset:0;border-radius:99px;background:rgba(128,128,160,.16);box-shadow:inset 0 2px 6px rgba(0,0,0,.25);overflow:hidden;
+  -webkit-mask-image:repeating-linear-gradient(90deg,#000 0,#000 calc(5% - 3px),transparent calc(5% - 3px),transparent 5%);mask-image:repeating-linear-gradient(90deg,#000 0,#000 calc(5% - 3px),transparent calc(5% - 3px),transparent 5%);}
+.hud-fill{position:absolute;inset:0;background:linear-gradient(270deg,#3DDC97 0%,#8BE04E 25%,#F4B740 50%,#FF9F43 72%,#ff3b3b 100%);clip-path:inset(0 0 0 calc((1 - var(--e)) * 100%));}
+.hud-fill::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.26) 0 7px,transparent 7px 16px);animation:hudSlide .9s linear infinite;}
+.hud-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.4),transparent 55%,rgba(0,0,0,.18));}
+@keyframes hudSlide{from{background-position:0 0}to{background-position:-23px 0}}
+.hud-bus{position:absolute;top:50%;right:calc(var(--e) * 100%);transform:translate(50%,-58%);font-style:normal;font-size:30px;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));z-index:2;}
+.hud-bus::before{content:'';position:absolute;top:50%;left:100%;width:34px;height:6px;border-radius:99px;transform:translateY(-50%);background:linear-gradient(90deg,rgba(255,255,255,.55),transparent);opacity:.8;}
+.bus-hud.hot .hud-bus{animation:hudJit .12s linear infinite;}
+@keyframes hudJit{0%,100%{margin-top:0}50%{margin-top:-2px}}
+.hud-flag{position:absolute;left:-12px;top:50%;transform:translateY(-62%);font-style:normal;font-size:22px;z-index:1;}
+.hud-scale{display:flex;justify-content:space-between;margin:6px 8px 0;font-family:'Cairo',sans-serif;font-weight:800;font-size:10.5px;color:var(--text-muted);direction:ltr;flex-direction:row-reverse;}
+.bus-vig{position:fixed;inset:0;pointer-events:none;z-index:40;opacity:0;transition:opacity .4s;box-shadow:inset 0 0 90px 10px rgba(255,50,50,.4);}
+.bus-vig.on{opacity:1;animation:vigPulse 1s ease-in-out infinite;}
+@keyframes vigPulse{50%{opacity:.35;}}
+@media (prefers-reduced-motion:reduce){.bus-hud.urgent,.hud-fill::before,.bus-hud.hot .hud-bus,.bus-hud.urgent .hud-digits b,.bus-vig.on{animation:none}}
 </style>
 <script id="bus-js">
 (function(){
-  var CATS=[['name','اسم','👤'],['animal','حيوان','🐾'],['plant','نبات','🌿'],['thing','جماد','🪑'],['place','بلاد','🌍']];
+  var CATS=[['boy','اسم ولد','👦','#4DA3FF'],['girl','اسم بنت','👧','#FF6FB1'],['animal','حيوان','🐾','#FF9F43'],['thing','جماد','🪑','#A78BFA'],['plant','نبات','🌿','#3DDC97'],['place','بلد/دولة','🌍','#2EC4D6']];
+  var NC=CATS.length;
   var LETTERS='ابتجحدرسشصطعفقكلمنهوي'.split('');
-  var ROUNDS=3, SECS=60, BONUS=10;
+  var ROUNDS=3, BONUS=10, RISK_BONUS=0.5;
+  /* خيارات وقت المرحلة: s=ثواني، m=مضاعف النقط، f=تأثير الوقت على سرعة الجهاز */
+  var TIMES=[{s:60,m:1,f:1,ic:'😌',c:'#3DDC97',n:'مريح'},{s:45,m:2,f:.95,ic:'⚖️',c:'#F4B740',n:'متوازن'},{s:30,m:3,f:.88,ic:'🔥',c:'#FF9F43',n:'سريع'},{s:20,m:4,f:.8,ic:'⚡',c:'#ff5d5d',n:'خاطف'}];
+  var PRESETS={safe:{n:'آمن',ic:'🛡️',t:[60,60,60]},rise:{n:'تصاعدي',ic:'📈',t:[60,45,30]},bold:{n:'مغامر',ic:'🔥',t:[45,30,30]},crazy:{n:'جنوني',ic:'💀',t:[20,20,20]}};
+  function tinfo(sec){ for(var i=0;i<TIMES.length;i++) if(TIMES[i].s===sec) return TIMES[i]; return TIMES[0]; }
   var DIFFS={easy:{label:'سهل',sub:'+20 نقطة',p:0.6,reward:20},mid:{label:'عادي',sub:'+30 نقطة',p:0.82,reward:30},hard:{label:'صعب',sub:'+50 نقطة',p:0.97,reward:50}};
-  /* اسم | حيوان | نبات | جماد | بلاد */
+  /* ولد | بنت | حيوان | جماد | نبات | بلد */
   var DICT={
-    'ا':'أحمد,أمير,أنطون,أيمن|أسد,أرنب,أخطبوط,أفعى|أناناس,أرز,أفوكادو,إجاص|إبريق,أريكة,أباجورة,أسانسير|الأردن,أمريكا,أسوان,الإسكندرية',
-    'ب':'باسم,بيشوي,بولا,بسمة|بطة,بقرة,ببغاء,بومة|بطيخ,برتقال,بصل,باذنجان|باب,بطانية,بالون,بوصلة|بلجيكا,بولندا,بغداد,بورسعيد',
-    'ت':'تامر,تريزا,توفيق,تقى|تمساح,تيس,تونة,ترسة|تفاح,تين,توت,ترمس|تلفزيون,تليفون,تابلت,تسريحة|تونس,تركيا,تايلاند,تنزانيا',
-    'ج':'جورج,جميلة,جيهان,جرجس|جمل,جاموس,جدي,جراد|جزر,جوافة,جرجير,جريب فروت|جرس,جاكيت,جوال,جزمة|الجزائر,جيبوتي,الجيزة,جورجيا',
-    'ح':'حنا,حسام,حنان,حازم|حصان,حمار,حمامة,حوت|حمص,حلبة,حبحب,حمضيات|حقيبة,حذاء,حبل,حاسوب|حلب,الحبشة,حيفا,حلوان',
-    'د':'داود,دينا,دانيال,دميانة|دب,دجاجة,دلفين,دودة|دراق,دوم,دقيق,دخن|دولاب,دفتر,دش,دراجة|دمياط,دبي,دمشق,الدنمارك',
-    'ر':'رامي,رحاب,رفيق,ريم|رنجة,رخمة,راكون,رنة|رمان,ريحان,رجلة,رز|راديو,ريموت,رف,رادار|روسيا,رومانيا,رشيد,رام الله',
-    'س':'سامح,سارة,سمير,سوزان|سمكة,سلحفاة,سنجاب,سلطعون|سبانخ,سفرجل,سمسم,سكر|سرير,ساعة,سيارة,سجادة|السودان,سوريا,سوهاج,السويس',
-    'ش':'شريف,شهد,شنودة,شيماء|شمبانزي,شاهين,شبل,شيهم|شمام,شعير,شبت,شاي|شباك,شنطة,شمعة,شوكة|شيلي,شرم الشيخ,الشرقية,شبرا',
-    'ص':'صموئيل,صفاء,صلاح,صباح|صقر,صرصور,صوص,صرار|صبار,صنوبر,صعتر,صفصاف|صندوق,صابونة,صحن,صنبور|الصين,الصومال,صنعاء,صور',
-    'ط':'طارق,طوني,طلعت,طه|طاووس,طائر,طوقان,طيهوج|طماطم,طرخون,طرطوفة,طلح|طبق,طاولة,طفاية,طابعة|طنطا,طوكيو,طرابلس,طهران',
-    'ع':'عماد,عزة,عادل,عايدة|عصفور,عقرب,عنكبوت,عجل|عنب,عدس,عرقسوس,عيش الغراب|عجلة,علبة,عصاية,عدسة|عمان,العراق,عدن,العريش',
-    'ف':'فادي,فيبي,فريد,فاطمة|فيل,فأر,فرس,فهد|فراولة,فجل,فلفل,فاصوليا|فنجان,فرن,فأس,فرشاة|فرنسا,فلسطين,فنلندا,الفيوم',
-    'ق':'قيصر,قمر,قدري,قسطنطين|قرد,قطة,قنفذ,قندس|قرنبيط,قمح,قلقاس,قصب|قلم,قفل,قدر,قرص|قطر,قبرص,القاهرة,قنا',
-    'ك':'كيرلس,كريم,كمال,كاترين|كلب,كنغر,كوالا,كركدن|كرنب,كمثرى,كزبرة,كرفس|كرسي,كوب,كتاب,كاميرا|الكويت,كندا,كوبا,كينيا',
-    'ل':'ليلى,لوقا,لبنى,لطفي|لقلق,ليمور,ليث,لاما|ليمون,لوبيا,لفت,لوز|لمبة,لوح,لابتوب,لحاف|لبنان,ليبيا,لندن,لشبونة',
-    'م':'مينا,محمد,مريم,ماجد|ماعز,مها,ماموث,محار|موز,مانجو,ملوخية,مشمش|مفتاح,مرآة,مروحة,مقص|مصر,المغرب,المنيا,موريتانيا',
-    'ن':'نادر,نانسي,نبيل,نيفين|نمر,نحلة,نعامة,نسر|نعناع,نخيل,نبق,نارنج|نظارة,نافذة,ناقوس,نجفة|النمسا,نيجيريا,نيويورك,نيوزيلندا',
-    'ه':'هاني,هدى,هبة,هشام|هدهد,هامستر,هرة,هزار|هليون,هيل,هندباء,هندي|هاتف,هرم,هاون,هودج|الهند,هولندا,هونغ كونغ,هاواي',
-    'و':'وليم,وفاء,وجيه,ولاء|وزة,وحيد القرن,وعل,ورل|ورد,ورق عنب,وسمة,ورد نيل|وسادة,وعاء,ورقة,وشاح|واشنطن,وارسو,الوادي الجديد,وهران',
-    'ي':'يوسف,يارا,يحيى,يسرا|يمامة,يعسوب,يربوع,يرقة|يقطين,يانسون,يوسفي,يمنى|يخت,ياقة,يافطة,يد|اليمن,اليابان,يافا,اليونان'
+    'ا':'أحمد,أمير,أنطون,أيمن,أشرف|أسماء,أمل,آية,أميرة,إيمان|أسد,أرنب,أخطبوط,أفعى|إبريق,أريكة,أباجورة,أسانسير|أناناس,أرز,أفوكادو,إجاص|الأردن,أمريكا,أسوان,الإسكندرية',
+    'ب':'باسم,بيشوي,بولا,بسام,بدر|بسمة,بسنت,بشرى,بتول,بيسان|بطة,بقرة,ببغاء,بومة|باب,بطانية,بالون,بوصلة|بطيخ,برتقال,بصل,باذنجان|بلجيكا,بولندا,بغداد,بورسعيد',
+    'ت':'تامر,توفيق,تيمور,توماس,تميم|تقى,تريزا,تغريد,تهاني,تسنيم|تمساح,تيس,تونة,ترسة|تلفزيون,تليفون,تابلت,تسريحة|تفاح,تين,توت,ترمس|تونس,تركيا,تايلاند,تنزانيا',
+    'ج':'جورج,جرجس,جمال,جاسر,جلال|جميلة,جيهان,جنى,جومانا,جيلان|جمل,جاموس,جدي,جراد|جرس,جاكيت,جوال,جزمة|جزر,جوافة,جرجير,جريب فروت|الجزائر,جيبوتي,الجيزة,جورجيا',
+    'ح':'حنا,حسام,حازم,حسن,حمدي|حنان,حبيبة,حياة,حلا,حنين|حصان,حمار,حمامة,حوت|حقيبة,حذاء,حبل,حاسوب|حمص,حلبة,حبحب,حمضيات|حلب,الحبشة,حيفا,حلوان',
+    'د':'داود,دانيال,دياب,درويش,دومينيك|دينا,دميانة,دعاء,دلال,دارين|دب,دجاجة,دلفين,دودة|دولاب,دفتر,دش,دراجة|دراق,دوم,دقيق,دخن|دمياط,دبي,دمشق,الدنمارك',
+    'ر':'رامي,رفيق,رضا,رمزي,رأفت|ريم,رحاب,رنا,رشا,رحمة|رنجة,رخمة,راكون,رنة|راديو,ريموت,رف,رادار|رمان,ريحان,رجلة,رز|روسيا,رومانيا,رشيد,رام الله',
+    'س':'سامح,سمير,سيف,سعيد,سليم|سارة,سوزان,سلمى,سناء,سهر|سمكة,سلحفاة,سنجاب,سلطعون|سرير,ساعة,سيارة,سجادة|سبانخ,سفرجل,سمسم,سكر|السودان,سوريا,سوهاج,السويس',
+    'ش':'شريف,شنودة,شادي,شهاب,شعبان|شهد,شيماء,شروق,شيرين,شاهندة|شمبانزي,شاهين,شبل,شيهم|شباك,شنطة,شمعة,شوكة|شمام,شعير,شبت,شاي|شيلي,شرم الشيخ,الشرقية,شبرا',
+    'ص':'صموئيل,صلاح,صابر,صفوت,صبحي|صفاء,صباح,صفية,صابرين|صقر,صرصور,صوص,صرار|صندوق,صابونة,صحن,صنبور|صبار,صنوبر,صعتر,صفصاف|الصين,الصومال,صنعاء,صور',
+    'ط':'طارق,طوني,طلعت,طه,طلال|طيبة,طاهرة,طيف,طوبى|طاووس,طائر,طوقان,طيهوج|طبق,طاولة,طفاية,طابعة|طماطم,طرخون,طرطوفة,طلح|طنطا,طوكيو,طرابلس,طهران',
+    'ع':'عماد,عادل,عمر,علي,عصام|عزة,عايدة,عبير,علا,عائشة|عصفور,عقرب,عنكبوت,عجل|عجلة,علبة,عصاية,عدسة|عنب,عدس,عرقسوس,عيش الغراب|عمان,العراق,عدن,العريش',
+    'ف':'فادي,فريد,فارس,فتحي,فؤاد|فيبي,فاطمة,فرح,فريدة,فيروز|فيل,فأر,فرس,فهد|فنجان,فرن,فأس,فرشاة|فراولة,فجل,فلفل,فاصوليا|فرنسا,فلسطين,فنلندا,الفيوم',
+    'ق':'قيصر,قدري,قسطنطين,قاسم,قصي|قمر,قطر الندى,قوت القلوب,قمرية|قرد,قطة,قنفذ,قندس|قلم,قفل,قدر,قرص|قرنبيط,قمح,قلقاس,قصب|قطر,قبرص,القاهرة,قنا',
+    'ك':'كيرلس,كريم,كمال,كامل,كارم|كاترين,كريمة,كوثر,كارمن,كاميليا|كلب,كنغر,كوالا,كركدن|كرسي,كوب,كتاب,كاميرا|كرنب,كمثرى,كزبرة,كرفس|الكويت,كندا,كوبا,كينيا',
+    'ل':'لوقا,لطفي,لؤي,ليث,لبيب|ليلى,لبنى,لمياء,لينا,لميس|لقلق,ليمور,ليث,لاما|لمبة,لوح,لابتوب,لحاف|ليمون,لوبيا,لفت,لوز|لبنان,ليبيا,لندن,لشبونة',
+    'م':'مينا,محمد,ماجد,مصطفى,محمود|مريم,منى,مها,مي,ملك|ماعز,مها,ماموث,محار|مفتاح,مرآة,مروحة,مقص|موز,مانجو,ملوخية,مشمش|مصر,المغرب,المنيا,موريتانيا',
+    'ن':'نادر,نبيل,نور,نبيه,نجيب|نانسي,نيفين,نهى,نادين,نجلاء|نمر,نحلة,نعامة,نسر|نظارة,نافذة,ناقوس,نجفة|نعناع,نخيل,نبق,نارنج|النمسا,نيجيريا,نيويورك,نيوزيلندا',
+    'ه':'هاني,هشام,هيثم,هادي,هلال|هدى,هبة,هناء,هالة,هنادي|هدهد,هامستر,هرة,هزار|هاتف,هرم,هاون,هودج|هليون,هيل,هندباء,هندي|الهند,هولندا,هونغ كونغ,هاواي',
+    'و':'وليم,وجيه,وائل,وسام,وليد|وفاء,ولاء,وعد,وردة,وسام|وزة,وحيد القرن,وعل,ورل|وسادة,وعاء,ورقة,وشاح|ورد,ورق عنب,وسمة,ورد نيل|واشنطن,وارسو,الوادي الجديد,وهران',
+    'ي':'يوسف,يحيى,ياسر,يوحنا,يعقوب|يارا,يسرا,ياسمين,يمنى,يسر|يمامة,يعسوب,يربوع,يرقة|يخت,ياقة,يافطة,يد|يقطين,يانسون,يوسفي,ياسمين|اليمن,اليابان,يافا,اليونان'
   };
   function norm(t){ return String(t||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim(); }
   function strip(t){ return norm(t).replace(/^ال(?=.{2,})/,''); }
@@ -35573,30 +35700,31 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 
   window.initBusGame=function(keepDiff){
     stopTimer(); if(spinIv){ clearInterval(spinIv); spinIv=null; }
-    var d=(keepDiff&&B&&B.diff)||'mid';
-    B={phase:'intro',diff:d,round:0,used:[],letter:'',ans:['','','','',''],res:null,userTotal:0,botTotal:0,left:SECS,rewarded:false,hintI:-1,hintTxt:'',hintUsed:false,won:false};
+    var d=(keepDiff&&B&&B.diff)||'mid', tm=(B&&B.times)?B.times.slice():[60,60,60];
+    B={phase:keepDiff?'setup':'intro',diff:d,times:tm,secs:tm[0],stageLog:[],round:0,used:[],letter:'',ans:['','','','','',''],res:null,userTotal:0,botTotal:0,left:tm[0],rewarded:false,hintI:-1,hintTxt:'',hintUsed:false,won:false};
   };
-  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+  var raf=0;
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } if(raf){ try{ cancelAnimationFrame(raf); }catch(e){} raf=0; } }
 
   function startRound(){
     var pool=LETTERS.filter(function(l){ return B.used.indexOf(l)<0; });
-    B.letter=rnd(pool); B.used.push(B.letter); B.round++;
-    B.ans=['','','','','']; B.res=null; B.hintI=-1; B.hintTxt=''; B.hintUsed=false; B.left=SECS; B.phase='spin';
+    B.letter=rnd(pool); B.used.push(B.letter); B.round++; B.secs=B.times[B.round-1];
+    B.ans=['','','','','','']; B.res=null; B.hintI=-1; B.hintTxt=''; B.hintUsed=false; B.left=B.secs; B.shown=false; B.phase='spin';
     render();
     var n=0; if(spinIv) clearInterval(spinIv);
     spinIv=setInterval(function(){
       if(state.view!=='game-bus'||!B||B.phase!=='spin'){ clearInterval(spinIv); spinIv=null; return; }
       n++; var el=document.getElementById('bus-spin'); if(el) el.textContent=rnd(LETTERS);
       if(n%3===0) vib(8);
-      if(n>=15){ clearInterval(spinIv); spinIv=null; B.phase='play'; try{ SND.click(); }catch(e){} render(); setTimeout(function(){ var f=document.querySelector('.bus-in'); if(f) try{ f.focus(); }catch(e){} },80); }
+      if(n>=15){ clearInterval(spinIv); spinIv=null; B.phase='play'; B.endAt=Date.now()+B.secs*1000; B.left=B.secs; try{ SND.click(); }catch(e){} render(); setTimeout(function(){ var f=document.querySelector('.bus-in'); if(f) try{ f.focus(); }catch(e){} },80); }
     },75);
   }
-  function readInputs(){ document.querySelectorAll('.bus-in').forEach(function(el){ var i=+el.getAttribute('data-i'); if(i>=0&&i<5) B.ans[i]=el.value; }); }
+  function readInputs(){ document.querySelectorAll('.bus-in').forEach(function(el){ var i=+el.getAttribute('data-i'); if(i>=0&&i<NC) B.ans[i]=el.value; }); }
 
   function finishRound(){
     if(!B||B.phase!=='play') return;
     readInputs(); stopTimer();
-    var L=B.letter, rows=[], ut=0, bt=0, valid=0, p=DIFFS[B.diff].p;
+    var T=tinfo(B.secs), m=T.m, L=B.letter, rows=[], ut=0, bt=0, valid=0, p=Math.min(0.99,DIFFS[B.diff].p*T.f);
     CATS.forEach(function(c,i){
       var list=dictList(L,i), bw=(Math.random()<p && list.length)?rnd(list):'';
       var uw=(B.ans[i]||'').trim();
@@ -35604,35 +35732,55 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
       var known=ok && inDict(uw,L,i);
       var same=!!(ok && bw && strip(uw)===strip(bw));
       var up=0; if(ok){ up=known?(same?5:10):5; if(B.hintI===i) up=Math.min(up,5); valid++; }
-      var bp=bw?(same?5:10):0;
+      var bp=bw?(same?5:10):0; up*=m; bp*=m;
       ut+=up; bt+=bp; rows.push({cat:c,user:uw,ok:ok,known:known,bot:bw,up:up,bp:bp,same:same});
     });
-    var bonus = valid===5 ? BONUS : 0; ut+=bonus;
-    B.res={rows:rows,ut:ut,bt:bt,bonus:bonus}; B.userTotal+=ut; B.botTotal+=bt;
+    var bonus = valid===NC ? BONUS*m : 0; ut+=bonus;
+    B.res={rows:rows,ut:ut,bt:bt,bonus:bonus}; B.userTotal+=ut; B.botTotal+=bt; B.stageLog.push({secs:B.secs,m:m,ut:ut,bt:bt,letter:L});
     B.phase = B.round>=ROUNDS ? 'final' : 'result';
     if(B.phase==='final'){
       B.won=B.userTotal>B.botTotal;
       try{ var st=myGameStats(state.pid); if(!st.busBest||B.userTotal>st.busBest){ st.busBest=B.userTotal; saveGameStats(GAME_STATS); } }catch(e){}
-      if(B.won && !B.rewarded){ B.rewarded=true; awardSoloGamePoints(DIFFS[B.diff].reward,'مبروك! كسبت أتوبيس كومبليت'); }
+      if(B.won && !B.rewarded){ B.rewarded=true; awardSoloGamePoints(reward(),'مبروك! كسبت أتوبيس كومبليت'); }
       else { try{ SND.click(); }catch(e){} }
     } else { try{ SND.cheer(); }catch(e){} }
     render();
   }
   function tick(){
     if(!B||B.phase!=='play'||state.view!=='game-bus'){ stopTimer(); return; }
-    B.left--;
-    var t=document.getElementById('bus-timer'); if(t){ t.textContent=Math.max(0,B.left)+' ث'; t.classList.toggle('hot',B.left<=10); }
-    var bar=document.getElementById('bus-bar'); if(bar){ bar.style.transform='scaleX('+Math.max(0,B.left/SECS)+')'; var w=bar.parentNode; if(w) w.classList.toggle('hot',B.left<=10); }
-    if(B.left<=5&&B.left>0) vib(15);
+    B.left=Math.max(0,Math.ceil((B.endAt-Date.now())/1000));
+    if(B.left<=5&&B.left>0){ vib(15); try{ SND.click(); }catch(e){} }
     if(B.left<=0) finishRound();
   }
+  /* تحديث سلس للتايمر (كل فريم) */
+  function hudFrame(){
+    raf=0;
+    if(!B||B.phase!=='play'||state.view!=='game-bus') return;
+    var rem=Math.max(0,(B.endAt-Date.now())/1000), e=1-rem/B.secs;
+    var hud=document.getElementById('bus-hud');
+    if(hud){
+      hud.style.setProperty('--e',e.toFixed(4));
+      var hot=rem<=10, urgent=rem<=5;
+      if(hud._hot!==hot){ hud._hot=hot; hud.classList.toggle('hot',hot); var vg=document.getElementById('bus-vig'); if(vg) vg.classList.toggle('on',hot); }
+      if(hud._urg!==urgent){ hud._urg=urgent; hud.classList.toggle('urgent',urgent); }
+    }
+    var sec=document.getElementById('bus-sec'), ms=document.getElementById('bus-ms');
+    var w=Math.floor(rem), t=Math.floor((rem-w)*10);
+    if(sec&&sec._v!==w){ sec._v=w; sec.textContent=w; }
+    if(ms&&ms._v!==t){ ms._v=t; ms.textContent='.'+t; }
+    if(rem<=0){ finishRound(); return; }
+    raf=requestAnimationFrame(hudFrame);
+  }
   window.busAfterRender=function(){
-    if(state.view==='game-bus'&&B&&B.phase==='play'){ if(!timer) timer=setInterval(tick,1000); } else stopTimer();
+    if(state.view==='game-bus'&&B&&B.phase==='play'){
+      if(!timer) timer=setInterval(tick,1000);
+      if(!raf&&typeof requestAnimationFrame==='function') raf=requestAnimationFrame(hudFrame);
+    } else stopTimer();
   };
   function useHint(){
     if(!B||B.phase!=='play'||B.hintUsed) return;
     readInputs();
-    var idx=-1; for(var i=0;i<5;i++){ if(!(B.ans[i]||'').trim()){ idx=i; break; } }
+    var idx=-1; for(var i=0;i<NC;i++){ if(!(B.ans[i]||'').trim()){ idx=i; break; } }
     if(idx<0){ try{ showToast('كل الخانات مليانة 👌'); }catch(e){} return; }
     var w=rnd(dictList(B.letter,idx)); if(!w) return;
     var raw=w.replace(/^ال/,''); 
@@ -35642,68 +35790,155 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 
   function head(){ return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">أتوبيس كومبليت</div></div>'; }
   function scoreRow(){
-    return '<div class="xo-score-row"><div class="xo-score-pill"><span>الجولة</span><b>'+Math.min(B.round||1,ROUNDS)+'/'+ROUNDS+'</b></div>'+
+    return '<div class="xo-score-row"><div class="xo-score-pill"><span>المرحلة</span><b>'+Math.min(B.round||1,ROUNDS)+'/'+ROUNDS+'</b></div>'+
       '<div class="xo-score-pill draw"><span>نقطك</span><b>'+B.userTotal+'</b></div><div class="xo-score-pill o"><span>الجهاز</span><b>'+B.botTotal+'</b></div></div>';
+  }
+  function fieldState(i){
+    var v=(B.ans[i]||'').trim(); if(!v) return '';
+    if(!startsWith(v,B.letter)) return 'wrong';
+    return strip(v).length>=2 ? 'filled' : '';
+  }
+  function busLive(){
+    if(!B||B.phase!=='play') return;
+    var dots=document.querySelectorAll('#bus-dots i');
+    document.querySelectorAll('.bus-in').forEach(function(el){
+      var i=+el.getAttribute('data-i'), st=fieldState(i), f=el.parentNode;
+      f.classList.toggle('filled',st==='filled'); f.classList.toggle('wrong',st==='wrong');
+      if(dots[i]){ dots[i].classList.toggle('on',st==='filled'); dots[i].classList.toggle('bad',st==='wrong'); }
+    });
+  }
+  function confetti(){
+    var e=['🎉','⭐','🏅','✨','🚌'], h='<div class="bus-confetti">';
+    for(var k=0;k<22;k++) h+='<i style="left:'+Math.floor(Math.random()*96)+'%;animation-delay:'+(Math.random()*1.2).toFixed(2)+'s;font-size:'+(16+Math.floor(Math.random()*16))+'px">'+e[k%e.length]+'</i>';
+    return h+'</div>';
   }
   function resultTable(){
     var h='<div class="bus-tbl"><div class="bus-row head"><span></span><span>إجابتك</span><span>الجهاز</span><span>نقط</span></div>';
     B.res.rows.forEach(function(r,i){
-      var u=r.user?'<div class="w'+(r.ok?'':' bad')+'">'+esc(r.user)+(r.ok?(r.known?'<small>✓ كلمة معروفة</small>':'<small>مقبولة</small>'):'<small>مش بالحرف</small>')+'</div>':'<div class="w bad">—</div>';
+      var u=r.user?'<div class="w'+(r.ok?'':' bad')+'">'+esc(r.user)+(r.ok?(r.known?'<small class="g">✓ كلمة معروفة</small>':'<small>مقبولة</small>'):'<small class="r">مش بالحرف</small>')+'</div>':'<div class="w bad">—</div>';
       var b=r.bot?'<div class="w">'+esc(r.bot)+(r.same?'<small>نفس إجابتك</small>':'')+'</div>':'<div class="w bad">—</div>';
-      h+='<div class="bus-row in" style="animation-delay:'+(i*0.09).toFixed(2)+'s"><span style="font-size:20px;text-align:center">'+r.cat[2]+'</span>'+u+b+'<span class="pt'+(r.up?'':' z')+'">'+r.up+'</span></div>';
+      h+='<div class="bus-row in" style="--c:'+r.cat[3]+';animation-delay:'+(i*0.09).toFixed(2)+'s"><span class="ci">'+r.cat[2]+'</span>'+u+b+'<span class="pt'+(r.up?'':' z')+'">'+(r.up?'+'+r.up:'0')+'</span></div>';
     });
     h+='</div>';
-    if(B.res.bonus) h+='<div class="bus-bonus">🚌 كومبليت! كملت الخمس خانات +'+B.res.bonus+' نقط</div>';
-    return h+'<div class="bus-tot"><div><b>'+B.res.ut+'</b><span>نقطك في الجولة</span></div><div><b>'+B.res.bt+'</b><span>نقط الجهاز</span></div></div>';
+    if(B.res.bonus) h+='<div class="bus-bonus">🚌 كومبليت! كملت الست خانات +'+B.res.bonus+' نقط</div>';
+    return h+'<div class="bus-tot"><div class="'+(B.res.ut>B.res.bt?'lead':'')+'"><b>'+B.res.ut+'</b><span>نقطك في المرحلة</span></div><div class="'+(B.res.bt>B.res.ut?'lead':'')+'"><b>'+B.res.bt+'</b><span>نقط الجهاز</span></div></div>';
+  }
+
+  function avgMult(){ return B.times.reduce(function(a,sec){ return a+tinfo(sec).m; },0)/ROUNDS; }
+  function reward(){ return Math.round(DIFFS[B.diff].reward*(1+(avgMult()-1)*RISK_BONUS)); }
+  function maxReward(){ return Math.round(DIFFS.hard.reward*(1+(4-1)*RISK_BONUS)); }
+  function stagesBar(){
+    var h='<div class="bus-stages">';
+    for(var i=0;i<ROUNDS;i++){
+      var T=tinfo(B.times[i]), done=(i<B.round-1)||(i===B.round-1&&(B.phase==='result'||B.phase==='final')), cur=(i===B.round-1&&!done);
+      h+='<div class="bus-stg'+(done?' done':(cur?' cur':''))+'" style="--c:'+T.c+'"><b>'+(done?'✓':(i+1))+'</b><span>'+T.ic+' '+B.times[i]+'ث</span><em>×'+T.m+'</em></div>';
+    }
+    return h+'</div>';
+  }
+  function setupSummary(){
+    var mx=0, avg=avgMult(); B.times.forEach(function(sec){ mx+=(NC*10+BONUS)*tinfo(sec).m; });
+    var pct=Math.round((avg-1)/3*100), lab=pct<25?'هادئ 😌':(pct<55?'متوازن ⚖️':(pct<85?'جريء 🔥':'جنوني 💀'));
+    return '<div class="bus-sum-row"><span>مستوى المخاطرة</span><b>'+lab+'</b></div><div class="bus-risk"><i style="width:'+Math.max(6,pct)+'%"></i></div>'+
+      '<div class="bus-sum-grid"><div><b>'+mx+'</b><span>أقصى نقط في الرحلة</span></div><div><b>×'+avg.toFixed(1)+'</b><span>مضاعف المكافأة</span></div><div><b>+'+reward()+'</b><span>لو كسبت الجهاز</span></div></div>';
+  }
+  function setupRefresh(){
+    document.querySelectorAll('.bus-times').forEach(function(w){
+      var si=+w.getAttribute('data-st');
+      w.querySelectorAll('button').forEach(function(bt){ bt.classList.toggle('on', +bt.getAttribute('data-bus-time').split(':')[1]===B.times[si]); });
+      var m=document.getElementById('bus-sm-'+si); if(m) m.textContent='×'+tinfo(B.times[si]).m;
+    });
+    var sm=document.getElementById('bus-sum'); if(sm) sm.innerHTML=setupSummary();
+  }
+  function stageSummary(){
+    var h='<div class="bus-fin">';
+    B.stageLog.forEach(function(g,i){ var T=tinfo(g.secs);
+      h+='<div class="bus-fin-row" style="--c:'+T.c+'"><span class="k">'+T.ic+'</span><div><b>المرحلة '+(i+1)+' · حرف '+esc(g.letter)+'</b><small>'+g.secs+' ث · ×'+g.m+'</small></div><div class="sc"><b>'+g.ut+'</b><small>الجهاز '+g.bt+'</small></div></div>'; });
+    return h+'</div>';
   }
 
   window.renderBusGame=function(){
     if(!B) initBusGame();
-    var D=DIFFS[B.diff];
+    var D=DIFFS[B.diff], EM={easy:'🌱',mid:'⚡',hard:'🔥'};
     if(B.phase==='intro'){
-      var best=''; try{ var st=state.pid?myGameStats(state.pid):{}; if(st.busBest) best='أفضل مجموع ليك: '+st.busBest+' نقطة'; }catch(e){}
-      return head()+'<div class="bus-hero"><div class="big">🚌</div><h2>أتوبيس كومبليت</h2><p>هيطلعلك حرف، املا الخمس خانات بكلمات بتبدأ بيه — بأسرع ما تقدر.</p></div>'+
-        '<div class="bus-cats">'+CATS.map(function(c){ return '<span>'+c[2]+' '+c[1]+'</span>'; }).join('')+'</div>'+
-        '<div class="bus-diff">'+Object.keys(DIFFS).map(function(k){ return '<button type="button" data-bus-diff="'+k+'" class="'+(k===B.diff?'on':'')+'">'+DIFFS[k].label+'<small>'+DIFFS[k].sub+'</small></button>'; }).join('')+'</div>'+
-        '<div class="card card-sm" style="font-size:13px;line-height:1.9;color:var(--text-muted)">• '+ROUNDS+' جولات، وقت كل جولة '+SECS+' ثانية.<br>• كلمة معروفة = 10 نقط (5 لو نفس كلمة الجهاز)، وكلمة صح بالحرف بس مش في القاموس = 5 نقط.<br>• كمّل الخمس خانات صح واكسب بونص +'+BONUS+' نقط.<br>• تلميح واحد في الجولة (الخانة اللي بتستخدمه فيها بتاخد 5 بالكتير).<br>• مجموعك أكتر من الجهاز = تكسب '+D.reward+' نقطة 🏅</div>'+
-        '<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px" data-bus="start">يلا نبدأ 🚌</button>'+(best?'<div class="hint" style="text-align:center;margin-top:10px">'+best+'</div>':'');
+      var best=''; try{ var st=state.pid?myGameStats(state.pid):{}; if(st.busBest) best='أفضل مجموع ليك: '+st.busBest+' نقطة 🏆'; }catch(e){}
+      return head()+'<div class="bus-hero"><div class="big">🚌</div><h2>أتوبيس كومبليت</h2><p>رحلة واحدة من 3 مراحل، وفي كل مرحلة حرف جديد — إنت اللي بتحدد الوقت وتراهن على نفسك.</p><div class="bus-road"><i>🚌</i></div></div>'+
+        '<div class="bus-cats">'+CATS.map(function(c){ return '<span style="--c:'+c[3]+'">'+c[2]+' '+c[1]+'</span>'; }).join('')+'</div>'+
+        '<div class="bus-diff">'+Object.keys(DIFFS).map(function(k){ return '<button type="button" data-bus-diff="'+k+'" class="'+(k===B.diff?'on':'')+'"><em>'+EM[k]+'</em>'+DIFFS[k].label+'<small>قوة الجهاز</small></button>'; }).join('')+'</div>'+
+        '<div class="bus-rules">'+
+          '<div><i>🗺️</i><span><b>3 مراحل</b> في رحلة واحدة، وكل مرحلة بحرف مختلف.</span></div>'+
+          '<div><i>⏱️</i><span>قبل ما تبدأ <b>بتختار وقت كل مرحلة</b>: وقت أقل = <b>نقط مضاعفة</b> (لحد ×4).</span></div>'+
+          '<div><i>✅</i><span>كلمة معروفة = <b>10 نقط</b> (5 لو نفس كلمة الجهاز)، وكلمة صح بالحرف بس مش في القاموس = <b>5 نقط</b> — وكله × مضاعف المرحلة.</span></div>'+
+          '<div><i>🚌</i><span>كمّل الست خانات واكسب بونص <b>+'+BONUS+' × المضاعف</b>.</span></div>'+
+          '<div><i>💡</i><span>تلميح واحد في كل مرحلة (الخانة اللي بتستخدمه فيها بتاخد 5 بالكتير).</span></div>'+
+          '<div><i>🏅</i><span>مجموعك أكتر من الجهاز = تكسب مكافأة بتكبر مع المخاطرة، لحد <b>'+(function(){ var b2=B.diff; return Math.round(D.reward*(1+(4-1)*RISK_BONUS)); })()+' نقطة</b>.</span></div>'+
+        '</div>'+
+        '<button type="button" class="btn btn-primary bus-go" data-bus="setup">يلا نجهز الرحلة 🚌</button>'+(best?'<div class="hint" style="text-align:center;margin-top:10px">'+best+'</div>':'');
+    }
+    if(B.phase==='setup'){
+      var pre='<div class="bus-presets">'+Object.keys(PRESETS).map(function(k){ return '<button type="button" data-bus-preset="'+k+'"><em>'+PRESETS[k].ic+'</em>'+PRESETS[k].n+'</button>'; }).join('')+'</div>';
+      var NAMES=['الأولى','التانية','التالتة'];
+      var cards=[0,1,2].map(function(si){
+        var opts=TIMES.slice().reverse().map(function(T){ return '<button type="button" class="'+(B.times[si]===T.s?'on':'')+'" data-bus-time="'+si+':'+T.s+'" style="--c:'+T.c+'"><em>'+T.ic+'</em><b>'+T.s+'ث</b><small>×'+T.m+'</small></button>'; }).join('');
+        return '<div class="bus-sc"><div class="bus-sc-h"><span class="n">'+(si+1)+'</span><b>المرحلة '+NAMES[si]+'</b><span class="bus-sc-m" id="bus-sm-'+si+'">×'+tinfo(B.times[si]).m+'</span></div><div class="bus-times" data-st="'+si+'">'+opts+'</div></div>';
+      }).join('');
+      return head()+'<div class="bus-hero sm"><h2>جهّز رحلتك 🚌</h2><p style="margin:4px 0 0;color:var(--text-muted);font-size:12.5px;font-weight:700">كل ما الوقت يقل، النقط تتضاعف — بس الخطر بيزيد</p></div>'+pre+cards+
+        '<div class="bus-sum" id="bus-sum">'+setupSummary()+'</div>'+
+        '<button type="button" class="btn btn-primary bus-go" data-bus="go">ابدأ الرحلة 🚀</button>'+
+        '<button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px" data-bus="toIntro">← رجوع</button>';
     }
     if(B.phase==='spin'){
-      return head()+scoreRow()+'<div class="bus-letter-wrap" style="margin-top:46px"><div class="bus-letter spin" id="bus-spin">'+esc(rnd(LETTERS))+'</div><div class="bus-cap">بنسحب الحرف…</div></div>';
+      return head()+scoreRow()+stagesBar()+'<div class="bus-letter-wrap" style="margin-top:30px"><div class="bus-letter spin" id="bus-spin">'+esc(rnd(LETTERS))+'</div><div class="bus-cap">بنسحب حرف المرحلة '+B.round+'…</div></div>';
     }
     if(B.phase==='play'){
+      var T=tinfo(B.secs);
       var fields=CATS.map(function(c,i){
-        return '<div class="bus-field"><span class="ic">'+c[2]+'</span><label>'+c[1]+'</label><input class="bus-in" data-i="'+i+'" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="'+(i<4?'next':'done')+'" placeholder="'+c[1]+' بحرف '+esc(B.letter)+'" value="'+esc(B.ans[i])+'"></div>'+(B.hintI===i?'<div class="bus-hint">💡 '+esc(B.hintTxt)+'</div>':'');
+        var fs=fieldState(i);
+        return '<div class="bus-field'+(fs?' '+fs:'')+'" style="--c:'+c[3]+'"><span class="ic">'+c[2]+'</span><label>'+c[1]+'</label><input class="bus-in" data-i="'+i+'" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="'+(i<NC-1?'next':'done')+'" placeholder="بحرف '+esc(B.letter)+'…" value="'+esc(B.ans[i])+'"><i class="st"></i></div>'+(B.hintI===i?'<div class="bus-hint">💡 '+esc(B.hintTxt)+'</div>':'');
       }).join('');
-      var hot=B.left<=10;
-      return head()+scoreRow()+
-        '<div class="bus-letter-wrap"><div class="bus-letter pop">'+esc(B.letter)+'</div><div class="bus-cap">كل الكلمات لازم تبدأ بالحرف ده · <b id="bus-timer" class="'+(hot?'hot':'')+'">'+Math.max(0,B.left)+' ث</b></div></div>'+
-        '<div class="bus-bar'+(hot?' hot':'')+'"><i id="bus-bar" style="transform:scaleX('+Math.max(0,B.left/SECS)+')"></i></div>'+fields+
+      var dots=CATS.map(function(c,i){ var fs=fieldState(i); return '<i'+(fs==='filled'?' class="on"':(fs==='wrong'?' class="bad"':''))+'></i>'; }).join('');
+      var rem=Math.max(0,(B.endAt-Date.now())/1000), e=1-rem/B.secs, hot=rem<=10, urg=rem<=5, w=Math.floor(rem);
+      var pop=B.shown?'':' pop'; B.shown=true;
+      var scale=[1,.75,.5,.25,0].map(function(f){ return '<span>'+Math.round(B.secs*f)+'</span>'; }).join('');
+      var hud='<div class="bus-hud'+(hot?' hot':'')+(urg?' urgent':'')+'" id="bus-hud" style="--tc:'+T.c+';--e:'+e.toFixed(4)+'">'+
+        '<div class="hud-top"><div class="bus-letter'+pop+'">'+esc(B.letter)+'</div>'+
+        '<div class="hud-time"><div class="hud-digits"><b id="bus-sec">'+w+'</b><small id="bus-ms">.'+Math.floor((rem-w)*10)+'</small><i>ث</i></div><div class="hud-sub">كل كلمة لازم تبدأ بحرف «'+esc(B.letter)+'»</div></div>'+
+        '<div class="hud-mult"><b>×'+T.m+'</b><span>'+T.ic+' '+T.n+'</span></div></div>'+
+        '<div class="hud-track"><div class="hud-lane"><div class="hud-fill"></div></div><i class="hud-bus">🚌</i><i class="hud-flag">🏁</i></div>'+
+        '<div class="hud-scale">'+scale+'</div></div>';
+      return '<div class="bus-vig'+(hot?' on':'')+'" id="bus-vig"></div>'+head()+scoreRow()+stagesBar()+hud+
+        '<div class="bus-dots" id="bus-dots">'+dots+'</div>'+fields+
         '<div class="bus-tools"><button type="button" class="btn btn-outline" style="flex:0 0 38%" data-bus="hint" '+(B.hintUsed?'disabled style="flex:0 0 38%;opacity:.5"':'')+'>💡 تلميح</button><button type="button" class="btn btn-primary" style="flex:1" data-bus="finish">أتوبيس كومبليت! 🚌</button></div>';
     }
     if(B.phase==='result'){
-      return head()+scoreRow()+'<div class="bus-hero" style="padding-bottom:0"><h2>نتيجة الجولة '+B.round+' — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+'<button type="button" class="btn btn-primary" style="width:100%" data-bus="next">الجولة اللي بعدها ←</button>';
+      var nx=tinfo(B.times[B.round]);
+      return head()+scoreRow()+stagesBar()+'<div class="bus-hero sm"><h2>نتيجة المرحلة '+B.round+' — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+
+        '<button type="button" class="btn btn-primary bus-go" style="margin-top:4px" data-bus="next">المرحلة '+(B.round+1)+' ← <span style="opacity:.8;font-weight:800">'+nx.ic+' '+nx.s+'ث · ×'+nx.m+'</span></button>';
     }
     var won=!!B.won, tie=B.userTotal===B.botTotal;
-    return head()+scoreRow()+
+    return (won?confetti():'')+head()+scoreRow()+stagesBar()+
       '<div class="match-result-card '+(won?'win':'lose')+'"><div class="match-result-ico">'+(won?'🏆':(tie?'🤝':'😅'))+'</div><div class="match-result-title">'+(won?'مبروك! كسبت الجهاز':(tie?'تعادل مع الجهاز':'الجهاز كسب المرة دي'))+'</div>'+
-      '<div class="match-result-sub">مجموعك '+B.userTotal+' ضد '+B.botTotal+' للجهاز · مستوى '+D.label+'</div>'+
-      (won?'<div class="match-result-points win">+'+D.reward+' نقطة 🎉</div>':'<div class="match-result-points lose">حاول تاني وهتكسب</div>')+'</div>'+
-      '<div class="bus-hero" style="padding-bottom:0"><h2>الجولة الأخيرة — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+
-      '<button type="button" class="btn btn-primary" style="width:100%" data-bus="again">🔄 لعبة جديدة</button>';
+      '<div class="match-result-sub">مجموعك '+B.userTotal+' ضد '+B.botTotal+' للجهاز · مستوى '+D.label+' · مضاعف الرحلة ×'+avgMult().toFixed(1)+'</div>'+
+      (won?'<div class="match-result-points win">+'+reward()+' نقطة 🎉</div>':'<div class="match-result-points lose">حاول تاني وهتكسب</div>')+'</div>'+
+      '<div class="bus-hero sm"><h2>ملخص المراحل</h2></div>'+stageSummary()+
+      '<div class="bus-hero sm"><h2>تفاصيل المرحلة الأخيرة — حرف '+esc(B.letter)+'</h2></div>'+resultTable()+
+      '<button type="button" class="btn btn-primary bus-go" style="margin-top:4px" data-bus="again">🔄 رحلة جديدة</button>';
   };
 
   document.addEventListener('click',function(e){
     if(!B||!e.target||!e.target.closest) return;
     var d=e.target.closest('[data-bus-diff]'); if(d&&B.phase==='intro'){ B.diff=d.getAttribute('data-bus-diff'); render(); return; }
+    var tt=e.target.closest('[data-bus-time]'); if(tt&&B.phase==='setup'){ var pr=tt.getAttribute('data-bus-time').split(':'); B.times[+pr[0]]=+pr[1]; setupRefresh(); try{ vib(8); }catch(x){} return; }
+    var pp=e.target.closest('[data-bus-preset]'); if(pp&&B.phase==='setup'){ B.times=PRESETS[pp.getAttribute('data-bus-preset')].t.slice(); setupRefresh(); try{ vib(8); }catch(x){} return; }
     var t=e.target.closest('[data-bus]'); if(!t) return;
     var a=t.getAttribute('data-bus');
-    if(a==='start'||a==='next') startRound();
+    if(a==='go'||a==='next') startRound();
+    else if(a==='setup'){ B.phase='setup'; render(); }
+    else if(a==='toIntro'){ B.phase='intro'; render(); }
     else if(a==='finish') finishRound();
     else if(a==='hint') useHint();
     else if(a==='again'){ initBusGame(true); render(); }
   });
-  document.addEventListener('input',function(e){ var t=e.target; if(B&&t&&t.classList&&t.classList.contains('bus-in')){ var i=+t.getAttribute('data-i'); if(i>=0&&i<5) B.ans[i]=t.value; } });
+  document.addEventListener('input',function(e){ var t=e.target; if(B&&t&&t.classList&&t.classList.contains('bus-in')){ var i=+t.getAttribute('data-i'); if(i>=0&&i<NC) B.ans[i]=t.value; busLive(); } });
   document.addEventListener('keydown',function(e){
     var t=e.target; if(e.key!=='Enter'||!t||!t.classList||!t.classList.contains('bus-in')) return;
     e.preventDefault(); var i=+t.getAttribute('data-i'), nx=document.querySelector('.bus-in[data-i="'+(i+1)+'"]');
