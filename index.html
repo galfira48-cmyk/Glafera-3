@@ -34491,10 +34491,22 @@ document.addEventListener('click',function(e){
 var MT_T='نعمل على تحديث جديد', MT_S='نقوم حاليًا بتطوير التطبيق لتقديم تجربة أفضل. سنعود قريبًا.';
 function maintHtml(){
   var C=CONF_SETTINGS||{}, t=esc2(C.glxMaintTitle||MT_T), s=esc2(C.glxMaintSub||MT_S);
+  var sch=schedOn()&&!C.glxLoginLock, ret='', prog='<div class="glx-mt-bar"><i></i></div>';
+  if(sch){
+    var d0=new Date(C.glxMtTo), f0=new Date(C.glxMtFrom).getTime(), t0=d0.getTime(), nowp=Math.min(100,Math.max(0,Math.round((Date.now()-f0)/(t0-f0)*100)));
+    var when=''; try{ when=d0.toLocaleString('ar-EG',{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'}); }catch(_){}
+    ret='<div class="mt2-ret"><small>موعد العودة المتوقع</small><b>'+when+'</b></div>';
+    prog='<div class="mt2-prog"><div class="mt2-prow"><span>نسبة الإنجاز</span><b id="mt2-pct" dir="ltr">'+nowp+'%</b></div><div class="mt2-ptrack"><i id="mt2-pf" data-from="'+f0+'" data-to="'+t0+'" style="width:'+nowp+'%"></i></div></div>';
+  }
+  var ct=String(C.glxMtContact||'').trim(), cl='';
+  if(ct){ var href=/^https?:\/\//i.test(ct)?ct:(function(){ var n=ct.replace(/\D/g,''); if(n.charAt(0)==='0') n='20'+n.slice(1); return 'https://wa.me/'+n; })();
+    cl='<a class="mt2-btn pri" href="'+esc2(href)+'" target="_blank" rel="noopener">تواصل مع الدعم</a>'; }
   return '<div class="glx-mt glx-mt2"><div class="mt2-status"><i></i>التحديث قيد التنفيذ</div>'+
     '<div class="mt2-ico"><svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="19" stroke="rgba(255,255,255,.12)" stroke-width="3"/><path class="mt2-arc" d="M24 5a19 19 0 0 1 19 19" stroke="url(#mt2g)" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="mt2g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F4B740"/><stop offset="1" stop-color="#FFDE94"/></linearGradient></defs><path d="M17 24.5l5 5 9-10" stroke="rgba(255,255,255,.55)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
-    '<div class="glx-mt-t">'+t+'</div><div class="glx-mt-s">'+s+'</div>'+
-    cdHtml()+'<div class="glx-mt-bar"><i></i></div><div class="glx-mt-f">نشكركم على تفهّمكم</div></div>';
+    '<div class="glx-mt-t">'+t+'</div><div class="glx-mt-s">'+s+'</div>'+ret+cdHtml()+prog+
+    '<div class="mt2-steps"><div class="st done"><i>✓</i><span>إيقاف الخدمة مؤقتًا</span></div><div class="st on"><i></i><span>تطبيق التحديث</span></div><div class="st"><i></i><span>إعادة التشغيل</span></div></div>'+
+    '<div class="mt2-acts">'+cl+'<button type="button" class="mt2-btn" data-glx-refresh="1">تحديث الحالة</button></div>'+
+    '<div class="glx-mt-f">نشكركم على تفهّمكم</div></div>';
 }
 var _rl2=window.renderLogin;
 window.renderLogin=function(){
@@ -34524,12 +34536,13 @@ window.glxAdminCards=function(){
     row('إنشاء الحساب',C.signupClosed?'مقفول — بتظهر رسالة «انتظرونا» بدل الفورم':'مفتوح',!C.signupClosed,'data-action="toggle-signup-open"')+
     '<div class="hint" style="margin:10px 0 6px;text-align:start">عنوان الرسالة</div><input type="text" id="glx-mt-t" class="field" maxlength="60" value="'+esc2(C.glxMaintTitle||'')+'" placeholder="'+MT_T+'">'+
     '<div class="hint" style="margin:10px 0 6px;text-align:start">السطر التحتيه</div><input type="text" id="glx-mt-s" class="field" maxlength="120" value="'+esc2(C.glxMaintSub||'')+'" placeholder="'+MT_S+'">'+
+    '<div class="hint" style="margin:10px 0 6px;text-align:start">رقم واتساب أو رابط للدعم (اختياري — بيظهر زر تواصل)</div><input type="text" id="glx-mt-c" class="field" dir="ltr" maxlength="120" value="'+esc2(C.glxMtContact||'')+'" placeholder="01xxxxxxxxx">'+
     '<div class="hint" style="margin:10px 0 0;text-align:start">الأدمن بيدخل من اللوجو زي ما هو. اللي داخل بالفعل مش بيتأثر.</div></div>';
   return card+_gac2();
 };
 document.addEventListener('change',async function(e){
-  var id=e.target&&e.target.id; if(id!=='glx-mt-t'&&id!=='glx-mt-s') return;
-  CONF_SETTINGS[id==='glx-mt-t'?'glxMaintTitle':'glxMaintSub']=e.target.value.trim();
+  var id=e.target&&e.target.id; if(id!=='glx-mt-t'&&id!=='glx-mt-s'&&id!=='glx-mt-c') return;
+  CONF_SETTINGS[id==='glx-mt-t'?'glxMaintTitle':(id==='glx-mt-c'?'glxMtContact':'glxMaintSub')]=e.target.value.trim();
   try{ await saveConfSettings(CONF_SETTINGS); toast('✅ اتحفظت الرسالة'); }catch(_){ toast('معرفتش أحفظ',true); }
 });
 
@@ -35978,5 +35991,44 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
 .mt2-tl.sec b{color:#F4B740}
 @media (prefers-reduced-motion:reduce){.mt2-arc,.mt2-status i,.glx-mt2 .glx-mt-bar i{animation:none!important}}
 </style>
+<style id="glx-mt3-css">
+.login-page:has(.glx-mt2) .brand-title{background:none!important;-webkit-text-fill-color:#fff;color:#fff;font-size:24px;font-weight:800;letter-spacing:0;text-shadow:none;filter:none;animation:none}
+.login-page:has(.glx-mt2) .login-hero .logo-wrap{width:84px;height:84px}
+.mt2-ret{margin:18px auto 0;padding:12px 14px;border-radius:14px;background:rgba(244,183,64,.08);border:1px solid rgba(244,183,64,.22)}
+.mt2-ret small{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
+.mt2-ret b{display:block;margin-top:3px;font-size:14px;font-weight:800;color:#FFDE94;line-height:1.6}
+.mt2-prog{margin:20px 0 4px}
+.mt2-prow{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:8px}
+.mt2-prow b{color:#fff;font-size:13px;font-family:'Cairo',sans-serif}
+.mt2-ptrack{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.mt2-ptrack i{display:block;height:100%;border-radius:99px;background:linear-gradient(270deg,#F4B740,#FFDE94);transition:width 1s linear;float:right}
+.mt2-steps{display:flex;justify-content:space-between;gap:6px;margin:22px 0 4px;position:relative}
+.mt2-steps::before{content:"";position:absolute;top:11px;right:12%;left:12%;height:2px;background:rgba(255,255,255,.1)}
+.mt2-steps .st{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:rgba(255,255,255,.45)}
+.mt2-steps .st i{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:900;background:#1b1752;border:2px solid rgba(255,255,255,.18);color:#171449}
+.mt2-steps .st.done{color:rgba(255,255,255,.8)}.mt2-steps .st.done i{background:#F4B740;border-color:#F4B740}
+.mt2-steps .st.on{color:#FFDE94}.mt2-steps .st.on i{border-color:#F4B740;box-shadow:0 0 0 4px rgba(244,183,64,.16);animation:mt2Blink 1.8s ease-in-out infinite}
+.mt2-acts{display:flex;gap:10px;margin-top:22px}
+.mt2-btn{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:14px;font-family:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);transition:transform .15s,background .2s}
+.mt2-btn:active{transform:scale(.97)}
+.mt2-btn.pri{background:linear-gradient(135deg,#F4B740,#E8A22A);color:#171449;border-color:transparent}
+.glx-mt2 .glx-mt-f{margin-top:18px}
+.login-page:has(.glx-mt2) .glx-link{display:inline-flex;margin:16px auto 0;padding:10px 20px;border-radius:99px;border:1px solid rgba(244,183,64,.35);text-decoration:none;font-size:12.5px;color:#FFDE94;background:rgba(244,183,64,.06)}
+.login-page:has(.glx-mt2){display:flex;flex-direction:column;align-items:center}
+</style>
+<script>
+(function(){
+  document.addEventListener('click',function(e){
+    if(!(e.target.closest&&e.target.closest('[data-glx-refresh]'))) return;
+    var b=e.target.closest('[data-glx-refresh]'); b.textContent='جاري التحقق…'; b.style.opacity='.6';
+    setTimeout(function(){ try{ window.render(); }catch(_){ location.reload(); } },700);
+  });
+  setInterval(function(){
+    var f=document.getElementById('mt2-pf'); if(!f) return;
+    var a=+f.getAttribute('data-from'), z=+f.getAttribute('data-to'), p=Math.min(100,Math.max(0,(Date.now()-a)/(z-a)*100));
+    f.style.width=p.toFixed(1)+'%'; var l=document.getElementById('mt2-pct'); if(l) l.textContent=Math.round(p)+'%';
+  },1000);
+})();
+</script>
 </body>
 </html>
