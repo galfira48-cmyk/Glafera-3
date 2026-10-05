@@ -34488,12 +34488,13 @@ document.addEventListener('click',function(e){
 });
 
 /* ===== GLX v4: وضع الصيانة (قفل الدخول / إنشاء الحساب) ===== */
-var MT_T='انتظرونا في أقوى تحديث', MT_S='بنجهّز لكم تجربة جديدة بالكامل — هنرجع لكم قريب جدًا';
+var MT_T='نعمل على تحديث جديد', MT_S='نقوم حاليًا بتطوير التطبيق لتقديم تجربة أفضل. سنعود قريبًا.';
 function maintHtml(){
   var C=CONF_SETTINGS||{}, t=esc2(C.glxMaintTitle||MT_T), s=esc2(C.glxMaintSub||MT_S);
-  return '<div class="glx-mt"><div class="glx-mt-glow"></div><div class="glx-mt-fire"><span>🔥</span></div>'+
-    '<div class="glx-mt-t">'+t+' <span class="glx-mt-e">🔥</span></div><div class="glx-mt-s">'+s+'</div>'+
-    cdHtml()+'<div class="glx-mt-bar"><i></i></div><div class="glx-mt-dots"><b></b><b></b><b></b></div><div class="glx-mt-f">شكرًا لصبركم 💛</div></div>';
+  return '<div class="glx-mt glx-mt2"><div class="mt2-status"><i></i>التحديث قيد التنفيذ</div>'+
+    '<div class="mt2-ico"><svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="19" stroke="rgba(255,255,255,.12)" stroke-width="3"/><path class="mt2-arc" d="M24 5a19 19 0 0 1 19 19" stroke="url(#mt2g)" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="mt2g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F4B740"/><stop offset="1" stop-color="#FFDE94"/></linearGradient></defs><path d="M17 24.5l5 5 9-10" stroke="rgba(255,255,255,.55)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
+    '<div class="glx-mt-t">'+t+'</div><div class="glx-mt-s">'+s+'</div>'+
+    cdHtml()+'<div class="glx-mt-bar"><i></i></div><div class="glx-mt-f">نشكركم على تفهّمكم</div></div>';
 }
 var _rl2=window.renderLogin;
 window.renderLogin=function(){
@@ -34501,7 +34502,7 @@ window.renderLogin=function(){
   var a=h.indexOf('<div class="card otp-card"'), b=h.indexOf('<div class="designer-credit"');
   if(a<0||b<0||b<a) return h;
   if(C.glxLoginLock||schedOn()) return h.slice(0,a)+maintHtml()+h.slice(b);
-  if(C.signupClosed||schedOn()) return h.slice(0,b)+'<div class="glx-mini">🔥 التسجيل الجديد مقفول مؤقتًا — انتظرونا في أقوى تحديث</div>'+h.slice(b);
+  if(C.signupClosed||schedOn()) return h.slice(0,b)+'<div class="glx-mini">التسجيل الجديد متوقف مؤقتًا أثناء التحديث</div>'+h.slice(b);
   return h;
 };
 var _rs=window.renderSignup;
@@ -34541,7 +34542,8 @@ function cdHtml(){ var C=CONF_SETTINGS||{}; if(!schedOn()||C.glxLoginLock) retur
 setInterval(function(){ var el=document.getElementById('glx-cd'); if(!el) return; var r=+el.getAttribute('data-to')-Date.now();
   if(r<=0){ try{ render(); }catch(e){} return; }
   var z=function(n){ return suAr(String(n).padStart(2,'0')); }, d=Math.floor(r/864e5), h=Math.floor(r%864e5/36e5), m=Math.floor(r%36e5/6e4), s=Math.floor(r%6e4/1e3);
-  el.innerHTML='<span>يفتح بعد</span> <b dir="ltr">'+(d?suAr(d)+'ي ':'')+z(h)+':'+z(m)+':'+z(s)+'</b>'; },1000);
+  var tile=function(v,l,sec){ return '<div class="mt2-tl'+(sec?' sec':'')+'"><b>'+v+'</b><small>'+l+'</small></div>'; };
+  el.innerHTML='<div class="mt2-cdh">يفتح بعد</div><div class="mt2-cdg">'+(d?tile(suAr(d),'يوم'):'')+tile(z(h),'ساعة')+tile(z(m),'دقيقة')+tile(z(s),'ثانية',1)+'</div>'; },1000);
 
 /* --- كارت الدخول جوه التطبيق --- */
 var _rmp=window.renderMePage;
@@ -34636,7 +34638,7 @@ function fillConf(){
 }
 var _ds8=window.doSignup;
 window.doSignup=function(){
-  if(schedOn()){ toast('التسجيل مقفول مؤقتًا — انتظرونا في أقوى تحديث 🔥',true); return Promise.resolve(); }
+  if(schedOn()){ toast('التسجيل متوقف مؤقتًا أثناء التحديث',true); return Promise.resolve(); }
   var b=document.getElementById('signup-submit-btn'), old=b?b.innerHTML:'';
   if(b){ b.classList.add('glx-busy'); b.innerHTML='<span class="glx-spin"></span> جاري إنشاء حسابك…'; }
   var done=function(){ var x=document.getElementById('signup-submit-btn'); if(x){ x.classList.remove('glx-busy'); x.innerHTML=old; } };
@@ -35946,5 +35948,35 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   });
 })();
 </script>
+
+<style id="glx-mt2-css">
+.glx-mt.glx-mt2{max-width:372px;padding:28px 24px 22px;border-radius:24px;text-align:center;
+ background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+ border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 60px -30px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.12);
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);animation:glxMtIn .6s ease-out both}
+.glx-mt2 .glx-mt-glow,.glx-mt2 .glx-mt-fire{display:none}
+.mt2-status{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;margin-bottom:22px;border-radius:99px;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);
+ background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.mt2-status i{width:7px;height:7px;border-radius:50%;background:#F4B740;animation:mt2Blink 1.8s ease-in-out infinite}
+@keyframes mt2Blink{50%{opacity:.25}}
+.mt2-ico{width:64px;height:64px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;border-radius:20px;
+ background:rgba(244,183,64,.09);border:1px solid rgba(244,183,64,.25)}
+.mt2-ico svg{width:40px;height:40px;overflow:visible}
+.mt2-arc{transform-origin:24px 24px;animation:mt2Rot 1.8s linear infinite}
+@keyframes mt2Rot{to{transform:rotate(360deg)}}
+.glx-mt2 .glx-mt-t{font-size:22px;font-weight:800;line-height:1.5;color:#fff;background:none;-webkit-text-fill-color:#fff;animation:none;filter:none}
+.glx-mt2 .glx-mt-s{margin:8px auto 0;max-width:290px;font-size:14px;font-weight:500;line-height:1.9;color:rgba(255,255,255,.7);opacity:1}
+.glx-mt2 .glx-mt-bar{height:4px;margin:24px 0 18px;background:rgba(255,255,255,.1)}
+.glx-mt2 .glx-mt-bar i{width:35%;background:linear-gradient(90deg,transparent,#F4B740,transparent);box-shadow:none}
+.glx-mt2 .glx-mt-f{margin:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:600;opacity:.55}
+.glx-mt2 .glx-mt-cd{margin-top:22px}
+.mt2-cdh{font-size:12px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:10px}
+.mt2-cdg{display:flex;gap:8px;justify-content:center;direction:rtl}
+.mt2-tl{flex:1;max-width:70px;padding:10px 4px 8px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.mt2-tl b{display:block;margin:0;font-size:22px;font-weight:800;line-height:1.1;color:#fff;letter-spacing:0;font-family:'Cairo',sans-serif;font-variant-numeric:tabular-nums}
+.mt2-tl small{display:block;margin-top:4px;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.55)}
+.mt2-tl.sec b{color:#F4B740}
+@media (prefers-reduced-motion:reduce){.mt2-arc,.mt2-status i,.glx-mt2 .glx-mt-bar i{animation:none!important}}
+</style>
 </body>
 </html>
