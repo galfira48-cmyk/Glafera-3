@@ -34800,6 +34800,116 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
   function vib(n){ try{ vibrate(n); }catch(e){} }
 
+  /* ===== تحقق دقيق: قواعد محلية + قاموس + ويكيبيديا/ويكاموس العربي ===== */
+  var WEB={}, pf={};
+  function key(w){ return strip(w); }
+  function looksReal(w,ci,fin){
+    var s=norm(w); if(!s||!/^[\u0621-\u064A ]+$/.test(s)) return false;
+    var t=s.replace(/ /g,'');
+    if(t.length>24||/(.)\1\1/.test(t)||/ا{2}|ء{2}|ؤ{2}|ئ{2}/.test(t)) return false;
+    if(fin&&t.length<3&&!(B&&inDict(w,B.letter,ci))) return false;
+    return true;
+  }
+  var STRICT=true, WDK={}, PLACEC=['Q6256','Q3624078','Q515','Q1549591','Q5119','Q486972'], SKIP=['Q5','Q4167410','Q4167836'];
+  function inDictX(w,l,ci){ w=strip(w); return dictList(l,ci).some(function(x){ return strip(x)===w; }); }
+  function localV(w,L,i){
+    if(inDict(w,L,i)) return 'yes';
+    for(var c=0;c<NC;c++) if(c!==i&&inDictX(w,L,c)) return 'no';
+    return null;
+  }
+  function catVerdict(i,K){
+    if(!K||!K.found) return null;
+    var nm=K.male||K.female||K.gname, obj=K.other-(K.animal||0)-(K.plant||0);
+    if(i===0) return K.male?'yes':((K.female||K.place)&&!K.other?'no':null);
+    if(i===1) return K.female?'yes':((K.male||K.place)&&!K.other?'no':null);
+    if(i===5) return K.place?'yes':((nm)&&!K.other?'no':null);
+    if(i===2){ if(K.animal) return 'yes'; if(K.sp&&K.plant&&obj<=0&&!nm) return 'no'; }
+    if(i===4){ if(K.plant) return 'yes'; if(K.sp&&K.animal&&obj<=0&&!nm) return 'no'; }
+    if(i===3&&K.ob) return 'yes';
+    if(i===3&&K.sp&&(K.animal||K.plant)&&obj<=0) return 'no';
+    return (!K.other&&(nm||K.place))?'no':null;
+  }
+  function judge(w,L,i){
+    w=(w||'').trim(); if(!w||!startsWith(w,L)||!looksReal(w,i,true)) return 'no';
+    var lv=localV(w,L,i); if(lv) return lv;
+    var k=key(w), cv=catVerdict(i,WDK[k]); if(cv) return cv;
+    var c=WEB[k]; if(c===false) return 'no';
+    if(c===true){ var K=WDK[k]; if(STRICT&&K&&(K.found===0||K.sp||i===0||i===1||i===5)) return 'no'; return (i===0||i===1||i===5)?'maybe':'yes'; }
+    return 'offline';
+  }
+  function wdGet(u){ return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.json(); }); }
+  function wdKinds(n){
+    var base='https://www.wikidata.org/w/api.php?format=json&origin=*';
+    return wdGet(base+'&action=wbsearchentities&language=ar&uselang=ar&limit=15&search='+encodeURIComponent(n.w)).then(function(j){
+      var ids=(j.search||[]).filter(function(r){ return r.match&&r.match.type==='label'&&strip(r.match.text)===n.k; }).map(function(r){ return r.id; }).slice(0,10);
+      if(!ids.length){ WDK[n.k]={found:0}; return; }
+      return wdGet(base+'&action=wbgetentities&props=claims&ids='+ids.join('|')).then(function(e){
+        var K={found:ids.length,male:0,female:0,gname:0,place:0,other:0,animal:0,plant:0,ob:0,sp:false};
+        ids.forEach(function(id){
+          var c=((e.entities||{})[id]||{}).claims||{}, t=0;
+          var p=(c.P31||[]).map(function(x){ try{ return x.mainsnak.datavalue.value.id; }catch(_){ return ''; } });
+          if(p.some(function(x){ return SKIP.indexOf(x)>=0; })) return;
+          if(p.indexOf('Q12308941')>=0||p.indexOf('Q3409032')>=0){ K.male++; t=1; }
+          if(p.indexOf('Q11879590')>=0||p.indexOf('Q3409032')>=0){ K.female++; t=1; }
+          if(p.indexOf('Q202444')>=0){ K.gname++; t=1; }
+          if(c.P625||c.P17||p.some(function(x){ return PLACEC.indexOf(x)>=0; })){ K.place++; t=1; }
+          if(!t) K.other++;
+        });
+        var q='SELECT ?i ?an ?pl ?ob WHERE{VALUES ?i{'+ids.map(function(x){ return 'wd:'+x; }).join(' ')+'} BIND(EXISTS{?i wdt:P171* wd:Q729} AS ?an) BIND((EXISTS{?i wdt:P171* wd:Q756}||EXISTS{?i wdt:P171* wd:Q764}) AS ?pl) BIND((EXISTS{?i wdt:P279* wd:Q16686448}||EXISTS{?i wdt:P31/wdt:P279* wd:Q16686448}||EXISTS{?i wdt:P279* wd:Q223557}||EXISTS{?i wdt:P31/wdt:P279* wd:Q223557}) AS ?ob)}';
+        return wdGet('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(q)).then(function(r){
+          ((r.results||{}).bindings||[]).forEach(function(b){ if(b.an&&b.an.value==='true') K.animal++; if(b.pl&&b.pl.value==='true') K.plant++; if(b.ob&&b.ob.value==='true'&&!(b.an&&b.an.value==='true')&&!(b.pl&&b.pl.value==='true')) K.ob++; });
+          K.sp=true;
+        }).catch(function(){}).then(function(){ WDK[n.k]=K; });
+      });
+    }).catch(function(){});
+  }
+  function variants(w){
+    var s=strip(w), out={};
+    function ends(x){ out[x]=1; if(/ه$/.test(x)) out[x.slice(0,-1)+'ة']=1; if(/ي$/.test(x)) out[x.slice(0,-1)+'ى']=1; }
+    var f=[s]; if(/^ا/.test(s)) f=[s,'أ'+s.slice(1),'إ'+s.slice(1),'آ'+s.slice(1)];
+    f.forEach(ends); ends('ال'+s);
+    return Object.keys(out);
+  }
+  function askWiki(host,need){
+    var titles=[]; need.forEach(function(n){ variants(n.w).forEach(function(t){ if(titles.indexOf(t)<0) titles.push(t); }); });
+    var chunks=[]; for(var i=0;i<titles.length;i+=50) chunks.push(titles.slice(i,i+50));
+    return Promise.all(chunks.map(function(ch){
+      var url='https://'+host+'/w/api.php?action=query&format=json&origin=*&redirects=1&titles='+encodeURIComponent(ch.join('|'));
+      return fetch(url).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+        var q=j.query||{}, nm={}, rd={}, pg={}, ex={};
+        (q.normalized||[]).forEach(function(x){ nm[x.from]=x.to; });
+        (q.redirects||[]).forEach(function(x){ rd[x.from]=x.to; });
+        Object.keys(q.pages||{}).forEach(function(id){ var g=q.pages[id]; pg[g.title]=g; });
+        ch.forEach(function(t){ var t1=nm[t]||t, t2=rd[t1]||t1, g=pg[t2]; ex[t]=!!(g&&!('missing' in g)&&!('invalid' in g)); });
+        return ex;
+      }).catch(function(){ return null; });
+    })).then(function(rs){
+      var bad=rs.some(function(r){ return r===null; }), out={};
+      need.forEach(function(n){
+        var vs=variants(n.w), hit=false;
+        rs.forEach(function(r){ if(r) vs.forEach(function(t){ if(r[t]) hit=true; }); });
+        if(hit) out[n.k]=true; else if(!bad) out[n.k]=false;
+      });
+      return out;
+    });
+  }
+  function verifyWords(items,L){
+    var need=[]; items.forEach(function(it){
+      var w=(it.w||'').trim(); if(!w||!startsWith(w,L)||!looksReal(w,it.ci,true)||localV(w,L,it.ci)) return;
+      var k=key(w); if((k in WEB&&k in WDK)||need.some(function(x){ return x.k===k; })) return; need.push({k:k,w:w});
+    });
+    if(!need.length) return Promise.resolve();
+    return Promise.all([askWiki('ar.wikipedia.org',need),askWiki('ar.wiktionary.org',need),Promise.all(need.map(wdKinds))]).then(function(r){
+      need.forEach(function(n){ var a=r[0][n.k], b=r[1][n.k];
+        if(a===true||b===true) WEB[n.k]=true; else if(a===false&&b===false) WEB[n.k]=false; });
+    }).catch(function(){});
+  }
+  function prefetch(i){
+    clearTimeout(pf[i]);
+    pf[i]=setTimeout(function(){ if(!B||B.phase!=='play') return; var v=(B.ans[i]||'').trim(); if(!v) return;
+      verifyWords([{w:v,ci:i}],B.letter).then(function(){ busLive(); }); },700);
+  }
+
   var B=null, timer=null, spinIv=null;
 
   window.initBusGame=function(keepDiff){
@@ -34826,18 +34936,27 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   function readInputs(){ document.querySelectorAll('.bus-in').forEach(function(el){ var i=+el.getAttribute('data-i'); if(i>=0&&i<NC) B.ans[i]=el.value; }); }
 
   function finishRound(){
+    if(!B||B.phase!=='play'||B.checking) return;
+    readInputs(); stopTimer(); B.checking=true;
+    document.querySelectorAll('.bus-in').forEach(function(el){ el.disabled=true; });
+    var ov=document.createElement('div'); ov.id='bus-chk';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(10,8,40,.72);color:#fff;font:800 16px Cairo,sans-serif;direction:rtl';
+    ov.textContent='🔍 بنراجع إجاباتك…'; document.body.appendChild(ov);
+    var done=false, bb=B;
+    function go(){ if(done) return; done=true; var o=document.getElementById('bus-chk'); if(o) o.remove(); bb.checking=false; if(B===bb) finishRoundCompute(); }
+    verifyWords(B.ans.map(function(a,i){ return {w:a,ci:i}; }),B.letter).then(go,go); setTimeout(go,6500);
+  }
+  function finishRoundCompute(){
     if(!B||B.phase!=='play') return;
-    readInputs(); stopTimer();
     var T=tinfo(B.secs), m=T.m, L=B.letter, rows=[], ut=0, bt=0, valid=0, p=Math.min(0.99,DIFFS[B.diff].p*T.f);
     CATS.forEach(function(c,i){
       var list=dictList(L,i), bw=(Math.random()<p && list.length)?rnd(list):'';
       var uw=(B.ans[i]||'').trim();
-      var ok=uw.length>0 && strip(uw).length>=2 && startsWith(uw,L);
-      var known=ok && inDict(uw,L,i);
+      var jd=judge(uw,L,i), ok=jd!=='no', known=jd==='yes';
       var same=!!(ok && bw && strip(uw)===strip(bw));
       var up=0; if(ok){ up=known?(same?5:10):5; if(B.hintI===i) up=Math.min(up,5); valid++; }
       var bp=bw?(same?5:10):0; up*=m; bp*=m;
-      ut+=up; bt+=bp; rows.push({cat:c,user:uw,ok:ok,known:known,bot:bw,up:up,bp:bp,same:same});
+      ut+=up; bt+=bp; rows.push({why:(uw&&!startsWith(uw,L))?'مش بالحرف':((looksReal(uw,i,true)&&WEB[key(uw)]!==false)?'مش '+c[1]:'كلمة غير صحيحة'),cat:c,user:uw,ok:ok,known:known,bot:bw,up:up,bp:bp,same:same});
     });
     var bonus = valid===NC ? BONUS*m : 0; ut+=bonus;
     B.res={rows:rows,ut:ut,bt:bt,bonus:bonus}; B.userTotal+=ut; B.botTotal+=bt; B.stageLog.push({secs:B.secs,m:m,ut:ut,bt:bt,letter:L});
@@ -34899,7 +35018,8 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   }
   function fieldState(i){
     var v=(B.ans[i]||'').trim(); if(!v) return '';
-    if(!startsWith(v,B.letter)) return 'wrong';
+    if(!startsWith(v,B.letter)||!looksReal(v,i,false)) return 'wrong';
+    if(strip(v).length>=3&&judge(v,B.letter,i)==='no') return 'wrong';
     return strip(v).length>=2 ? 'filled' : '';
   }
   function busLive(){
@@ -34919,7 +35039,7 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
   function resultTable(){
     var h='<div class="bus-tbl"><div class="bus-row head"><span></span><span>إجابتك</span><span>الجهاز</span><span>نقط</span></div>';
     B.res.rows.forEach(function(r,i){
-      var u=r.user?'<div class="w'+(r.ok?'':' bad')+'">'+esc(r.user)+(r.ok?(r.known?'<small class="g">✓ كلمة معروفة</small>':'<small>مقبولة</small>'):'<small class="r">مش بالحرف</small>')+'</div>':'<div class="w bad">—</div>';
+      var u=r.user?'<div class="w'+(r.ok?'':' bad')+'">'+esc(r.user)+(r.ok?(r.known?'<small class="g">✓ كلمة معروفة</small>':'<small>مقبولة</small>'):'<small class="r">'+(r.why||'مش بالحرف')+'</small>')+'</div>':'<div class="w bad">—</div>';
       var b=r.bot?'<div class="w">'+esc(r.bot)+(r.same?'<small>نفس إجابتك</small>':'')+'</div>':'<div class="w bad">—</div>';
       h+='<div class="bus-row in" style="--c:'+r.cat[3]+';animation-delay:'+(i*0.09).toFixed(2)+'s"><span class="ci">'+r.cat[2]+'</span>'+u+b+'<span class="pt'+(r.up?'':' z')+'">'+(r.up?'+'+r.up:'0')+'</span></div>';
     });
@@ -35042,7 +35162,7 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
     else if(a==='hint') useHint();
     else if(a==='again'){ initBusGame(true); render(); }
   });
-  document.addEventListener('input',function(e){ var t=e.target; if(B&&t&&t.classList&&t.classList.contains('bus-in')){ var i=+t.getAttribute('data-i'); if(i>=0&&i<NC) B.ans[i]=t.value; busLive(); } });
+  document.addEventListener('input',function(e){ var t=e.target; if(B&&t&&t.classList&&t.classList.contains('bus-in')){ var i=+t.getAttribute('data-i'); if(i>=0&&i<NC) B.ans[i]=t.value; busLive(); prefetch(i); } });
   document.addEventListener('keydown',function(e){
     var t=e.target; if(e.key!=='Enter'||!t||!t.classList||!t.classList.contains('bus-in')) return;
     e.preventDefault(); var i=+t.getAttribute('data-i'), nx=document.querySelector('.bus-in[data-i="'+(i+1)+'"]');
