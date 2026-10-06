@@ -72,13 +72,27 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js'
   ];
-  var i = 0;
+  var i = 0, KEY = 'glv-jsqr-src';
+  /* أوفلاين: لو الـCDN مش متاح نحمّل المكتبة من النسخة اللي اتحفظت على الجهاز لما كان فيه نت */
+  function loadCached(){
+    try{
+      var src = localStorage.getItem(KEY);
+      if(src && !window.jsQR){ var s = document.createElement('script'); s.textContent = src; document.head.appendChild(s); }
+    }catch(e){}
+  }
+  function cacheIt(url){
+    try{
+      if(localStorage.getItem(KEY)) return;
+      fetch(url).then(function(r){ return r.ok ? r.text() : ''; }).then(function(t){ if(t && t.length > 20000){ try{ localStorage.setItem(KEY, t); }catch(e){} } }).catch(function(){});
+    }catch(e){}
+  }
   function tryNext(){
-    if(window.jsQR || i >= sources.length) return;
-    var s = document.createElement('script');
-    s.src = sources[i++];
+    if(window.jsQR) return;
+    if(i >= sources.length){ loadCached(); return; }
+    var s = document.createElement('script'), url = sources[i++];
+    s.src = url;
     s.onerror = tryNext;
-    s.onload = function(){ if(!window.jsQR) tryNext(); };
+    s.onload = function(){ if(!window.jsQR) tryNext(); else cacheIt(url); };
     document.head.appendChild(s);
   }
   tryNext();
@@ -160,9 +174,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .conf-logo-img{width:100%; height:100%; object-fit:contain; padding:3%; box-sizing:border-box; display:block; border-radius:inherit;
     animation:confLogoPop .45s cubic-bezier(.34,1.56,.64,1);}
   @keyframes confLogoPop{from{opacity:0; transform:scale(.7);} to{opacity:1; transform:scale(1);}}
-  .brand-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; letter-spacing:.5px;
+  .brand-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; letter-spacing:0; word-spacing:2px;
     background:linear-gradient(95deg,var(--gold-2),var(--teal) 70%);
-    -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.1;}
+    -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.6; padding:.08em .06em; overflow:visible;}
   .brand-sub{color:var(--text-muted); font-size:12.5px; margin-top:2px;}
   .top-bar{display:flex; align-items:center; justify-content:space-between;}
   .icon-btn{width:38px; height:38px; border-radius:12px; background:var(--surface); border:1px solid var(--border);
@@ -193,7 +207,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .splash-logo{position:relative; width:112px; height:112px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(145deg,var(--gold),var(--coral)); box-shadow:0 10px 30px rgba(244,183,64,.4); overflow:hidden;}
   .splash-logo svg{width:36px; height:36px;}
-  .splash-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:40px; letter-spacing:.5px; line-height:1.1;
+  .splash-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:40px; letter-spacing:0; word-spacing:3px; line-height:1.6; padding:.08em .06em; overflow:visible;
     background:linear-gradient(100deg, var(--gold) 15%, #fff 42%, var(--gold-2) 55%, var(--gold) 85%);
     background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
     animation:shimmer 3.2s linear infinite;}
@@ -655,7 +669,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .list-row.is-locked .lr-num{background:rgba(214,71,58,.12); color:var(--danger);}
   .chevron{color:var(--text-muted); margin-inline-start:6px;}
 
-  /* ---------- session glass squares (فقرات اليوم) ---------- */
+  /* ---------- session glass squares ---------- */
   
   
   
@@ -3278,7 +3292,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ============================= EXTRA AMBIENT MOTION ============================= */
   .profile-hero .avatar{ animation:heroFloat 4.5s ease-in-out infinite; }
   @keyframes heroFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-4px);} }
-  .brand-title, .display{ letter-spacing:.4px; }
+  .brand-title, .display{ letter-spacing:0; }
   .section-title{ position:relative; }
   .badge-item{ transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
   .badge-item:active{ transform:scale(1.08) rotate(-2deg); }
@@ -7056,6 +7070,7 @@ let _fbLastError = '';
 window.storage = {
   async get(key, shared){
     if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
+    if(typeof navigator!=='undefined' && navigator.onLine===false) return null; /* أوفلاين: متستناش السيرفر */
     try{
       const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).once('value'), null);
       if(!snap || !snap.exists()) return null;
@@ -7196,8 +7211,8 @@ async function loadVisaTx(){
   return out;
 }
 const VISA_TX_META = {
-  deposit:{label:'إيداع من نقاط الفقرات', ico:'📥', sign:1, cat:'wallet'},
-  withdraw:{label:'سحب إلى نقاط الفقرات', ico:'📤', sign:-1, cat:'wallet'},
+  deposit:{label:'إيداع من النقاط', ico:'📥', sign:1, cat:'wallet'},
+  withdraw:{label:'سحب إلى النقاط', ico:'📤', sign:-1, cat:'wallet'},
   transfer_out:{label:'تحويل صادر', ico:'↗️', sign:-1, cat:'transfer'},
   transfer_in:{label:'تحويل وارد', ico:'↙️', sign:1, cat:'transfer'},
   renew:{label:'تجديد الفيزا', ico:'🔄', sign:-1, cat:'shop'},
@@ -8031,8 +8046,8 @@ function renderVisaPage(){
       ${visaStatsHtml(bal, total)}
       <div class="vp-fee-row"><span>رسوم التجديد</span><b>${fee} نقطة</b></div>
       <button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="visa-renew" data-src="wallet" ${canW?'':'disabled'}>💳 تجديد من رصيد الفيزا</button>
-      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-renew" data-src="points" ${canP?'':'disabled'}>🏅 تجديد من نقاط الفقرات</button>
-      ${(!canW && !canP) ? `<div class="vp-empty" style="margin:12px 0 0;">رصيدك لا يكفي لرسوم التجديد (${fee} نقطة)، اجمع نقاطًا من الفقرات ثم جدّد.</div>` : ''}
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="visa-renew" data-src="points" ${canP?'':'disabled'}>🏅 تجديد من النقاط</button>
+      ${(!canW && !canP) ? `<div class="vp-empty" style="margin:12px 0 0;">رصيدك لا يكفي لرسوم التجديد (${fee} نقطة)، اجمع نقاطًا ثم جدّد.</div>` : ''}
     </div>`;
   const validHint = expired
     ? `منتهية الصلاحية · اضغط على البطاقة لقلبها`
@@ -8270,7 +8285,7 @@ async function doVisaMove(kind){
   if(amt<=0){ visaMsg('warn','المبلغ مطلوب','اكتب عدد النقاط المراد '+(kind==='deposit'?'إيداعها':'سحبها')+'.'); return; }
   {
     const curBal = WALLET[pid]||0, after = kind==='deposit' ? curBal+amt : curBal-amt;
-    const okConfirm = await visaPayConfirm({ title: kind==='deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب', subtitle: kind==='deposit' ? 'من نقاط الفقرات إلى الفيزا' : 'من الفيزا إلى نقاط الفقرات', amount: amt,
+    const okConfirm = await visaPayConfirm({ title: kind==='deposit' ? 'تأكيد الإيداع' : 'تأكيد السحب', subtitle: kind==='deposit' ? 'من النقاط إلى الفيزا' : 'من الفيزا إلى النقاط', amount: amt,
       rows:[['رصيد الفيزا الحالي', curBal+' نقطة'], ['رصيد الفيزا بعد العملية', after+' نقطة']], label:'اسحب للتأكيد' });
     if(!okConfirm) return;
   }
@@ -9023,7 +9038,6 @@ async function chipHandleIncoming(r){
 }
 if(!window.__chipInboxTimer){ window.__chipInboxTimer = setInterval(chipInboxPoll, 2000); }
 
-
 /* =====================================================================
    نغمة الشريحة: نفس رقم العملية بيتبعت كنغمة قصيرة (FSK بـ 16 نغمة)
    المرسل بيبث النغمة، وميكروفون المستلم بيلتقطها ويفكّها (CRC16 بيأكد الصحة)
@@ -9194,13 +9208,13 @@ async function copyMyVisaNumber(btn){
   }
   if(btn){ const old = btn.textContent; btn.textContent = ok ? '✓ تم نسخ الرقم' : num; setTimeout(()=>{ btn.textContent = old; }, 2200); }
 }
-/* تجديد الفيزا بعد انتهاء الصلاحية: رسوم ثابتة (100 افتراضيًا) من رصيد الفيزا أو من نقاط الفقرات */
+/* تجديد الفيزا بعد انتهاء الصلاحية: رسوم ثابتة (100 افتراضيًا) من رصيد الفيزا أو من النقاط */
 async function doVisaRenew(src){
   if(window.__visaRenewing) return;
   const pid = state.pid, fee = visaRenewFee();
   if(!visaExpired(pid)){ render(); return; }
   const okConfirm = await visaPayConfirm({ title:'تأكيد تجديد الفيزا', subtitle:'رسوم التجديد بتتخصم فورًا', amount: fee,
-    rows:[['الخصم من', src==='wallet' ? 'رصيد الفيزا' : 'نقاط الفقرات'], ['صالحة حتى', fmtVisaDate(Date.now() + visaValidDays()*VISA_DAY_MS)]], label:'اسحب للتجديد' });
+    rows:[['الخصم من', src==='wallet' ? 'رصيد الفيزا' : 'النقاط'], ['صالحة حتى', fmtVisaDate(Date.now() + visaValidDays()*VISA_DAY_MS)]], label:'اسحب للتجديد' });
   if(!okConfirm) return;
   showPinEntryModal({
     title: 'تأكيد التجديد',
@@ -9221,7 +9235,7 @@ async function executeVisaRenew(pid, src, fee){
     [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
     const fromWallet = src==='wallet';
     if(fromWallet ? (WALLET[pid]||0) < fee : participantTotal(pid) < fee){
-      visaMsg('warn','الرصيد غير كافٍ','رصيدك لا يغطي رسوم التجديد.',{ rows:[[fromWallet?'رصيد الفيزا':'نقاط الفقرات', (fromWallet?(WALLET[pid]||0):participantTotal(pid))+' نقطة'],['رسوم التجديد', fee+' نقطة']] });
+      visaMsg('warn','الرصيد غير كافٍ','رصيدك لا يغطي رسوم التجديد.',{ rows:[[fromWallet?'رصيد الفيزا':'النقاط', (fromWallet?(WALLET[pid]||0):participantTotal(pid))+' نقطة'],['رسوم التجديد', fee+' نقطة']] });
       return;
     }
     const key = fromWallet ? 'glavera-visa-wallet' : 'glavera-bonus';
@@ -9239,7 +9253,7 @@ async function executeVisaRenew(pid, src, fee){
       return;
     }
     [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
-    await logVisaTx([{ pid, type:'renew', amount:fee, balAfter: fromWallet ? (WALLET[pid]||0) : participantTotal(pid), note: fromWallet?'من رصيد الفيزا':'من نقاط الفقرات' }]);
+    await logVisaTx([{ pid, type:'renew', amount:fee, balAfter: fromWallet ? (WALLET[pid]||0) : participantTotal(pid), note: fromWallet?'من رصيد الفيزا':'من النقاط' }]);
     pushNotification(pid, `✅ تم تجديد فيزتك حتى ${fmtVisaDate(expires)}`, '✅');
     vibrate([15,10,25]); render();
     visaMsg('success','تم تجديد الفيزا','فيزتك تعمل الآن ويمكنك استخدامها في الإيداع والسحب وGames.',
@@ -9858,7 +9872,7 @@ function checkConfTimeAlerts(){
     extra.confAlertsSent.beforeStart = true; changed = true;
   }
   if(now >= end-3600000 && now < end && !extra.confAlertsSent.beforeEnd){
-    pushNotification(state.pid, 'باقي ساعة على ختام الاجتماع — متفوتش آخر الفقرات 💫', '⏰');
+    pushNotification(state.pid, 'باقي ساعة على ختام الاجتماع 💫', '⏰');
     notifyNative('اجتماع جامعة', 'باقي ساعة على ختام الاجتماع');
     extra.confAlertsSent.beforeEnd = true; changed = true;
   }
@@ -9879,8 +9893,6 @@ function exportParticipantsXlsx(){
       'العنوان': (cpOf(p.id)||{}).address || '',
       'تاريخ الانضمام': (cpOf(p.id)||{}).joinDate || '',
       'النقاط': participantTotal(p.id),
-      'عدد الفقرات المحضورة': attended,
-      'إجمالي الفقرات': totalSessions,
       'نسبة الحضور %': totalSessions ? Math.round((attended/totalSessions)*1000)/10 : 0
     };
   });
@@ -9937,7 +9949,7 @@ const TRANSLATIONS = {
     opinion_positives_label:'✅ الإيجابيات', opinion_positives_ph:'إيه اللي عجبك في الاجتماع؟',
     opinion_negatives_label:'⚠️ السلبيات', opinion_negatives_ph:'إيه اللي ممكن يتحسن؟',
     opinion_suggestions_label:'💡 اقتراحاتك', opinion_suggestions_ph:'عندك اقتراح نطبقه المرة الجاية؟',
-    opinion_favorite_label:'⭐ أكتر فقرة عجبتك', opinion_favorite_ph:'اكتب اسم الفقرة اللي عجبتك أكتر',
+    
     opinion_send:'إرسال رأيك', opinion_sent_toast:'وصلنا رأيك، شكرًا ليك 🙏', opinion_empty_err:'اكتب حاجة في خانة واحدة على الأقل',
     opinion_edit_hint:'ده رأيك اللي بعتّه قبل كده — تقدر تعدّله وتبعته تاني',
     nav_myphotos:'Photo', nav_myphotos_sub:'صورك الخاصة — بس إنت اللي تشوفها',
@@ -9945,7 +9957,7 @@ const TRANSLATIONS = {
     nav_chat:'شات المشاركين', nav_chat_sub:'كلم كل المشاركين — نص، صور، صوت، فيديو',
     nav_settings:'الإعدادات', nav_settings_sub:'الهوية، الصوت، والتصدير',
     nav_gallery:'معرض الصور', nav_gallery_sub:'أجمل لحظات الاجتماع',
-    nav_games:'Games', nav_games_sub:'العب وأنت مستني الفقرة الجاية 🎮',
+    nav_games:'Games', nav_games_sub:'العب وتسلّى 🎮',
     nav_attendance:'الحضور', nav_attendance_sub:'قداس · اجتماع · تسبحة',
     gallery_title:'معرض صور الاجتماع', gallery_sub:'مرّر أو اسحب لاستعراض الصور',
     gallery_hint:'اسحب يمين أو شمال، أو دوس على الصورة اللي في النص عشان تفتح الألبوم',
@@ -9955,8 +9967,6 @@ const TRANSLATIONS = {
     save:'حفظ', cancel:'إلغاء', back:'رجوع', done:'تم', edit:'تعديل', delete:'حذف', add:'إضافة',
     conf_capabilities_title:'كل الإمكانات', conf_capabilities_sub:'اضغط على الزرار',
 
-
-
     settings_title:'الإعدادات', settings_music:'موسيقى الخلفية', settings_music_toggle:'🎵 تشغيل موسيقى الخلفية',
     settings_volume:'مستوى الصوت', settings_data:'البيانات', settings_export_pdf:'تصدير رحلتي كـ PDF',
     settings_report:'الإبلاغ عن مشكلة', settings_report_hint:'واجهت مشكلة في التطبيق؟ اكتبها هنا وهنعملها معالجة بأسرع وقت',
@@ -9965,20 +9975,9 @@ const TRANSLATIONS = {
     pass_share:'مشاركة البطاقة 📤', pass_invite:'دعوة صديق',
     badges_title:'أوسمتك', badges_earned_of:'وسام محقق من', badges_earned_title:'الأوسمة المحققة',
     badges_locked_title:'أوسمة لسه هتيجي', badges_locked_sub:'اضغط لمعرفة الطريقة',
-    badges_empty:'🚀 ابدأ رحلتك! سجّل حضورك في أول فقرة عشان تجمع أول أوسمتك',
-    
-    
-    
-    
-    
+    badges_empty:'🚀 ابدأ رحلتك واجمع نقاطك',
+
     lb_you:'(أنت)',
-
-
-
-
-
-
-
 
   }
 };
@@ -9992,42 +9991,9 @@ function trFmt(key, vals){
   Object.keys(vals||{}).forEach(k=>{ s = s.replace('{'+k+'}', vals[k]); });
   return s;
 }
-async function doToggleSessionReminders(){
-  const extra = myExtra(state.pid);
-  extra.reminders = !extra.reminders;
-  if(extra.reminders && typeof Notification !== 'undefined' && Notification.permission==='default'){
-    try{ await Notification.requestPermission(); }catch(e){}
-  }
-  await saveProfileExtra(PROFILE_EXTRA);
-  showToast(extra.reminders ? '🔔 هيتم تذكيرك بمواعيد الفقرات لما الموقع يبقى مفتوح' : 'تم إيقاف تذكير الفقرات');
-  render();
-}
+
 let _remindedSessionIds = new Set();
-function checkSessionReminders(){
-  if(!state.pid) return;
-  const extra = myExtra(state.pid);
-  if(!extra.reminders) return;
-  const nowMin = nowMinutes();
-  DAYS.forEach(day=>{
-    if(day.locked) return; // بنذكّر بس بفقرات اليوم المفتوح حاليًا
-    day.sessions.forEach(s=>{
-      if(_remindedSessionIds.has(s.id)) return;
-      const info = SESSION_INFO[s.id] || {};
-      const startMin = parseArabicTime(info.timeFrom);
-      if(startMin===null) return;
-      const diff = startMin - nowMin;
-      if(diff>0 && diff<=15){
-        _remindedSessionIds.add(s.id);
-        const label = info.name || s.name;
-        showToast(`⏰ فقرة "${label}" هتبدأ بعد ${diff} دقيقة`);
-        if(typeof Notification !== 'undefined' && Notification.permission==='granted'){
-          try{ new Notification('اجتماع جامعة', { body:`فقرة "${label}" هتبدأ بعد ${diff} دقيقة`, icon:'icon-192.png' }); }catch(e){}
-        }
-      }
-    });
-  });
-}
-if(typeof window !== 'undefined'){ setInterval(checkSessionReminders, 60000); }
+
 function logisticsOf(pid){ return LOGISTICS[pid] || (LOGISTICS[pid] = {}); }
 const KIT_ITEMS = [
   {key:'badge', ico:'🪪', lab:'Badge'},
@@ -10042,21 +10008,7 @@ function currentJourneyDay(pid){
   const idx = DAYS.findIndex(d=>dayTotal(pid,d)===0);
   return idx>=0 ? DAYS[idx] : DAYS[DAYS.length-1];
 }
-function dayQuests(pid, day){
-  const extra = myExtra(pid);
-  const claimed = extra.questsClaimed || {};
-  const doneCount = day.sessions.filter(s=>sessionPoints(pid,s.id)>0).length;
-  const dayPts = dayTotal(pid, day);
-  const defs = [
-    { key:'attend1', icon:'✅', label:'سجّل حضورك في فقرة واحدة اليوم', progress:Math.min(1,doneCount), goal:1, reward:5 },
-    { key:'attendAll', icon:'🎯', label:`اكمل كل فقرات ${day.label} (${day.sessions.length} فقرات)`, progress:Math.min(doneCount, day.sessions.length), goal:day.sessions.length, reward:15 },
-    { key:'points20', icon:'⚡', label:'اجمع 20 نقطة من فقرات اليوم', progress:Math.min(20,dayPts), goal:20, reward:10 },
-  ];
-  return defs.map(q=>{
-    const claimKey = day.id+'_'+q.key;
-    return {...q, claimKey, done:q.progress>=q.goal, claimed:!!claimed[claimKey]};
-  });
-}
+function dayQuests(pid, day){ return []; }
 
 function pushNotification(pid, text, icon){
   const extra = myExtra(pid);
@@ -10168,38 +10120,8 @@ function computeStreak(pid){
   flat.forEach(f=>{ if(CHECKINS[pid+'__'+f.session.id]){ run++; max=Math.max(max,run); } else run=0; });
   return { current: cur, max };
 }
-function computeBadges(pid){
-  const badges = [];
-  const myKeys = Object.keys(CHECKINS).filter(k=>k.startsWith(pid+'__'));
-  if(myKeys.length>0) badges.push({icon:'🥇', label:'أول تسجيل حضور'});
-  DAYS.forEach(d=>{
-    if(d.sessions.length>0 && d.sessions.every(s=>CHECKINS[pid+'__'+s.id])) badges.push({icon:'📅', label:'حضور كامل — '+d.label});
-  });
-  DAYS.forEach(d=>d.sessions.forEach(s=>{
-    const regs = Object.entries(CHECKINS).filter(([k])=>k.endsWith('__'+s.id))
-      .map(([k,v])=>({pid:k.split('__')[0], ts:v.ts})).sort((a,b)=>a.ts-b.ts).slice(0,5);
-    if(regs.some(r=>r.pid===pid)) badges.push({icon:'⚡', label:'من أول 5: '+s.name});
-  }));
-  const streak = computeStreak(pid);
-  if(streak.max>=5) badges.push({icon:'🔥', label:'متتالية 5 فقرات'});
-  return badges;
-}
-function computeSecretBadges(pid){
-  const secrets = [];
-  DAYS.forEach(d=>d.sessions.forEach(s=>{
-    const c = CHECKINS[pid+'__'+s.id];
-    const info = SESSION_INFO[s.id];
-    if(!c || !info || !info.timeFrom) return;
-    const startMin = parseArabicTime(info.timeFrom);
-    if(startMin==null) return;
-    const checkinDate = new Date(c.ts);
-    const checkinMin = checkinDate.getHours()*60+checkinDate.getMinutes()+checkinDate.getSeconds()/60;
-    if(checkinMin >= startMin && checkinMin <= startMin+1){
-      secrets.push({icon:'🕵️', label:'دقيقة الذهب — سجّلت في أول 60 ثانية من: '+s.name});
-    }
-  }));
-  return secrets;
-}
+function computeBadges(pid){ return []; }
+function computeSecretBadges(pid){ return []; }
 function computeTitle(pid){
   const tally={};
   DAYS.forEach(d=>d.sessions.forEach(s=>{ if(CHECKINS[pid+'__'+s.id]) tally[s.type]=(tally[s.type]||0)+1; }));
@@ -10209,19 +10131,7 @@ function computeTitle(pid){
   const map = {opening:'نجم الافتتاح', lecture:'محب المعرفة', workshop:'بطل الورش', activity:'بطل الأنشطة', closing:'روح الختام'};
   return map[entries[0][0]] || null;
 }
-function recommendationMessage(pid){
-  const tally={};
-  DAYS.forEach(d=>d.sessions.forEach(s=>{ if(CHECKINS[pid+'__'+s.id]) tally[s.type]=(tally[s.type]||0)+1; }));
-  const entries=Object.entries(tally);
-  if(!entries.length) return null;
-  entries.sort((a,b)=>b[1]-a[1]);
-  if(entries[0][1] < 2) return null;
-  const type = entries[0][0];
-  const label = SESSION_TYPE_LABELS[type];
-  let next=null;
-  DAYS.forEach(d=>d.sessions.forEach(s=>{ if(!next && s.type===type && !CHECKINS[pid+'__'+s.id]) next=s; }));
-  return next ? `بتميل لـ${label} أكتر — الفقرة الجاية "${next.name}" هتعجبك` : `بتميل لـ${label} أكتر — استمتعت بمعظم رحلتك بهذا النوع 👏`;
-}
+
 const TYPE_COLORS = { opening:'#F4B740', lecture:'#3FDCC9', workshop:'#FF7A59', activity:'#9B8CFF', closing:'#5FE0A4' };
 function findLiveSessionForDay(day){
   const nm = nowMinutes();
@@ -10245,18 +10155,6 @@ function checkinsForSession(sid){
 }
 
 /* ============================= SESSION REMINDERS ============================= */
-async function doToggleReminder(el, sid){
-  if(!state.pid) return;
-  const extra = myExtra(state.pid);
-  extra.remindersOff = extra.remindersOff || {};
-  extra.remindersOff[sid] = !extra.remindersOff[sid];
-  await saveProfileExtra(PROFILE_EXTRA);
-  const on = !extra.remindersOff[sid];
-  el.textContent = on ? '🔔' : '🔕';
-  el.classList.toggle('on', on);
-  el.title = on ? 'نبّهني قبل الفقرة بـ 10 دقائق' : 'التذكير متوقف لهذه الفقرة';
-  showToast(on ? 'هننبهك قبل الفقرة بـ 10 دقايق 🔔' : 'اتوقف التذكير لهذه الفقرة');
-}
 
 /* ============================= SESSION RATINGS ============================= */
 function myRatingFor(pid, sid){ return (myExtra(pid).sessionRatings||{})[sid] || 0; }
@@ -10404,11 +10302,11 @@ function showGamesIntroModal(){
       <div class="confirm-icon">🎮</div>
       <div class="confirm-msg">إزاي نقاط الألعاب شغالة؟</div>
       <ul class="games-intro-list">
-        <li><span class="games-intro-ico">🏆</span><span>كل نقطة تكسبها من الألعاب بتتحول <b>مباشرة لرصيدك في الفيزا</b> 💳، ومش بتضاف لنقاط الفقرات ولا بتأثر على ترتيبك في اللوحة.</span></li>
-        <li><span class="games-intro-ico">📥</span><span>تقدر <b>تودع</b> من نقاط فقراتك في الفيزا وقت ما تحب، عشان يبقى عندك رصيد كافي تلعب بيه.</span></li>
+        <li><span class="games-intro-ico">🏆</span><span>كل نقطة تكسبها من الألعاب بتتحول <b>مباشرة لرصيدك في الفيزا</b> 💳، ومش بتضاف للنقاط ولا بتأثر على ترتيبك في اللوحة.</span></li>
+        <li><span class="games-intro-ico">📥</span><span>تقدر <b>تودع</b> من نقاطك في الفيزا وقت ما تحب، عشان يبقى عندك رصيد كافي تلعب بيه.</span></li>
         <li><span class="games-intro-ico">🛍️</span><span>رصيد الفيزا هو اللي بتدفع بيه رسوم الألعاب والغرف، وتشتري بيه تصاميم الكروت.</span></li>
         <li><span class="games-intro-ico">🤝</span><span>وكمان تقدر <b>تبعت</b> من رصيدك لأي صاحب ليك في الاجتماع برقم فيزته مباشرة.</span></li>
-        <li><span class="games-intro-ico">📤</span><span>ولما رصيدك يكبر كفاية تقدر <b>تسحب</b> منه يرجع نقاط فقرات تاني.</span></li>
+        <li><span class="games-intro-ico">📤</span><span>ولما رصيدك يكبر كفاية تقدر <b>تسحب</b> منه يرجع نقاط تاني.</span></li>
       </ul>
       <label class="games-intro-remind" for="games-intro-dont-remind">
         <input type="checkbox" id="games-intro-dont-remind" />
@@ -11087,7 +10985,7 @@ function renderMePage(){
     </div>
     <div class="me-stats">
       ${st('⭐',total,'مجموع النقاط')}
-      ${st('🔥',streak.current,'فقرات متتالية')}
+      ${st('🏆',rank>0?('#'+rank):'—','الترتيب')}
     </div>
     <div class="me-tier">
       <div class="me-tier-top"><span>${tier===3?'👑':'🎖️'} الميدالية ${tierName}</span><small>${nextAt?`باقي ${Math.max(0,nextAt-total)} نقطة للمستوى الجاي`:'وصلت لأعلى مستوى'}</small></div>
@@ -11095,7 +10993,6 @@ function renderMePage(){
     </div>
     <div class="me-links">
       ${link('🎯','quests','التحديات')}
-      ${link('📿','timeline','رحلتك',attended+' / '+flat.length+' فقرة')}
       ${link('⚙️','settings','الإعدادات')}
     </div>
     <button type="button" class="btn btn-ghost me-logout" data-action="logout">${ICO.logout} تسجيل الخروج</button>
@@ -12213,14 +12110,11 @@ function renderProfile(){
 
     <div class="profile-hero">
       ${title?`<div class="earned-title">🏷️ ${title}</div>`:''}
-      ${streak.current>0?`<div style="margin-top:12px;"><span class="streak-pill">🔥 ${streak.current} فقرة متتالية</span></div>`:''}
-      ${liveSession?`<div class="home-live-chip" data-action="open-session" data-session="${liveSession.id}"><span class="live-dot"></span> على المسرح الآن: ${escapeHtml(liveSession.name)}</div>`:''}
     </div>
 
     ${homeRetreatCardHtml()}
 
     ${attHomeSectionHtml()}
-
 
     <div class="brand-signature">te-epistoly</div>
     <div class="brand-signature-sub">اجتماع جامعة — بإدارة تي إبستولي</div>
@@ -12231,13 +12125,7 @@ function renderProfile(){
 }
 
 /* ============================= RENDER: BADGES PAGE ============================= */
-const BADGE_CATALOG = [
-  {icon:'🥇', label:'أول تسجيل حضور', hint:'سجّل حضورك في أول فقرة'},
-  {icon:'📅', label:'حضور كامل ليوم', hint:'احضر كل فقرات يوم واحد بالكامل'},
-  {icon:'⚡', label:'من أول 5', hint:'كن من أول 5 مسجلين في أي فقرة'},
-  {icon:'🔥', label:'متتالية 5 فقرات', hint:'سجّل حضورك في 5 فقرات متتالية بدون انقطاع'},
-  {icon:'🕵️', label:'دقيقة الذهب', hint:'سجّل حضورك في أول 60 ثانية من بداية الفقرة'},
-];
+const BADGE_CATALOG = [];
 function renderBadgesPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const badges = computeBadges(p.id);
@@ -12293,7 +12181,6 @@ function renderQuestsPage(){
     {icon:'🎖️', label:'اجمع 50 نقطة إجمالاً', goal:50, progress:total},
     {icon:'🏅', label:'اجمع 100 نقطة إجمالاً', goal:100, progress:total},
     {icon:'👑', label:'اجمع 150 نقطة إجمالاً', goal:150, progress:total},
-    {icon:'📿', label:'احضر 10 فقرات إجمالاً', goal:10, progress:flatSessions().filter(f=>CHECKINS[p.id+'__'+f.session.id]).length},
   ];
   const milestonesHtml = milestones.map(m=>{
     const pct = Math.round(Math.min(1,m.progress/m.goal)*100);
@@ -12313,58 +12200,14 @@ function renderQuestsPage(){
     <div class="opinion-hero">
       <div class="opinion-hero-ico">🎯</div>
       <div class="opinion-hero-title">التحديات</div>
-      <div class="opinion-hero-sub">${escapeHtml(qDay.label)} — أنجز المهام واستلم مكافآت فورية</div>
+      <div class="opinion-hero-sub">أنجز واجمع نقاطك</div>
     </div>
-    <div class="section-title">تحديات ${qDay.label} <span class="sub">${ICO.target} إنجازات سريعة بمكافآت فورية</span></div>
-    <div class="quest-list">${questsHtml}</div>
-    <div class="section-title">إنجازات الرحلة الكاملة</div>
+    <div class="section-title">الإنجازات</div>
     <div class="quest-list">${milestonesHtml}</div>
   `;
 }
 
 /* ============================= RENDER: DNA PAGE ============================= */
-function renderDnaPage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const byType={}; let dnaTotal=0;
-  DAYS.forEach(d=>d.sessions.forEach(s=>{ const pts=sessionPoints(p.id,s.id); if(pts>0){ byType[s.type]=(byType[s.type]||0)+pts; dnaTotal+=pts; } }));
-  let dnaHtml = `<div class="empty-note">سجّل حضورك في بعض الفقرات الأول عشان نقدر نحلل نوع مشاركتك</div>`;
-  if(dnaTotal>0){
-    let acc=0; const stops=[];
-    Object.entries(byType).forEach(([type,pts])=>{ const pct=pts/dnaTotal*100; stops.push(`${TYPE_COLORS[type]||'#888'} ${acc}% ${acc+pct}%`); acc+=pct; });
-    const legend = Object.entries(byType).map(([type,pts])=>`<span><span class="dna-dot" style="background:${TYPE_COLORS[type]||'#888'}"></span>${SESSION_TYPE_LABELS[type]} ${Math.round(pts/dnaTotal*100)}%</span>`).join('');
-    dnaHtml = `
-      <div class="card" style="text-align:center;">
-        <div style="width:130px;height:130px;border-radius:50%;background:conic-gradient(${stops.join(',')});margin:0 auto 12px;position:relative;">
-          <div style="position:absolute;inset:16px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;font-weight:800;font-size:12px;color:var(--text-muted);">توزيعك</div>
-        </div>
-        <div class="dna-legend">${legend}</div>
-      </div>`;
-  }
-  const byTypeCount={};
-  DAYS.forEach(d=>d.sessions.forEach(s=>{ if(CHECKINS[p.id+'__'+s.id]) byTypeCount[s.type]=(byTypeCount[s.type]||0)+1; }));
-  const barsHtml = Object.keys(SESSION_TYPE_LABELS).map(type=>{
-    const count = byTypeCount[type]||0;
-    const maxCount = Math.max(1, ...Object.values(byTypeCount));
-    const pct = Math.round((count/maxCount)*100);
-    return `<div class="compare-bar-row">
-      <div class="compare-bar-lab"><span>${SESSION_TYPE_LABELS[type]}</span><span>${count}</span></div>
-      <div class="compare-bar-track"><div class="compare-bar-half left"><div class="compare-fill" style="width:${pct}%;background:${TYPE_COLORS[type]}"></div></div><div class="compare-bar-half"></div></div>
-    </div>`;
-  }).join('');
-  const reco = recommendationMessage(p.id);
-
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">DNA رحلتك</div>
-    </div>
-    <div class="section-title">توزيع نقاطك حسب نوع الفقرة</div>
-    ${dnaHtml}
-    <div class="section-title">عدد الفقرات لكل نوع</div>
-    <div class="card">${barsHtml}</div>
-    ${reco?`<div class="section-title">توصية لك</div><div class="card reco-card"><div class="reco-ico">✨</div><div class="reco-txt">${escapeHtml(reco)}</div></div>`:''}
-  `;
-}
 
 /* ============================= RENDER: GALLERY PAGE (COVERFLOW SLIDER) ============================= */
 /* الخانات السبعة وصورها بقت بيتحكم فيها الأدمن بالكامل من "لوحة المنظمين ← معرض الصور" — مفيش تعديل كود مطلوب. */
@@ -12894,7 +12737,7 @@ function renderGameAchievements(){
 }
 
 /* ============================= GAMES: ترتيب الأبطال (نقاط جوائز الألعاب فقط) =============================
-   المصدر: كشف حساب الفيزا (game_win فقط) — مش بيدخل فيه نقاط الفقرات/الحضور/إضافات المنظمين ولا تعويض الانسحاب.
+   المصدر: كشف حساب الفيزا (game_win فقط) — مش بيدخل فيه النقاط/الحضور/إضافات المنظمين ولا تعويض الانسحاب.
    التخزين المشترك: glavera-game-score = { pid: {pts, wins, ts} } */
 const GS_KEY = 'glavera-game-score';
 const GS = {ready:false, loading:false, data:{}, at:0};
@@ -13359,7 +13202,7 @@ function renderGamesHub(){
       <img class="gx-logo" src="${GAMES_LOGO}" alt="" draggable="false">
       <div class="gx-kicker">مركز الألعاب</div>
       <div class="gx-title">استراحة تفاعلية</div>
-      <div class="gx-sub">العب مع أصحابك أو ضد الجهاز وأنت مستني الفقرة الجاية</div>
+      <div class="gx-sub">العب مع أصحابك أو ضد الجهاز</div>
       <div class="gx-stats">
         <div class="gx-stat"><b>${enabledGamesCatalog().length}</b><span>لعبة متاحة</span></div>
         <button type="button" class="gx-stat${liveCount?' is-live':''}" data-action="open-watch"><b>${liveCount}</b><span>غرفة لايف</span></button>
@@ -14828,7 +14671,6 @@ function renderConnect4Game(){
     ${g.winner ? nextProBtn('c4-reset') : ''}
   `;
 }
-
 
 /* ============================= GAMES: BILLIARDS (بلياردو 8-Ball احترافي) ============================= */
 const BIL = { W:400, H:800, RAIL:26, R:13.5, POCKET_R:23, FRICTION:0.988, MIN_V:0.06, MAX_PULL:200, MAX_POWER:29, SHOT_SECONDS:20 };
@@ -20399,7 +20241,6 @@ function c4PickerHtml(label, myColor, takenColor, takenById, action, extraAttrs,
   return `<div class="c4-picker ${locked?'locked':''}"><div class="c4-picker-label"><span class="c4-picker-ico">🎨</span><span>${label}</span></div><div class="c4-swatches">${sw}</div></div>`;
 }
 
-
 /* ---- Connect Four: centered color-choice dialog (gold buttons) ---- */
 function c4CloseColorDialog(instant){
   const o = document.getElementById('c4dlg'); if(!o) return;
@@ -23478,7 +23319,6 @@ function renderRoomDomino(){
   `;
 }
 
-
 /* ---------- rooms: shared helpers for the new games ---------- */
 function roomGate(title, room){
   if(!room){
@@ -23847,7 +23687,6 @@ function renderRoomMath(){
   `;
 }
 
-
 /* ---------- rooms: REFLEX (أسرع واحد — استنى الإشارة ودوس بأسرع وقت) ---------- */
 async function doRoomReflexGo(code, atRound){
   GAME_ROOMS = await loadGameRooms();
@@ -24206,14 +24045,6 @@ function renderSettingsPage(){
     <div class="card">
       <button type="button" class="btn btn-ghost" data-action="export-pdf">${ICO.download} ${tr('settings_export_pdf')}</button>
     </div>
-    <div class="section-title">🔔 تذكير بمواعيد الفقرات</div>
-    <div class="card">
-      <div class="settings-row">
-        <span>تفعيل تذكير قبل بداية الفقرة بـ15 دقيقة</span>
-        <button type="button" class="switch ${extra.reminders?'on':''}" data-action="toggle-session-reminders"></button>
-      </div>
-      <div class="hint" style="margin-top:10px;">التذكير بيشتغل بس لما تطبيق الموقع مفتوح قدامك (مش إشعار خارجي زي واتساب)، وبيدّيك تنبيه لكل فقرة من فقرات اليوم المفتوح حاليًا قبل ميعادها بربع ساعة</div>
-    </div>
     <div class="section-title">${tr('settings_report')}</div>
     <div class="card report-box">
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${tr('settings_report_hint')}</div>
@@ -24505,19 +24336,6 @@ if(typeof window !== 'undefined'){
 function renderOpinionPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const mine = p ? OPINIONS.find(o=>o.pid===p.id) : null;
-  // نبض الاجتماع: أكتر فقرة اتذكرت كمفضلة لحد دلوقتي — بيظهر فقط لو وصل عدد كافٍ من الآراء (3+) عشان يفضل مجهول الهوية
-  let pulseHtml = '';
-  if(OPINIONS.length >= 3){
-    const favTally = {};
-    OPINIONS.forEach(o=>{ const fv=(o.favoriteSession||'').trim(); if(fv) favTally[fv]=(favTally[fv]||0)+1; });
-    const top = Object.entries(favTally).sort((a,b)=>b[1]-a[1])[0];
-    if(top){
-      pulseHtml = `<div class="card" style="margin-bottom:14px;text-align:center;">
-        <div style="font-size:11.5px;color:var(--text-muted);">🔥 نبض الاجتماع لحد دلوقتي</div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;margin-top:4px;">أكتر فقرة عجبت الحضور: ${escapeHtml(top[0])}</div>
-      </div>`;
-    }
-  }
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
@@ -24529,7 +24347,6 @@ function renderOpinionPage(){
       <div class="opinion-hero-sub">${tr('opinion_hint')}</div>
       ${mine ? `<div class="opinion-hero-edit">✏️ ${tr('opinion_edit_hint')}</div>` : ''}
     </div>
-    ${pulseHtml}
     <div class="opinion-field" style="--op-accent:#3FDCC9;">
       <div class="opinion-field-head">
         <span class="opinion-field-ico">✅</span>
@@ -24550,13 +24367,6 @@ function renderOpinionPage(){
         <span class="opinion-field-lab">${tr('opinion_suggestions_label').replace('💡 ','')}</span>
       </div>
       <textarea id="opinion-suggestions" placeholder="${tr('opinion_suggestions_ph')}">${mine?escapeHtml(mine.suggestions||''):''}</textarea>
-    </div>
-    <div class="opinion-field" style="--op-accent:#9B8CFF;">
-      <div class="opinion-field-head">
-        <span class="opinion-field-ico">⭐</span>
-        <span class="opinion-field-lab">${tr('opinion_favorite_label').replace('⭐ ','')}</span>
-      </div>
-      <input type="text" id="opinion-favorite" placeholder="${tr('opinion_favorite_ph')}" value="${mine?escapeHtml(mine.favoriteSession||''):''}" />
     </div>
     <button type="button" class="btn btn-primary opinion-send-btn" data-action="submit-opinion">📨 ${tr('opinion_send')}</button>
   `;
@@ -24650,168 +24460,9 @@ function renderTransportPage(){
 
 /* ============================= RENDER: CERTIFICATE PAGE ============================= */
 /* ============================= RENDER: SESSION ============================= */
-function renderSession(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const found = findSessionById(state.sessionId);
-  const day = found ? found.day : DAYS.find(d=>d.id===state.dayId);
-  const session = found ? found.session : day.sessions.find(s=>s.id===state.sessionId);
-  const pts = sessionPoints(p.id, session.id);
-  const done = pts>0;
-  const closed = !done && (session.locked || day.locked);
-  const total = participantTotal(p.id);
-  const info = SESSION_INFO[session.id] || {};
-
-  const sessionCodeBoxes = (idPrefix)=>`
-    <div class="otp-boxes-row" style="margin-top:14px;">
-      <div class="otp-boxes" id="${idPrefix}-${session.id}" dir="ltr">
-        ${[0,1,2,3].map(i=>`<span class="otp-circle-wrap"><input type="text" class="otp-box otp-circle session-code-box" maxlength="1" autocomplete="off" data-idx="${i}" data-session="${session.id}" data-group="${idPrefix}-${session.id}" style="animation-delay:${i*80}ms" /><span class="otp-digit-visual" data-idx="${i}"></span></span>`).join('')}
-      </div>
-      <button type="button" class="otp-scan-btn" data-action="open-scan" title="مسح بالكاميرا">${ICO.cam}</button>
-    </div>
-    <div class="hint" style="margin-top:8px;text-align:center;">اكتب كود النقاط (4 خانات) أو امسحه بالكاميرا</div>
-  `;
-  const pointsOff = info.pointsEnabled===false;
-  const checkinBlock = pointsOff ? `
-    <div class="closed-panel">
-      <div class="closed-panel-icon">🪙</div>
-      <div class="closed-panel-title">لا يوجد نقاط في هذه الفقرة</div>
-      <div class="closed-panel-sub">هذه الفقرة من غير كود تسجيل نقاط — استمتع بيها وخلاص 🙌</div>
-    </div>
-  ` : done ? `
-    <div class="checkin-status">
-      <div class="big-check">${ICO.check}</div>
-      <div>مبروك عليك النقاط</div>
-      <div class="earned">+<span id="earned-num" data-total="${pts}">${state.justScoredSessionId===session.id?0:pts}</span> نقطة</div>
-      <div class="total-note">إجمالي نقاطك الآن: ${total} نقطة</div>
-      <div class="hint" style="margin-top:10px;">خدت نقاط هذه الفقرة بالفعل — مينفعش تمسح كود تاني ليها</div>
-    </div>
-  ` : closed ? `
-    <div class="closed-panel">
-      <div class="closed-panel-icon">${lockIconSvg()}</div>
-      <div class="closed-panel-title">التسجيل مقفول حاليًا</div>
-      <div class="closed-panel-sub">${session.locked ? 'المنظمين قفلوا تسجيل الحضور في هذه الفقرة مؤقتًا.' : 'المنظمين قفلوا هذا اليوم بالكامل مؤقتًا.'} حاول تاني بعد شوية.</div>
-    </div>
-  ` : `
-    ${sessionCodeBoxes('checkin-code')}
-  `;
-  const myRating = myRatingFor(p.id, session.id);
-  const ratingBlock = done ? `
-    <div class="rate-block">
-      <div class="hint" style="margin:14px 0 6px;">قيّم هذه الفقرة</div>
-      <div class="stars-row">
-        ${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn ${n<=myRating?'on':''}" data-action="rate-session" data-session="${session.id}" data-star="${n}">★</button>`).join('')}
-      </div>
-      ${myRating ? `<div class="hint" style="margin-top:4px;">شكرًا لتقييمك! يساعدنا نحسّن الفقرات القادمة</div>` : ''}
-    </div>
-  ` : '';
-
-  const metaLines = [];
-  if(info.timeFrom || info.timeTo){
-    metaLines.push(`<div class="admin-meta-line" style="font-size:12.5px;">${ICO.clock} ${escapeHtml(info.timeFrom||'')}${info.timeFrom&&info.timeTo?' - ':''}${escapeHtml(info.timeTo||'')}</div>`);
-  }
-  if(info.location){ metaLines.push(`<div class="admin-meta-line" style="font-size:12.5px;">${ICO.pin} ${escapeHtml(info.location)}</div>`); }
-  if(info.speaker){ metaLines.push(`<div class="admin-meta-line" style="font-size:12.5px;">${ICO.mic} ${escapeHtml(info.speaker)}</div>`); }
-
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div>
-        <div class="back-title">${escapeHtml(session.name)}</div>
-        <div style="color:var(--text-muted);font-size:12px;">${day.label}</div>
-      </div>
-    </div>
-    <div class="card">
-      ${info.logo?`<div style="display:flex;justify-content:center;margin-bottom:12px;"><img src="${info.logo}" alt="لوجو الفقرة" style="width:64px;height:64px;border-radius:18px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,.25);" /></div>`:''}
-      <span class="type-badge">${ICO[session.type]||''} ${SESSION_TYPE_LABELS[session.type]||''}</span>
-      ${metaLines.length ? `<div style="margin-bottom:12px;">${metaLines.join('')}</div>` : ''}
-      ${info.desc ? `<div style="color:var(--text-muted);font-size:13px;line-height:1.7;margin-bottom:14px;">${escapeHtml(info.desc)}</div>` : ''}
-      ${pointsOff ? '' : `<div class="hint" style="margin-bottom:12px;">النقاط في هذه الفقرة تُحسب حسب أكواد QR اللي بتمسحها — كل كود له قيمة نقاط خاصة به</div>`}
-      <div class="section-title" style="margin:0 0 6px;font-size:14.5px;">${done ? 'تم تسجيل النقاط' : 'تسجيل الحضور (الإسكان)'}</div>
-      ${checkinBlock}
-      ${ratingBlock}
-    </div>
-    ${info.askEnabled ? `
-    <div class="card ask-box">
-      <div class="ask-box-title">✋ عندك سؤال للمتحدث؟</div>
-      <textarea id="ask-question-text" placeholder="اكتب سؤالك هنا وهيتقدم للمتحدث..."></textarea>
-      <button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="submit-question" data-session="${session.id}">إرسال السؤال</button>
-    </div>` : ''}
-  `;
-}
 
 /* ============================= RENDER: LEADERBOARD ============================= */
 /* ============================= RENDER: COMPARE ============================= */
-function renderCompare(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(!state.compareId){
-    const others = PARTICIPANTS.filter(m=>m.id!==p.id);
-    const rows = others.map(m=>`<div class="compare-pick-row" data-action="pick-compare" data-member="${m.id}">
-      <div class="avatar" style="width:38px;height:38px;font-size:13px;background:${AVATAR_COLOR}">${initials(m.name)}</div>
-      <div style="flex:1;">${escapeHtml(m.name)}</div>
-      <div class="lb-pts">${participantTotal(m.id)} نقطة</div>
-      <span class="chevron">${ICO.chev}</span>
-    </div>`).join('');
-    return `
-      <div class="back-row">
-        <button class="icon-btn" data-action="back">${ICO.back}</button>
-        <div class="back-title">قارن نفسك</div>
-      </div>
-      <div class="hint" style="margin-bottom:10px;">اختر مشارك للمقارنة</div>
-      <div class="card">${rows || '<div class="empty-note">لا يوجد أعضاء آخرون بعد</div>'}</div>
-    `;
-  }
-  const other = PARTICIPANTS.find(x=>x.id===state.compareId);
-  const myTotal = participantTotal(p.id), otherTotal = participantTotal(other.id);
-  const maxTotal = Math.max(1, myTotal, otherTotal);
-
-  let iAheadDays=0, theyAheadDays=0;
-  const dayRows = DAYS.map(d=>{
-    const mine = dayTotal(p.id,d), theirs = dayTotal(other.id,d);
-    if(mine>theirs) iAheadDays++; else if(theirs>mine) theyAheadDays++;
-    const mMax=Math.max(1,mine,theirs);
-    return `<div class="compare-bar-row">
-      <div class="compare-bar-lab"><span>${mine}</span><span>${d.label}</span><span>${theirs}</span></div>
-      <div class="compare-bar-track">
-        <div class="compare-bar-half left"><div class="compare-fill" style="width:${(mine/mMax)*100}%;background:${AVATAR_COLOR}"></div></div>
-        <div class="compare-bar-half"><div class="compare-fill" style="width:${(theirs/mMax)*100}%;background:#8C6A4A"></div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  let mySessions=0, theirSessions=0;
-  flatSessions().forEach(({session:s})=>{
-    if(CHECKINS[p.id+'__'+s.id]) mySessions++;
-    if(CHECKINS[other.id+'__'+s.id]) theirSessions++;
-  });
-
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back-compare">${ICO.back}</button>
-      <div class="back-title">${escapeHtml(p.name)} vs ${escapeHtml(other.name)}</div>
-    </div>
-    <div class="card" style="text-align:center;">
-      <div style="display:flex;justify-content:space-around;align-items:center;">
-        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:${AVATAR_COLOR};margin:0 auto 6px;">${initials(p.name)}</div><div style="font-size:12px;">أنت</div></div>
-        <div style="font-family:'Cairo',sans-serif;font-weight:900;color:var(--text-muted);">VS</div>
-        <div><div class="avatar" style="width:56px;height:56px;font-size:18px;background:#8C6A4A;margin:0 auto 6px;">${initials(other.name)}</div><div style="font-size:12px;">${escapeHtml(other.name)}</div></div>
-      </div>
-      <div class="compare-stats-row">
-        <div><div class="cs-num">${myTotal}</div><div class="cs-lab">نقاطك</div></div>
-        <div><div class="cs-num">${otherTotal}</div><div class="cs-lab">نقاطه</div></div>
-      </div>
-    </div>
-    <div class="section-title">مقارنة الأيام</div>
-    <div class="card">${dayRows}</div>
-    <div class="section-title">مين سبق مين</div>
-    <div class="card">
-      <div class="compare-stats-row">
-        <div><div class="cs-num">${mySessions}</div><div class="cs-lab">فقرات حضرتها أنت</div></div>
-        <div><div class="cs-num">${theirSessions}</div><div class="cs-lab">فقرات حضرها هو</div></div>
-      </div>
-      <div class="hint" style="margin-top:10px;">${iAheadDays>theyAheadDays?'أنت متقدم في أيام أكتر 🎉':iAheadDays<theyAheadDays?'هو متقدم في أيام أكتر — لسه فيه وقت! 💪':'متعادلين في عدد الأيام المتقدمين فيها'}</div>
-    </div>
-  `;
-}
 
 /* ============================= RENDER: TIMELINE ============================= */
 function renderTimeline(){
@@ -24912,51 +24563,6 @@ function parseTimeStr(str){
   if(!m) return { h:'10', m:'00', ampm:'ص' };
   return { h: m[1].padStart(2,'0'), m: m[2], ampm: m[3]||'ص' };
 }
-function renderAdminEditForm(s, info){
-  return `
-    <div class="admin-edit-form">
-      <label>اسم الفقرة</label>
-      <input type="text" id="edit-sname-${s.id}" value="${escapeHtml(info.name||s.name)}" placeholder="اسم الفقرة" />
-      <div class="admin-edit-row">
-        <div style="flex:1;">
-          <label>من الساعة</label>
-          ${renderTimePickerField('edit-from-'+s.id, info.timeFrom||'')}
-        </div>
-        <div style="flex:1;">
-          <label>إلى الساعة</label>
-          ${renderTimePickerField('edit-to-'+s.id, info.timeTo||'')}
-        </div>
-      </div>
-      <label>المكان</label>
-      <input type="text" id="edit-loc-${s.id}" value="${escapeHtml(info.location||'')}" placeholder="مثال: القاعة الرئيسية" />
-      <label>اسم المتحدث</label>
-      <input type="text" id="edit-speaker-${s.id}" value="${escapeHtml(info.speaker||'')}" placeholder="مثال: أ. محمد سامي" />
-      <label>وصف مختصر</label>
-      <textarea id="edit-desc-${s.id}" placeholder="سطر أو اتنين عن الفقرة">${escapeHtml(info.desc||'')}</textarea>
-      <label>لوجو الفقرة (اختياري)</label>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-        <div class="logo-wrap ${info.logo?'has-custom-logo':''}" style="width:52px;height:52px;border-radius:14px;flex:0 0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg-2);">${info.logo?`<img src="${info.logo}" alt="لوجو الفقرة" class="conf-logo-img" />`:'🖼️'}</div>
-        <div style="flex:1;">
-          <input type="file" accept="image/*" id="edit-slogo-${s.id}" style="font-size:11px;" />
-          ${info.logo?`<button type="button" class="btn btn-ghost" style="margin-top:6px;padding:5px 10px;font-size:10.5px;" data-action="remove-session-logo" data-session="${s.id}">حذف اللوجو</button>`:''}
-        </div>
-      </div>
-      <div class="settings-row" style="margin-top:4px;">
-        <span>✋ إظهار خانة "اسأل" في هذه الفقرة</span>
-        <button type="button" class="switch ${info.askEnabled?'on':''}" data-action="admin-toggle-ask" data-session="${s.id}"></button>
-      </div>
-      <div class="settings-row" style="margin-top:8px;">
-        <span>🪙 تفعيل النقاط في هذه الفقرة</span>
-        <button type="button" class="switch ${info.pointsEnabled!==false?'on':''}" data-action="admin-toggle-points-enabled" data-session="${s.id}"></button>
-      </div>
-      ${info.pointsEnabled===false?`<div class="hint" style="color:var(--danger,#d6473a);margin-top:2px;">النقاط متوقفة في هذه الفقرة — المشاركين مش هياخدوا نقاط ولا هيقدروا يدخلوا كود، وهيشوفوا بيانات الفقرة بس</div>`:''}
-      <div class="admin-edit-actions">
-        <button type="button" class="btn btn-primary" data-action="save-session-info" data-session="${s.id}" style="flex:1;">حفظ</button>
-        <button type="button" class="btn btn-ghost" data-action="cancel-edit-session" style="flex:1;">إلغاء</button>
-      </div>
-    </div>
-  `;
-}
 
 function lockIconSvg(){
   return `<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24965,7 +24571,6 @@ function lockIconSvg(){
     <circle cx="9.5" cy="12.6" r="1.1" fill="currentColor"/>
   </svg>`;
 }
-
 
 function renderAdminAuditTab(){
   const entries = Object.entries(CHECKINS).map(([key, v])=>{
@@ -24992,7 +24597,7 @@ function renderAdminAuditTab(){
       <div class="admin-stat-cell"><div class="admin-stat-num">${entries.length}</div><div class="admin-stat-lab">تسجيل حضور</div></div>
       <div class="admin-stat-cell"><div class="admin-stat-num">${new Set(entries.map(e=>e.pid)).size}</div><div class="admin-stat-lab">مشارك حضر</div></div>
     </div>
-    <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم أو الفقرة..." style="margin-bottom:10px;" />
+    <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" />
     <div class="card">${rows}</div>`;
 }
 
@@ -25005,49 +24610,18 @@ function renderAdminAnalyticsTab(){
   const activeCount = PARTICIPANTS.filter(p=>participantTotal(p.id)>0).length;
   const tabs = adminSubTabs('analytics', [
     {id:'overview', label:'📊 نظرة عامة'},
-    {id:'sessions', label:'🗓️ الفقرات'},
     {id:'people', label:'👤 المشاركون'},
   ], sub);
   let body = '';
   if(sub==='overview'){
-    const typeTally = {};
-    DAYS.forEach(d=>d.sessions.forEach(s=>{ typeTally[s.type] = (typeTally[s.type]||0) + checkinsForSession(s.id); }));
-    const typeTotal = Object.values(typeTally).reduce((a,b)=>a+b,0) || 1;
-    let acc=0; const stops=[];
-    Object.entries(typeTally).forEach(([type,c])=>{ const pct=c/typeTotal*100; stops.push(`${TYPE_COLORS[type]||'#888'} ${acc}% ${acc+pct}%`); acc+=pct; });
-    const legend = Object.entries(typeTally).sort((a,b)=>b[1]-a[1]).map(([type,c])=>
-      `<div class="donut-legend-row"><span class="donut-dot" style="background:${TYPE_COLORS[type]||'#888'}"></span>${SESSION_TYPE_LABELS[type]||type} — ${c} تسجيل</div>`).join('');
-    const topType = Object.entries(typeTally).sort((a,b)=>b[1]-a[1])[0];
     const totalBadges = PARTICIPANTS.reduce((s,p)=>s+computeBadges(p.id).length+computeSecretBadges(p.id).length,0);
-    const avgRating = avgRatingOverall();
     body = `
       <div class="kpi-grid">
         <div class="card kpi-card"><div class="kpi-num">${participationRate}%</div><div class="kpi-lab">نسبة المشاركة الكلية</div></div>
         <div class="card kpi-card"><div class="kpi-num">${avgPoints}</div><div class="kpi-lab">متوسط نقاط المشارك</div></div>
         <div class="card kpi-card"><div class="kpi-num">${activeCount}/${PARTICIPANTS.length}</div><div class="kpi-lab">مشاركون نشطون</div></div>
         <div class="card kpi-card"><div class="kpi-num">${totalBadges}</div><div class="kpi-lab">إجمالي الأوسمة الممنوحة</div></div>
-        <div class="card kpi-card"><div class="kpi-num">${avgRating?avgRating.toFixed(1)+' ★':'—'}</div><div class="kpi-lab">متوسط رضا الحضور عن الفقرات</div></div>
-      </div>
-      ${adminSectionTitle('🍩','إقبال حسب نوع الفقرة')}
-      <div class="card donut-wrap">
-        <div style="width:88px;height:88px;border-radius:50%;background:conic-gradient(${stops.join(',')||'#333 0 100%'});flex:0 0 auto;position:relative;">
-          <div style="position:absolute;inset:12px;border-radius:50%;background:var(--surface-2);"></div>
-        </div>
-        <div class="donut-legend">${legend || '<div class="hint">لا توجد بيانات بعد</div>'}</div>
-      </div>
-      ${topType ? `<div class="hint" style="margin:-4px 2px 4px;">أكثر نوع فقرات إقبالاً: <strong style="color:var(--gold);">${SESSION_TYPE_LABELS[topType[0]]||topType[0]}</strong></div>` : ''}`;
-  } else if(sub==='sessions'){
-    const rowsByDay = DAYS.map(d=>{
-      const rows = d.sessions.map(s=>{
-        const n = checkinsForSession(s.id);
-        const pct = PARTICIPANTS.length ? Math.round(n/PARTICIPANTS.length*100) : 0;
-        const info = SESSION_INFO[s.id] || {};
-        return `<div class="admin-bar-row"><div class="abr-name">${escapeHtml(info.name||s.name)}</div><div class="abr-track"><div class="abr-fill" style="width:${pct}%"></div></div><div class="abr-val">${n} · ${pct}%</div></div>`;
-      }).join('');
-      return `${adminSectionTitle('📅', escapeHtml(d.label))}<div class="card">${rows || '<div class="hint">لا توجد فقرات</div>'}</div>`;
-    }).join('');
-    const best = flatSessions().map(s=>({s,n:checkinsForSession(s.id)})).sort((a,b)=>b.n-a.n)[0];
-    body = adminKpis([{num:flatSessions().length,lab:'فقرة'},{num:totalCheckins,lab:'تسجيل حضور'},{num:participationRate+'%',lab:'نسبة الحضور'},{num:best&&best.n?best.n:'—',lab:'أعلى حضور'}]) + rowsByDay;
+      </div>`;
   } else {
     const streaks = PARTICIPANTS.map(p=>({p, streak: computeStreak(p.id).max})).sort((a,b)=>b.streak-a.streak).filter(x=>x.streak>0).slice(0,5);
     const streakRows = streaks.length ? streaks.map(({p,streak})=>`<div class="streak-lead-row">🔥 <div style="flex:1;">${escapeHtml(p.name)}</div><span style="color:var(--gold);font-weight:800;">${streak} متتالية</span></div>`).join('')
@@ -25142,10 +24716,10 @@ function _renderAdminSettingsAll(){
       <div class="hint" style="margin:0 0 12px;">تتحكم في قيم فيزا Games لكل المشاركين — بتتطبق على الفيزا الموجودة فعلاً من غير ما تأثر على رصيد أي حد.</div>
       <label>💰 الحد الأدنى للسحب (نقطة)</label>
       <input type="number" id="visa-min-withdraw" value="${GAME_POINTS_SETTINGS.visaMinWithdraw||600}" min="0" />
-      <div class="hint" style="margin-top:4px;">أقل رصيد فيزا لازم يوصله المشارك عشان يقدر يسحب منه لنقاط الفقرات تاني</div>
+      <div class="hint" style="margin-top:4px;">أقل رصيد فيزا لازم يوصله المشارك عشان يقدر يسحب منه للنقاط تاني</div>
       <label style="margin-top:12px;">🔄 رسوم تجديد الفيزا (نقطة)</label>
       <input type="number" id="visa-renew-fee" value="${GAME_POINTS_SETTINGS.visaRenewFee||100}" min="0" />
-      <div class="hint" style="margin-top:4px;">المبلغ اللي بيتخصم (من رصيد الفيزا أو نقاط الفقرات) عشان يجدد الفيزا بعد ما تنتهي صلاحيتها</div>
+      <div class="hint" style="margin-top:4px;">المبلغ اللي بيتخصم (من رصيد الفيزا أو النقاط) عشان يجدد الفيزا بعد ما تنتهي صلاحيتها</div>
       <label style="margin-top:12px;">📅 مدة صلاحية الفيزا (يوم)</label>
       <input type="number" id="visa-valid-days" value="${GAME_POINTS_SETTINGS.visaValidDays||14}" min="1" />
       <div class="hint" style="margin-top:4px;">عدد الأيام من لحظة إنشاء/تجديد الفيزا لحد ما تحتاج تجديد تاني</div>
@@ -25259,8 +24833,6 @@ function _renderAdminSettingsAll(){
     </div>
   `;
 }
-
-
 
 /* ===== تقسيم الإعدادات لخانات حسب الموضوع ===== */
 const ADM_SET_RULES = [
@@ -25552,23 +25124,18 @@ function renderAdminOpinionsTab(){
         ${field('#3FDCC9','✅ الإيجابيات', o.positives)}
         ${field('#FF7A59','⚠️ السلبيات', o.negatives)}
         ${field('#F4B740','💡 اقتراحات', o.suggestions)}
-        ${field('#9B8CFF','⭐ أكتر فقرة عجبته', o.favoriteSession)}
         <button type="button" class="btn btn-ghost" style="margin-top:6px;width:100%;color:var(--danger);" data-action="admin-delete-opinion" data-id="${o.id}">✕ حذف هذا الرأي</button>
       `;
     }
   }
   const os = OPINIONS.slice().sort((a,b)=>b.ts-a.ts);
   if(!os.length) return adminEmptyState('📝','لسه محدش بعت رأيه','آراء المشاركين هتظهر هنا');
-  const favTally = {};
   let posCount=0, negCount=0, sugCount=0;
   os.forEach(o=>{
     if(o.positives && o.positives.trim()) posCount++;
     if(o.negatives && o.negatives.trim()) negCount++;
     if(o.suggestions && o.suggestions.trim()) sugCount++;
-    const fv = (o.favoriteSession||'').trim();
-    if(fv) favTally[fv] = (favTally[fv]||0)+1;
   });
-  const topFav = Object.entries(favTally).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const f = adminSubGet('opinions','all');
   let list = os;
   if(f==='neg') list = os.filter(o=>(o.negatives||'').trim());
@@ -25579,7 +25146,6 @@ function renderAdminOpinionsTab(){
     {id:'neg', label:'⚠️ فيها سلبيات ('+negCount+')'},
     {id:'sug', label:'💡 اقتراحات ('+sugCount+')'},
   ], f);
-  const favLine = topFav.length ? `<div class="hint" data-keep="1" style="margin:0 2px 10px;">⭐ الأكتر ذكرًا كفقرة مفضلة: ${topFav.map(([name,n])=>`${escapeHtml(name)} (${n})`).join('، ')}</div>` : '';
   const search = os.length>4 ? `<input type="text" class="field admin-search-input" data-filter-target=".op-admin-row" placeholder="🔍 دور بالاسم..." style="margin-bottom:10px;" />` : '';
   const flags = o => `${(o.positives||'').trim()?'✅':''}${(o.negatives||'').trim()?'⚠️':''}${(o.suggestions||'').trim()?'💡':''}`;
   const rows = list.map(o=>`
@@ -25591,7 +25157,7 @@ function renderAdminOpinionsTab(){
       </span>
       <span class="op-admin-row-chev">${ICO.chev}</span>
     </button>`).join('');
-  return kpis + tabs + favLine + search + (rows || adminEmptyState('🎉','مفيش آراء في القسم ده',''));
+  return kpis + tabs + search + (rows || adminEmptyState('🎉','مفيش آراء في القسم ده',''));
 }
 function renderAdminTrashTab(){
   if(!TRASH.length) return adminEmptyState('🗑️','سلة المهملات فاضية','أي حاجة بتتحذف بتفضل هنا لحد ما تسترجعها أو تحذفها نهائيًا');
@@ -25726,24 +25292,7 @@ function renderAdminAddParticipantPage(){
 }
 function renderAdminParticipantDetail(p){
   const myRank = rankedParticipants().findIndex(x=>x.id===p.id)+1;
-  const attendedCount = DAYS.reduce((sum,d)=>sum+d.sessions.filter(s=>CHECKINS[p.id+'__'+s.id]).length, 0);
-  const attendedRows = [];
-  DAYS.forEach(d=>d.sessions.forEach(s=>{
-    const c = CHECKINS[p.id+'__'+s.id];
-    if(!c) return;
-    const info = SESSION_INFO[s.id] || {};
-    attendedRows.push(`<div class="admin-meta-chip" style="justify-content:space-between;width:100%;padding:9px 12px;margin-top:6px;">
-      <span>✅ ${escapeHtml(info.name||s.name)} — <b>${c.points}</b> نقطة</span>
-      <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:10.5px;color:var(--danger);" data-action="admin-cancel-checkin" data-pid="${p.id}" data-session="${s.id}">إلغاء الحضور</button>
-    </div>`);
-  }));
-  const attendanceBlock = `
-    <div style="margin-top:0;">
-      <div class="admin-session-name" style="margin-bottom:4px;">📋 الفقرات اللي حضرها (${attendedCount})</div>
-      <div class="hint" style="margin:0 0 8px;">إلغاء الحضور بيمسح نقاط الفقرة دي بس من رصيد المشارك، وبيسيبه يقدر يمسح كود QR جديد لنفس الفقرة تاني</div>
-      ${attendedRows.join('') || `<div class="hint">لسه معملش أي حضور</div>`}
-    </div>
-  `;
+  const attendanceBlock = '';
   const sub = adminSubGet('participant:'+p.id,'info');
   const heroHtml = `
     <button type="button" class="admin-back-link" data-action="cancel-edit-participant">${ICO.back} كل المشاركين</button>
@@ -25757,8 +25306,8 @@ function renderAdminParticipantDetail(p){
       </div>
       
     </div>
-    ${adminKpis([{num:participantTotal(p.id),lab:'مجموع النقاط'},{num:'#'+myRank,lab:'الترتيب الفردي'},{num:attendedCount,lab:'فقرات حضرها'}])}
-    ${adminSubTabs('participant:'+p.id, [{id:'info',label:'👤 البيانات'},{id:'points',label:'🪙 النقاط والحضور'},{id:'photos',label:'📷 الصور'}], sub)}`;
+    ${adminKpis([{num:participantTotal(p.id),lab:'مجموع النقاط'},{num:'#'+myRank,lab:'الترتيب الفردي'}])}
+    ${adminSubTabs('participant:'+p.id, [{id:'info',label:'👤 البيانات'},{id:'points',label:'🪙 النقاط'},{id:'photos',label:'📷 الصور'}], sub)}`;
   let bodyHtml = '';
   if(sub==='info'){
     const cp = cpOf(p.id);
@@ -25946,7 +25495,6 @@ function renderAdminAlertsTab(){
   return kpis + tabs + body;
 }
 
-
 /* ============================= BOTTOM NAV BAR ============================= */
 const BNAV_ICONS = {
   me:'<svg viewBox="0 0 24 24"><circle class="d" cx="12" cy="8" r="3.7"/><path fill="none" d="M5 20.2c.5-3.7 3.3-5.9 7-5.9s6.5 2.2 7 5.9"/></svg>',
@@ -26109,7 +25657,6 @@ function render(){
   else if(state.view==='me') html = renderMePage();
   else if(state.view==='badges') html = renderBadgesPage();
   else if(state.view==='quests') html = renderQuestsPage();
-  else if(state.view==='dna') html = renderDnaPage();
   else if(state.view==='share') html = renderSharePage();
   else if(state.view==='wall') html = renderWallPage();
   else if(state.view==='structure') html = featureLockedForMe('structure') ? renderMaintenancePage('هيكلة الاجتماع','👥') : renderMeetingStructurePage();
@@ -26165,8 +25712,6 @@ function render(){
   else if(state.view==='kit') html = renderKitPage();
   else if(state.view==='transport') html = renderTransportPage();
   else if(state.view==='retreat') html = featureLockedForMe('retreat') ? renderMaintenancePage('خلوة فردية','✝️') : renderRetreatPage();
-  else if(state.view==='session') html = renderSession();
-  else if(state.view==='compare') html = renderCompare();
   else if(state.view==='timeline') html = renderTimeline();
   else if(state.view==='admin') html = renderAdmin();
   if(String(state.view).indexOf('room-')===0 && state.roomCode){
@@ -26252,14 +25797,6 @@ function render(){
       cs.forEach(e=>{ const to = parseInt(e.dataset.to,10)||0; if(calm) e.textContent = to; else animateCount(e, to, 1000); });
     }
   }
-  if(state.view==='session'){
-    const earnedEl = document.getElementById('earned-num');
-    if(earnedEl && state.justScoredSessionId===state.sessionId){
-      animateCount(earnedEl, parseInt(earnedEl.dataset.total,10)||0, 600);
-      state.justScoredSessionId = null;
-    }
-    attachSessionCodeBoxes();
-  }
 
   updateAmbientForView();
 }
@@ -26325,8 +25862,6 @@ document.addEventListener('pointerdown', (e)=>{
     if(target.dataset._rippleOverflow!==undefined){ target.style.overflow = target.dataset._rippleOverflow; delete target.dataset._rippleOverflow; }
   }, {once:true});
 }, {passive:true});
-
-
 
 /* ============================= ANIMATION HELPERS ============================= */
 function animateCount(el, to, duration){
@@ -26993,9 +26528,9 @@ const LOCKED_DAY_MESSAGES = [
   'لسه بدري 🤌 اليوم ده مقفول دلوقتي من المنظمين'
 ];
 const LOCKED_SESSION_MESSAGES = [
-  'استنى شوية 😂🤌 الفقرة دي لسه مقفولة من المنظمين',
-  'هدّي عليك 😅 الفقرة دي لسه مقفولة، حاول تاني بعد شوية',
-  'لسه بدري 🤌 التسجيل في الفقرة دي مقفول دلوقتي'
+  'استنى شوية 😂🤌 الخانة دي لسه مقفولة من المنظمين',
+  'هدّي عليك 😅 الخانة دي لسه مقفولة، حاول تاني بعد شوية',
+  'لسه بدري 🤌 التسجيل هنا مقفول دلوقتي'
 ];
 function showLockedToast(kind){
   const list = kind==='day' ? LOCKED_DAY_MESSAGES : LOCKED_SESSION_MESSAGES;
@@ -27020,102 +26555,7 @@ function shakeLockedEl(el){
 }
 
 /* ============================= CHECK-IN LOGIC ============================= */
-async function tryCheckin(codeRaw, targetSessionId){
-  const code = String(codeRaw||'').trim().toUpperCase().replace(/[^A-Z0-9*#@%+=-]/g,'');
-  if(!code){ showToast('الكود غير صحيح', true); return false; }
-  const sid = targetSessionId || state.sessionId;
-  if(!sid){ showToast('افتح الفقرة أولاً قبل مسح الكود', true); return false; }
-  const found = findSessionById(sid);
-  const day = found ? found.day : null;
-  const session = found ? found.session : null;
-  if(!session){ showToast('الفقرة غير موجودة', true); return false; }
-  if(session.locked){ showToast('التسجيل مقفول مؤقتًا في هذه الفقرة', true); return false; }
-  if(day && day.locked){ showToast('هذا اليوم مقفول مؤقتًا من المنظمين', true); return false; }
-  if((SESSION_INFO[session.id]||{}).pointsEnabled===false){ showToast('لا يوجد نقاط في هذه الفقرة', true); return false; }
-  if(CHECKINS[state.pid+'__'+session.id]){ showToast('خدت نقاط هذه الفقرة قبل كده — مينفعش تاخد تاني', true); return false; }
 
-  /* أكواد النقاط ممكن المنظم يكون ولّدها بعد ما فتحت الصفحة، فالنسخة المحفوظة في
-     الذاكرة (POINT_CODES) ممكن تكون قديمة. نجيب أحدث نسخة من Firebase قبل ما نتأكد
-     من صحة الكود، عشان منرفضش كود صحيح لمجرد إنه اتولد بعد فتح الصفحة. */
-  try{
-    const freshPointCodes = await loadPointCodes();
-    if(freshPointCodes && Object.keys(freshPointCodes).length){ POINT_CODES = freshPointCodes; }
-  }catch(e){}
-
-  let pc = POINT_CODES[session.id+':'+code];
-  if(!pc) pc = POINT_CODES[code];
-  if(!pc){ showToast('كود النقاط غير صحيح', true); return false; }
-  if(pc.used){ showToast('هذا الكود مستخدم بالفعل', true); return false; }
-  if(pc.sessionId && pc.sessionId !== session.id){ showToast('هذا الكود خاص بفقرة تانية — مينفعش تستخدمه هنا', true); return false; }
-
-  if(typeof navigator!=='undefined' && navigator.onLine===false){
-    showToast('لا يوجد اتصال بالإنترنت — حاول مرة أخرى', true);
-    return false;
-  }
-
-  const rankBefore = rankedParticipants().findIndex(x=>x.id===state.pid)+1;
-  const key = state.pid+'__'+session.id;
-  const prevEntry = CHECKINS[key];
-  const isFirstCheckinForSession = !prevEntry;
-  const addedPoints = pc.value;
-  const newTotalForSession = (prevEntry?prevEntry.points:0) + addedPoints;
-
-  pc.used = true; pc.usedBy = state.pid; pc.usedAt = Date.now(); pc.usedSessionId = session.id;
-  const pcSaved = await savePointCodes(POINT_CODES);
-  if(pcSaved===false){
-    pc.used = false; pc.usedBy = null; pc.usedAt = null; pc.usedSessionId = null;
-    showToast('تعذر حفظ الكود — تحقق من الاتصال وحاول مرة أخرى', true);
-    return false;
-  }
-
-  CHECKINS[key] = { points: newTotalForSession, ts: prevEntry?prevEntry.ts:Date.now() };
-  const saved = await saveCheckins(CHECKINS);
-  if(saved===false){
-    CHECKINS[key] = prevEntry;
-    showToast('تعذر حفظ النقاط — تحقق من الاتصال وحاول مرة أخرى', true);
-    return false;
-  }
-
-  const rankAfter = rankedParticipants().findIndex(x=>x.id===state.pid)+1;
-  const dayObj = day;
-  const dayFull = dayObj.sessions.every(s=>CHECKINS[state.pid+'__'+s.id]);
-  const secrets = computeSecretBadges(state.pid);
-  const gotSecret = secrets.some(sb=>sb.label.includes(session.name));
-
-  state.justScoredSessionId = session.id;
-  state.pulseMedal = true;
-  if(!myExtra(state.pid).dataSaver) playSuccessCelebration(addedPoints);
-
-  if(rankAfter===1 && rankBefore!==1) vibrate([40,30,40,30,90]);
-  else if(rankAfter < rankBefore) vibrate([30,30,60]);
-  else if(dayFull) vibrate([25,20,25,20,60]);
-  else vibrate(18);
-
-  showToast('مبروك عليك النقاط! +'+addedPoints+' نقطة');
-  pushNotification(state.pid, `مسحت كود بقيمة ${addedPoints} نقطة في "${session.name}"`, '✅');
-  if(rankAfter < rankBefore){
-    showToast('طلعت مركز #'+rankAfter+'! 🎉', false, 2400);
-    pushNotification(state.pid, `تقدمت للمركز #${rankAfter} في الترتيب الفردي`, '📈');
-  }
-  if(dayFull){
-    showToast('🏅 حضور كامل لـ'+dayObj.label+'!', false, 4600);
-    pushNotification(state.pid, `حضور كامل لـ${dayObj.label} — أحسنت! 🏅`, '🏅');
-  }
-  if(gotSecret){
-    showToast('🕵️ اكتشفت وسام سري: دقيقة الذهب!', false, 6800);
-    pushNotification(state.pid, 'اكتشفت وسام سري: دقيقة الذهب 🕵️', '🕵️');
-  }
-  const extra = myExtra(state.pid);
-  if(rankAfter===1 && !extra.rank1Achieved){
-    extra.rank1Achieved = true;
-    saveProfileExtra(PROFILE_EXTRA);
-    setTimeout(()=>{ SND.rank1Chime(); goldDustBurst(window.innerWidth/2, window.innerHeight*0.35, 30); showToast('👑 وصلت للمركز الأول لأول مرة!', false, 3000); }, 400);
-    pushNotification(state.pid, 'وصلت للمركز الأول لأول مرة! 👑', '👑');
-  }
-  render();
-  if(isFirstCheckinForSession) autoAdvanceToNextSession(session.id);
-  return true;
-}
 function autoAdvanceToNextSession(currentSessionId){
   const flat = flatSessions();
   const idx = flat.findIndex(x=>x.session.id===currentSessionId);
@@ -27161,7 +26601,7 @@ async function addToTrash(type, label, data){
   if(TRASH.length>200) TRASH = TRASH.slice(0,200);
   await saveTrash(TRASH);
 }
-const TRASH_TYPE_LABELS = { participant:'مشارك', session:'فقرة', wall_post:'رأي على الحائط', report:'بلاغ', opinion:'رأي (استبيان)' };
+const TRASH_TYPE_LABELS = { participant:'مشارك', wall_post:'رأي على الحائط', report:'بلاغ', opinion:'رأي (استبيان)' };
 async function doRestoreTrashItem(trashId){
   const idx = TRASH.findIndex(t=>t.id===trashId);
   if(idx<0) return;
@@ -27327,7 +26767,15 @@ async function attRefresh(force){
   _attLoading = true;
   const ver = _attVer;
   try{
-    const [c, r, tl] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY)]);
+    const [c0, r0, tl] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY)]);
+    let c = c0, r = r0;
+    const gotCfg = !!(c0 && Object.keys(c0).length);
+    if(gotCfg){ attCfgCacheSet(c0); attRecCacheSet(r0); }
+    else{ /* مفيش اتصال: نكمّل بآخر نسخة محفوظة بدل ما الشاشة تفضى */
+      const cc = attCfgCacheGet(); if(cc) c = cc;
+      r = (ATT_RECORDS && Object.keys(ATT_RECORDS).length) ? ATT_RECORDS : attRecCacheGet();
+    }
+    r = attOverlayPending(r);
     const typesAdded = attApplyTypes(tl);
     _attLastLoad = Date.now(); _attLoadedOnce = true;
     if(ver !== _attVer) return; // فيه كتابة حصلت أثناء القراءة، القراءة دي قديمة
@@ -27338,6 +26786,7 @@ async function attRefresh(force){
       if(!(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName))) render();
     }
     attMaybeAdminInit();
+    if(gotCfg) attSyncPending();
   }catch(e){} finally{ _attLoading = false; }
 }
 async function attCfgUpdate(mut){
@@ -27367,6 +26816,47 @@ async function attRecUpdate(mut){
   if(res && res.value){ _attVer++; try{ ATT_RECORDS = JSON.parse(res.value); }catch(e){} return true; }
   return false;
 }
+/* ---------- حضور أوفلاين: نسخة محلية من إعدادات الجلسة + طابور تسجيلات بتتبعت لما النت يرجع ---------- */
+const ATT_CACHE_KEY = 'glv-att-cfg-cache', ATT_REC_CACHE_KEY = 'glv-att-rec-cache', ATT_PEND_KEY = 'glv-att-pending';
+function attCfgCacheSet(c){ try{ localStorage.setItem(ATT_CACHE_KEY, JSON.stringify({ ts:Date.now(), cfg:c })); }catch(e){} }
+function attCfgCacheGet(){ try{ const o = JSON.parse(localStorage.getItem(ATT_CACHE_KEY)||'null'); return (o && o.cfg && typeof o.cfg==='object' && Object.keys(o.cfg).length) ? o.cfg : null; }catch(e){ return null; } }
+function attRecCacheSet(r){ try{ localStorage.setItem(ATT_REC_CACHE_KEY, JSON.stringify(r||{})); }catch(e){} }
+function attRecCacheGet(){ try{ const o = JSON.parse(localStorage.getItem(ATT_REC_CACHE_KEY)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+function attPendGet(){ try{ const a = JSON.parse(localStorage.getItem(ATT_PEND_KEY)||'[]'); return Array.isArray(a) ? a.filter(x=>x && x.pid && x.type && x.sid) : []; }catch(e){ return []; } }
+function attPendSet(a){ try{ localStorage.setItem(ATT_PEND_KEY, JSON.stringify(a)); }catch(e){} }
+function attOverlayPending(r){
+  const out = Object.assign({}, r||{});
+  attPendGet().forEach(x=>{ const k = attRecKey(x.pid, x.type, x.sid); if(!out[k]) out[k] = { pid:x.pid, type:x.type, sid:x.sid, sname:x.sname, ts:x.ts, pts:x.pts, pending:true }; });
+  return out;
+}
+let _attSyncBusy = false;
+async function attSyncPending(){
+  if(_attSyncBusy || (typeof navigator!=='undefined' && navigator.onLine===false)) return;
+  const list = attPendGet(); if(!list.length) return;
+  _attSyncBusy = true;
+  try{
+    const cfg = await Promise.race([attLoadJson(ATT_CONFIG_KEY), new Promise(r=>setTimeout(()=>r(null), 8000))]);
+    if(!cfg || !Object.keys(cfg).length) return;
+    /* لو الكود اتغيّر جوه نفس الجلسة بعد ما الجهاز آخر مرة اتزامن، التسجيل ده مش بيتقبل */
+    const okList = [], badList = [];
+    list.forEach(x=>{ const c = cfg[x.type]; if(c && c.sessionId===x.sid && x.code && attNormCode(c.code)!==x.code) badList.push(x); else okList.push(x); });
+    if(okList.length){
+      const ok = await attRecUpdate(o=>{ okList.forEach(x=>{ const k = attRecKey(x.pid, x.type, x.sid); if(!o[k]) o[k] = { pid:x.pid, type:x.type, sid:x.sid, sname:x.sname, ts:x.ts, pts:x.pts }; }); });
+      if(!ok) return;
+    }
+    const done = new Set(list.map(x=>attRecKey(x.pid, x.type, x.sid)));
+    attPendSet(attPendGet().filter(x=>!done.has(attRecKey(x.pid, x.type, x.sid))));
+    ATT_RECORDS = attOverlayPending(ATT_RECORDS);
+    attRecCacheSet(ATT_RECORDS);
+    okList.forEach(x=>{ try{ pushNotification(x.pid, 'تم تسجيل حضورك في '+(x.sname||'')+(x.pts>0 ? ' وأخدت '+x.pts+' نقطة' : ''), '✅'); }catch(e){} });
+    if(okList.length) showToast('✅ اتبعت حضورك اللي سجّلته أوفلاين');
+    if(badList.length) showToast('حضور أوفلاين اتلغى لأن كود الجلسة اتغيّر', true);
+    if(attViewActive()) render();
+  }catch(e){} finally{ _attSyncBusy = false; }
+}
+window.addEventListener('online', ()=>{ setTimeout(attSyncPending, 1500); });
+setInterval(attSyncPending, 30000);
+
 function attMaybeAdminInit(){
   if(_attInitBusy || !_attLoadedOnce || Date.now()-_attInitFailedAt < 20000) return;
   if(!(state.view==='admin' && state.adminUnlocked && !state.adminHub && state.adminTab==='attendance')) return;
@@ -27677,10 +27167,18 @@ async function tryAttendance(codeRaw, typeArg){
   if(featureLockedForMe('attendance')){ showToast('الحضور جاري تحديثه دلوقتي 🔧 — جرّب بعد شوية', true); return false; }
   const code = attNormCode(codeRaw);
   if(!code){ showToast('الكود غير صحيح', true); return false; }
-  if(typeof navigator!=='undefined' && navigator.onLine===false){ showToast('لا يوجد اتصال بالإنترنت — حاول مرة أخرى', true); return false; }
-  const cfg = await attLoadJson(ATT_CONFIG_KEY);
-  if(!cfg || !cfg[type]){ showToast('التسجيل لسه ما اتفتحش', true); return false; }
-  ATT_CONFIG = cfg;
+  let cfg = null, viaCache = false;
+  if(!(typeof navigator!=='undefined' && navigator.onLine===false)){
+    cfg = await Promise.race([attLoadJson(ATT_CONFIG_KEY), new Promise(r=>setTimeout(()=>r(null), 6000))]);
+  }
+  if(!cfg || !Object.keys(cfg).length){
+    /* أوفلاين: نتحقق من آخر نسخة محفوظة من إعدادات الجلسة ونسجّل في الطابور */
+    const cc = attCfgCacheGet();
+    if(cc){ cfg = cc; viaCache = true; }
+    else { showToast('مفيش اتصال — افتح التطبيق وفيه نت مرة على الأقل عشان تقدر تسجّل حضور أوفلاين', true); return false; }
+  }
+  if(!cfg[type]){ showToast('التسجيل لسه ما اتفتحش', true); return false; }
+  if(!viaCache) ATT_CONFIG = cfg;
   const c = cfg[type];
   if(!c.open){ showToast('التسجيل في '+t.label+' مقفول حاليًا', true); render(); return false; }
   if(code !== attNormCode(c.code)){
@@ -27692,6 +27190,17 @@ async function tryAttendance(codeRaw, typeArg){
   }
   const pid = state.pid, rkey = attRecKey(pid, type, c.sessionId);
   let dup = false; const pts = attPtsOfCfg(type, c);
+  if(viaCache){
+    if((ATT_RECORDS && ATT_RECORDS[rkey]) || attRecCacheGet()[rkey] || attPendGet().some(x=>attRecKey(x.pid,x.type,x.sid)===rkey)){ showToast('سجّلت حضورك في الجلسة دي قبل كده', true); render(); return false; }
+    const pl = attPendGet(); pl.push({ pid, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), pts, code });
+    attPendSet(pl);
+    ATT_RECORDS = attOverlayPending(ATT_RECORDS);
+    vibrate([18,40,18]);
+    _apCelebrate = true; _apKey = null; apChime();
+    showToast('✅ اتسجّل حضورك في '+t.label+(pts>0 ? ' — +'+pts+' نقطة 🪙' : '')+' (أوفلاين — هيتبعت لما النت يرجع)');
+    render();
+    return true;
+  }
   const ok = await attRecUpdate(o=>{
     dup = !!o[rkey];
     if(!dup) o[rkey] = { pid, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), pts };
@@ -28131,7 +27640,7 @@ async function openScanModal(mode, sessionId){
           closeScanModal();
           if(scanMode==='login'){ doLoginWithCode(result.data); }
           else if(scanMode==='attendance'){ tryAttendance(result.data, scanTargetSessionId); }
-          else{ tryCheckin(result.data, scanTargetSessionId); }
+          else{ showToast('الكود غير صالح', true); }
           return;
         }
       }
@@ -28252,18 +27761,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='add-address-sug'){ doAddAddressSug(); }
   else if(action==='del-address-sug'){ doDelAddressSug(+el.dataset.i); }
   else if(action==='admin-reset-pass'){ doAdminResetPass(el.dataset.pid); }
-  else if(action==='submit-manual-code'){ doManualSubmit(); }
   else if(action==='back'){ goBack(); }
   else if(action==='logout'){ const outPid = state.pid; forgetLogin(); stopAmbient(); state = FRESH_STATE(); render(); if(outPid) clearDeviceSession(outPid); }
-  else if(action==='open-session'){
-    const sid = el.dataset.session;
-    const found = findSessionById(sid);
-    const dayLocked = found && found.day && found.day.locked;
-    const sessionLocked = found && found.session && found.session.locked;
-    const alreadyDone = found && sessionPoints(state.pid, sid) > 0;
-    if(!alreadyDone && (dayLocked || sessionLocked)){ shakeLockedEl(el); showLockedToast('session'); }
-    else{ go('session', {sessionId: sid}); }
-  }
   else if(action==='open-scan'){ openScanModal(el.dataset.mode || 'checkin', el.dataset.session); }
   else if(action.indexOf('att-')===0){ attHandleAction(action, el); }
   else if(action==='close-scan'){ closeScanModal(); }
@@ -28321,7 +27820,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-game-points'){ confirmAdminGamePoints(parseInt(el.dataset.sign,10)); }
   else if(action==='cancel-edit-participant'){ state.editingParticipantId = null; render(); }
   else if(action==='save-participant'){ doSaveParticipant(el.dataset.pid); }
-  else if(action==='admin-cancel-checkin'){ confirmCancelCheckin(el.dataset.pid, el.dataset.session); }
   else if(action==='delete-participant'){ confirmDeleteParticipant(el.dataset.pid); }
   else if(action==='apply-participant-bonus'){ doApplyParticipantBonus(el.dataset.pid, parseInt(el.dataset.sign,10)); }
   else if(action==='apply-participant-game-points'){ doApplyParticipantGamePoints(el.dataset.pid, parseInt(el.dataset.sign,10)); }
@@ -28329,17 +27827,12 @@ document.addEventListener('click', (e)=>{
   else if(action==='submit-admin-alert'){ doSubmitAdminAlert(); }
   else if(action==='cancel-admin-alert'){ confirmCancelAdminAlert(el.dataset.id); }
   else if(action==='admin-toggle-day-lock'){ doAdminToggleDayLock(el.dataset.day); }
-  else if(action==='admin-toggle-session-lock'){ doAdminToggleSessionLock(el.dataset.session); }
-  else if(action==='admin-delete-session'){ confirmAdminDeleteSession(el.dataset.session); }
-  else if(action==='admin-add-session'){ doAdminAddSession(el.dataset.day); }
   else if(action==='admin-save-day-label'){ doAdminSaveDayLabel(el.dataset.day); }
-  else if(action==='open-time-picker'){ openTimePicker(el.dataset.field); }
   else if(action==='cancel-time-picker'){ closeTimePicker(); }
   else if(action==='confirm-time-picker'){ confirmTimePicker(); }
   else if(action==='tp-ampm'){ setTpAmpm(el.dataset.val); }
   else if(action==='edit-session'){ state.editingSessionId = el.dataset.session; render(); }
   else if(action==='cancel-edit-session'){ state.editingSessionId = null; render(); }
-  else if(action==='save-session-info'){ doSaveSessionInfo(el.dataset.session); }
   else if(action==='export-results'){ doExportResults(); }
   else if(action==='open-compare'){ go('compare', {compareId: el.dataset.member}); }
   else if(action==='pick-compare'){ state.compareId = el.dataset.member; render(); }
@@ -28363,16 +27856,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='notif-back'){ notifShow('recent'); }
   else if(action==='invite-friend'){ doInviteFriend(); }
   else if(action==='claim-quest'){ doClaimQuest(el, el.dataset.claim, parseInt(el.dataset.reward,10)||0); }
-  else if(action==='toggle-reminder'){ doToggleReminder(el, el.dataset.session); }
   else if(action==='save-daily-message'){ doSaveDailyMessage(); }
   else if(action==='send-participant-alert'){ doSendParticipantAlert(); }
   else if(action==='generate-point-codes'){ doGeneratePointCodes(); }
   else if(action==='print-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10)); }
-  else if(action==='generate-session-point-codes'){ doGenerateSessionPointCodes(el.dataset.session); }
-  else if(action==='confirm-delete-session-point-codes'){ confirmDeleteAllSessionPointCodes(el.dataset.session); }
-  else if(action==='generate-day-point-codes'){ doGenerateDayPointCodes(el.dataset.day); }
-  else if(action==='download-all-day-point-codes'){ doDownloadAllDayPointCodes(el.dataset.day); }
-  else if(action==='confirm-delete-all-day-point-codes'){ confirmDeleteAllDayPointCodes(el.dataset.day); }
   else if(action==='generate-custom-session-qr'){ doGenerateCustomSessionQr(el.dataset.session); }
   else if(action==='print-session-point-codes'){ doPrintPointCodes(parseInt(el.dataset.value,10), el.dataset.session); }
   else if(action==='rate-session'){ doRateSession(el.dataset.session, parseInt(el.dataset.star,10)); }
@@ -28696,7 +28183,6 @@ document.addEventListener('click', (e)=>{
     else{ radialItemTap(el, el.dataset.page, el.dataset.logout==='1'); }
   }
   else if(action==='toggle-theme'){ doToggleTheme(); }
-  else if(action==='toggle-session-reminders'){ doToggleSessionReminders(); }
   else if(action==='toggle-music'){ doToggleMusic(); }
   else if(action==='submit-wall-post'){ doSubmitWallPost(); }
   else if(action==='admin-delete-wall-post'){ confirmAdminDeleteWallPost(el.dataset.id); }
@@ -28705,8 +28191,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='export-full-backup'){ doExportFullBackup(); }
   else if(action==='submit-question'){ doSubmitQuestion(el.dataset.session); }
   else if(action==='admin-toggle-ask'){ doAdminToggleAsk(el.dataset.session); }
-  else if(action==='admin-toggle-points-enabled'){ doAdminTogglePointsEnabled(el.dataset.session); }
-  else if(action==='remove-session-logo'){ confirmRemoveSessionLogo(el.dataset.session); }
   else if(action==='admin-mark-question-answered'){ doAdminMarkQuestionAnswered(el.dataset.id); }
   else if(action==='admin-delete-report'){ confirmAdminDeleteReport(el.dataset.id); }
   else if(action==='admin-delete-opinion'){ confirmAdminDeleteOpinion(el.dataset.id); }
@@ -29642,7 +29126,6 @@ async function doAdminRestoreBuiltinTheme(key){
   await saveHiddenBuiltinThemes(HIDDEN_BUILTIN_THEMES);
 }
 
-
 function attachGalleryAdminInputs(){
   document.querySelectorAll('input[type="file"][id^="gallery-admin-upload-"]').forEach(inputEl=>{
     if(inputEl.dataset.bound) return;
@@ -29990,26 +29473,7 @@ function confirmDeleteParticipant(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
   showConfirmDialog(`حذف "${escapeHtml(p?p.name:pid)}"؟`, ()=>doDeleteParticipant(pid), {sub:'هينقل لسلة المهملات وتقدر تسترجعه منها.'});
 }
-function confirmCancelCheckin(pid, sessionId){
-  const p = PARTICIPANTS.find(x=>x.id===pid);
-  const found = findSessionById(sessionId);
-  const sName = found ? (SESSION_INFO[sessionId]||{}).name || found.session.name : sessionId;
-  showConfirmDialog(`إلغاء حضور "${escapeHtml(p?p.name:pid)}" في "${escapeHtml(sName)}"؟`, ()=>doAdminCancelCheckin(pid, sessionId), {icon:'↩️', sub:'هتتمسح نقاط هذه الفقرة بس من رصيده، وهيقدر يمسح كود QR جديد لنفس الفقرة تاني.', confirmLabel:'إلغاء الحضور'});
-}
-async function doAdminCancelCheckin(pid, sessionId){
-  const key = pid+'__'+sessionId;
-  if(!CHECKINS[key]){ showToast('المشارك ده أصلاً معملش حضور في هذه الفقرة', true); return; }
-  const prev = CHECKINS[key];
-  delete CHECKINS[key];
-  const saved = await saveCheckins(CHECKINS);
-  if(saved===false){
-    CHECKINS[key] = prev;
-    showToast('تعذر الحفظ على السيرفر — تحقق من الاتصال وحاول مرة أخرى', true);
-    return;
-  }
-  showToast('اتلغى الحضور والنقاط بتاعت الفقرة دي');
-  render();
-}
+
 async function doDeleteParticipant(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid);
   const cpRec = cpOf(pid);
@@ -30080,7 +29544,7 @@ async function doApplyParticipantGamePoints(pid, sign){
   } finally { _participantGamePointsBusy = false; }
 }
 /* ============================= ADMIN: تصفير / استرجاع نقاط الجميع ============================= */
-/* التصفير بياخد نسخة كاملة من (نقاط الفقرات + البونص) ويحفظها في مفتاح منفصل على Firebase
+/* التصفير بياخد نسخة كاملة من (النقاط + البونص) ويحفظها في مفتاح منفصل على Firebase
    وبعدين يصفّر النقاط الحية. الاسترجاع بيرجّع النسخة دي "بالإضافة" لأي نقاط اتجمعت بعد التصفير، وبعدها بيمسح النسخة
    (عشان محدش يرجّعها مرتين). لو ضغطت تصفير أكتر من مرة قبل الاسترجاع، النسخ بتتجمع مع بعض ومفيش حاجة بتضيع. */
 const POINTS_BACKUP_KEY = 'glavera-points-backup';
@@ -30575,102 +30039,11 @@ async function doAdminSaveDayLabel(dayId){
   render();
   await saveDayOverrides(DAY_OVERRIDES);
 }
-async function doAdminToggleSessionLock(sessionId){
-  const ov = SESSION_OVERRIDES[sessionId] || (SESSION_OVERRIDES[sessionId] = {});
-  ov.locked = !ov.locked;
-  const found = findSessionById(sessionId);
-  if(found) found.session.locked = ov.locked;
-  showToast(ov.locked ? 'تم قفل الفقرة' : 'تم فتح الفقرة');
-  render();
-  await saveSessionOverrides(SESSION_OVERRIDES);
-}
-function confirmAdminDeleteSession(sessionId){
-  const found = findSessionById(sessionId);
-  const name = found ? (SESSION_INFO[sessionId]&&SESSION_INFO[sessionId].name || found.session.name) : sessionId;
-  showConfirmDialog(`حذف الفقرة "${escapeHtml(name)}"؟`, ()=>doAdminDeleteSession(sessionId), {sub:'هتنقل لسلة المهملات وتقدر تسترجعها منها.'});
-}
-async function doAdminDeleteSession(sessionId){
-  const found = findSessionById(sessionId);
-  const name = found ? (SESSION_INFO[sessionId]&&SESSION_INFO[sessionId].name || found.session.name) : sessionId;
-  await addToTrash('session', name, Object.assign({}, found?found.session:{id:sessionId}, {dayId: found?found.day.id:null}));
-  const ov = SESSION_OVERRIDES[sessionId] || (SESSION_OVERRIDES[sessionId] = {});
-  ov.deleted = true;
-  if(found){ const idx = found.day.sessions.indexOf(found.session); if(idx>=0) found.day.sessions.splice(idx,1); }
-  if(state.editingSessionId===sessionId) state.editingSessionId = null;
-  showToast('تم نقل الفقرة لسلة المهملات');
-  render();
-  await saveSessionOverrides(SESSION_OVERRIDES);
-}
-async function doAdminAddSession(dayId){
-  const nameEl = document.getElementById('new-session-name-'+dayId);
-  const ptsEl = document.getElementById('new-session-points-'+dayId);
-  const name = nameEl ? nameEl.value.trim() : '';
-  if(!name){ showToast('اكتب اسم الفقرة الأول', true); return; }
-  const pts = ptsEl ? (parseInt(normalizeDigits(ptsEl.value),10)||5) : 5;
-  const list = CUSTOM_SESSIONS[dayId] || (CUSTOM_SESSIONS[dayId] = []);
-  const newId = dayId+'-cs'+Date.now();
-  const newSession = { id:newId, name, points:pts, type:'talk', code:Math.random().toString(36).slice(2,6).toUpperCase() };
-  list.push(newSession);
-  const day = DAYS.find(d=>d.id===dayId);
-  if(day){ day.sessions.push(newSession); if(day.baseSessions) day.baseSessions.push(newSession); }
-  showToast('تمت إضافة الفقرة');
-  if(nameEl) nameEl.value = '';
-  if(ptsEl) ptsEl.value = '';
-  render();
-  await saveCustomSessions(CUSTOM_SESSIONS);
-}
 
 /* ============================= PREMIUM TIME PICKER ============================= */
 let tpTargetField = null;
 let tpState = { h:10, m:0, ampm:'ص' };
-function openTimePicker(fieldId){
-  tpTargetField = fieldId;
-  const hidden = document.getElementById(fieldId);
-  const parsed = parseTimeStr(hidden ? hidden.value : '');
-  tpState = { h: parseInt(parsed.h,10), m: parseInt(parsed.m,10), ampm: parsed.ampm };
-  const hourItems = Array.from({length:12},(_,i)=>i+1).map(h=>`<div class="tp-wheel-item" data-val="${h}">${String(h).padStart(2,'0')}</div>`).join('');
-  const minuteVals = Array.from({length:12},(_,i)=>i*5);
-  const minuteItems = minuteVals.map(m=>`<div class="tp-wheel-item" data-val="${m}">${String(m).padStart(2,'0')}</div>`).join('');
-  const overlay = document.createElement('div');
-  overlay.className = 'tp-overlay';
-  overlay.id = 'tp-overlay';
-  overlay.innerHTML = `
-    <div class="tp-sheet">
-      <div class="tp-header">اختر وقت الفقرة</div>
-      <div class="tp-display-row">
-        <span class="tp-clock-ico">🕐</span>
-        <span id="tp-live-h">${String(tpState.h).padStart(2,'0')}</span>:<span id="tp-live-m">${String(tpState.m).padStart(2,'0')}</span>
-        <span class="tp-live-ampm" id="tp-live-ampm">${tpState.ampm}</span>
-      </div>
-      <div class="tp-wheels">
-        <div class="tp-wheel-highlight"></div>
-        <div class="tp-wheel" id="tp-wheel-hour"><div class="tp-wheel-pad"></div>${hourItems}<div class="tp-wheel-pad"></div></div>
-        <div class="tp-wheel-colon">:</div>
-        <div class="tp-wheel" id="tp-wheel-min"><div class="tp-wheel-pad"></div>${minuteItems}<div class="tp-wheel-pad"></div></div>
-        <div class="tp-ampm-col">
-          <button type="button" class="tp-ampm-btn ${tpState.ampm==='ص'?'active':''}" data-action="tp-ampm" data-val="ص">ص AM</button>
-          <button type="button" class="tp-ampm-btn ${tpState.ampm==='م'?'active':''}" data-action="tp-ampm" data-val="م">م PM</button>
-        </div>
-      </div>
-      <div class="tp-actions">
-        <button type="button" class="tp-cancel-btn" data-action="cancel-time-picker">إلغاء</button>
-        <button type="button" class="tp-done-btn" data-action="confirm-time-picker">تم</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  requestAnimationFrame(()=>{
-    overlay.classList.add('show');
-    const hourWheel = document.getElementById('tp-wheel-hour');
-    const minWheel = document.getElementById('tp-wheel-min');
-    const hourIdx = tpState.h-1;
-    const minIdx = minuteVals.indexOf(tpState.m)>=0 ? minuteVals.indexOf(tpState.m) : Math.round(tpState.m/5);
-    hourWheel.scrollTop = hourIdx*38;
-    minWheel.scrollTop = minIdx*38;
-    attachWheelScroll(hourWheel, (idx)=>{ tpState.h = idx+1; syncTpDisplay(); });
-    attachWheelScroll(minWheel, (idx)=>{ tpState.m = minuteVals[idx]; syncTpDisplay(); });
-  });
-  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeTimePicker(); });
-}
+
 function attachWheelScroll(wheelEl, onSettle){
   let timer = null;
   wheelEl.addEventListener('scroll', ()=>{
@@ -31005,7 +30378,6 @@ function doExportJourneyPdf(){
   setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 400);
 }
 
-
 /* ============================= DAILY MORNING MESSAGE ============================= */
 async function doSaveDailyMessage(){
   const text = document.getElementById('daily-msg-text');
@@ -31103,255 +30475,7 @@ function genSecureSessionCode(existingSet){
   } while(existingSet.has(code) && attempts<500);
   return code;
 }
-async function doGenerateDayPointCodes(dayId){
-  const day = DAYS.find(d=>d.id===dayId);
-  if(!day) return;
-  const minEl = document.getElementById('gen-day-scode-min-'+dayId);
-  const maxEl = document.getElementById('gen-day-scode-max-'+dayId);
-  const qtyEl = document.getElementById('gen-day-scode-qty-'+dayId);
-  if(!minEl || !maxEl || !qtyEl) return;
-  const minVal = parseInt(normalizeDigits(minEl.value),10);
-  const maxVal = parseInt(normalizeDigits(maxEl.value),10);
-  const qtyPerValue = Math.min(300, parseInt(normalizeDigits(qtyEl.value),10)||0);
-  if(isNaN(minVal) || minVal<0){ showToast('اكتب أقل قيمة نقاط صحيحة (تقدر تكون صفر)', true); return; }
-  if(isNaN(maxVal) || maxVal<minVal){ showToast('أعلى قيمة لازم تكون أكبر من أو تساوي أقل قيمة', true); return; }
-  if(!qtyPerValue || qtyPerValue<=0){ showToast('اكتب عدد أكواد صحيح لكل قيمة في كل فقرة', true); return; }
-  const eligibleSessions = day.sessions.filter(s=>(SESSION_INFO[s.id]||{}).pointsEnabled!==false);
-  if(!eligibleSessions.length){ showToast('كل فقرات اليوم ده متوقف فيها النقاط', true); return; }
 
-  const valuesRange = [];
-  for(let v=minVal; v<=maxVal; v++) valuesRange.push(v);
-
-  eligibleSessions.forEach(s=>{
-    const existingKeys = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===s.id);
-    const existingSet = new Set(existingKeys.map(k=>POINT_CODES[k].code));
-    valuesRange.forEach(value=>{
-      for(let i=0;i<qtyPerValue;i++){
-        const code = genSecureSessionCode(existingSet);
-        existingSet.add(code);
-        const storageKey = s.id+':'+code;
-        POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId:s.id };
-      }
-    });
-  });
-
-  const totalPerSession = qtyPerValue * valuesRange.length;
-  const ok = await savePointCodes(POINT_CODES);
-  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true); render(); return; }
-  showToast(`اتولد ${qtyPerValue} كود لكل قيمة من ${minVal} لـ ${maxVal} (إجمالي ${totalPerSession} كود) لكل فقرة من فقرات "${day.label}" (${eligibleSessions.length} فقرة)`, false, 3600);
-  if(minEl) minEl.value = '';
-  if(maxEl) maxEl.value = '';
-  if(qtyEl) qtyEl.value = '';
-  render();
-}
-function confirmDeleteAllDayPointCodes(dayId){
-  const day = DAYS.find(d=>d.id===dayId);
-  if(!day) return;
-  const sessionIds = new Set(day.sessions.map(s=>s.id));
-  const count = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId)).length;
-  if(!count){ showToast('لا يوجد أكواد لحذفها في فقرات هذا اليوم', true); return; }
-  showConfirmDialog(`حذف كل أكواد QR (${count}) الخاصة بكل فقرات "${escapeHtml(day.label)}"؟`, ()=>doDeleteAllDayPointCodes(dayId), {icon:'🗑️', sub:'هيتشال كل الأكواد المتولدة لكل فقرات اليوم ده نهائيًا (المستخدمة وغير المستخدمة)، ومينفعش ترجعها تاني.', confirmLabel:'حذف الكل'});
-}
-async function doDeleteAllDayPointCodes(dayId){
-  const day = DAYS.find(d=>d.id===dayId);
-  if(!day) return;
-  const sessionIds = new Set(day.sessions.map(s=>s.id));
-  const keysToDelete = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId));
-  if(!keysToDelete.length){ showToast('لا يوجد أكواد لحذفها', true); return; }
-  const backup = {};
-  keysToDelete.forEach(k=>{ backup[k] = POINT_CODES[k]; delete POINT_CODES[k]; });
-  const ok = await savePointCodes(POINT_CODES);
-  if(!ok){
-    Object.keys(backup).forEach(k=>{ POINT_CODES[k] = backup[k]; });
-    showToast('تعذر الحذف على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true);
-    render();
-    return;
-  }
-  showToast(`اتحذف ${keysToDelete.length} كود من كل فقرات "${day.label}"`);
-  render();
-}
-async function doDownloadAllDayPointCodes(dayId){
-  const day = DAYS.find(d=>d.id===dayId);
-  if(!day) return;
-  const sessionIds = new Set(day.sessions.map(s=>s.id));
-  const allKeys = Object.keys(POINT_CODES).filter(c=>sessionIds.has(POINT_CODES[c].sessionId));
-  if(!allKeys.length){ showToast('لسه مفيش أكواد QR اتولدت لفقرات هذا اليوم', true); return; }
-
-  const w = window.open('', '_blank');
-  if(!w){ showToast('يرجى السماح بالنوافذ المنبثقة للتحميل', true); return; }
-
-  // group codes by session, then sort by value within each session
-  const bySession = {};
-  allKeys.forEach(k=>{
-    const pc = POINT_CODES[k];
-    (bySession[pc.sessionId] = bySession[pc.sessionId] || []).push({ code: pc.code || k, value: pc.value, used: pc.used });
-  });
-
-  let globalIdx = 0;
-  const allItems = []; // flat list in render order, used for QR generation
-  const sectionsHtml = day.sessions.filter(s=>bySession[s.id] && bySession[s.id].length).map(s=>{
-    const info = SESSION_INFO[s.id] || {};
-    const sName = info.name || s.name;
-    const items = bySession[s.id].slice().sort((a,b)=>a.value-b.value || a.code.localeCompare(b.code));
-    const cardsHtml = items.map(it=>{
-      const i = globalIdx++;
-      allItems.push(it);
-      return `
-      <div class="tk ${it.used?'used':''}">
-        <div class="tk-top">
-          <div class="tk-brand">GLAVERA<span>III</span></div>
-          <div class="tk-serial">${String(i+1).padStart(4,'0')}</div>
-        </div>
-        <div class="tk-qr" id="qrc-${i}"></div>
-        <div class="tk-value"><span class="num">${it.value}</span><span class="lbl">نقطة</span></div>
-        <div class="tk-perf"></div>
-        <div class="tk-code">${it.code}</div>
-        ${it.used?'<div class="tk-stamp">مُستخدم</div>':''}
-      </div>`;
-    }).join('');
-    return `
-      <div class="doc-session-name" style="margin:26px auto 14px;">📌 ${escapeHtml(sName)} — ${items.length} كود</div>
-      <div class="grid">${cardsHtml}</div>
-    `;
-  }).join('');
-
-  w.document.open();
-  w.document.write(`<!DOCTYPE html>
-<html dir="rtl" lang="ar"><head><meta charset="utf-8">
-<title>كل أكواد QR — ${escapeHtml(day.label)} — اجتماع جامعة</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&family=Cormorant+Garamond:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
-<style>
-  :root{ --ink:#171449; --gold:#B8892E; --gold-2:#E8C874; --paper:#FBF8F1; --line:#DDD3B8; }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; padding:34px 26px 60px; background:var(--paper);
-    font-family:'Cairo',Tahoma,sans-serif; color:var(--ink);
-    background-image: radial-gradient(circle at 50% 0%, rgba(184,137,46,.08), transparent 55%);
-  }
-  .doc-header{ text-align:center; margin-bottom:10px; }
-  .doc-session-name{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; color:var(--ink);
-    background:linear-gradient(120deg,#FFF4DC,#FBF0D8); border:1.5px solid var(--gold); border-radius:14px;
-    padding:10px 18px; max-width:520px; text-align:center; }
-  .doc-eyebrow{ font-size:11px; letter-spacing:4px; color:var(--gold); font-weight:800; }
-  .doc-title{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
-    font-size:36px; margin:6px 0 4px; color:var(--ink); }
-  .doc-rule{ width:120px; height:2px; margin:10px auto 14px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
-  .doc-meta{ font-size:12.5px; color:#7a7566; display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
-  .doc-meta b{ color:var(--ink); }
-
-  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; max-width:1000px; margin:0 auto; }
-
-  .tk{ position:relative; background:#fff; border:1px solid var(--line); border-radius:4px;
-    padding:16px 12px 14px; text-align:center; box-shadow:0 1px 0 rgba(0,0,0,.03);
-    break-inside:avoid; page-break-inside:avoid; }
-  .tk::before, .tk::after{ content:""; position:absolute; width:14px; height:14px; border-radius:50%;
-    background:var(--paper); border:1px solid var(--line); top:50%; margin-top:-7px; }
-  .tk::before{ left:-8px; } .tk::after{ right:-8px; }
-
-  .tk-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-  .tk-brand{ font-size:9.5px; font-weight:900; letter-spacing:1.5px; color:var(--gold); }
-  .tk-brand span{ color:#c8bda1; margin-right:2px; }
-  .tk-serial{ font-size:9px; color:#b3ac97; direction:ltr; font-weight:700; }
-
-  .tk-qr{ display:flex; align-items:center; justify-content:center; padding:6px;
-    border:1px solid var(--line); border-radius:3px; margin:0 auto 10px; width:118px; }
-  .tk-qr canvas, .tk-qr img{ display:block; width:100px; height:100px; }
-
-  .tk-value{ display:flex; align-items:baseline; justify-content:center; gap:5px; margin-bottom:8px; }
-  .tk-value .num{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:26px; color:var(--ink); }
-  .tk-value .lbl{ font-size:11px; color:#8a8368; }
-
-  .tk-perf{ border-top:1.5px dashed var(--line); margin:0 0 8px; }
-  .tk-code{ font-size:11.5px; font-weight:800; letter-spacing:.5px; direction:ltr; color:#5c5745; }
-
-  .tk.used{ opacity:.45; }
-  .tk-stamp{ position:absolute; top:38%; left:50%; transform:translate(-50%,-50%) rotate(-18deg);
-    border:2.5px solid #b23b3b; color:#b23b3b; font-weight:900; font-size:15px; letter-spacing:2px;
-    padding:3px 10px; border-radius:6px; opacity:.75; }
-
-  .print-bar{ max-width:1000px; margin:0 auto 22px; display:flex; justify-content:center; position:sticky; top:0; z-index:5; }
-  .print-btn{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:#fff;
-    background:linear-gradient(135deg,var(--ink),#2a2470); border:none; padding:11px 26px;
-    border-radius:30px; cursor:pointer; box-shadow:0 6px 16px rgba(23,20,73,.25); }
-
-  @media print{
-    .print-bar{ display:none; }
-    body{ padding:10px 14px; background:#fff; }
-    .tk{ box-shadow:none; }
-  }
-</style></head>
-<body>
-  <div class="doc-header">
-    <div class="doc-eyebrow">GLAVERA III &nbsp;·&nbsp; POINT VOUCHERS</div>
-    <div class="doc-title">كل أكواد نقاط "${escapeHtml(day.label)}"</div>
-    <div class="doc-rule"></div>
-    <div class="doc-meta">
-      <span>عدد الفقرات: <b>${Object.keys(bySession).length}</b></span>
-      <span>إجمالي الأكواد: <b>${allItems.length}</b></span>
-    </div>
-  </div>
-  <div class="print-bar"><button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ الكل PDF</button></div>
-  ${sectionsHtml}
-<script>${QR_LIB_SRC}<\/script>
-<script>
-  var DATA = ${JSON.stringify(allItems)};
-  DATA.forEach(function(it, i){
-    var el = document.getElementById('qrc-'+i);
-    if(el){ new QRCode(el, {text: it.code, width:100, height:100, colorDark:'#171449', colorLight:'#ffffff'}); }
-  });
-<\/script>
-</body></html>`);
-  w.document.close();
-}
-function confirmDeleteAllSessionPointCodes(sessionId){
-  const found = findSessionById(sessionId);
-  const info = found ? (SESSION_INFO[sessionId] || {}) : {};
-  const sName = found ? (info.name || found.session.name) : sessionId;
-  const count = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId).length;
-  showConfirmDialog(`حذف كل أكواد QR (${count}) الخاصة بـ"${escapeHtml(sName)}"؟`, ()=>doDeleteAllSessionPointCodes(sessionId), {icon:'🗑️', sub:'هيتشال كل الأكواد المتولدة لهذه الفقرة نهائيًا (المستخدمة وغير المستخدمة)، ومينفعش ترجعها تاني.', confirmLabel:'حذف الكل'});
-}
-async function doDeleteAllSessionPointCodes(sessionId){
-  const keysToDelete = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId);
-  if(!keysToDelete.length){ showToast('لا يوجد أكواد لحذفها', true); return; }
-  const backup = {};
-  keysToDelete.forEach(k=>{ backup[k] = POINT_CODES[k]; delete POINT_CODES[k]; });
-  const ok = await savePointCodes(POINT_CODES);
-  if(!ok){
-    Object.keys(backup).forEach(k=>{ POINT_CODES[k] = backup[k]; });
-    showToast('تعذر الحذف على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true);
-    render();
-    return;
-  }
-  showToast(`اتحذف ${keysToDelete.length} كود من هذه الفقرة`);
-  render();
-}
-async function doGenerateSessionPointCodes(sessionId){
-  const info = SESSION_INFO[sessionId] || {};
-  if(info.pointsEnabled===false){ showToast('النقاط متوقفة في هذه الفقرة — فعّلها الأول من إعدادات الفقرة', true); return; }
-  const valEl = document.getElementById('gen-scode-value-'+sessionId);
-  const qtyEl = document.getElementById('gen-scode-qty-'+sessionId);
-  if(!valEl || !qtyEl) return;
-  const value = parseInt(normalizeDigits(valEl.value),10);
-  const qty = Math.min(300, parseInt(normalizeDigits(qtyEl.value),10)||0);
-  if(!value || value<=0){ showToast('اكتب قيمة نقاط صحيحة', true); return; }
-  if(!qty || qty<=0){ showToast('اكتب كمية صحيحة', true); return; }
-  const existingKeys = Object.keys(POINT_CODES).filter(c=>POINT_CODES[c].sessionId===sessionId);
-  const existingSet = new Set(existingKeys.map(k=>POINT_CODES[k].code));
-  for(let i=0;i<qty;i++){
-    const code = genSecureSessionCode(existingSet);
-    existingSet.add(code);
-    const storageKey = sessionId+':'+code;
-    POINT_CODES[storageKey] = { code, value, used:false, usedBy:null, usedAt:null, usedSessionId:null, sessionId };
-  }
-  const ok = await savePointCodes(POINT_CODES);
-  if(!ok){ showToast('تعذر حفظ الأكواد على السيرفر — السبب: ' + (_fbLastError||'غير معروف'), true); render(); return; }
-  showToast(`اتولدت ${qty} كود خاص بهذه الفقرة بقيمة ${value} نقطة`);
-  if(valEl) valEl.value = '';
-  if(qtyEl) qtyEl.value = '';
-  render();
-}
 function drawCustomSessionQr(sessionId, text){
   const holder = document.getElementById('custom-qr-holder-'+sessionId);
   if(!holder || !window.QRCode) return;
@@ -31751,55 +30875,6 @@ async function doRemoveConfLogo(){
   render();
 }
 
-async function doSaveSessionInfo(sessionId){
-  const nameEl = document.getElementById('edit-sname-'+sessionId);
-  const from = document.getElementById('edit-from-'+sessionId);
-  const to = document.getElementById('edit-to-'+sessionId);
-  const loc = document.getElementById('edit-loc-'+sessionId);
-  const speaker = document.getElementById('edit-speaker-'+sessionId);
-  const desc = document.getElementById('edit-desc-'+sessionId);
-  const logoInput = document.getElementById('edit-slogo-'+sessionId);
-  if(!from) return;
-  const prevInfo = SESSION_INFO[sessionId] || {};
-  const newName = nameEl && nameEl.value.trim() ? nameEl.value.trim() : prevInfo.name;
-  const uploadedLogo = await readImageFileToDataUrl(logoInput, 300);
-  SESSION_INFO[sessionId] = {
-    ...prevInfo,
-    name: newName,
-    timeFrom: from.value.trim(),
-    timeTo: to.value.trim(),
-    location: loc.value.trim(),
-    speaker: speaker.value.trim(),
-    desc: desc.value.trim(),
-    logo: uploadedLogo || prevInfo.logo || null,
-  };
-  // Apply immediately to the live in-memory session object so the UI reflects
-  // the change right away, without depending on a storage round-trip.
-  const found = findSessionById(sessionId);
-  if(found && newName) found.session.name = newName;
-  await saveSessionInfo(SESSION_INFO);
-  state.editingSessionId = null;
-  showToast('تم حفظ تفاصيل الفقرة');
-  render();
-}
-function confirmRemoveSessionLogo(sessionId){
-  showConfirmDialog('حذف لوجو الفقرة؟', ()=>doRemoveSessionLogo(sessionId));
-}
-async function doRemoveSessionLogo(sessionId){
-  const info = SESSION_INFO[sessionId] || (SESSION_INFO[sessionId] = {});
-  info.logo = null;
-  await saveSessionInfo(SESSION_INFO);
-  showToast('تم حذف لوجو الفقرة');
-  render();
-}
-async function doAdminTogglePointsEnabled(sessionId){
-  const info = SESSION_INFO[sessionId] || (SESSION_INFO[sessionId] = {});
-  info.pointsEnabled = info.pointsEnabled===false ? true : false;
-  await saveSessionInfo(SESSION_INFO);
-  showToast(info.pointsEnabled===false ? 'تم إيقاف النقاط في هذه الفقرة' : 'تم تفعيل النقاط في هذه الفقرة');
-  render();
-}
-
 async function doExportFullBackup(){
   showToast('بيتم تجهيز النسخة الاحتياطية...');
   try{
@@ -31900,90 +30975,7 @@ function updateOtpProgress(){
     });
   }
 }
-function attachSessionCodeBoxes(){
-  document.querySelectorAll('.session-code-box').forEach(box=>{
-    if(box.dataset.bound) return;
-    box.dataset.bound = '1';
-    box.addEventListener('input', ()=>{
-      box.value = box.value.replace(/[^a-zA-Z0-9*#@%+=]/g,'').toUpperCase().slice(0,1);
-      const group = document.querySelectorAll(`.session-code-box[data-group="${box.dataset.group}"]`);
-      const idx = parseInt(box.dataset.idx,10);
-      const wasFilled = box.classList.contains('filled');
-      box.classList.toggle('filled', !!box.value);
-      const visual = box.parentElement && box.parentElement.querySelector('.otp-digit-visual');
-      if(visual){
-        visual.textContent = box.value;
-        visual.classList.remove('show');
-        void visual.offsetWidth;
-        if(box.value) visual.classList.add('show');
-      }
-      if(box.value && !wasFilled){
-        box.classList.remove('spark');
-        void box.offsetWidth;
-        box.classList.add('spark');
-        SND.otpType(idx);
-        const rect = box.getBoundingClientRect();
-        goldDustBurst(rect.left+rect.width/2, rect.top+rect.height/2, 8);
-      }
-      if(box.value && idx < group.length-1){ group[idx+1].focus(); }
-      const allFilled = Array.from(group).every(b=>b.value);
-      if(allFilled){
-        const code = Array.from(group).map(b=>b.value).join('');
-        tryCheckin(code).then(ok=>{
-          if(!ok){
-            group.forEach(b=>{
-              b.value = '';
-              b.classList.remove('filled');
-              const v = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
-              if(v){ v.textContent=''; v.classList.remove('show'); }
-            });
-            group[0].focus();
-          }
-        });
-      }
-    });
-    box.addEventListener('keydown', (e)=>{
-      const group = document.querySelectorAll(`.session-code-box[data-group="${box.dataset.group}"]`);
-      const idx = parseInt(box.dataset.idx,10);
-      if(e.key==='Backspace' && !box.value && idx>0){ group[idx-1].focus(); }
-    });
-    box.addEventListener('paste', (e)=>{
-      e.preventDefault();
-      const group = document.querySelectorAll(`.session-code-box[data-group="${box.dataset.group}"]`);
-      const idx = parseInt(box.dataset.idx,10);
-      const text = ((e.clipboardData || window.clipboardData || {}).getData) ? (e.clipboardData || window.clipboardData).getData('text') : '';
-      const chars = String(text||'').replace(/[^a-zA-Z0-9*#@%+=]/g,'').toUpperCase().split('');
-      if(!chars.length) return;
-      let i = idx;
-      chars.forEach(c=>{
-        if(i>=group.length) return;
-        const b = group[i];
-        b.value = c;
-        b.classList.add('filled');
-        const visual = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
-        if(visual){ visual.textContent = c; visual.classList.remove('show'); void visual.offsetWidth; visual.classList.add('show'); }
-        i++;
-      });
-      const lastIdx = Math.min(idx + chars.length, group.length) - 1;
-      if(group[lastIdx]) group[lastIdx].focus();
-      const allFilled = Array.from(group).every(b=>b.value);
-      if(allFilled){
-        const code = Array.from(group).map(b=>b.value).join('');
-        tryCheckin(code).then(ok=>{
-          if(!ok){
-            group.forEach(b=>{
-              b.value = '';
-              b.classList.remove('filled');
-              const v = b.parentElement && b.parentElement.querySelector('.otp-digit-visual');
-              if(v){ v.textContent=''; v.classList.remove('show'); }
-            });
-            group[0].focus();
-          }
-        });
-      }
-    });
-  });
-}
+
 function attachOtpBoxes(){
   const boxes = document.querySelectorAll('.otp-box');
   if(!boxes.length) return;
@@ -32218,11 +31210,30 @@ function savedAccountRemove(pid){
   showToast('اتشال الحساب من الجهاز ده');
   render();
 }
+/* دخول أوفلاين: الحساب المحفوظ على الجهاز اتعمله دخول ناجح قبل كده، فلو السيرفر مش متاح نفتحه من البيانات المحفوظة محليًا */
+function savedAccountStub(pid){
+  const sid = String(pid);
+  if(PARTICIPANTS.some(x=>x.id===sid)) return true;
+  const a = savedAccountsGet().find(x=>x.id===sid);
+  if(!a) return false;
+  PARTICIPANTS.push({ id:sid, name:a.name||'', photo:a.thumb||'' });
+  return true;
+}
 function savedAccountLogin(pid){
   if(!pid) return;
-  const p = PARTICIPANTS.find(x=>x.id===String(pid));
-  if(!p && __loginDataReady){ showToast('مش لاقي الحساب ده — ادخل بالرقم والباسورد', true); state._loginOther = true; render(); return; }
-  doLoginWithCode(String(pid));
+  const sid = String(pid);
+  const p = PARTICIPANTS.find(x=>x.id===sid);
+  if(!p && navigator.onLine === false && savedAccountStub(sid)){ doLoginWithCode(sid); return; }
+  if(!p && !__loginDataReady){
+    loginWaitAndRetry(()=>{
+      /* لو السيرفر ما رجّعش أي حسابات (النت ضعيف/مقطوع) نكمّل بالحساب المحفوظ بدل ما نرفض */
+      if(!PARTICIPANTS.some(x=>x.id===sid) && !CUSTOM_PARTICIPANTS.length) savedAccountStub(sid);
+      savedAccountLogin(sid);
+    });
+    return;
+  }
+  if(!p){ showToast('مش لاقي الحساب ده — ادخل بالرقم والباسورد', true); state._loginOther = true; render(); return; }
+  doLoginWithCode(sid);
 }
 function loginFormOpen(){ return !savedAccountsGet().length || !!state._loginOther; }
 function savedAccountsHtml(){
@@ -32408,13 +31419,7 @@ async function doToggleSignupOpen(){
   showToast(CONF_SETTINGS.signupClosed ? '🔒 اتقفل إنشاء الحسابات الذاتي' : '✅ اتفتح إنشاء الحسابات الذاتي');
   render();
 }
-function doManualSubmit(){
-  const input = document.getElementById('manual-code-input');
-  if(!input) return;
-  const code = input.value;
-  if(!code.trim()){ showToast('اكتب الكود أولاً', true); return; }
-  tryCheckin(code);
-}
+
 function doFallbackSubmit(){
   const input = document.getElementById('fallback-code-input');
   if(!input) return;
@@ -32423,7 +31428,7 @@ function doFallbackSubmit(){
   closeScanModal();
   if(scanMode==='login'){ doLoginWithCode(code); }
   else if(scanMode==='attendance'){ tryAttendance(code, scanTargetSessionId); }
-  else{ tryCheckin(code, scanTargetSessionId); }
+  else{ showToast('الكود غير صالح', true); }
 }
 
 /* ===== قوائم الاختيار الموحّدة: أي <select> في الصفحة بتفتح ورقة بنفس التصميم ===== */
@@ -32509,7 +31514,6 @@ document.addEventListener('keydown', (e)=>{
   if(false){}
   else if(e.target.id === 'login-phone' || e.target.id === 'login-pass'){ e.preventDefault(); doLogin(); }
   else if(e.target.id === 'signup-pass2'){ e.preventDefault(); doSignup(); }
-  else if(e.target.id === 'manual-code-input'){ e.preventDefault(); doManualSubmit(); }
   else if(e.target.id === 'fallback-code-input'){ e.preventDefault(); doFallbackSubmit(); }
   else if(e.target.id === 'admin-pass-input'){ e.preventDefault(); doAdminUnlock(); }
 });
@@ -32651,15 +31655,6 @@ function startLivePolling(){
       if(JSON.stringify(fresh) !== before){
         CHECKINS = fresh;
         updateLiveWidgetsInPlace();
-      }
-    }catch(e){}
-    try{
-      if(state.view==='session'){
-        const freshPointCodes = await loadPointCodes();
-        if(freshPointCodes && Object.keys(freshPointCodes).length){
-          POINT_CODES = freshPointCodes;
-          render();
-        }
       }
     }catch(e){}
     try{
@@ -32933,6 +31928,7 @@ function loginWaitAndRetry(retry){
   __markLoginDataReady();
   try{
     const sp = localStorage.getItem('meeting-pid');
+    if(sp && !PARTICIPANTS.some(x=>x.id===sp) && !CUSTOM_PARTICIPANTS.length){ savedAccountStub(sp); }
     if(sp && PARTICIPANTS.some(x=>x.id===sp) && (state.view==='splash' || state.view==='login')){ doLoginWithCode(sp); }
   }catch(e){}
   try{ savedAccountsRefresh(); }catch(e){}
@@ -33560,7 +32556,7 @@ function aiMarkSvg(variant){
   /* ---------- شاشة العملية الاحترافية: مبلغ ← مراجعة ← رقم سري ← دفع ← إيصال ---------- */
   function nm(id){ return (VISA_CARDS[id]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === id; })||{}).name) || '—'; }
   function avail(k){ return k === 'deposit' ? participantTotal(state.pid) : (WALLET[state.pid]||0); }
-  var OPM = {deposit:['إيداع في الفيزا','من نقاط الفقرات'], withdraw:['سحب من الفيزا','إلى نقاط الفقرات'], transfer:['تحويل نقاط','من رصيد الفيزا']};
+  var OPM = {deposit:['إيداع في الفيزا','من النقاط'], withdraw:['سحب من الفيزا','إلى النقاط'], transfer:['تحويل نقاط','من رصيد الفيزا']};
   function openSheet(kind){
     var pid = state.pid;
     if(visaExpired(pid)){ showExpiredDialog(); return; }
@@ -33615,11 +32611,11 @@ function aiMarkSvg(variant){
         return true; } });
   }
   wrapOp('executeVisaMove', function(kind, pid, amt){ var dep = kind === 'deposit';
-    return {kind:(VISA_TX_META[kind]||{}).label || kind, amount:amt, sign:dep?1:-1, bal:WALLET[pid]||0, prev:(WALLET[pid]||0) - (dep?amt:-amt), note:dep?'من نقاط الفقرات':'إلى نقاط الفقرات', stamp:dep?'مُودَع':'مسحوب'}; });
+    return {kind:(VISA_TX_META[kind]||{}).label || kind, amount:amt, sign:dep?1:-1, bal:WALLET[pid]||0, prev:(WALLET[pid]||0) - (dep?amt:-amt), note:dep?'من النقاط':'إلى النقاط', stamp:dep?'مُودَع':'مسحوب'}; });
   wrapOp('executeVisaTransfer', function(from, to, amt){
     return {kind:'تحويل صادر', amount:amt, sign:-1, bal:WALLET[from]||0, prev:(WALLET[from]||0) + amt, note:(VISA_CARDS[to]||{}).holder || ((PARTICIPANTS.find(function(x){ return x.id === to; })||{}).name) || '', stamp:'مُحوَّل'}; });
   wrapOp('executeVisaRenew', function(pid, src, fee){
-    return {kind:'تجديد الفيزا', amount:fee, sign:-1, bal:src === 'wallet' ? (WALLET[pid]||0) : participantTotal(pid), prev:src === 'wallet' ? (WALLET[pid]||0) + fee : null, note:src === 'wallet' ? 'من رصيد الفيزا' : 'من نقاط الفقرات', stamp:'مُجدَّد'}; });
+    return {kind:'تجديد الفيزا', amount:fee, sign:-1, bal:src === 'wallet' ? (WALLET[pid]||0) : participantTotal(pid), prev:src === 'wallet' ? (WALLET[pid]||0) + fee : null, note:src === 'wallet' ? 'من رصيد الفيزا' : 'من النقاط', stamp:'مُجدَّد'}; });
   /* ---------- 5) الإيصال بيتطبع من الطابعة ---------- */
   function paper(R){
     var pid = state.pid, name = ((PARTICIPANTS||[]).find(function(x){ return x.id === pid; })||{}).name || '';
@@ -34225,7 +33221,8 @@ var FX = {
   vivid:function(r,g,b){ var y=r*.3+g*.59+b*.11, k=1.6; return [(y+(r-y)*k-128)*1.08+128,(y+(g-y)*k-128)*1.08+128,(y+(b-y)*k-128)*1.08+128]; },
   soft:function(r,g,b){ return [r*.9+25, g*.9+25, b*.9+25]; }
 };
-function loadImg(src){ return new Promise(function(res){ var i=new Image(); i.onload=function(){res(i);}; i.onerror=function(){res(null);}; i.src=src; }); }
+function glxT(pr,ms){ return Promise.race([pr,new Promise(function(r){ setTimeout(r,ms); })]); }
+function loadImg(src,ms){ return new Promise(function(res){ var done=false, t=setTimeout(function(){ if(!done){ done=true; res(null); } }, ms||4000); var i=new Image(); i.onload=function(){ if(!done){ done=true; clearTimeout(t); res(i); } }; i.onerror=function(){ if(!done){ done=true; clearTimeout(t); res(null); } }; i.src=src; }); }
 function applyFilter(src, key){
   if(key==='none') return Promise.resolve(src);
   return loadImg(src).then(function(img){
@@ -34289,7 +33286,7 @@ function qrCanvas(text){
 }
 function drawCard(name,photo,id){
   var fonts = (document.fonts && document.fonts.load) ? Promise.all([document.fonts.load('800 40px Cairo'),document.fonts.load('900 40px Cairo')]).catch(function(){}) : Promise.resolve();
-  return Promise.all([fonts, photo?loadImg(photo):Promise.resolve(null)]).then(function(r){
+  return Promise.all([glxT(fonts,1500), photo?loadImg(photo,2500):Promise.resolve(null)]).then(function(r){
     var img=r[1], W=720, H=1080, c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
     var F=function(w,s){ return w+' '+s+'px Cairo, Tahoma, sans-serif'; };
     var bg=g.createLinearGradient(0,0,W,H); bg.addColorStop(0,'#171449'); bg.addColorStop(1,'#33227a');
@@ -34413,7 +33410,7 @@ drawCard=function(name,photo,id){
   var P=PAL[(CONF_SETTINGS&&CONF_SETTINGS.glxCardStyle)||'dark']||PAL.dark;
   var title=(CONF_SETTINGS&&CONF_SETTINGS.glxCardTitle)||'اجتماع جامعة';
   var fonts=(document.fonts&&document.fonts.load)?Promise.all([document.fonts.load('800 40px Cairo'),document.fonts.load('900 40px Cairo')]).catch(function(){}):Promise.resolve();
-  return Promise.all([fonts,photo?loadImg(photo):Promise.resolve(null)]).then(function(r){
+  return Promise.all([glxT(fonts,1500),photo?loadImg(photo,2500):Promise.resolve(null)]).then(function(r){
     var img=r[1],W=720,H=1080,c=document.createElement('canvas'); c.width=W; c.height=H; var g=c.getContext('2d');
     var F=function(w,s){ return w+' '+s+'px Cairo, Tahoma, sans-serif'; };
     var bg=g.createLinearGradient(0,0,W,H); bg.addColorStop(0,P.bg[0]); bg.addColorStop(1,P.bg[1]);
@@ -34620,11 +33617,36 @@ setInterval(function(){ var el=document.getElementById('glx-cd'); if(!el) return
 var _rmp=window.renderMePage;
 window.renderMePage=function(){
   var h=_rmp.apply(this,arguments);
+  try{ glxCardPrecache(); }catch(e){}
   return h.replace('<div class="me-card"','<button type="button" class="glx-idbtn" data-glx-idcard="1"><span class="ic">🎫</span><div><b>كارت الدخول</b><small>اعرضه عند الحضور أو احفظه كصورة</small></div><i>‹</i></button><div class="me-card"');
 };
+function glxCardSig(p){ var C=CONF_SETTINGS||{}; return [p.name,p.photo||'',C.glxCardStyle||'dark',C.glxCardTitle||''].join('|'); }
+function glxCardSave(p,c){ try{ localStorage.setItem('glx-card-'+p.id,c.toDataURL('image/png')); localStorage.setItem('glx-card-sig-'+p.id,glxCardSig(p)); }catch(e){} }
+function glxCardLocal(p){
+  var d=null; try{ d=localStorage.getItem('glx-card-'+p.id); }catch(e){}
+  if(!d) return Promise.resolve(null);
+  return loadImg(d,2000).then(function(img){ if(!img) return null; var c=document.createElement('canvas'); c.width=720; c.height=1080; c.getContext('2d').drawImage(img,0,0); return c; });
+}
+function glxCardBuild(p){
+  var local=function(){ return glxCardLocal(p).then(function(c){ return c||drawCard(p.name,null,p.id); }); };
+  if(navigator.onLine===false) return local();
+  return (p.photo?loadImg(p.photo,1500):Promise.resolve(true)).then(function(ph){
+    if(p.photo && !ph) return local();
+    return drawCard(p.name,p.photo,p.id).then(function(c){ glxCardSave(p,c); return c; });
+  }).catch(local);
+}
+var _glxPre='';
+function glxCardPrecache(){
+  try{
+    var p=PARTICIPANTS.find(function(x){ return x.id===state.pid; }); if(!p||navigator.onLine===false) return;
+    var sig=glxCardSig(p), key=p.id+'|'+sig; if(_glxPre===key) return;
+    if(localStorage.getItem('glx-card-sig-'+p.id)===sig && localStorage.getItem('glx-card-'+p.id)){ _glxPre=key; return; }
+    _glxPre=key; setTimeout(function(){ glxCardBuild(p).catch(function(){}); },1200);
+  }catch(e){}
+}
 function openMyCard(){
   var p=PARTICIPANTS.find(function(x){ return x.id===state.pid; }); if(!p) return;
-  drawCard(p.name,p.photo,p.id).then(function(c){
+  glxCardBuild(p).then(function(c){
     var o=sheet('<div class="glx-h">🎫 كارت الدخول</div><div class="glx-stage"><div class="glx-3d"><div class="glx-cv"></div><div class="glx-shine"></div></div></div><div class="glx-act"><button type="button" class="btn btn-primary" id="glx-ms">حفظ الكارت 📥</button><button type="button" class="btn btn-outline" id="glx-mq">تكبير الـQR</button><button type="button" class="btn btn-outline" id="glx-mx">إغلاق</button></div>');
     o.classList.add('glx-pro'); c.style.cssText='width:100%;height:auto;display:block;border-radius:20px'; $('.glx-cv',o).appendChild(c);
     $('#glx-ms',o).onclick=function(){ saveCard(c,p.id); }; $('#glx-mx',o).onclick=function(){ o.close(); };
@@ -34763,7 +33785,7 @@ function streakHtml(){
 var _rmp9=window.renderMePage;
 window.renderMePage=function(){
   var h=_rmp9.apply(this,arguments), bar='<button type="button" class="glx-sbar" data-glx-search="1"><span>🔍</span> ابحث في التطبيق…</button>';
-  var st=''; try{ st=streakHtml(); }catch(e){}
+  var st='';
   return h.replace('<button type="button" class="glx-idbtn"',bar+'<button type="button" class="glx-idbtn"').replace('<div class="me-card"',st+'<div class="me-card"');
 };
 var _rp9=window.renderProfile;
@@ -34774,12 +33796,11 @@ function searchIndex(){
   var out=[], seen={};
   BNAV_TABS.forEach(function(t){ if(t.page&&t.label&&!seen[t.page]){ seen[t.page]=1; out.push({k:'page',ic:'📂',t:t.label,s:'قسم',page:t.page}); }
     (t.quick||[]).forEach(function(q){ if(!seen[q[0]]){ seen[q[0]]=1; out.push({k:'page',ic:'✨',t:q[1],s:q[3]||'قسم',page:q[0]}); } }); });
-  flatSessions().forEach(function(f){ out.push({k:'ses',ic:'🗓️',t:f.session.name,s:f.day.label+' • جلسة',sid:f.session.id}); });
   PARTICIPANTS.forEach(function(p){ out.push({k:'per',ic:'👤',t:p.name,s:'مشارك',pid:p.id}); });
   return out.map(function(r){ r.n=nz(r.t+' '+r.s); return r; });
 }
 function openSearch(){
-  var IDX=searchIndex(), o=sheet('<div class="glx-sh"><input type="search" id="glx-q" class="field" placeholder="ابحث عن قسم أو جلسة أو زميل…" autocomplete="off"></div><div class="glx-res" id="glx-res"></div><div class="glx-act"><button type="button" class="btn btn-outline" id="glx-qx">إغلاق</button></div>');
+  var IDX=searchIndex(), o=sheet('<div class="glx-sh"><input type="search" id="glx-q" class="field" placeholder="ابحث عن قسم أو زميل…" autocomplete="off"></div><div class="glx-res" id="glx-res"></div><div class="glx-act"><button type="button" class="btn btn-outline" id="glx-qx">إغلاق</button></div>');
   o.classList.add('glx-top'); var q=$('#glx-q',o), box=$('#glx-res',o); q.focus();
   function paint(){
     var v=nz(q.value); if(!v){ box.innerHTML='<div class="glx-s">اكتب أي حاجة وهتظهر النتايج وأنت بتكتب</div>'; return; }
