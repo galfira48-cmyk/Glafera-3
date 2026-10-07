@@ -29622,8 +29622,37 @@ async function doDownloadAllQR(){
   w.document.close();
 }
 function confirmDeleteParticipant(pid){
-  const p = PARTICIPANTS.find(x=>x.id===pid);
-  showConfirmDialog(`حذف "${escapeHtml(p?p.name:pid)}"؟`, ()=>doDeleteParticipant(pid), {sub:'هينقل لسلة المهملات وتقدر تسترجعه منها.'});
+  const p = PARTICIPANTS.find(x=>x.id===pid); if(!p){ showToast('المشارك مش موجود', true); return; }
+  const total = (()=>{ try{ return participantTotal(pid); }catch(e){ return 0; } })();
+  const attended = (()=>{ try{ return flatSessions().filter(f=>CHECKINS[pid+'__'+f.session.id]).length; }catch(e){ return 0; } })();
+  const hasAcc = !!cpOf(pid);
+  const av = p.photo ? `<div class="sar-av" style="background-image:url('${String(p.photo).replace(/'/g,'%27')}')"></div>` : `<div class="sar-av sar-ini">${escapeHtml(initials(p.name))}</div>`;
+  const old = document.getElementById('adp-ov'); if(old) old.remove();
+  const ov = document.createElement('div'); ov.id = 'adp-ov'; ov.className = 'sar-ov'; ov.setAttribute('role','alertdialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `<div class="sar-card">
+    <div class="sar-grab"></div>
+    <div class="sar-who">${av}<span class="sar-badge">🗑️</span></div>
+    <div class="sar-title" style="margin-top:2px">حذف «${escapeHtml(p.name)}» من السيرفر؟</div>
+    <div class="adp-chips"><span>#${escapeHtml(String(p.id))}</span><span>⭐ ${total} نقطة</span><span>✅ ${attended} حضور</span></div>
+    <div class="adp-list">
+      <div><b>🔒</b><span>${hasAcc?'الحساب هيتشال من السيرفر وصاحبه مش هيقدر يدخل بيه.':'المشارك هيتشال من القايمة ومش هيظهر في الحضور والترتيب.'}</span></div>
+      <div><b>♻️</b><span>بيتنقل لسلة المهملات، وتقدر ترجّعه منها في أي وقت لحد ما تمسحه نهائي.</span></div>
+      ${hasAcc?'<div><b>📝</b><span>صاحبه يقدر ينشئ حساب جديد بنفس الرقم بعد الحذف.</span></div>':''}
+    </div>
+    <label class="adp-lab" for="adp-in">اكتب كلمة <b>حذف</b> للتأكيد</label>
+    <input id="adp-in" class="field adp-in" autocomplete="off" placeholder="حذف" inputmode="text">
+    <div class="sar-actions"><button type="button" class="sar-cancel">إلغاء</button><button type="button" class="sar-ok" disabled>حذف المشارك</button></div></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>ov.classList.add('in'));
+  const ok = ov.querySelector('.sar-ok'), inp = ov.querySelector('#adp-in');
+  const onKey = e=>{ if(e.key==='Escape') close(); };
+  const close = ()=>{ if(!ov.parentNode) return; ov.classList.remove('in'); ov.classList.add('out'); document.removeEventListener('keydown', onKey); setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 240); };
+  document.addEventListener('keydown', onKey);
+  inp.addEventListener('input', ()=>{ ok.disabled = inp.value.trim() !== 'حذف'; });
+  ov.addEventListener('click', e=>{
+    if(e.target===ov || e.target.closest('.sar-cancel')){ close(); return; }
+    if(e.target.closest('.sar-ok') && !ok.disabled){ close(); doDeleteParticipant(pid); }
+  });
 }
 
 async function doDeleteParticipant(pid){
@@ -31372,6 +31401,7 @@ function confirmRemoveSavedAccount(pid){
     <div class="sar-title" id="sar-t">إزالة الحساب من الجهاز ده؟</div>
     <div class="sar-body">هنشيل الحساب من الأجهزة المحفوظة هنا، وهتحتاج رقم الموبايل والباسورد عشان تدخل المرة الجاية.</div>
     <div class="sar-safe"><span>🛡️</span><span>حسابك ونقاطك وبياناتك فاضلين محفوظين — الإزالة من الجهاز ده بس.</span></div>
+    <div class="sar-note">لحذف حسابك نهائيًا من السيرفر، اطلب ده من الأدمن.</div>
     <div class="sar-actions">
       <button type="button" class="sar-cancel">إلغاء</button>
       <button type="button" class="sar-ok">إزالة من الجهاز</button>
@@ -35691,6 +35721,18 @@ html[data-theme="light"] ::-webkit-scrollbar{ width:8px; height:8px; } html[data
 .sar-cancel{background:transparent;color:var(--text);border:1.5px solid var(--border)}
 .sar-ok{border:0;color:#fff;background:linear-gradient(135deg,#FF8A7A,#E5484D);box-shadow:0 14px 24px -12px rgba(229,72,77,.7)}
 @media(prefers-reduced-motion:reduce){.sar-card,.sar-ov{transition:none}}
+</style>
+<style id="adp-css">
+.sar-note{margin-top:10px;font:600 12px/1.6 Tajawal,Arial,sans-serif;color:var(--text-muted)}
+.adp-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:10px}
+.adp-chips span{padding:5px 12px;border-radius:99px;font:800 12px Cairo,sans-serif;background:rgba(127,127,160,.14);border:1px solid var(--border)}
+.adp-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:right}
+.adp-list div{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:rgba(127,127,160,.08);border:1px solid var(--border);font:500 12.5px/1.65 Tajawal,Arial,sans-serif}
+.adp-list b{flex:none;font-size:15px}
+.adp-lab{display:block;margin-top:14px;font:600 12.5px Tajawal,Arial,sans-serif;color:var(--text-muted);text-align:right}
+.adp-lab b{color:var(--danger)}
+.adp-in{margin-top:6px;text-align:center;font-weight:800}
+.sar-ok[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
 </style>
 </body>
 </html>
