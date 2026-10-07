@@ -7063,6 +7063,25 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 .sa-card:active .sa-go{transform:scale(.95);}
 .sa-x{width:24px; height:24px; line-height:24px; top:8px; left:8px;}
 </style>
+<style id="att-logo-css">
+  .att-logo{ width:100%; height:100%; object-fit:contain; padding:10px; box-sizing:border-box; display:block; border-radius:inherit; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)); pointer-events:none; -webkit-user-drag:none; user-select:none; }
+  .att-emo{ font-size:34px; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+  .att-glass-ico.has-logo, .ap-ico.has-logo, .aa-tile-ico.has-logo{ background:linear-gradient(150deg,color-mix(in srgb,var(--lc,#7C9CFF) 46%,rgba(255,255,255,.14)),color-mix(in srgb,var(--lc,#7C9CFF) 18%,rgba(12,16,40,.55))) !important; border:1px solid rgba(255,255,255,.22); overflow:visible; }
+  .aa-tile-ico.has-logo .att-logo{ padding:7px; }
+  .ap-ico.has-logo .att-logo{ padding:11px; }
+  .att-wm .att-logo{ padding:0; filter:grayscale(1) brightness(2.2); border-radius:0; }
+  .att-wm .att-emo{ font-size:110px; filter:grayscale(1); }
+  .att-glass-ico.att-prev{ width:64px; height:64px; border-radius:21px; }
+  .aa-logo-card{ margin-top:14px; }
+  .aa-logo-row{ display:flex; align-items:center; gap:14px; }
+  .aa-logo-txt{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .aa-logo-txt small{ opacity:.7; font-size:12px; }
+  .aa-logo-btns{ display:flex; gap:8px; margin-top:12px; }
+  .aa-logo-btns .btn{ margin:0; flex:1; text-align:center; cursor:pointer; }
+  .aa-logo-btns .aa-logo-del{ flex:0 0 auto; padding-inline:18px; }
+  .aa-logo-auto{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:12.5px; opacity:.85; cursor:pointer; }
+  .aa-logo-auto input{ width:18px; height:18px; accent-color:#7C9CFF; }
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -27022,6 +27041,129 @@ const ATT_TYPES = {
 };
 const ATT_CONFIG_KEY = 'glavera-att-config', ATT_RECORDS_KEY = 'glavera-att-records', ATT_TYPES_KEY = 'glavera-att-types';
 const ATT_ICONS = ['⛪','👥','🎶','📖','🙏','✝️','🕊️','🎓','🍽️','⚽','🎭','⭐'];
+/* ===== لوجو كل نشاط حضور (يترفع من الأدمن ويظهر في الكارت وصفحة النشاط) ===== */
+const ATT_LOGOV_KEY = 'glavera-att-logov', ATT_LOGO_PFX = 'glavera-att-logo-', ATT_LOGO_CACHE = 'glavera-att-logo-cache';
+let ATT_LOGOS = {};
+try{ ATT_LOGOS = JSON.parse(localStorage.getItem(ATT_LOGO_CACHE)||'{}') || {}; }catch(e){ ATT_LOGOS = {}; }
+function attLogoCacheSave(){ try{ localStorage.setItem(ATT_LOGO_CACHE, JSON.stringify(ATT_LOGOS)); }catch(e){} }
+function attLogoOf(k){ const v = ATT_LOGOS && ATT_LOGOS[k]; return (v && v.img) ? v : null; }
+function attIconHtml(k){
+  const lg = attLogoOf(k);
+  if(lg) return '<img class="att-logo" src="'+lg.img+'" alt="" draggable="false">';
+  if(typeof ATT_ICO_SVG!=='undefined' && ATT_ICO_SVG[k]) return ATT_ICO_SVG[k];
+  const t = ATT_TYPES[k]; return '<span class="att-emo">'+((t && t.icon) ? t.icon : '⭐')+'</span>';
+}
+function attIcoAttrs(k){ const lg = attLogoOf(k); return lg ? ' has-logo" style="--lc:'+(lg.c||'#7C9CFF') : '"'; }
+/* بيجيب اللوجوهات اللي اتغيّرت بس (فهرس صغير فيه نسخة كل لوجو) بدل ما يحمّل الصور كل مرة */
+async function attSyncLogos(vmap){
+  let changed = false;
+  try{
+    vmap = vmap || {};
+    for(const k of Object.keys(vmap)){
+      const v = vmap[k];
+      if(v===0){ if(ATT_LOGOS[k]){ delete ATT_LOGOS[k]; changed = true; } continue; }
+      if(!ATT_TYPES[k]) continue;
+      if(ATT_LOGOS[k] && ATT_LOGOS[k].ts===v) continue;
+      const r = await window.storage.get(ATT_LOGO_PFX+k, true);
+      if(r && r.value){ try{ const o = JSON.parse(r.value); if(o && o.img){ ATT_LOGOS[k] = o; changed = true; } }catch(e){} }
+    }
+    if(changed) attLogoCacheSave();
+  }catch(e){}
+  return changed;
+}
+/* تجهيز ذكي: شيل الخلفية الموحدة، قص الحواف الفاضية، تكبير/تصغير لمربع، واستخراج اللون الأساسي */
+function attLogoFromImage(im, autoBg){
+  let w = im.naturalWidth||im.width, h = im.naturalHeight||im.height;
+  const k0 = Math.min(1, 320/Math.max(w,h)); w = Math.max(1,Math.round(w*k0)); h = Math.max(1,Math.round(h*k0));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const cx = cv.getContext('2d', {willReadFrequently:true}); cx.drawImage(im,0,0,w,h);
+  const d = cx.getImageData(0,0,w,h), px = d.data;
+  const dist = (a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2]);
+  if(autoBg){
+    const cs = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].map(([x,y])=>{ const i=(y*w+x)*4; return [px[i],px[i+1],px[i+2],px[i+3]]; });
+    if(cs.every(c=>c[3]>240)){
+      const avg = [0,1,2].map(j=>Math.round(cs.reduce((a,c)=>a+c[j],0)/4));
+      if(cs.every(c=>dist(c,avg)<36)){
+        const TOL = 54, seen = new Uint8Array(w*h), stack = [];
+        const push = (x,y)=>{ if(x<0||y<0||x>=w||y>=h) return; const q=y*w+x; if(seen[q]) return; const i=q*4; if(dist([px[i],px[i+1],px[i+2]],avg)>TOL) return; seen[q]=1; stack.push(q); };
+        for(let x=0;x<w;x++){ push(x,0); push(x,h-1); } for(let y=0;y<h;y++){ push(0,y); push(w-1,y); }
+        let cnt = 0;
+        while(stack.length){ const q = stack.pop(); cnt++; const x = q%w, y = (q-x)/w; push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1); }
+        if(cnt < w*h*0.72){ /* لو الخلفية أكتر من 72% يبقى ده شكل اللوجو نفسه فمنلمسهوش */
+          const edge = [];
+          for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const q=y*w+x; if(seen[q]) continue;
+            if((x>0&&seen[q-1])||(x<w-1&&seen[q+1])||(y>0&&seen[q-w])||(y<h-1&&seen[q+w])) edge.push(q); }
+          for(let q=0;q<w*h;q++) if(seen[q]) px[q*4+3] = 0;
+          edge.forEach(q=>{ const i=q*4, dd = dist([px[i],px[i+1],px[i+2]],avg); px[i+3] = Math.max(0,Math.min(255,Math.round((dd-TOL*0.7)/(TOL*1.2)*255))); });
+        }
+      }
+    }
+  }
+  cx.putImageData(d,0,0);
+  let x0=w, y0=h, x1=-1, y1=-1;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ if(px[(y*w+x)*4+3]>18){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  if(x1<0){ x0=0; y0=0; x1=w-1; y1=h-1; }
+  const pad = Math.round(Math.max(x1-x0,y1-y0)*0.04);
+  x0 = Math.max(0,x0-pad); y0 = Math.max(0,y0-pad); x1 = Math.min(w-1,x1+pad); y1 = Math.min(h-1,y1+pad);
+  const sw = x1-x0+1, sh = y1-y0+1;
+  let sr=0, sg=0, sb=0, sw8=0;
+  for(let y=y0;y<=y1;y+=2) for(let x=x0;x<=x1;x+=2){ const i=(y*w+x)*4; if(px[i+3]<200) continue;
+    const mx=Math.max(px[i],px[i+1],px[i+2]), mn=Math.min(px[i],px[i+1],px[i+2]); const wt = (mx-mn)/255 + 0.04;
+    sr+=px[i]*wt; sg+=px[i+1]*wt; sb+=px[i+2]*wt; sw8+=wt; }
+  let col = '#7C9CFF';
+  if(sw8>0){ let r=sr/sw8, g=sg/sw8, b=sb/sw8; const lum = .299*r+.587*g+.114*b;
+    if(lum<70){ const f=70/Math.max(lum,1); r=Math.min(255,r*f); g=Math.min(255,g*f); b=Math.min(255,b*f); }
+    col = '#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''); }
+  for(const N of [256,200,160,128]){
+    const o = document.createElement('canvas'); o.width = N; o.height = N;
+    const oc = o.getContext('2d'); oc.imageSmoothingEnabled = true; oc.imageSmoothingQuality = 'high';
+    const sc = Math.min(N/sw, N/sh); const dw = Math.max(1,Math.round(sw*sc)), dh = Math.max(1,Math.round(sh*sc));
+    oc.drawImage(cv, x0, y0, sw, sh, Math.round((N-dw)/2), Math.round((N-dh)/2), dw, dh);
+    let url = o.toDataURL('image/png');
+    if(url.length>110000){ const u2 = o.toDataURL('image/webp', .86); if(u2.indexOf('image/webp')>0 && u2.length<url.length) url = u2; }
+    if(url.length<=110000 || N===128) return { img:url, c:col };
+  }
+  return null;
+}
+function attProcessLogo(file, autoBg){
+  return new Promise(res=>{
+    const fr = new FileReader();
+    fr.onerror = ()=>res(null);
+    fr.onload = ()=>{ const im = new Image(); im.onerror = ()=>res(null); im.onload = ()=>{ try{ res(attLogoFromImage(im, autoBg)); }catch(e){ res(null); } }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+async function attLogoPicked(inp){
+  const f = inp.files && inp.files[0]; try{ inp.value = ''; }catch(e){}
+  const type = state.attNav && state.attNav.type; if(!f || !type || !ATT_TYPES[type]) return;
+  if(!/^image\//.test(f.type||'')){ showToast('اختار ملف صورة', true); return; }
+  showToast('جارٍ تجهيز اللوجو...');
+  const out = await attProcessLogo(f, state.attLogoAuto!==false);
+  if(!out){ showToast('تعذر قراءة الصورة — جرّب صورة تانية', true); return; }
+  const ts = Date.now();
+  const r1 = await window.storage.update(ATT_LOGO_PFX+type, ()=>JSON.stringify({img:out.img, c:out.c, ts}), true);
+  if(!(r1 && r1.value)){ showToast('تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', true); return; }
+  const r2 = await window.storage.update(ATT_LOGOV_KEY, cur=>{ let o={}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o={}; } if(!o || typeof o!=='object') o={}; o[type] = ts; return JSON.stringify(o); }, true);
+  if(!(r2 && r2.value)){ showToast('تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', true); return; }
+  ATT_LOGOS[type] = {img:out.img, c:out.c, ts}; attLogoCacheSave();
+  showToast('تم حفظ لوجو '+ATT_TYPES[type].label); render();
+}
+function attLogoAdminCard(type){
+  const t = ATT_TYPES[type], lg = attLogoOf(type), auto = state.attLogoAuto!==false;
+  return `<div class="card aa-logo-card">
+    <div class="aa-logo-row">
+      <span class="att-glass-ico att-prev${lg?' has-logo':''}" style="--cap-color:${t.color};--lc:${lg?lg.c:'transparent'}">${attIconHtml(type)}</span>
+      <div class="aa-logo-txt"><b>لوجو ${escapeHtml(t.label)}</b><small>${lg?'ظاهر في كارت الحضور وصفحة النشاط':'ارفع لوجو يظهر بدل الأيقونة الحالية'}</small></div>
+    </div>
+    <div class="aa-logo-btns">
+      <label for="att-logo-file" class="btn btn-primary aa-logo-up">📤 ${lg?'تغيير اللوجو':'رفع لوجو'}</label>
+      ${lg?`<button type="button" class="btn btn-ghost aa-logo-del" data-action="att-admin-logo-del" data-type="${type}">🗑️ حذف</button>`:''}
+    </div>
+    <label class="aa-logo-auto"><input type="checkbox" ${auto?'checked':''} data-action="att-admin-logo-auto" data-type="${type}"><span>تجهيز تلقائي: شيل الخلفية وقصّ الحواف</span></label>
+    <input type="file" id="att-logo-file" accept="image/*" style="display:none">
+  </div>`;
+}
+
 const ATT_COLORS = ['linear-gradient(145deg,#5FE0A4,#2A9D78)','linear-gradient(145deg,#7C9CFF,#5A67D8)','linear-gradient(145deg,#FF9EC7,#D6618F)','linear-gradient(145deg,#C9A27A,#8A6A4A)'];
 function attApplyTypes(arr){
   let added = false;
@@ -27106,7 +27248,7 @@ async function attRefresh(force){
   _attLoading = true;
   const ver = _attVer;
   try{
-    const [c0, r0, tl] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY)]);
+    const [c0, r0, tl, lv] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY), attLoadJson(ATT_LOGOV_KEY)]);
     let c = c0, r = r0;
     const gotCfg = !!(c0 && Object.keys(c0).length);
     if(gotCfg){ attCfgCacheSet(c0); attRecCacheSet(r0); }
@@ -27116,9 +27258,10 @@ async function attRefresh(force){
     }
     r = attOverlayPending(r);
     const typesAdded = attApplyTypes(tl);
+    const logosChanged = await attSyncLogos(lv);
     _attLastLoad = Date.now(); _attLoadedOnce = true;
     if(ver !== _attVer) return; // فيه كتابة حصلت أثناء القراءة، القراءة دي قديمة
-    const changed = typesAdded || JSON.stringify(c)!==JSON.stringify(ATT_CONFIG) || JSON.stringify(r)!==JSON.stringify(ATT_RECORDS);
+    const changed = typesAdded || logosChanged || JSON.stringify(c)!==JSON.stringify(ATT_CONFIG) || JSON.stringify(r)!==JSON.stringify(ATT_RECORDS);
     ATT_CONFIG = c; ATT_RECORDS = r;
     if(changed && attViewActive()){
       const ae = document.activeElement;
@@ -27338,8 +27481,8 @@ function attGlassTilesHtml(anim){
         <span class="att-scan-txt"><span>امسح كود الحضور</span><small>${ptsN>0 ? 'اكسب '+ptsN+' نقطة بمسح الكود' : 'وجّه الكاميرا نحو كود QR'}</small></span>
       </button>` : '';
     return `<div role="button" tabindex="0" class="att-glass ${cls}" style="--cap-color:${t.color};--c1:${cc[0]||'#F4B740'};--c2:${cc[1]||cc[0]||'#FF7A59'};--i:${i}" data-action="att-open" data-type="${k}">
-      <span class="att-wm" aria-hidden="true">${ATT_ICO_SVG[k]}</span>
-      <span class="att-glass-ico">${ATT_ICO_SVG[k]}${st.cls==='done'?`<span class="att-tick">${ATT_TICK_SVG}</span>`:''}</span>
+      <span class="att-wm" aria-hidden="true">${attIconHtml(k)}</span>
+      <span class="att-glass-ico${attIcoAttrs(k)}">${attIconHtml(k)}${st.cls==='done'?`<span class="att-tick">${ATT_TICK_SVG}</span>`:''}</span>
       <span class="att-glass-body">
         <div class="att-kick">ADMIT ONE · 0${i+1}</div><div class="att-glass-lab">${t.label}</div>
         <div class="att-glass-name">${line}</div>
@@ -27485,7 +27628,7 @@ function renderAttendanceScanPage(){
       <svg class="ap-cross" viewBox="0 0 100 100" aria-hidden="true"><g stroke-width="6" stroke-linecap="round" fill="none"><path d="M50 24V76M24 50H76"/><path d="M39 24H61M39 76H61M24 39V61M76 39V61"/></g><g stroke="none" fill="#FFDE94"><circle cx="50" cy="14" r="3.6"/><circle cx="50" cy="86" r="3.6"/><circle cx="14" cy="50" r="3.6"/><circle cx="86" cy="50" r="3.6"/><circle cx="39" cy="15" r="2.6"/><circle cx="61" cy="15" r="2.6"/><circle cx="39" cy="85" r="2.6"/><circle cx="61" cy="85" r="2.6"/><circle cx="15" cy="39" r="2.6"/><circle cx="15" cy="61" r="2.6"/><circle cx="85" cy="39" r="2.6"/><circle cx="85" cy="61" r="2.6"/></g><circle cx="50" cy="50" r="7" stroke-width="3"/><circle cx="50" cy="50" r="2.4" fill="#FFDE94" stroke="none"/></svg>
       <div class="ap-dust" aria-hidden="true">${[8,22,36,50,64,78,90].map((x,i)=>`<i style="left:${x}%;--sx:${i%2?14:-14}px;animation-delay:${(i*.7).toFixed(1)}s;animation-duration:${4+i%3}s"></i>`).join('')}</div>
       <div class="ap-pass-top">
-        <div class="ap-ico">${ATT_ICO_SVG[type]}</div>
+        <div class="ap-ico${attIcoAttrs(type)}">${attIconHtml(type)}</div>
         <div class="ap-txt"><div class="ap-title">${t.full}</div><div class="ap-sub">${sessionName}</div></div>
       </div>
       <div class="ap-foot"><span class="ap-pill ${st.cls}" role="status" aria-live="polite"><i></i>${st.txt}</span><span class="ap-cnt">${mine.length ? 'حضرت '+mine.length+' '+attTimesWord(mine.length) : 'لسه ما حضرتش'}</span></div>
@@ -27600,7 +27743,7 @@ function renderAdminAttendanceTab(){
     const tiles = ATT_KEYS.map(k=>{
       const tt = ATT_TYPES[k], cc = attCfg(k);
       const sub = cc ? `${cc.open?'🟢 مفتوح':'مقفول'} · ${cntOf(k,cc)} حضروا` : 'جاهز';
-      return `<div class="aa-tile-wrap"><button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico" style="background:${tt.color}">${tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button><button type="button" class="aa-tile-del" data-action="att-admin-deltype" data-type="${k}" aria-label="حذف ${escapeHtml(tt.label)}" title="حذف النشاط">🗑️</button></div>`;
+      return `<div class="aa-tile-wrap"><button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico${attLogoOf(k)?attIcoAttrs(k)+';background:'+tt.color:'" style="background:'+tt.color}">${attLogoOf(k)?attIconHtml(k):tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button><button type="button" class="aa-tile-del" data-action="att-admin-deltype" data-type="${k}" aria-label="حذف ${escapeHtml(tt.label)}" title="حذف النشاط">🗑️</button></div>`;
     }).join('');
     return `<div class="aa-grid">${tiles}<button type="button" class="aa-tile add" data-action="att-admin-addtype"><span class="aa-tile-ico">＋</span><b>نشاط جديد</b><small>أضف نوع حضور</small></button></div>`;
   }
@@ -27677,6 +27820,7 @@ function renderAdminAttendanceTab(){
   const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>` : '';
   return `
     <button type="button" class="btn btn-primary aa-newday" data-action="att-admin-page" data-page="new" data-type="${type}">＋ إضافة يوم جديد</button>
+    ${attLogoAdminCard(type)}
     ${staleBanner}
     <div class="aa-hero">
       <div class="aa-hero-top">
@@ -27753,6 +27897,16 @@ async function attAdminAction(action, el){
   
   if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
   if(action==='att-admin-page'){ state.attNav = state.attNav || {type, page:'home'}; state.attNav.page = el.dataset.page; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-logo-auto'){ state.attLogoAuto = !!el.checked; return; }
+  if(action==='att-admin-logo-del'){
+    showConfirmDialog('هتحذف لوجو «'+t.label+'» ويرجع للأيقونة العادية.', async ()=>{
+      const r = await window.storage.update(ATT_LOGOV_KEY, cur=>{ let o={}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o={}; } if(!o || typeof o!=='object') o={}; o[type] = 0; return JSON.stringify(o); }, true);
+      if(!(r && r.value)){ showToast('تعذر الحذف — تحقق من الاتصال وحاول مرة أخرى', true); return; }
+      try{ window.storage.delete(ATT_LOGO_PFX+type, true).catch(()=>{}); }catch(e){}
+      delete ATT_LOGOS[type]; attLogoCacheSave(); showToast('تم حذف اللوجو'); render();
+    }, {icon:'🗑️', confirmLabel:'حذف'});
+    return;
+  }
   if(action==='att-admin-addtype'){ state.attNav = {type:null, page:'addtype'}; state.attNewIcon = ATT_ICONS[0]; state.attNewName = ''; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
   if(action==='att-admin-pick-icon'){ const ni = document.getElementById('att-type-name'); if(ni) state.attNewName = ni.value; state.attNewIcon = el.dataset.icon; render(); return; }
   if(action==='att-admin-addtype-save'){
@@ -28579,6 +28733,7 @@ document.addEventListener('click', (e)=>{
 });
 
 document.addEventListener('change', (e)=>{
+  if(e.target.id==='att-logo-file'){ attLogoPicked(e.target); return; }
   if(e.target.id==='kh-time'){ khSetTime(e.target.value); return; }
   if(e.target.id==='pulse-session-select'){
     state.pulseSessionId = e.target.value || null;
