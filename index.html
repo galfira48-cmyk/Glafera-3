@@ -36620,6 +36620,7 @@ function sec(title,fn){
 async function load(){
   if(!visaCreated(pid())){go('visa');return;}
   [U]=await Promise.all([rd(uk()),pullE()]);
+  if(E.locked&&!state.adminUnlocked){ok=true;render();return;}
   U.cr=U.cr??50;U.sav=U.sav||0;U.dep=U.dep||[];U.hold=U.hold||{};U.cost=U.cost||{};
   WALLET=await loadWallet();
   if(U.dca&&U.dca.a>0){const wk=fl((T()-U.dca.ts)/W);if(wk>=1){let n=0;for(let i=0;i<Math.min(wk,4);i++){if((WALLET[pid()]||0)<U.dca.a||!(await wal(-U.dca.a,'ادخار تلقائي')))break;n+=U.dca.a;}await sv(u=>{if(n&&!u.sav)u.st=T();u.sav+=n;u.dca.ts+=wk*W;});if(n)showToast('💰 اتحوّل '+n+' نقطة لتوفيرك تلقائيًا');}}
@@ -36633,11 +36634,13 @@ async function load(){
   try{const t=await loadVisaTx();tx=t[pid()]||[];}catch(e){tx=[];}
   const net=netOf(),sid=fl(T()/(28*864e5));
   if(U.sid!==sid)await sv(u=>{u.sid=sid;u.base=Math.max(net,1);});
-  await upd(LBK,o=>{if(o.s!==sid){o.s=sid;o.p={};}o.p=o.p||{};o.p[pid()]={n:((PARTICIPANTS.find(x=>x.id===pid())||{}).name||'مشارك'),r:Math.round((net/U.base-1)*100)};});
+  await upd(LBK,o=>{if(o.s!==sid){o.s=sid;o.p={};}o.p=o.p||{};o.p[pid()]={n:((PARTICIPANTS.find(x=>x.id===pid())||{}).name||'مشارك'),r:Math.round((net/U.base-1)*100),d:Math.round((U.hist||[]).reduce((m,x)=>{m.p=Math.max(m.p,x.v);m.d=Math.max(m.d,m.p?(m.p-x.v)/m.p:0);return m;},{p:0,d:0}).d*100)};});
   LB=await rd(LBK);
   if(!nt){nt=true;const jb=(E.jobs||[]).find(x=>x.id===U.job);if(U.dep.some(d=>d.end<=T()))showToast('📈 وديعتك جاهزة للاستلام');else if(jb&&T()-U.jt>=W)showToast('💼 راتبك الأسبوعي جاهز');else if(U.loan&&!U.loan.late&&U.loan.due-T()<864e5)showToast('⏰ قرضك بيستحق خلال يوم',true);}
   {const dy=fl(T()/864e5),l=(U.hist||[])[(U.hist||[]).length-1];if(!(l&&l.d===dy&&l.v===net))await sv(u=>{u.hist=u.hist||[];const z=u.hist[u.hist.length-1];if(z&&z.d===dy)z.v=net;else u.hist.push({d:dy,v:net});u.hist=u.hist.slice(-30);});}
   {const nb=BD.filter(b=>!(U.bd||[]).includes(b.k)&&b.c());if(nb.length){await sv(u=>{u.bd=(u.bd||[]).concat(nb.map(b=>b.k));});showToast('🏆 شارة جديدة: '+nb.map(b=>b.n).join(' '));coins(24);}}
+  if(!window.__ecoPrev){window.__ecoPrev={t:U.lv,n:U.lvn,p:U.lvp||{}};}
+  if(!U.lv||T()-U.lv>216e5){const pp={};ST.forEach(s=>{pp[s.id]=pr(s,hr(),1);});await sv(u=>{u.lv=T();u.lvn=net;u.lvp=pp;});}
   ok=true;render();
 }
 async function reload(){await load();}
@@ -36745,7 +36748,7 @@ function tM(bal,inv,net){
   const n=E.news,nw=n&&n.t&&T()-n.ts<864e5?`<div style="${C}background:rgba(250,204,21,.18);">📰 ${esc(n.t)}</div>`:'';
   return nw+tI()+tK()+`<div style="font-size:12px;opacity:.75;margin:6px 2px;">سقف المخاطرة عندك: ${Math.round((U.rk||.5)*100)}% من ثروتك · عمولة الشراء 1% · الإشارات تعليمية وليست توقعات مضمونة</div>`+ST.map(s=>{
     const p=pr(s,hr(),1),q=U.hold[s.id]||0,pl=q?p*q-U.cost[s.id]:0,fc=lastP[s.id]!=null&&lastP[s.id]!==p?(p>lastP[s.id]?'ecoFlashG':'ecoFlashR')+' 1.2s ease':'none';lastP[s.id]=p;
-    return `<div style="${C}"><div style="${R}"><b>${s.n}</b><b style="border-radius:8px;padding:0 6px;animation:${fc};">${p} نقطة</b></div><div style="font-size:11px;opacity:.75;">نشاط الموقع اليوم: ${af(s.id)>=1?'▲ +':'▼ -'}${Math.abs(Math.round((af(s.id)-1)*100))}%</div><div style="${R}">${spark(s)}<div style="font-size:12px;text-align:left;">${q?'عندك '+q+'<br>'+(pl>=0?'ربح ':'خسارة ')+Math.abs(pl):'لسه ماشتريتش'}</div></div><div style="${R};margin-top:8px;">${B('buy','شراء 1','data-id="'+s.id+'" data-q="1"')}${B('buy','شراء 5','data-id="'+s.id+'" data-q="5"')}${q?B('sell','بيع الكل','data-id="'+s.id+'"','1')+((U.ins||{})[s.id]>T()?'<span style="font-size:12px;">🛡️ مؤمَّن</span>':B('ins','🛡️ تأمين 7 أيام','data-id="'+s.id+'"','1')):''}</div>${U.al&&U.al[s.id]?`<div style="font-size:12px;margin-top:6px;">🔔 تنبيه عند ${U.al[s.id].t} ${B('alx','إلغاء','data-id="'+s.id+'"','1')}</div>`:`<div style="${R}margin-top:6px;"><input id="al-${s.id}" class="field" type="number" placeholder="نبّهني عند سعر" style="margin:4px 0;">${B('al','🔔 تنبيه','data-id="'+s.id+'"')}</div>`}${q?`<div style="font-size:12px;margin-top:8px;">${U.ord&&U.ord[s.id]?'🎯 وقف خسارة '+(U.ord[s.id].sl||'—')+'% · جني ربح '+(U.ord[s.id].tp||'—')+'% '+B('ordx','إلغاء','data-id="'+s.id+'"','1'):`<div style="${R}"><input id="sl-${s.id}" class="field" type="number" placeholder="وقف خسارة %" style="margin:4px 0;"><input id="tp-${s.id}" class="field" type="number" placeholder="جني ربح %" style="margin:4px 0;"></div>${B('ord','حفظ الأوامر التلقائية','data-id="'+s.id+'"')}`}</div>`:''}</div>`;}).join('');
+    return `<div style="${C}"><div style="${R}"><b>${s.n}</b><b style="border-radius:8px;padding:0 6px;animation:${fc};">${p} نقطة</b></div>${sg(s)}<div style="font-size:11px;opacity:.75;">نشاط الموقع اليوم: ${af(s.id)>=1?'▲ +':'▼ -'}${Math.abs(Math.round((af(s.id)-1)*100))}%</div><div style="${R}">${spark(s)}<div style="font-size:12px;text-align:left;">${q?'عندك '+q+'<br>'+(pl>=0?'ربح ':'خسارة ')+Math.abs(pl):'لسه ماشتريتش'}</div></div><div style="${R};margin-top:8px;">${B('buy','شراء 1','data-id="'+s.id+'" data-q="1"')}${B('buy','شراء 5','data-id="'+s.id+'" data-q="5"')}${q?B('sell','بيع الكل','data-id="'+s.id+'"','1')+((U.ins||{})[s.id]>T()?'<span style="font-size:12px;">🛡️ مؤمَّن</span>':B('ins','🛡️ تأمين 7 أيام','data-id="'+s.id+'"','1')):''}</div>${U.al&&U.al[s.id]?`<div style="font-size:12px;margin-top:6px;">🔔 تنبيه عند ${U.al[s.id].t} ${B('alx','إلغاء','data-id="'+s.id+'"','1')}</div>`:`<div style="${R}margin-top:6px;"><input id="al-${s.id}" class="field" type="number" placeholder="نبّهني عند سعر" style="margin:4px 0;">${B('al','🔔 تنبيه','data-id="'+s.id+'"')}</div>`}${q?`<div style="font-size:12px;margin-top:8px;">${U.ord&&U.ord[s.id]?'🎯 وقف خسارة '+(U.ord[s.id].sl||'—')+'% · جني ربح '+(U.ord[s.id].tp||'—')+'% '+B('ordx','إلغاء','data-id="'+s.id+'"','1'):`<div style="${R}"><input id="sl-${s.id}" class="field" type="number" placeholder="وقف خسارة %" style="margin:4px 0;"><input id="tp-${s.id}" class="field" type="number" placeholder="جني ربح %" style="margin:4px 0;"></div>${B('ord','حفظ الأوامر التلقائية','data-id="'+s.id+'"')}`}</div>`:''}</div>`;}).join('');
 }
 function tC(){
   const jobs=E.jobs||[],my=jobs.find(j=>j.id===U.job),left=my?Math.ceil((U.jt+W-T())/864e5):0;
@@ -36772,20 +36775,25 @@ function tA(){
   <div style="${C}"><b>🤝 مشروع للتصويت</b>${TX('p-t','اسم المشروع')}${B('padd','إضافة')}${pj}${B('pfund','تمويل المشروع الفائز','','1')}</div>
   <div style="${C}"><b>🕵️ سجل التدقيق</b>${(E.aud||[]).slice(0,15).map(a=>`<div style="font-size:12px;margin-top:4px;${Math.abs(a.n)>=300?'color:#ef4444;':''}">${Math.abs(a.n)>=300?'⚠️ ':''}${esc((PARTICIPANTS.find(x=>x.id===a.p)||{}).name||a.p)} · ${esc(a.m)} · ${a.n}</div>`).join('')}</div>`;
 }
+const sm=(k,bal,inv,net,lk)=>{try{return window.ecoSmart?ecoSmart[k]({U,E,ST,pr,hr,tx,LB,WALLET,pid:pid(),bal,inv,net,lk,esc,fmt,C,R,B,M:VISA_TX_META,af}):'';}catch(e){return '<div style="'+C+'">تعذّر تحميل التحليل الذكي حاليًا</div>';}};
+const sg=s=>{try{return window.ecoSmart?ecoSmart.sig({U,E,ST,pr,hr},s):'';}catch(e){return '';}};
+const lockBar=()=>`<div style="${C}padding:10px 14px;${E.locked?'border-color:#ef4444;':''}"><div style="${R}"><span style="font-size:13px;">${E.locked?'🔒 القسم مقفول عن المشاركين (إنت شايفه كأدمن)':'🔓 القسم مفتوح للمشاركين'}</span>${B('alock',E.locked?'🔓 فتح':'🔒 قفل','',E.locked?'':'1')}</div></div>`;
 const _rp=function(){
   const back=`<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">الاقتصاد والاستثمار</div></div>`;
   if(!ok)return back+`<div class="vp-panel" style="text-align:center;">جاري التحميل…</div>`;
+  if(E.locked&&!state.adminUnlocked)return back+`<div style="${C}text-align:center;"><div style="font-size:44px;">🔒</div><b>قسم الاستثمار والاقتصاد مقفول حاليًا</b><div style="font-size:12px;opacity:.75;margin-top:6px;">هيتفتح قريب من المنظمين. استنوا الإعلان!</div></div>`;
   const bal=WALLET[pid()]||0,inv=ST.reduce((a,s)=>a+(U.hold[s.id]||0)*pr(s,hr(),1),0),lk=U.dep.reduce((a,d)=>a+d.a,0),net=bal+U.sav+lk+inv;
-  const tabs=[['w','💰 محفظتي'],['m','📈 السوق'],['b','🏢 أعمال'],['c','🏙️ المدينة']].concat(state.adminUnlocked?[['a','🏦 البنك']]:[]);
+  const tabs=[['w','💰 محفظتي'],['m','📈 السوق'],['i','🧠 المستشار'],['b','🏢 أعمال'],['c','🏙️ المدينة']].concat(state.adminUnlocked?[['a','🏦 البنك']]:[]);
   return back+`<div style="${C}background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#7c3aed);color:#fff;"><div style="font-size:12px;opacity:.85;">إجمالي ثروتك</div><div style="font-size:30px;font-weight:800;"><span id="eco-net" data-v="${net}">${fmt(net)}</span> نقطة</div><div style="${R}font-size:12px;margin-top:6px;"><span>فيزا ${bal}</span><span>توفير ${U.sav}</span><span>ودائع ${lk}</span><span>أسهم ${inv}</span></div></div>
-  <div style="display:flex;gap:4px;overflow-x:auto;padding:4px;border-radius:18px;background:rgba(127,127,127,.14);margin:6px 0;">${tabs.map(t=>`<button type="button" class="btn ${tab===t[0]?'btn-primary':'btn-ghost'}" style="padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:14px;" data-eco="tab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>`
-  +'<div class="'+(anim?'eco-in':'')+'">'+(tab==='w'?tH(bal,inv,net)+tO(bal,inv,net)+tX(net)+tT()+tG()+tW(bal,inv,net)+tD()+tS()+tL()+tR():tab==='m'?tM(bal,inv,net):tab==='b'?tB():tab==='c'?tC():(state.adminUnlocked?tA():''))+'</div>';
+  ${state.adminUnlocked?lockBar():''}<div style="display:flex;gap:4px;overflow-x:auto;padding:4px;border-radius:18px;background:rgba(127,127,127,.14);margin:6px 0;">${tabs.map(t=>`<button type="button" class="btn ${tab===t[0]?'btn-primary':'btn-ghost'}" style="padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:14px;" data-eco="tab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>`
+  +'<div class="'+(anim?'eco-in':'')+'">'+(tab==='w'?tH(bal,inv,net)+tO(bal,inv,net)+tX(net)+tT()+tG()+tW(bal,inv,net)+tD()+tS()+tL()+tR():tab==='m'?tM(bal,inv,net):tab==='i'?sm('user',bal,inv,net,lk):tab==='b'?tB():tab==='c'?tC():(state.adminUnlocked?tA()+sm('admin',bal,inv,net,lk):''))+'</div>';
 };
 setInterval(()=>{const ae=document.activeElement;if(state.view==='eco'&&ok&&!document.querySelector('.modal-overlay')&&!(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))&&![...document.querySelectorAll('input.field')].some(i=>i.value))reload();},60000);
 window.renderEcoPage=function(){const h=_rp();anim=false;setTimeout(cu,30);return h;};
 document.addEventListener('click',async e=>{
   const el=e.target.closest&&e.target.closest('[data-eco]');if(!el)return;
   const a=el.dataset.eco,d=el.dataset,p=pid(),adm=state.adminUnlocked;
+  if(E.locked&&!adm&&a!=='open')return showToast('القسم مقفول حاليًا من المنظمين',true);
   if(a==='open'){ok=false;nt=false;anim=true;go('eco');load();return;}
   if(a==='tab'){tab=d.v;anim=true;render();return;}
   const done=m=>{if(m){showToast(m);coins(10);}return reload();};
@@ -36837,8 +36845,25 @@ document.addEventListener('click',async e=>{
   else if(a==='ssend'){await upd(K,o=>{const y=o.svc.find(z=>z.id===d.id);if(!y||y.sel!==p||y.st!=='esc')return false;y.st='sent';});done('اتسجّل التسليم');}
   else if(a==='sok'){const x=(E.svc||[]).find(y=>y.id===d.id);let g=false;await upd(K,o=>{const y=o.svc.find(z=>z.id===d.id);if(!y||y.buy!==p||y.st!=='sent')return false;y.st='done';g=true;});if(g){const fee=Math.max(1,fl(x.pr*.03)),n=x.pr-fee;await adjustSharedNumber('glavera-visa-wallet',x.sel,n);await give(fee);try{logVisaTx([{pid:x.sel,type:'eco_in',amount:n,balAfter:0,note:'بيع خدمة'}]);}catch(e){}}done(g?'اتحوّلت النقاط للبائع':'');}
   else if(a==='sref'&&adm){const x=(E.svc||[]).find(y=>y.id===d.id);let g=false;await upd(K,o=>{const y=o.svc.find(z=>z.id===d.id);if(!y||(y.st!=='esc'&&y.st!=='sent'))return false;y.st='ref';g=true;});if(g){await adjustSharedNumber('glavera-visa-wallet',x.buy,x.pr);try{logVisaTx([{pid:x.buy,type:'eco_in',amount:x.pr,balAfter:0,note:'استرجاع خدمة'}]);}catch(e){}}done(g?'اتسترجعت النقاط للمشتري':'');}
+  else if(a==='apost'){const t=val('au-t'),pc=num('au-p'),hrs=Math.max(1,Math.min(72,num('au-h')||24));if(!t||pc<=0)return showToast('اكتب الغرض والسعر الابتدائي',true);await upd(K,o=>{o.auc=(o.auc||[]).concat([{id:'a'+T(),sel:p,t,p0:pc,top:0,bid:null,end:T()+hrs*36e5,st:'open'}]).slice(-30);});done('اتنشر المزاد');}
+  else if(a==='abid'){const x=(E.auc||[]).find(y=>y.id===d.id),n=num('ab-'+d.id);if(!x||x.sel===p||x.st!=='open'||x.end<=T())return showToast('المزاد مش متاح',true);const mn=x.bid?Math.ceil(x.top*1.05):x.p0;if(n<mn)return showToast('أقل مزايدة '+mn,true);
+    sec('مزايدة '+n+' على '+x.t,async()=>{if(!(await wal(-n,'مزايدة مزاد')))return;let prev=null,g=false;await upd(K,o=>{const y=(o.auc||[]).find(z=>z.id===d.id);if(!y||y.st!=='open'||y.end<=T()||n<(y.bid?Math.ceil(y.top*1.05):y.p0))return false;prev=y.bid?{b:y.bid,a:y.top}:null;y.bid=p;y.top=n;if(y.end-T()<3e5)y.end+=3e5;g=true;});
+      if(!g){await wal(n,'استرجاع مزايدة');return done('المزايدة اتسبقت ونقاطك رجعت');}
+      if(prev){await adjustSharedNumber('glavera-visa-wallet',prev.b,prev.a);try{logVisaTx([{pid:prev.b,type:'eco_in',amount:prev.a,balAfter:0,note:'استرجاع مزايدة'}]);}catch(e){}}
+      done('مزايدتك اتسجّلت');});}
+  else if(a==='aset'){const x=(E.auc||[]).find(y=>y.id===d.id);if(!x||x.end>T()||x.st!=='open')return;let g=null;await upd(K,o=>{const y=(o.auc||[]).find(z=>z.id===d.id);if(!y||y.st!=='open'||y.end>T())return false;y.st=y.bid?'done':'void';g=y.bid?{s:y.sel,a:y.top}:null;});
+    if(g){const fee=Math.max(1,fl(g.a*.03));await adjustSharedNumber('glavera-visa-wallet',g.s,g.a-fee);await give(fee);try{logVisaTx([{pid:g.s,type:'eco_in',amount:g.a-fee,balAfter:0,note:'بيع في المزاد'}]);}catch(e){}}
+    done(g?'اتسوّى المزاد وانتقلت النقاط للبائع':'المزاد انتهى من غير مزايدات');}
+  else if(a==='qz'){const day=fl(T()/864e5),Q=window.ecoQuiz||[];if(!Q.length||(U.qz&&U.qz.d===day))return;const g=+d.i===Q[day%Q.length].a;await sv(u=>{u.qz={d:day,ok:g};if(g)u.iq=(u.iq||0)+1;});done(g?'إجابة صح! +15 XP 🎓':'إجابة غلط، جرّب بكرة 💡');}
+  else if(a==='wl'){await sv(u=>{u.wl=u.wl||{};if(u.wl[d.id])delete u.wl[d.id];else u.wl[d.id]=1;});done();}
+  else if(a==='tg'){await sv(u=>{u.tp=d.v;});done();}
+  else if(a==='bl'){const n=num('bl-a');if(n<=0)return showToast('اكتب الميزانية الأسبوعية',true);await sv(u=>{u.bl=n;});done('اتحفظت الميزانية');}
   else if(adm){
-    if(a==='arate')await upd(K,o=>{const r=val('a-r'),w=val('a-7'),m=val('a-30');if(r!=='')o.rate=Math.max(0,Number(r));if(w!=='')o.d7=Math.max(0,Number(w));if(m!=='')o.d30=Math.max(0,Number(m));});
+    if(a==='apol'&&['rate','d7','d30'].includes(d.k))await upd(K,o=>{o[d.k]=Math.max(0,Number(d.v)||0);});
+    else if(a==='alock'){await upd(K,o=>{o.locked=!o.locked;});}
+    else if(a==='aev'){const ev=(window.ecoEvents||[])[fl(Math.random()*(window.ecoEvents||[]).length)];if(!ev)return;await upd(K,o=>{o.news={t:ev[0],st:ev[1],pct:Math.max(-30,Math.min(30,ev[2])),ts:T()};});}
+    else if(a==='acx'){let g=null;await upd(K,o=>{const y=(o.auc||[]).find(z=>z.id===d.id);if(!y||y.st!=='open')return false;y.st='void';g=y.bid?{b:y.bid,a:y.top}:null;});if(g){await adjustSharedNumber('glavera-visa-wallet',g.b,g.a);try{logVisaTx([{pid:g.b,type:'eco_in',amount:g.a,balAfter:0,note:'استرجاع مزاد ملغي'}]);}catch(e){}}}
+    else if(a==='arate')await upd(K,o=>{const r=val('a-r'),w=val('a-7'),m=val('a-30');if(r!=='')o.rate=Math.max(0,Number(r));if(w!=='')o.d7=Math.max(0,Number(w));if(m!=='')o.d30=Math.max(0,Number(m));});
     else if(a==='avault'){const n=num('a-v');if(n>0)await give(n);}
     else if(a==='anews'){const t=val('n-t');if(!t)return;await upd(K,o=>{o.news={t,st:val('n-s'),pct:Math.max(-30,Math.min(30,Number(val('n-p'))||0)),ts:T()};});}
     else if(a==='jadd'){const t=val('j-t'),n=num('j-p');if(!t||n<=0)return;await upd(K,o=>{(o.jobs=o.jobs||[]).push({id:'j'+T(),t,pay:n});});}
@@ -36852,5 +36877,283 @@ document.addEventListener('click',async e=>{
 });
 })();
 </script>
+<script id="eco-smart">
+(function(){
+const fl=Math.floor,cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+function hs(s){let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function rng(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+function gz(r){return Math.sqrt(-2*Math.log(r()||1e-9))*Math.cos(6.2831853*r());}
+function stat(c,s){
+  const h=c.hr(),v=[];for(let i=48;i>=0;i--)v.push(c.pr(s,h-i,i===0));
+  const r=[];for(let i=1;i<v.length;i++)r.push(Math.log(v[i]/v[i-1]));
+  const mu=r.reduce((a,b)=>a+b,0)/r.length,sd=Math.sqrt(r.reduce((a,b)=>a+(b-mu)*(b-mu),0)/r.length);
+  let g=0,l=0;for(let i=v.length-14;i<v.length;i++){const d=v[i]-v[i-1];if(d>0)g+=d;else l-=d;}
+  const p=v[v.length-1],ma=v.slice(-24).reduce((a,b)=>a+b,0)/24,mn=Math.min.apply(null,v),mx=Math.max.apply(null,v);
+  return{p,rsi:l===0?100:Math.round(100-100/(1+g/l)),pos:mx===mn?50:Math.round((p-mn)/(mx-mn)*100),dev:(p/ma-1)*100,vol:Math.max(.1,sd*Math.sqrt(24)*100)};
+}
+function verdict(x){
+  if(x.rsi>=70||x.pos>=90)return['🔥 سخن','#f59e0b','السعر عالي مقارنة بآخر يومين، ممكن تستنى تصحيح'];
+  if(x.rsi<=35&&x.pos<=30)return['🟢 فرصة','#22c55e','السعر قريب من قاع آخر يومين'];
+  if(x.dev>2)return['📈 صاعد','#22c55e','فوق متوسط 24 ساعة'];
+  if(x.dev<-2)return['📉 هابط','#ef4444','تحت متوسط 24 ساعة'];
+  return['⚖️ محايد','#94a3b8','قريب من متوسطه'];
+}
+const card=(c,t,b)=>'<div style="'+c.C+'"><b>'+t+'</b>'+b+'</div>';
+const sm=(c)=>'font-size:12px;opacity:.75;';
+function sig(c,s){
+  const x=stat(c,s),v=verdict(x);
+  return '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;margin:4px 0;"><span style="padding:2px 8px;border-radius:10px;background:'+v[1]+'33;color:'+v[1]+';font-weight:700;">'+v[0]+'</span><span style="opacity:.8;">RSI '+x.rsi+'</span><span style="opacity:.8;">تذبذب '+x.vol.toFixed(1)+'%/يوم</span><span style="opacity:.8;">موقعه في مدى يومين '+x.pos+'%</span></div>';
+}
+function sentiment(c){
+  const xs=c.ST.map(s=>stat(c,s)),rs=xs.reduce((a,x)=>a+x.rsi,0)/xs.length,ac=c.ST.reduce((a,s)=>a+c.af(s.id),0)/c.ST.length;
+  const sc=Math.round(cl(rs*.6+cl(50+(ac-1)*200,0,100)*.4,0,100)),lb=sc>=75?'😈 طمع شديد':sc>=55?'🙂 تفاؤل':sc>=45?'😐 محايد':sc>=25?'😟 قلق':'😱 خوف شديد',
+  tip=sc>=75?'السوق سخن: خليك حذر من الشراء المتأخر.':sc<=30?'السوق خايف: غالبًا فرص للصبورين، بس وزّع.':'السوق هادي: التوزيع أهم من التوقيت.';
+  return card(c,'🌡️ نبض السوق','<div style="display:flex;justify-content:space-between;margin-top:6px;"><b>'+lb+'</b><b>'+sc+'/100</b></div><div style="position:relative;height:10px;border-radius:8px;margin:8px 0;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e);"><div style="position:absolute;top:-4px;right:'+sc+'%;width:4px;height:18px;border-radius:2px;background:#fff;box-shadow:0 0 4px #000;"></div></div><div style="'+sm()+'">'+tip+' (مؤشر تعليمي من الأسعار ونشاط الموقع)</div>');
+}
+function advisor(c){
+  const U=c.U,L=[],hd=Math.max(0,c.net*(U.rk||.5)-c.inv),pos=c.ST.filter(s=>U.hold[s.id]);
+  if(c.bal>200&&!U.sav)L.push([3,'رصيدك ('+c.bal+') واقف. حوّل 30% للتوفير يشتغل لحسابك أسبوعيًا.','']);
+  c.ST.forEach(s=>{const x=stat(c,s),q=Math.min(5,fl(hd/x.p));if(verdict(x)[0]==='🟢 فرصة'&&q>=1&&c.bal>=x.p*q*1.01)L.push([4,s.n+' قريب من قاعه ('+x.p+' نقطة). فرصة تعليمية تشتري '+q+'.',c.B('buy','شراء '+q,'data-id="'+s.id+'" data-q="'+q+'"')]);});
+  pos.forEach(s=>{const x=stat(c,s),q=U.hold[s.id],pl=x.p*q-U.cost[s.id];if(x.rsi>=70&&pl>0)L.push([5,'مركزك في '+s.n+' رابح '+fl(pl)+' والسهم سخن. فكّر في جني ربح تلقائي من السوق.','']);});
+  if(c.inv>0){const big=pos.map(s=>[s,U.hold[s.id]*c.pr(s,c.hr(),1)]).sort((a,b)=>b[1]-a[1])[0];if(big&&big[1]/c.inv>.5&&pos.length<4)L.push([6,'أكتر من نص أسهمك في '+big[0].n+'. التنويع بيقلل الخطر.','']);}
+  const sp=spend(c);if(U.bl>0&&sp.w7>U.bl)L.push([7,'صرفت '+sp.w7+' الأسبوع ده وميزانيتك '+U.bl+'. قلّل المصاريف.','']);
+  if(U.loan&&!U.loan.late&&U.loan.due-Date.now()<2*864e5)L.push([9,'قرضك قرب ميعاده. السداد بيرفع تقييم ثقتك.','']);
+  if(U.goal&&U.goal.t){const h=U.hist||[];if(h.length>=3){const n=h.length,sl=(h[n-1].v-h[0].v)/Math.max(1,h[n-1].d-h[0].d);if(c.net<U.goal.t){const d=sl>0?Math.ceil((U.goal.t-c.net)/sl):0;L.push([8,d?'بمعدل نموك الحالي هتوصل لهدفك «'+c.esc(U.goal.n)+'» بعد حوالي '+d+' يوم.':'ثروتك مش بتنمو بما يكفي لهدفك «'+c.esc(U.goal.n)+'». فعّل الادخار التلقائي.','']);}}}
+  L.sort((a,b)=>b[0]-a[0]);
+  return card(c,'🧠 المستشار الذكي',(L.slice(0,5).map(x=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:13px;"><span>• '+x[1]+'</span>'+x[2]+'</div>').join('')||'<div style="margin-top:6px;font-size:13px;">محفظتك مظبوطة، مفيش تنبيهات 🎉</div>')+'<div style="'+sm()+'margin-top:8px;">نصايح تعليمية مبنية على أسعار اللعبة، مش توقعات مضمونة.</div>');
+}
+function weights(c,k){
+  const xs=c.ST.map(s=>stat(c,s).vol),w=k==='def'?xs.map(v=>1/v):k==='agg'?xs.map(v=>v):xs.map(()=>1),t=w.reduce((a,b)=>a+b,0);return w.map(v=>v/t);
+}
+function rebal(c){
+  const U=c.U,k=U.tp||'eq',w=weights(c,k),base=c.inv>0?c.inv:Math.max(0,c.net*(U.rk||.5)*.5);
+  const rows=c.ST.map((s,i)=>{const p=c.pr(s,c.hr(),1),cur=(U.hold[s.id]||0)*p,tg=base*w[i],dq=Math.round((tg-cur)/p),pc=c.inv?Math.round(cur/c.inv*100):0;
+    const act=dq>=1?c.B('buy','اشتري '+Math.min(dq,10),'data-id="'+s.id+'" data-q="'+Math.min(dq,10)+'"'):dq<=-1?'<span style="font-size:12px;color:#f59e0b;">زيادة '+(-dq)+' سهم</span>':'<span style="font-size:12px;color:#22c55e;">✔ متوازن</span>';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;"><span>'+s.n+'<br><small style="opacity:.7;">حاليًا '+pc+'% ← هدف '+Math.round(w[i]*100)+'%</small></span>'+act+'</div>';}).join('');
+  const P=[['eq','⚖️ متساوي'],['def','🛡️ دفاعي'],['agg','🚀 هجومي']];
+  return card(c,'🧭 إعادة التوازن الذكية','<div style="'+sm()+'">الدفاعي بيدّي وزن أكبر للأسهم الأهدى، والهجومي للأعلى تذبذبًا.</div><div style="display:flex;gap:6px;margin-top:8px;">'+P.map(x=>c.B('tg',x[1],'data-v="'+x[0]+'"',x[0]===k?'':1)).join('')+'</div>'+rows+(c.inv?'':'<div style="'+sm()+'margin-top:8px;">لسه معندكش أسهم: الأرقام دي توزيع مقترح لو بدأت.</div>'));
+}
+function fan(c){
+  const r=rng(hs(c.pid+fl(Date.now()/864e5))),N=160,D=28,U=c.U;
+  const ps=c.ST.map(s=>({v:(U.hold[s.id]||0)*c.pr(s,c.hr(),1),sd:stat(c,s).vol/100})).filter(x=>x.v>0),oth=c.net-c.inv-U.sav,rt=(c.E.rate||0)/700,cols=[];
+  for(let d=0;d<=D;d++)cols.push([]);
+  for(let k=0;k<N;k++){let st=ps.map(x=>x.v),sa=U.sav;for(let d=0;d<=D;d++){cols[d].push(oth+sa+st.reduce((a,b)=>a+b,0));st=st.map((v,i)=>v*Math.exp(ps[i].sd*gz(r)-ps[i].sd*ps[i].sd/2));sa*=1+rt;}}
+  const q=(a,p)=>{a=a.slice().sort((x,y)=>x-y);return a[fl((a.length-1)*p)];},lo=cols.map(a=>q(a,.1)),md=cols.map(a=>q(a,.5)),hi=cols.map(a=>q(a,.9));
+  const mn=Math.min.apply(null,lo),mx=Math.max.apply(null,hi),X=i=>(i*300/D).toFixed(1),Y=v=>(60-(v-mn)/((mx-mn)||1)*56).toFixed(1);
+  const band=hi.map((v,i)=>X(i)+','+Y(v)).concat(lo.map((v,i)=>[X(D-i),Y(lo[D-i])].join(','))).join(' '),line=md.map((v,i)=>X(i)+','+Y(v)).join(' ');
+  const loss=Math.round(cols[D].filter(v=>v<c.net).length/N*100);
+  return card(c,'🔮 محاكاة ثروتك (4 أسابيع)','<svg viewBox="0 0 300 64" width="100%" height="76" preserveAspectRatio="none" style="margin-top:8px;"><polygon points="'+band+'" fill="rgba(124,58,237,.25)"/><polyline points="'+line+'" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><div style="display:flex;justify-content:space-between;font-size:12px;"><span>😟 '+Math.round(lo[D]).toLocaleString('en-US')+'</span><b>🎯 '+Math.round(md[D]).toLocaleString('en-US')+'</b><span>😄 '+Math.round(hi[D]).toLocaleString('en-US')+'</span></div><div style="'+sm()+'margin-top:6px;">160 سيناريو عشوائي بتذبذب الأسهم الحقيقي. احتمال إنك تبقى أقل من دلوقتي: <b>'+loss+'%</b>. تعليمية، مش توقع.</div>');
+}
+function spend(c){
+  const now=Date.now(),W=6048e5,cat={},M=c.M;let w7=0,p7=0;
+  (c.tx||[]).forEach(x=>{const m=M[x.type];if(!m||m.sign>=0||x.type==='eco_out'||x.type==='withdraw')return;const a=now-x.ts;if(a<W){w7+=x.amount;}else if(a<2*W)p7+=x.amount;if(a<4*W){cat[m.cat]=(cat[m.cat]||0)+x.amount;}});
+  return{w7,p7,cat};
+}
+function budget(c){
+  const s=spend(c),N={shop:'🛍️ شوب',game:'🎮 ألعاب',transfer:'↗️ تحويلات',admin:'⚠️ خصومات',wallet:'💳 أخرى'},mx=Math.max.apply(null,Object.values(s.cat).concat([1])),U=c.U;
+  const bars=Object.keys(s.cat).map(k=>'<div style="margin-top:6px;font-size:12px;"><div style="display:flex;justify-content:space-between;"><span>'+(N[k]||k)+'</span><b>'+s.cat[k]+'</b></div><div style="height:6px;border-radius:6px;background:rgba(127,127,127,.25);"><div style="height:100%;width:'+Math.round(s.cat[k]/mx*100)+'%;border-radius:6px;background:#3b82f6;"></div></div></div>').join('')||'<div style="'+sm()+'margin-top:6px;">مفيش مصاريف في آخر 4 أسابيع.</div>';
+  const ch=s.p7?Math.round((s.w7/s.p7-1)*100):null,run=s.w7>0?Math.floor(c.bal/(s.w7/7)):null,pg=U.bl>0?Math.min(100,Math.round(s.w7/U.bl*100)):0;
+  return card(c,'💸 تحليل المصاريف والميزانية','<div style="font-size:13px;margin-top:6px;">الأسبوع ده: <b>'+s.w7+'</b> نقطة'+(ch!=null?' ('+(ch>=0?'+':'')+ch+'% عن الأسبوع اللي قبله)':'')+(run!=null?'<br>على المعدل ده رصيدك يكفي حوالي <b>'+run+'</b> يوم':'')+'</div>'+(U.bl>0?'<div style="height:8px;border-radius:8px;background:rgba(127,127,127,.25);margin-top:8px;overflow:hidden;"><div style="height:100%;width:'+pg+'%;background:'+(pg>=100?'#ef4444':pg>=80?'#f59e0b':'#22c55e')+';"></div></div><div style="'+sm()+'">ميزانيتك الأسبوعية '+U.bl+' · استهلكت '+pg+'%</div>':'')+bars+'<div style="display:flex;gap:6px;align-items:center;margin-top:8px;"><input id="bl-a" class="field" type="number" inputmode="numeric" placeholder="ميزانية أسبوعية" style="margin:0;">'+c.B('bl','حفظ')+'</div>');
+}
+function gini(a){a=a.filter(x=>x>=0).sort((x,y)=>x-y);const n=a.length,t=a.reduce((p,q)=>p+q,0);if(n<2||!t)return 0;let s=0;a.forEach((v,i)=>{s+=(i+1)*v;});return Math.max(0,(2*s)/(n*t)-(n+1)/n);}
+function admin(c){
+  const w=Object.values(c.WALLET).map(Number).filter(x=>x>=0),sup=w.reduce((a,b)=>a+b,0),vault=c.E.vault||0,g=gini(w),ratio=sup?vault/sup:0,rate=c.E.rate||0,liab=sup*.3*rate/100,runw=liab?vault/liab:99,L=[];
+  const so=w.slice().sort((a,b)=>a-b),med=so.length?so[fl(so.length/2)]:0;
+  const hl=g<.35?['🟢 متكافئ','#22c55e']:g<.55?['🟡 متوسط','#f59e0b']:['🔴 فجوة كبيرة','#ef4444'];
+  const sc=Math.round(cl(100-Math.abs(g-.35)*100-(runw<4?25:0)-(ratio<.03?15:0),0,100));
+  if(runw<4)L.push(['خزنة ضعيفة: لو 30% من النقاط اتوفّرت، الفوايد تخلّصها في '+runw.toFixed(1)+' أسبوع.',c.B('apol','قلّل الفايدة لـ '+Math.max(0,rate-1)+'%','data-k="rate" data-v="'+Math.max(0,rate-1)+'"')]);
+  else if(ratio>.25&&g<.5)L.push(['الخزنة مليانة ('+Math.round(ratio*100)+'% من النقاط) والاقتصاد بطيء. زوّد الفايدة تشجّع الادخار.',c.B('apol','زوّد الفايدة لـ '+(rate+1)+'%','data-k="rate" data-v="'+(rate+1)+'"')]);
+  if(g>=.55)L.push(['الفجوة بين الأغنى والأفقر كبيرة. اعمل حدث مكافآت أو زوّد رواتب الوظايف.','']);
+  if(g<.2&&w.length>5)L.push(['التوزيع متساوي جدًا. شجّع الاستثمار بأخبار اقتصادية وأسهم أنشط.','']);
+  if(!L.length)L.push(['مؤشرات الاقتصاد سليمة، مفيش تدخل مطلوب.','']);
+  return card(c,'🏛️ لوحة قيادة الاقتصاد','<div style="display:flex;justify-content:space-between;margin-top:8px;"><b style="font-size:26px;">'+sc+'/100</b><b style="color:'+hl[1]+';">'+hl[0]+'</b></div><div style="font-size:13px;line-height:1.9;margin-top:6px;">معامل جيني: <b>'+g.toFixed(2)+'</b> (0 = تساوي تام)<br>النقاط المتداولة: <b>'+sup.toLocaleString('en-US')+'</b> · الوسيط: <b>'+med+'</b><br>تغطية الخزنة: <b>'+Math.round(ratio*100)+'%</b> · صمودها: <b>'+(runw>=99?'+':runw.toFixed(1))+'</b> أسبوع (تقدير)</div>'+L.map(x=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:13px;"><span>🤖 '+x[0]+'</span>'+x[1]+'</div>').join(''));
+}
+function timing(c){
+  const h=c.hr(),rows=c.ST.map(s=>{const b=c.pr(s,h,0);let mi=1,ma=1,lo=1e9,hi=0;for(let i=1;i<=36;i++){const p=c.pr(s,h+i,0);if(p<lo){lo=p;mi=i;}if(p>hi){hi=p;ma=i;}}
+    const dn=Math.round((lo/b-1)*100),up=Math.round((hi/b-1)*100),t=dn<=-3&&mi<=12?'<span style="color:#22c55e;">⏳ استنى '+mi+' ساعة: متوقع ينزل '+(-dn)+'%</span>':up>=3&&ma<=12?'<span style="color:#f59e0b;">⚡ قمة قريبة بعد '+ma+' ساعة (+'+up+'%)</span>':'<span style="opacity:.7;">مفيش حركة كبيرة قريبة</span>';
+    return '<div style="margin-top:8px;font-size:12px;"><b>'+s.n+'</b><br>'+t+'<br><span style="opacity:.7;">أدنى '+lo+' بعد '+mi+'س · أعلى '+hi+' بعد '+ma+'س (36 ساعة)</span></div>';}).join('');
+  return card(c,'⏱️ توقيت الشراء الذكي',rows+'<div style="'+sm()+'margin-top:8px;">محسوب من دورة سعر كل سهم. الأخبار ونشاط الموقع ممكن يغيّروا النتيجة.</div>');
+}
+function freedom(c){
+  const U=c.U,E=c.E,r=(E.rate||0)/100,me=c.pid;
+  let ps=U.sav*r*.98;U.dep.forEach(d=>{ps+=d.a*d.r/100*.98/(d.r===E.d7?1:4.3);});
+  (E.cos||[]).forEach(x=>{ps+=(x.sh[me]||0)/100*x.cash*.02;});
+  const w=spend(c).w7,pc=w>0?Math.min(100,Math.round(ps/w*100)):(ps>0?100:0),dbl=U.sav>0&&r>0?Math.round(72/(r*100)):0;
+  return card(c,'🏝️ الحرية المالية','<div style="font-size:13px;margin-top:6px;">دخلك السلبي (فوايد وأرباح): <b>~'+Math.round(ps)+'</b> نقطة/أسبوع<br>مصاريفك الأسبوعية: <b>'+w+'</b></div><div style="height:8px;border-radius:8px;background:rgba(127,127,127,.25);margin-top:8px;overflow:hidden;"><div style="height:100%;width:'+pc+'%;background:#22c55e;"></div></div><div style="'+sm()+'">دخلك السلبي بيغطي '+pc+'% من مصاريفك'+(dbl?' · توفيرك بيتضاعف تقريبًا كل '+dbl+' أسبوع (قاعدة الـ72)':'')+'</div>');
+}
+function optim(c){
+  const E=c.E,a=c.bal>=10?c.bal:100,t=.98,o=[['💳 سيبها في الفيزا',a],['💰 توفير (4 أسابيع)',a*Math.pow(1+(E.rate||0)/100*t,4)],['🔒 وديعة أسبوع ×4',a*Math.pow(1+(E.d7||0)/100*t,4)],['🔒 وديعة شهر',a*(1+(E.d30||0)/100*t)]],best=o.reduce((m,x)=>x[1]>m[1]?x:m,o[0]);
+  return card(c,'⚖️ أفضل مكان لفلوسك','<div style="'+sm()+'">لو وظّفت '+a+' نقطة لمدة 30 يوم:</div>'+o.map(x=>'<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:13px;'+(x===best?'color:#22c55e;font-weight:700;':'')+'"><span>'+(x===best?'🏆 ':'')+x[0]+'</span><span>'+Math.round(x[1])+' (+'+Math.round(x[1]-a)+')</span></div>').join('')+'<div style="'+sm()+'margin-top:6px;">بعد ضريبة 2%. الوديعة مقفولة لحد انتهاء مدتها.</div>');
+}
+function risk(c){
+  const U=c.U;let v=0;const rows=c.ST.filter(s=>U.hold[s.id]).map(s=>{const x=stat(c,s),q=U.hold[s.id],val=x.p*q,rk=val*x.vol/100*Math.sqrt(7)*1.65;v+=rk;const be=Math.ceil(U.cost[s.id]/q*1.01),gap=Math.round((be/x.p-1)*100);
+    return '<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;"><span>'+s.n+'</span><span>تعادل '+be+' ('+(gap>0?'محتاج +'+gap+'%':'✔ فوق التعادل')+')</span></div>';}).join('');
+  if(!rows)return '';
+  return card(c,'🛡️ إدارة المخاطر','<div style="font-size:13px;margin-top:6px;">أقصى خسارة معقولة خلال أسبوع (ثقة 95%): <b style="color:#ef4444;">−'+Math.round(Math.min(v,c.inv))+'</b> نقطة ('+Math.round(Math.min(v,c.inv)/Math.max(c.net,1)*100)+'% من ثروتك)</div>'+rows+'<div style="'+sm()+'margin-top:6px;">التعادل شامل عمولة الشراء 1%.</div>');
+}
+function missions(c){
+  const U=c.U,hk=Object.keys(U.hold),pr=c.ST.filter(s=>U.hold[s.id]),M=[['🧩 نوّع في 3 أسهم',hk.length,3],['💰 وفّر 100 نقطة',Math.min(U.sav,100),100],['🔒 افتح وديعة',Math.min(U.dep.length,1),1],['🛡️ احمِ كل أسهمك',pr.filter(s=>(U.ins&&U.ins[s.id]>Date.now())||(U.ord&&U.ord[s.id])).length,Math.max(1,pr.length)],['🔥 3 أيام متتالية',Math.min((U.ds||{}).n||0,3),3],['🎯 حدد هدف',U.goal?1:0,1]],dn=M.filter(x=>x[1]>=x[2]).length;
+  return card(c,'🎯 تحديات الاستثمار ('+dn+'/'+M.length+')',M.map(x=>{const p=Math.min(100,Math.round(x[1]/x[2]*100));return '<div style="margin-top:8px;font-size:12px;"><div style="display:flex;justify-content:space-between;"><span>'+(p>=100?'✅ ':'')+x[0]+'</span><span>'+Math.min(x[1],x[2])+'/'+x[2]+'</span></div><div style="height:6px;border-radius:6px;background:rgba(127,127,127,.25);"><div style="height:100%;width:'+p+'%;border-radius:6px;background:'+(p>=100?'#22c55e':'#3b82f6')+';"></div></div></div>';}).join(''));
+}
+function rank(c){
+  const L=(c.LB||{}).p||{},P=Object.values(L),me=L[c.pid];if(P.length<2||!me)return '';
+  const sc=x=>x.r/((x.d||0)+5),ar=P.slice().sort((a,b)=>sc(b)-sc(a)),pos=ar.indexOf(me)+1;
+  return card(c,'🏅 ترتيب العائد المعدّل بالمخاطر','<div style="'+sm()+'">النقاط = العائد ÷ (أقصى هبوط + 5). بتكافئ اللي بيكسب بهدوء مش اللي بيجازف.</div>'+ar.slice(0,5).map((x,i)=>'<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:13px;'+(x===me?'font-weight:800;color:#a78bfa;':'')+'"><span>'+['🥇','🥈','🥉','4️⃣','5️⃣'][i]+' '+c.esc(x.n)+'</span><span>'+(x.r>=0?'+':'')+x.r+'% · هبوط '+(x.d||0)+'%</span></div>').join('')+'<div style="margin-top:8px;font-size:13px;">ترتيبك: <b>'+pos+'</b> من '+P.length+' · نقاطك '+sc(me).toFixed(2)+'</div>');
+}
+function report(c){
+  const U=c.U,h=U.hist||[],td=fl(Date.now()/864e5);let b=h[0];h.forEach(x=>{if(x.d<=td-7)b=x;});
+  const dl=b?c.net-b.v:0,pc=b?Math.round(dl/Math.max(b.v,1)*100):0,hs=c.ST.filter(s=>U.hold[s.id]).map(s=>[s.n,Math.round((c.pr(s,c.hr(),1)*U.hold[s.id]/Math.max(U.cost[s.id],1)-1)*100)]).sort((a,b)=>b[1]-a[1]);
+  const t='📊 تقريري الاستثماري الأسبوعي\n💰 ثروتي: '+c.net.toLocaleString('en-US')+' نقطة ('+(pc>=0?'+':'')+pc+'% هذا الأسبوع)\n'+(hs.length?'⭐ أفضل مركز: '+hs[0][0]+' ('+hs[0][1]+'%)\n':'')+'💸 مصاريفي: '+spend(c).w7+' نقطة\n🔥 '+((U.ds||{}).n||0)+' يوم متتالي · 🏅 ثقة '+U.cr+'/100\n#جلافيرا';
+  window.__ecoRepText=t;
+  return card(c,'📰 تقريري الأسبوعي','<div style="font-size:13px;line-height:1.9;white-space:pre-line;margin-top:6px;">'+c.esc(t)+'</div><button type="button" class="btn btn-primary" style="margin-top:8px;padding:8px 12px;font-size:13px;" onclick="ecoRep()">📤 شارك التقرير</button>');
+}
+window.ecoRep=function(){const t=window.__ecoRepText||'';if(navigator.share){navigator.share({text:t}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){showToast('اتنسخ التقرير 📋');});}};
+window.ecoPol=function(sup,vault){
+  const r=+(document.getElementById('pl-r')||{}).value||0,s=+(document.getElementById('pl-s')||{}).value||30,o=document.getElementById('pl-o');if(!o)return;
+  const li=sup*s/100*r/100,wk=li?vault/li:99,col=wk<4?'#ef4444':wk<8?'#f59e0b':'#22c55e';
+  o.innerHTML='لو فايدة '+r+'% و'+s+'% من النقاط اتوفّرت: التزام أسبوعي <b>~'+Math.round(li)+'</b> نقطة · الخزنة تكفي <b style="color:'+col+'">'+(wk>=99?'+99':wk.toFixed(1))+'</b> أسبوع '+(wk<4?'⚠️ خطر':wk<8?'🟡 حذر':'🟢 آمن');
+};
+function policy(c){
+  const sup=Object.values(c.WALLET).map(Number).filter(x=>x>0).reduce((a,b)=>a+b,0),v=c.E.vault||0;
+  return card(c,'🧪 محاكي قرارات الأدمن','<div style="'+sm()+'">جرّب الفايدة قبل ما تطبّقها وشوف أثرها على الخزنة.</div><input id="pl-r" class="field" type="number" placeholder="الفايدة الأسبوعية المقترحة %" value="'+(c.E.rate||0)+'" oninput="ecoPol('+sup+','+v+')" style="margin:6px 0;"><input id="pl-s" type="range" min="5" max="100" value="30" oninput="ecoPol('+sup+','+v+')" style="width:100%;"><div style="'+sm()+'">نسبة النقاط المتوقع توفيرها (الافتراضي 30%)</div><div id="pl-o" style="font-size:13px;margin-top:8px;">اكتب نسبة الفايدة…</div>');
+}
+
+window.ecoEvents=[['🎮 بطولة ألعاب كبرى اتعلنت!','g',12],['🛍️ عروض تخفيضات كبيرة في الشوب','c',10],['🚌 رحلة جماعية اتلغت','t',-12],['🎬 فيديو الميديا حقق انتشار كبير','m',15],['📉 ركود اقتصادي مؤقت','*',-8],['🚀 انتعاش اقتصادي عام','*',8],['⚠️ عطل فني في متجر الشوب','c',-15],['🏆 فريق الميديا فاز بجائزة','m',10],['🎉 إقبال كبير على الفعاليات','t',14],['🧯 أزمة سيولة في ألعاب جلافيرا','g',-10]];
+function events(c){
+  return card(c,'🎲 مولّد الأحداث الاقتصادية','<div style="'+sm()+'">بيطلّق خبر عشوائي من '+window.ecoEvents.length+' حدث بتأثير بين -15% و+15% على سهم أو كل الأسهم لمدة 24 ساعة.</div>'+(c.E.news&&c.E.news.t?'<div style="font-size:12px;margin-top:6px;">الخبر الحالي: '+c.esc(c.E.news.t)+' ('+c.E.news.pct+'%)</div>':'')+'<div style="margin-top:8px;">'+c.B('aev','🎲 أطلق حدث عشوائي')+'</div>');
+}
+function aleft(x){const m=Math.max(0,Math.ceil((x.end-Date.now())/6e4));return m>=60?Math.floor(m/60)+' س '+(m%60)+' د':m+' د';}
+function auction(c){
+  const A=(c.E.auc||[]).filter(x=>x.st==='open'||Date.now()-x.end<864e5).slice(-8).reverse(),me=c.pid,T=Date.now();
+  const rows=A.map(x=>{const over=x.end<=T,min=x.bid?Math.ceil(x.top*1.05):x.p0,nm=function(i){return c.esc((c.names&&c.names[i])||'مشارك');};
+    let act='';
+    if(x.st==='open'&&!over&&x.sel!==me)act='<div style="display:flex;gap:6px;align-items:center;margin-top:6px;"><input id="ab-'+x.id+'" class="field" type="number" inputmode="numeric" placeholder="أقل '+min+'" style="margin:0;">'+c.B('abid','زايد','data-id="'+x.id+'"')+'</div>';
+    else if(x.st==='open'&&over)act='<div style="margin-top:6px;">'+c.B('aset','تسوية المزاد','data-id="'+x.id+'"')+'</div>';
+    const stt=x.st==='done'?'✅ اتباع':x.st==='void'?'⛔ انتهى بدون بيع':(over?'⏰ انتهى':'⏳ باقي '+aleft(x));
+    return '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(127,127,127,.2);font-size:13px;"><div style="display:flex;justify-content:space-between;"><b>'+c.esc(x.t)+'</b><span>'+stt+'</span></div><div style="'+sm()+'">'+(x.bid?'أعلى مزايدة '+x.top+(x.bid===me?' (إنت 👑)':''):'سعر البداية '+x.p0)+(x.sel===me?' · مزادك':'')+'</div>'+act+'</div>';}).join('')||'<div style="'+sm()+'margin-top:6px;">مفيش مزادات دلوقتي. انشر أول واحد!</div>';
+  return card(c,'🔨 سوق المزادات','<div style="'+sm()+'">النقاط بتتحجز مع المزايدة وبترجع لو اتسبقت. أقل زيادة 5%. لو حد زايد في آخر 5 دقايق المزاد بيتمدد 5 دقايق. عمولة 3%.</div>'+rows+'<div style="margin-top:12px;padding-top:8px;border-top:1px solid rgba(127,127,127,.2);"><b style="font-size:13px;">انشر مزاد</b><input id="au-t" class="field" type="text" placeholder="إيه اللي بتبيعه؟" style="margin:6px 0;"><div style="display:flex;gap:6px;"><input id="au-p" class="field" type="number" inputmode="numeric" placeholder="سعر البداية" style="margin:0;"><input id="au-h" class="field" type="number" inputmode="numeric" placeholder="مدة بالساعات (1-72)" style="margin:0;"></div><div style="margin-top:8px;">'+c.B('apost','نشر المزاد')+'</div></div>');
+}
+function aadmin(c){
+  const A=(c.E.auc||[]).filter(x=>x.st==='open');if(!A.length)return '';
+  return card(c,'🔨 مزادات شغالة (تحكم الأدمن)',A.map(x=>'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;"><span>'+c.esc(x.t)+' · '+(x.bid?x.top:x.p0)+'</span>'+c.B('acx','إلغاء واسترجاع','data-id="'+x.id+'"','1')+'</div>').join(''));
+}
+
+function cmd(c){
+  const U=c.U,xp=(U.bd||[]).length*50+((U.ds||{}).n||0)*10+(U.cr||0)*2+Object.keys(U.hold).length*30+(U.pdone||0)*40+(U.sav>0?60:0)+(U.iq||0)*15,
+  T=[[0,'🌱 مبتدئ'],[100,'📘 متدرب'],[250,'💼 مستثمر'],[450,'🎓 خبير'],[700,'💎 محترف'],[1000,'👑 أسطورة']];let i=0;T.forEach(function(t,j){if(xp>=t[0])i=j;});
+  const nx=T[i+1],pg=nx?Math.round((xp-T[i][0])/(nx[0]-T[i][0])*100):100,h=U.hist||[],td=fl(Date.now()/864e5);let b=h[0];h.forEach(function(x){if(x.d<=td-7)b=x;});
+  const wk=b?Math.round((c.net-b.v)/Math.max(b.v,1)*100):0,liq=c.net?Math.round((c.bal+U.sav)/c.net*100):0,vs=c.ST.map(function(s){return(U.hold[s.id]||0)*c.pr(s,c.hr(),1);}).filter(function(x){return x>0;}),
+  hh=c.inv?vs.reduce(function(a,x){return a+(x/c.inv)*(x/c.inv);},0):1,dv=c.inv?Math.round((1-hh)/.75*100):0;
+  const tl=function(l,v,col){return '<div style="padding:10px;border-radius:14px;background:rgba(127,127,127,.14);text-align:center;"><div style="font-size:11px;opacity:.7;">'+l+'</div><b style="font-size:17px;color:'+(col||'inherit')+'">'+v+'</b></div>';};
+  return '<div style="'+c.C+'background:linear-gradient(135deg,#0f172a,#312e81 60%,#7c3aed);color:#fff;"><div style="display:flex;justify-content:space-between;align-items:center;"><b style="font-size:18px;">'+T[i][1]+'</b><span style="font-size:12px;opacity:.85;">'+xp+' XP'+(nx?' · التالي '+nx[1]:' · القمة')+'</span></div><div style="height:8px;border-radius:8px;background:rgba(255,255,255,.2);margin:8px 0 12px;overflow:hidden;"><div style="height:100%;width:'+pg+'%;background:linear-gradient(90deg,#22d3ee,#a78bfa);"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;color:#fff;">'+tl('ثروتك',c.net.toLocaleString('en-US'))+tl('الأسبوع',(wk>=0?'+':'')+wk+'%',wk>=0?'#4ade80':'#f87171')+tl('السيولة',liq+'%',liq<15?'#fbbf24':'#fff')+tl('التنويع',dv+'/100',dv<35&&c.inv?'#fbbf24':'#fff')+'</div></div>';
+}
+function calendar(c){
+  const U=c.U,E=c.E,me=c.pid,W=6048e5,L=[];
+  U.dep.forEach(function(d){L.push([d.end,'🔒 وديعة '+d.a+' نقطة تنتهي']);});
+  if(U.loan)L.push([U.loan.due,'💳 قرض '+U.loan.a+' نقطة يستحق']);
+  if((E.jobs||[]).some(function(j){return j.id===U.job;}))L.push([U.jt+W,'💼 راتبك الأسبوعي']);
+  if(U.dca)L.push([U.dca.ts+W,'🤖 تحويل الادخار التلقائي']);
+  (E.auc||[]).forEach(function(x){if(x.st==='open'&&(x.sel===me||x.bid===me))L.push([x.end,'🔨 مزاد «'+c.esc(x.t)+'» ينتهي']);});
+  if(E.news&&E.news.t)L.push([E.news.ts+864e5,'📰 انتهاء تأثير الخبر الاقتصادي']);
+  L.sort(function(a,b){return a[0]-b[0];});
+  const rel=function(t){const m=Math.round((t-Date.now())/6e4);if(m<=0)return '<b style="color:#22c55e;">جاهز الآن ✅</b>';if(m<60)return 'بعد '+m+' د';if(m<2880)return 'بعد '+Math.round(m/60)+' س';return 'بعد '+Math.round(m/1440)+' يوم';};
+  return card(c,'🗓️ تقويمي المالي',(L.slice(0,6).map(function(x){return '<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;"><span>'+x[1]+'</span><span>'+rel(x[0])+'</span></div>';}).join('')||'<div style="'+sm()+'margin-top:6px;">مفيش مواعيد قادمة.</div>'));
+}
+function heat(c){
+  const h=c.hr();
+  return card(c,'🔥 خريطة السوق الحرارية','<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">'+c.ST.map(function(s){const p=c.pr(s,h,1),d1=p/c.pr(s,h-24,0)-1,d7=p/c.pr(s,h-168,0)-1,a=Math.min(.6,Math.abs(d1)*4+.15),bg=d1>=0?'34,197,94':'239,68,68',f=function(x){return(x>=0?'+':'')+(x*100).toFixed(1)+'%';};
+    return '<div style="padding:10px;border-radius:14px;background:rgba('+bg+','+a.toFixed(2)+');font-size:12px;"><b style="font-size:13px;">'+s.n+'</b><br>'+p+' نقطة<br>يوم '+f(d1)+' · أسبوع '+f(d7)+'</div>';}).join('')+'</div>');
+}
+window.ecoGoal=function(net,rate){
+  const t=+(document.getElementById('gp-t')||{}).value||0,w=+(document.getElementById('gp-w')||{}).value||12,o=document.getElementById('gp-o'),lb=document.getElementById('gp-l');if(lb)lb.textContent=w+' أسبوع';if(!o)return;
+  const r=rate/100*.98,q=Math.pow(1+r,w),need=t>net?(t-net)/(r>0?(q-1)/r:w):0;
+  o.innerHTML=t<=net?'🎉 ثروتك الحالية أعلى من الهدف بالفعل.':'محتاج توفّر <b>~'+Math.ceil(need)+'</b> نقطة كل أسبوع لمدة '+w+' أسبوع (يعني ~'+Math.ceil(need/7)+'/يوم) بدون احتساب نمو أسهمك.';
+};
+function goalp(c){
+  const g=c.U.goal,t=g&&g.t?g.t:Math.round(c.net*1.25);
+  return card(c,'🎯 مخطط الهدف','<div style="'+sm()+'">اختار هدف ومدة وشوف المطلوب أسبوعيًا بفايدة التوفير الحالية.</div><input id="gp-t" class="field" type="number" value="'+t+'" oninput="ecoGoal('+c.net+','+(c.E.rate||0)+')" style="margin:6px 0;"><input id="gp-w" type="range" min="2" max="52" value="12" oninput="ecoGoal('+c.net+','+(c.E.rate||0)+')" style="width:100%;"><div id="gp-l" style="'+sm()+'">12 أسبوع</div><div id="gp-o" style="font-size:13px;margin-top:8px;">حرّك السلايدر…</div>');
+}
+document.addEventListener('click',function(e){const el=e.target.closest&&e.target.closest('[data-esub]');if(!el)return;window.__ecoSub=el.dataset.esub;if(typeof render==='function')render();});
+const SEC=[['ov','🏠 نظرة عامة',[cmd,digest,advisor,calendar,quiz]],['mk','📈 السوق',[sentiment,heat,watch,compare,timing]],['pf','💼 المحفظة',[rebal,whatif,risk,stress,optim,freedom]],['pl','🧭 التخطيط',[goalp,fan,budget,missions]],['cm','🤝 المجتمع',[rank,auction,report]]];
+function userView(c){
+  const k=window.__ecoSub||'ov',sc=SEC.find(function(x){return x[0]===k;})||SEC[0];
+  return '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;">'+SEC.map(function(x){return '<button type="button" data-esub="'+x[0]+'" class="btn '+(x[0]===sc[0]?'btn-primary':'btn-ghost')+'" style="padding:7px 13px;font-size:12px;white-space:nowrap;border-radius:14px;">'+x[1]+'</button>';}).join('')+'</div>'+sc[2].map(function(f){try{return f(c)||'';}catch(e){return '';}}).join('');
+}
+
+window.ecoQuiz=[
+{q:'إيه فايدة تنويع الاستثمار؟',o:['يضمن الربح','يقلل أثر هبوط سهم واحد','يلغي الضريبة'],a:1,e:'التنويع مش بيضمن ربح، لكنه بيوزّع الخطر.'},
+{q:'سهم سعره نزل 50%، محتاج يطلع كام% عشان يرجع لسعره الأول؟',o:['50%','75%','100%'],a:2,e:'من 50 لـ 100 يعني ضعف السعر: 100%. الخسارة أسهل من التعويض.'},
+{q:'إيه معنى «وقف الخسارة»؟',o:['بيع تلقائي لما السعر ينزل لنسبة حددتها','منع الشراء','تأمين بيدفع الأرباح'],a:0,e:'بيحميك من خسارة أكبر من اللي تحملها.'},
+{q:'الفايدة المركّبة معناها…',o:['فايدة على الأصل بس','فايدة على الأصل والفايدة السابقة','فايدة ثابتة كل سنة'],a:1,e:'الأرباح بتولّد أرباح: كل ما الوقت زاد الفرق كبر.'},
+{q:'مين الأنسب لهدف قريب (أسبوعين)؟',o:['سهم متذبذب','وديعة أو توفير','قرض'],a:1,e:'الهدف القريب محتاج أمان مش مخاطرة.'},
+{q:'ليه الأفضل تسيب جزء كاش (سيولة)؟',o:['عشان الطوارئ والفرص','عشان الفلوس تتجمد','عشان تقلل الفايدة'],a:0,e:'السيولة بتحميك من البيع تحت ضغط.'},
+{q:'إيه المخاطرة في وضع كل فلوسك في سهم واحد؟',o:['مفيش','تركّز الخطر','الضريبة أعلى'],a:1,e:'أي خبر وحش للسهم بيضرب ثروتك كلها.'},
+{q:'لو سهم سخن جدًا (RSI عالي) إيه الأحسن؟',o:['تشتري بكل فلوسك','تحذر وتراجع قبل الشراء','تتجاهل السعر'],a:1,e:'الارتفاع السريع ممكن يتبعه تصحيح.'},
+{q:'التضخم معناه…',o:['زيادة قيمة النقاط','زيادة الأسعار ونقص القوة الشرائية','نقص الضرايب'],a:1,e:'لما النقاط تكتر من غير إنتاج، قيمتها بتقل.'},
+{q:'إيه أحسن عادة للادخار؟',o:['لما يفضل فلوس','مبلغ ثابت بانتظام','مرة كل سنة'],a:1,e:'الانتظام بيبني العادة ومتوسط سعر أحسن.'}];
+function digest(c){
+  const pv=window.__ecoPrev;if(!pv||!pv.t)return '';const hrs=Math.round((Date.now()-pv.t)/36e5);if(hrs<1)return '';
+  const dl=c.net-pv.n,mv=c.ST.map(function(s){const o=(pv.p||{})[s.id];return o?[s.n,Math.round((c.pr(s,c.hr(),1)/o-1)*100)]:null;}).filter(Boolean).sort(function(a,b){return Math.abs(b[1])-Math.abs(a[1]);}).slice(0,3);
+  return card(c,'📬 من آخر زيارة (من '+(hrs>=48?Math.round(hrs/24)+' يوم':hrs+' ساعة')+')','<div style="font-size:13px;margin-top:6px;">'+(dl>=0?'📈 ثروتك زادت ':'📉 ثروتك نقصت ')+'<b>'+Math.abs(Math.round(dl)).toLocaleString('en-US')+'</b> نقطة</div>'+mv.map(function(x){return '<div style="font-size:12px;margin-top:4px;color:'+(x[1]>=0?'#22c55e':'#ef4444')+'">'+x[0]+': '+(x[1]>=0?'+':'')+x[1]+'%</div>';}).join(''));
+}
+function cmpHtml(a,b){
+  const S=window.__ecoSer||{},N=window.__ecoNm||{},va=S[a],vb=S[b];if(!va||!vb)return '';
+  const rt=function(v){const r=[];for(let i=1;i<v.length;i++)r.push(Math.log(v[i]/v[i-1]));return r;},mean=function(r){return r.reduce(function(x,y){return x+y;},0)/r.length;},sd=function(r){const m=mean(r);return Math.sqrt(mean(r.map(function(x){return(x-m)*(x-m);})));};
+  const ra=rt(va),rb=rt(vb),ma=mean(ra),mb=mean(rb);let cv=0;for(let i=0;i<ra.length;i++)cv+=(ra[i]-ma)*(rb[i]-mb);const cr=a===b?1:cv/ra.length/((sd(ra)*sd(rb))||1);
+  const na=va.map(function(x){return x/va[0]*100;}),nb=vb.map(function(x){return x/vb[0]*100;}),mn=Math.min.apply(null,na.concat(nb)),mx=Math.max.apply(null,na.concat(nb)),pl=function(n){return n.map(function(y,i){return(i*300/(n.length-1)).toFixed(1)+','+(50-(y-mn)/((mx-mn)||1)*46).toFixed(1);}).join(' ');};
+  const f=function(v){const x=(v[v.length-1]/v[0]-1)*100;return(x>=0?'+':'')+x.toFixed(1)+'%';},vo=function(r){return(sd(r)*Math.sqrt(24)*100).toFixed(1)+'%';};
+  return '<svg viewBox="0 0 300 54" width="100%" height="70" preserveAspectRatio="none" style="margin-top:8px;"><polyline points="'+pl(na)+'" fill="none" stroke="#22d3ee" stroke-width="2"/><polyline points="'+pl(nb)+'" fill="none" stroke="#f472b6" stroke-width="2"/></svg><div style="font-size:12px;line-height:1.9;"><span style="color:#22d3ee;">●</span> '+N[a]+': '+f(va)+' · تذبذب '+vo(ra)+'<br><span style="color:#f472b6;">●</span> '+N[b]+': '+f(vb)+' · تذبذب '+vo(rb)+'<br>الارتباط بينهم: <b>'+cr.toFixed(2)+'</b> — '+(a===b?'نفس السهم':cr>.6?'بيتحركوا مع بعض: تنويع ضعيف':cr<.2?'مستقلين تقريبًا: تنويع كويس':'ارتباط متوسط')+'</div>';
+}
+window.ecoCmp=function(){const a=(document.getElementById('cp-a')||{}).value,b=(document.getElementById('cp-b')||{}).value,o=document.getElementById('cp-o');if(o)o.innerHTML=cmpHtml(a,b);};
+function compare(c){
+  const h=c.hr(),S={},N={};c.ST.forEach(function(s){const v=[];for(let i=48;i>=0;i--)v.push(c.pr(s,h-i,i===0));S[s.id]=v;N[s.id]=s.n;});window.__ecoSer=S;window.__ecoNm=N;
+  const op=function(d){return c.ST.map(function(s,i){return '<option value="'+s.id+'"'+(i===d?' selected':'')+'>'+s.n+'</option>';}).join('');};
+  return card(c,'⚔️ قارن بين سهمين','<div style="display:flex;gap:6px;margin-top:8px;"><select id="cp-a" class="field" onchange="ecoCmp()" style="margin:0;">'+op(0)+'</select><select id="cp-b" class="field" onchange="ecoCmp()" style="margin:0;">'+op(1)+'</select></div><div id="cp-o">'+cmpHtml(c.ST[0].id,c.ST[1].id)+'</div>');
+}
+function stress(c){
+  const U=c.U,vs=c.ST.map(function(s){return(U.hold[s.id]||0)*c.pr(s,c.hr(),1);}),big=Math.max.apply(null,vs.concat([0])),w=spend(c).w7,wks=w>0?Math.floor((c.bal+U.sav)/w):null;
+  const L=[['📉 هبوط السوق 20%',c.inv*.2],['💥 انهيار السوق 35%',c.inv*.35],['🎯 أكبر سهم عندك يخسر 50%',big*.5],['🧨 انهيار 35% + قرض متأخر',c.inv*.35+(U.loan?U.loan.a:0)]];
+  return card(c,'🧪 اختبار الضغط','<div style="'+sm()+'">إيه اللي يحصل لثروتك في أسوأ الظروف؟</div>'+L.map(function(x){const n=c.net-x[1],p=Math.round(x[1]/Math.max(c.net,1)*100),col=p>=30?'#ef4444':p>=12?'#f59e0b':'#22c55e';return '<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;"><span>'+x[0]+'</span><span style="color:'+col+';">'+Math.round(n).toLocaleString('en-US')+' (−'+p+'%)</span></div>';}).join('')+(wks!=null?'<div style="'+sm()+'margin-top:8px;">سيولتك (فيزا + توفير) تغطي مصاريفك حوالي <b>'+wks+'</b> أسبوع.</div>':''));
+}
+function quiz(c){
+  const Q=window.ecoQuiz,day=fl(Date.now()/864e5),q=Q[day%Q.length],U=c.U,t=U.qz&&U.qz.d===day;
+  return card(c,'🎓 سؤال اليوم · ذكاؤك المالي: '+(U.iq||0),'<div style="font-size:14px;margin-top:8px;">'+q.q+'</div>'+(t?'<div style="margin-top:8px;font-size:13px;color:'+(U.qz.ok?'#22c55e':'#f59e0b')+';">'+(U.qz.ok?'✅ إجابة صح (+15 XP). ':'❌ الإجابة الصح: '+q.o[q.a]+'. ')+q.e+'</div><div style="'+sm()+'margin-top:6px;">سؤال جديد بكرة.</div>':'<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">'+q.o.map(function(x,i){return c.B('qz',x,'data-i="'+i+'"',1);}).join('')+'</div>'));
+}
+
+function watch(c){
+  const w=c.U.wl||{},h=c.hr();let n=0;
+  const rows=c.ST.map(function(s){const on=w[s.id],x=stat(c,s),v=verdict(x),d1=Math.round((x.p/c.pr(s,h-24,0)-1)*100),al=[];
+    if(on){if(x.rsi>=70)al.push('🔥 RSI عالي');if(x.rsi<=30)al.push('🧊 RSI منخفض');if(Math.abs(d1)>=5)al.push('⚡ '+(d1>0?'+':'')+d1+'% في يوم');if(x.pos<=10)al.push('⬇️ عند قاع يومين');if(x.pos>=90)al.push('⬆️ عند قمة يومين');n+=al.length;}
+    return '<div style="margin-top:10px;font-size:13px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span>'+(on?'⭐ ':'')+s.n+' · <b>'+x.p+'</b></span>'+c.B('wl',on?'إزالة':'☆ راقب','data-id="'+s.id+'"',on?'1':'')+'</div>'+(on?'<div style="font-size:11px;margin-top:4px;"><span style="padding:1px 8px;border-radius:10px;background:'+v[1]+'33;color:'+v[1]+';">'+v[0]+'</span> '+(al.join(' · ')||'مفيش تنبيهات دلوقتي')+'</div>':'')+'</div>';}).join('');
+  return card(c,'⭐ قائمة المراقبة'+(n?' · '+n+' تنبيه':''),'<div style="'+sm()+'">راقب الأسهم اللي تهمك وهتظهر لها تنبيهات ذكية: RSI، حركة كبيرة، قاع أو قمة.</div>'+rows);
+}
+window.ecoWI=function(){
+  const D=window.__ecoWI;if(!D)return;const id=(document.getElementById('wi-s')||{}).value,q=Math.max(0,Math.floor(+(document.getElementById('wi-q')||{}).value||0)),s=D.s[id],o=document.getElementById('wi-o'),b=document.getElementById('wi-b');if(!s||!o)return;
+  if(b){b.setAttribute('data-id',id);b.setAttribute('data-q',String(Math.max(1,q)));}
+  if(!q){o.innerHTML='اكتب الكمية…';return;}
+  const cost=s.p*q,fee=Math.max(1,Math.floor(cost*.01)),tot=cost+fee,ni=D.inv+cost,cap=D.net*D.rk,V={};Object.keys(D.s).forEach(function(k){V[k]=D.s[k].v+(k===id?cost:0);});
+  const hh=ni?Object.keys(V).reduce(function(a,k){return a+(V[k]/ni)*(V[k]/ni);},0):1,dv=Math.round(100*(1-hh)/.75),va=function(m){return Object.keys(D.s).reduce(function(a,k){return a+(D.s[k].v+(k===id?m:0))*D.s[k].vol/100*Math.sqrt(7)*1.65;},0);},dr=Math.round(va(cost)-va(0));
+  const okB=D.bal>=tot,okC=ni<=cap,sc=Math.round(ni/D.net*100);
+  o.innerHTML='التكلفة: <b>'+cost+'</b> + عمولة '+fee+' = <b>'+tot+'</b><br>الرصيد بعد الشراء: <b>'+(D.bal-tot)+'</b> '+(okB?'':'⚠️ مش كفاية')+'<br>أسهمك هتبقى <b>'+sc+'%</b> من ثروتك (سقفك '+Math.round(D.rk*100)+'%) '+(okC?'✅':'⛔ فوق السقف')+'<br>التنويع بعد الشراء: <b>'+dv+'/100</b> ('+(dv>=D.dv?'تحسّن':'تراجع')+') · الخطر الأسبوعي <b>'+(dr>=0?'+':'')+dr+'</b> نقطة<br>سعر التعادل: <b>'+Math.ceil(s.p*1.01)+'</b>';
+};
+function whatif(c){
+  const U=c.U,S={};let hh=0;c.ST.forEach(function(s){const x=stat(c,s),v=(U.hold[s.id]||0)*x.p;S[s.id]={p:x.p,vol:x.vol,v:v,n:s.n};hh+=c.inv?(v/c.inv)*(v/c.inv):0;});
+  window.__ecoWI={s:S,bal:c.bal,inv:c.inv,net:c.net,rk:U.rk||.5,dv:c.inv?Math.round(100*(1-hh)/.75):0};
+  return card(c,'🔬 لو اشتريت… (محاكاة قبل التنفيذ)','<div style="'+sm()+'">شوف أثر الصفقة على سقف المخاطرة والتنويع والخطر قبل ما تأكد.</div><div style="display:flex;gap:6px;margin-top:8px;"><select id="wi-s" class="field" onchange="ecoWI()" style="margin:0;">'+c.ST.map(function(s){return '<option value="'+s.id+'">'+s.n+'</option>';}).join('')+'</select><input id="wi-q" class="field" type="number" inputmode="numeric" placeholder="الكمية" oninput="ecoWI()" style="margin:0;max-width:110px;"></div><div id="wi-o" style="font-size:13px;line-height:1.9;margin-top:8px;">اكتب الكمية…</div><div style="margin-top:8px;">'+c.B('buy','نفّذ الشراء','id="wi-b" data-id="'+c.ST[0].id+'" data-q="1"')+'</div>');
+}
+window.ecoHofShare=function(){const t=window.__ecoHof||'';if(navigator.share){navigator.share({text:t}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){showToast('اتنسخت لوحة الشرف 📋');});}};
+function hof(c){
+  const P=Object.values((c.LB||{}).p||{});if(P.length<2)return card(c,'🏛️ لوحة الشرف','<div style="'+sm()+'margin-top:6px;">محتاج مشاركين أكتر عشان تظهر المقارنات.</div>');
+  const by=function(f){return P.slice().sort(f);},best=by(function(a,b){return b.r-a.r;}).slice(0,3),calm=by(function(a,b){return(a.d||0)-(b.d||0);}).filter(function(x){return x.r>0;}).slice(0,3),risky=by(function(a,b){return(b.d||0)-(a.d||0);}).filter(function(x){return(x.d||0)>0;}).slice(0,2),avg=Math.round(P.reduce(function(a,x){return a+x.r;},0)/P.length),up=P.filter(function(x){return x.r>0;}).length;
+  const M=['🥇','🥈','🥉'],ln=function(a,k){return a.map(function(x,i){return M[i]+' '+c.esc(x.n)+(k==='r'?' ('+(x.r>=0?'+':'')+x.r+'%)':' (هبوط '+(x.d||0)+'%)');}).join('\n');};
+  window.__ecoHof='🏛️ لوحة شرف مستثمري جلافيرا\n\n📈 الأكثر نموًا:\n'+ln(best,'r')+(calm.length?'\n\n🧘 الأكثر ثباتًا:\n'+ln(calm,'d'):'')+'\n\nمتوسط النمو '+avg+'% · '+up+' من '+P.length+' رابحين';
+  const sec=function(t,a,k){return a.length?'<div style="margin-top:10px;"><b style="font-size:13px;">'+t+'</b>'+a.map(function(x,i){return '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>'+M[i]+' '+c.esc(x.n)+'</span><span>'+(k==='r'?(x.r>=0?'+':'')+x.r+'%':'هبوط '+(x.d||0)+'%')+'</span></div>';}).join('')+'</div>':'';};
+  return card(c,'🏛️ لوحة شرف المستثمرين','<div style="'+sm()+'margin-top:4px;">متوسط النمو <b>'+avg+'%</b> · '+up+' رابح من '+P.length+'</div>'+sec('📈 الأكثر نموًا',best,'r')+sec('🧘 الأكثر ثباتًا (رابحين بأقل هبوط)',calm,'d')+(risky.length?'<div style="'+sm()+'margin-top:10px;">⚠️ أعلى هبوط: '+risky.map(function(x){return c.esc(x.n)+' ('+x.d+'%)';}).join('، ')+'</div>':'')+'<div style="margin-top:10px;"><button type="button" class="btn btn-primary" style="padding:8px 12px;font-size:13px;" onclick="ecoHofShare()">📢 شارك لوحة الشرف</button></div>');
+}
+
+window.ecoSmart={sig,user:userView,admin:function(c){return admin(c)+policy(c)+events(c)+aadmin(c)+(function(){try{return hof(c);}catch(e){return '';}})();}};
+})();
+</script>
+
 </body>
 </html>
