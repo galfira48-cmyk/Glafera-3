@@ -4240,6 +4240,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:linear-gradient(120deg,rgba(120,40,52,.55),rgba(31,33,76,.7)); border:1px solid rgba(255,140,140,.3); }
   .gx-live span{ flex:1; } .gx-live svg{ width:16px; height:16px; opacity:.7; }
   .gx-live i{ width:8px; height:8px; border-radius:50%; background:#FF6B6B; box-shadow:0 0 0 0 rgba(255,107,107,.6); animation:gxPulse 1.6s ease-out infinite; }
+
+  .gx-smart{ text-align:right; padding:16px 14px 14px; }
+  .gxs-top{ display:flex; align-items:center; gap:10px; }
+  .gxs-logo{ width:42px; height:42px; object-fit:contain; border-radius:12px; }
+  .gxs-hi{ flex:1; min-width:0; } .gxs-hi small{ display:block; font-size:11px; color:rgba(252,249,243,.6); }
+  .gxs-hi b{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gxs-card{ display:flex; align-items:center; gap:12px; margin-top:12px; padding:12px; border-radius:14px; background:rgba(255,255,255,.07); border:1px solid rgba(233,219,192,.18); }
+  .gxs-card.warn{ border-color:rgba(255,200,110,.45); background:rgba(255,190,80,.08); } .gxs-card.live{ border-color:rgba(255,120,120,.45); background:rgba(255,90,90,.1); }
+  .gxs-ic{ width:40px; height:40px; flex:none; display:grid; place-items:center; font-size:21px; border-radius:12px; background:rgba(255,255,255,.08); }
+  .gxs-tx b{ display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; } .gxs-tx span{ display:block; margin-top:2px; font-size:11.5px; line-height:1.6; color:rgba(252,249,243,.7); }
+  .gxs-bar{ margin-top:10px; } .gxs-bt{ display:flex; justify-content:space-between; font-size:11px; color:#E3D8C6; } .gxs-bt b{ font-family:'Cairo',sans-serif; }
+  .gxs-tr{ margin-top:5px; height:6px; border-radius:6px; background:rgba(255,255,255,.1); overflow:hidden; } .gxs-tr i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,#E3D8C6,#F4B740); transition:width .8s cubic-bezier(.22,1,.36,1); }
+  .gxs-act{ display:flex; gap:8px; margin-top:12px; }
+  .gxs-cta,.gxs-sec{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; padding:11px 8px; border-radius:12px; cursor:pointer; touch-action:manipulation; }
+  .gxs-cta{ flex:1.3; border:0; color:#1b1d4a; background:linear-gradient(135deg,#F3E9D6,#E3C98F); } .gxs-sec{ flex:1; color:#FCF9F3; background:rgba(255,255,255,.07); border:1px solid rgba(233,219,192,.25); }
+  .gxs-cta:active,.gxs-sec:active{ transform:scale(.97); }
   .gx-label{ margin:4px 4px 10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#E3D8C6; display:flex; align-items:center; gap:10px; }
   .gx-label::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(233,219,192,.3),transparent); }
   @keyframes gxPulse{ 70%{ box-shadow:0 0 0 8px rgba(255,107,107,0); } 100%{ box-shadow:0 0 0 0 rgba(255,107,107,0); } }
@@ -13346,6 +13362,37 @@ document.addEventListener('keydown', (e)=>{
 }, true);
 /* ============================= GAMES: FRIENDS LEADERBOARD (ترتيب وتصنيف الأصدقاء) ============================= */
 function isFriendModeLockedForMe(){ return !!(CONF_SETTINGS.friendModeLocked) && state.pid!==GAMES_LOCK_REVIEWER_ID; }
+/* ===== كارت مركز الألعاب الذكي: بيتغير حسب حالة اللاعب ===== */
+function gxSmartHero(liveCount){
+  const pid=state.pid, me=PARTICIPANTS.find(x=>x.id===pid)||{};
+  const first=escapeHtml(String(me.name||'').trim().split(/\s+/)[0]||'');
+  const h=new Date().getHours();
+  const hi=h<5?'سهران ليه؟':h<12?'صباح الخير':h<18?'نهارك سعيد':'مساء الخير';
+  const canVisa=hasVisa(pid), made=canVisa&&visaCreated(pid), expired=made&&visaExpired(pid);
+  const bal=WALLET[pid]||0, min=visaMin();
+  let rows=[]; try{ rows=gsRows(); }catch(e){}
+  const idx=rows.findIndex(x=>x.p.id===pid), mine=idx>=0?rows[idx]:null, ahead=idx>0?rows[idx-1]:null;
+  let ic,t,sub,cta,act,tone='';
+  if(canVisa&&!made){ ic='💳'; t='فعّل فيزتك الأول'; sub='من غيرها مش هتقدر تلعب ولا تدخل الغرف'; cta='إنشاء الفيزا'; act='open-visa'; tone='warn'; }
+  else if(expired){ ic='⏳'; t='فيزتك انتهت'; sub='جدّدها وارجع للعب'; cta='تجديد الفيزا'; act='open-visa'; tone='warn'; }
+  else if(canVisa&&bal<=0){ ic='🪫'; t='رصيدك فاضي'; sub='أودع من نقاطك في الفيزا وابدأ العب'; cta='إيداع'; act='open-visa'; tone='warn'; }
+  else if(liveCount){ ic='🔴'; t=liveCount+(liveCount===1?' مباراة':' مباريات')+' لايف دلوقتي'; sub='اتفرج على أصحابك وشجّعهم'; cta='مشاهدة'; act='open-watch'; tone='live'; }
+  else if(ahead&&mine){ const gap=Math.max(1,ahead.pts-mine.pts+1), nm=escapeHtml(String(ahead.p.name||'').trim().split(/\s+/)[0]);
+    ic='🎯'; t='باقيلك '+gap+' نقطة وتتخطى '+nm; sub='ترتيبك دلوقتي #'+mine.rank+' — كل فوز بيقرّبك'; cta='العب ضد الجهاز'; act='open-solo'; }
+  else if(mine&&mine.rank===1){ ic='👑'; t='إنت في الصدارة'; sub='حافظ على مركزك، الكل ورا ضهرك'; cta='كمّل اللعب'; act='open-solo'; }
+  else { ic='🎮'; t='ابدأ أول مباراة'; sub='أول فوز بيدخلك لوحة الأبطال'; cta='العب ضد الجهاز'; act='open-solo'; }
+  const pct=made?Math.max(0,Math.min(100,Math.round(bal/min*100))):0;
+  const bar=(made&&!expired)?`<div class="gxs-bar"><div class="gxs-bt"><span>الطريق للسحب</span><b>${bal} / ${min}</b></div><div class="gxs-tr"><i style="width:${pct}%"></i></div></div>`:'';
+  const stat=(n,l,a)=>`<button type="button" class="gx-stat" data-action="${a}"><b>${n}</b><span>${l}</span></button>`;
+  return `<div class="gx-hero gx-smart">
+    <div class="gxs-top"><img class="gxs-logo" src="${GAMES_LOGO}" alt="" draggable="false"><div class="gxs-hi"><small>${hi}</small><b>${first||'يا بطل'}</b></div><span class="gx-kicker">مركز الألعاب</span></div>
+    <div class="gxs-card ${tone}"><span class="gxs-ic">${ic}</span><div class="gxs-tx"><b>${t}</b><span>${sub}</span></div></div>
+    ${bar}
+    <div class="gxs-act"><button type="button" class="gxs-cta" data-action="${act}">${cta}</button><button type="button" class="gxs-sec" data-action="open-rooms">🧑‍🤝‍🧑 غرفة مع صديق</button></div>
+    <div class="gx-stats">${stat(mine?'#'+mine.rank:'—','ترتيبك','open-gs')}${stat(liveCount,'غرفة لايف','open-watch')}${made?stat(bal,'رصيد الفيزا','open-visa'):stat(enabledGamesCatalog().length,'لعبة متاحة','open-solo')}</div>
+  </div>`;
+}
+
 function renderGamesHub(){
   const ft = state.friendTile || null;
   const friendLocked = isFriendModeLockedForMe();
@@ -13421,17 +13468,7 @@ function renderGamesHub(){
       <div class="back-title">Games</div>
       <button type="button" class="gx-help" data-action="games-guide" aria-label="شرح نقاط الألعاب" title="إزاي النقاط شغالة؟"><span>؟</span></button>
     </div>
-    <div class="gx-hero">
-      <img class="gx-logo" src="${GAMES_LOGO}" alt="" draggable="false">
-      <div class="gx-kicker">مركز الألعاب</div>
-      <div class="gx-title">استراحة تفاعلية</div>
-      <div class="gx-sub">العب مع أصحابك أو ضد الجهاز</div>
-      <div class="gx-stats">
-        <div class="gx-stat"><b>${enabledGamesCatalog().length}</b><span>لعبة متاحة</span></div>
-        <button type="button" class="gx-stat${liveCount?' is-live':''}" data-action="open-watch"><b>${liveCount}</b><span>غرفة لايف</span></button>
-        ${(hasVisa(state.pid) && visaCreated(state.pid)) ? `<button type="button" class="gx-stat" data-action="open-visa"><b>${WALLET[state.pid]||0}</b><span>رصيد الفيزا</span></button>` : ''}
-      </div>
-    </div>
+    ${gxSmartHero(liveCount)}
     ${liveCount ? `<button type="button" class="gx-live" data-action="open-watch"><i></i><span>${liveCount} ${liveCount===1?'مباراة':'مباريات'} مباشرة الآن — انضم للمشاهدة</span>${ICO.chev}</button>` : ''}
     <div class="gx-label">اختر طريقة اللعب</div>
     <div class="gh-grid">${friendTile}${soloTile}${watchTile}${stickerStoreTile}${hasVisa(state.pid) ? visaTile : ''}${achTile}${gsTile}</div>
