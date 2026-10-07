@@ -10018,7 +10018,6 @@ function currentJourneyDay(pid){
   const idx = DAYS.findIndex(d=>dayTotal(pid,d)===0);
   return idx>=0 ? DAYS[idx] : DAYS[DAYS.length-1];
 }
-function dayQuests(pid, day){ return []; }
 
 function pushNotification(pid, text, icon){
   const extra = myExtra(pid);
@@ -10121,7 +10120,26 @@ function nowMinutes(){ const d=new Date(); return d.getHours()*60+d.getMinutes()
 function flatSessions(){
   const out=[]; DAYS.forEach(d=>d.sessions.forEach(s=>out.push({day:d, session:s}))); return out;
 }
-function medalTier(total){ if(total>=100) return 3; if(total>=50) return 2; return 1; }
+const DEFAULT_MEDALS = [{id:'m1',icon:'🎖️',name:'برونزية',min:0},{id:'m2',icon:'🏅',name:'فضية',min:50},{id:'m3',icon:'👑',name:'ذهبية',min:100}];
+function getMedals(){
+  const a = CONF_SETTINGS && Array.isArray(CONF_SETTINGS.medals) && CONF_SETTINGS.medals.length ? CONF_SETTINGS.medals : DEFAULT_MEDALS;
+  return a.slice().sort((x,y)=>(+x.min||0)-(+y.min||0));
+}
+function medalTier(total){ const m = getMedals(); let t = 1; m.forEach((x,i)=>{ if(total >= (+x.min||0)) t = i+1; }); return t; }
+const CH_TYPES = {points:{label:'إجمالي النقاط', unit:'نقطة'}, attend:{label:'عدد مرات الحضور', unit:'حضور'}, streak:{label:'حضور متتالي', unit:'متتالي'}};
+function getChallenges(){ return (CONF_SETTINGS && Array.isArray(CONF_SETTINGS.challenges)) ? CONF_SETTINGS.challenges : []; }
+function dayQuests(pid, day){
+  const total = participantTotal(pid), ex = (typeof myExtra==='function' && state.pid===pid) ? myExtra(pid) : {};
+  const claimedMap = (ex && ex.questsClaimed) || {};
+  const attended = flatSessions().filter(f=>CHECKINS[pid+'__'+f.session.id]).length;
+  const st = computeStreak(pid);
+  return getChallenges().map(c=>{
+    const goal = Math.max(1, +c.goal||1), reward = Math.max(0, +c.reward||0);
+    const progress = c.type==='attend' ? attended : (c.type==='streak' ? st.max : total);
+    const claimKey = 'ch_'+c.id;
+    return {icon:c.icon||'🎯', label:c.title, goal, reward, progress, done:progress>=goal, claimed:!!claimedMap[claimKey], claimKey};
+  });
+}
 function computeStreak(pid){
   const flat = flatSessions();
   let cur=0;
@@ -10974,9 +10992,10 @@ function renderMePage(){
   const rank = ranked.findIndex(x=>x.id===p.id)+1;
   const flat = flatSessions();
   const attended = flat.filter(f=>CHECKINS[p.id+'__'+f.session.id]).length;
-  const tierName = ['','برونزية','فضية','ذهبية'][tier];
-  const nextAt = tier===1 ? 50 : (tier===2 ? 100 : null);
-  const pct = nextAt ? Math.min(100, Math.round(((total-(tier===1?0:50))/50)*100)) : 100;
+  const _ms = getMedals(), mi = _ms[tier-1]||_ms[0], nx = _ms[tier]||null;
+  const tierName = mi.name, tierIcon = mi.icon;
+  const nextAt = nx ? (+nx.min||0) : null;
+  const pct = nx ? Math.min(100, Math.round(((total-(+mi.min||0))/Math.max(1,(+nx.min||0)-(+mi.min||0)))*100)) : 100;
   const st = (ico,val,lab,cls,unit)=>`<div class="me-stat ${cls||''}"><div class="ico">${ico}</div><b>${val}${unit?`<small>${unit}</small>`:''}</b><span>${lab}</span></div>`;
   const link = (ico,page,label,cnt)=>`<button type="button" class="me-link" data-action="tile-nav" data-page="${page}"><span class="ico">${ico}</span><span class="t">${label}</span>${cnt?`<span class="cnt">${cnt}</span>`:''}${ICO.chev}</button>`;
   return `
@@ -10998,7 +11017,7 @@ function renderMePage(){
       ${st('🏆',rank>0?('#'+rank):'—','الترتيب','rank')}
     </div>
     <div class="me-tier">
-      <div class="me-tier-top"><span>${tier===3?'👑':'🎖️'} الميدالية ${tierName}</span><small>${nextAt?`باقي ${Math.max(0,nextAt-total)} نقطة للمستوى الجاي`:'وصلت لأعلى مستوى'}</small></div>
+      <div class="me-tier-top"><span>${tierIcon} الميدالية ${escapeHtml(tierName)}</span><small>${nextAt?`باقي ${Math.max(0,nextAt-total)} نقطة لـ${nx.icon} ${escapeHtml(nx.name)}`:'وصلت لأعلى مستوى'}</small></div>
       <div class="me-bar"><i style="width:${pct}%"></i></div>
     </div>
     <div class="me-links">
@@ -12187,11 +12206,7 @@ function renderQuestsPage(){
     </div>`;
   }).join('');
 
-  const milestones = [
-    {icon:'🎖️', label:'اجمع 50 نقطة إجمالاً', goal:50, progress:total},
-    {icon:'🏅', label:'اجمع 100 نقطة إجمالاً', goal:100, progress:total},
-    {icon:'👑', label:'اجمع 150 نقطة إجمالاً', goal:150, progress:total},
-  ];
+  const milestones = getMedals().filter(m=>(+m.min||0)>0).map(m=>({icon:m.icon, label:`اجمع ${+m.min} نقطة — الميدالية ${m.name}`, goal:+m.min, progress:total}));
   const milestonesHtml = milestones.map(m=>{
     const pct = Math.round(Math.min(1,m.progress/m.goal)*100);
     const done = m.progress>=m.goal;
@@ -13016,10 +13031,10 @@ const GAME_CATEGORY_OF = {
     if(busy || document.hidden) return; busy = true;
     try{
       const fresh = await loadConfSettings();
-      const a = JSON.stringify(fresh.disabledGames || {}), b = JSON.stringify(CONF_SETTINGS.disabledGames || {});
-      if(a !== b){
-        CONF_SETTINGS.disabledGames = fresh.disabledGames || {};
-        if(typeof state !== 'undefined' && LOBBY.indexOf(state.view) > -1) render();
+      const pick = o=>JSON.stringify([o.disabledGames||{}, o.medals||null, o.challenges||[]]);
+      if(pick(fresh) !== pick(CONF_SETTINGS)){
+        CONF_SETTINGS.disabledGames = fresh.disabledGames || {}; CONF_SETTINGS.medals = fresh.medals || null; CONF_SETTINGS.challenges = fresh.challenges || [];
+        if(typeof state !== 'undefined' && (LOBBY.indexOf(state.view) > -1 || state.view==='me' || state.view==='quests')) render();
       }
     }catch(e){} busy = false;
   }
@@ -22824,6 +22839,57 @@ function renderSnakesGame(){
   `;
 }
 /* ---------- admin: إدارة بنك أسئلة "تحدي الأسئلة" (إضافة/تعديل/حذف) ---------- */
+/* ============================= ADMIN: MEDALS & CHALLENGES ============================= */
+function renderAdminMedalsTab(){
+  const medals = getMedals(), chs = getChallenges();
+  const mRows = medals.map((m,i)=>`
+    <div class="amd-row" data-kind="medal" data-id="${escapeHtml(m.id)}">
+      <input class="field amd-ico" data-f="icon" maxlength="4" value="${escapeHtml(m.icon||'🏅')}" aria-label="الأيقونة">
+      <input class="field amd-name" data-f="name" maxlength="24" value="${escapeHtml(m.name||'')}" placeholder="اسم الميدالية">
+      <label class="amd-num"><input class="field" data-f="min" type="number" min="0" inputmode="numeric" value="${+m.min||0}" ${i===0?'readonly':''}><small>نقطة</small></label>
+      ${i===0?'<span class="amd-lock" title="أول ميدالية بتبدأ من صفر">🔒</span>':`<button type="button" class="amd-del" data-action="adm-del-row" data-kind="medal" data-id="${escapeHtml(m.id)}" aria-label="حذف">🗑️</button>`}
+    </div>`).join('');
+  const cRows = chs.length ? chs.map(c=>`
+    <div class="amd-row amd-ch" data-kind="challenge" data-id="${escapeHtml(c.id)}">
+      <input class="field amd-ico" data-f="icon" maxlength="4" value="${escapeHtml(c.icon||'🎯')}" aria-label="الأيقونة">
+      <input class="field amd-name" data-f="title" maxlength="60" value="${escapeHtml(c.title||'')}" placeholder="اسم التحدي">
+      <select class="field amd-type" data-f="type">${Object.keys(CH_TYPES).map(k=>`<option value="${k}" ${c.type===k?'selected':''}>${CH_TYPES[k].label}</option>`).join('')}</select>
+      <label class="amd-num"><input class="field" data-f="goal" type="number" min="1" inputmode="numeric" value="${+c.goal||1}"><small>الهدف</small></label>
+      <label class="amd-num"><input class="field" data-f="reward" type="number" min="0" inputmode="numeric" value="${+c.reward||0}"><small>المكافأة</small></label>
+      <button type="button" class="amd-del" data-action="adm-del-row" data-kind="challenge" data-id="${escapeHtml(c.id)}" aria-label="حذف">🗑️</button>
+    </div>`).join('') : '<div class="hint amd-empty">لسه مفيش تحديات — اضغط «إضافة تحدي»</div>';
+  return `
+    <div class="card amd-card">
+      <div class="section-title" style="margin-top:0">🏅 الميداليات <span class="sub">${medals.length} مستوى</span></div>
+      <div class="hint" style="margin:0 0 10px">كل ميدالية بتتفتح لما مجموع نقاط المشارك يوصل للرقم. أول واحدة بتبدأ من صفر.</div>
+      <div class="amd-list">${mRows}</div>
+      <div class="amd-actions"><button type="button" class="btn btn-outline" data-action="adm-add-row" data-kind="medal">＋ إضافة ميدالية</button><button type="button" class="btn btn-ghost" data-action="adm-reset-medals">استرجاع الافتراضي</button></div>
+    </div>
+    <div class="card amd-card">
+      <div class="section-title" style="margin-top:0">🎯 التحديات <span class="sub">${chs.length} تحدي</span></div>
+      <div class="hint" style="margin:0 0 10px">المشارك يكمّل الهدف ويستلم المكافأة (نقاط) من صفحة التحديات.</div>
+      <div class="amd-list">${cRows}</div>
+      <div class="amd-actions"><button type="button" class="btn btn-outline" data-action="adm-add-row" data-kind="challenge">＋ إضافة تحدي</button></div>
+    </div>
+    <button type="button" class="btn" data-action="adm-save-medals">💾 حفظ الميداليات والتحديات</button>`;
+}
+function admMedalsCollect(){
+  const read = (kind)=>[].map.call(document.querySelectorAll('.amd-row[data-kind="'+kind+'"]'), row=>{
+    const o = {id: row.dataset.id}; row.querySelectorAll('[data-f]').forEach(i=>{ o[i.dataset.f] = i.value; }); return o; });
+  const medals = read('medal').map(m=>({id:m.id, icon:(m.icon||'🏅').trim(), name:(m.name||'').trim(), min:Math.max(0,Math.round(+m.min||0))}))
+    .filter(m=>m.name).sort((a,b)=>a.min-b.min);
+  if(medals.length) medals[0].min = 0;
+  const challenges = read('challenge').map(c=>({id:c.id, icon:(c.icon||'🎯').trim(), title:(c.title||'').trim(), type:CH_TYPES[c.type]?c.type:'points', goal:Math.max(1,Math.round(+c.goal||1)), reward:Math.max(0,Math.round(+c.reward||0))})).filter(c=>c.title);
+  return {medals, challenges};
+}
+async function admMedalsSave(msg){
+  const d = admMedalsCollect();
+  if(document.querySelector('.amd-row[data-kind="medal"]')) CONF_SETTINGS.medals = d.medals.length ? d.medals : null;
+  CONF_SETTINGS.challenges = d.challenges;
+  await saveConfSettings(CONF_SETTINGS);
+  if(msg) showToast(msg);
+  render();
+}
 function renderAdminQuizQuestionsTab(){
   const optRow = (idPrefix, i, val, correctName, correctVal, checked)=>`
     <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -24961,6 +25027,7 @@ const ADMIN_HUB_ITEMS = [
   {group:'people', tab:'structure', short:"الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
   {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين", icon:'💬', label:'آراء المشاركين', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
 
+  {group:'games',  tab:'medals', short:"ميداليات المستويات والتحديات", desc:"إضافة وتعديل الميداليات (الاسم والأيقونة والنقاط) والتحديات اللي بتظهر للمشاركين", icon:'🏅', label:'الميداليات والتحديات', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
   {group:'games',  tab:'gamecfg', short:"قفل الألعاب وتحدي الأسبوع", desc:"قفل الألعاب، «العب ضد صديق»، فتح/قفل كل لعبة، وتحدي الأسبوع", icon:'🎮', label:'الألعاب والتحديات', color:'linear-gradient(145deg,#845EC2,#3FDCC9)'},
   {group:'games',  tab:'quizq', short:"أسئلة تحدي الأسئلة", desc:"إضافة وتعديل وحذف أسئلة لعبة تحدي الأسئلة", icon:'❓', label:'أسئلة التحدي', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
   {group:'games',  tab:'points', short:"إضافة وتصفير النقاط والفيزا", desc:"أدوات النقاط (للجميع)، نقاط الألعاب، تصفير النقاط والفيزا، وإعدادات الفيزا", icon:'🏆', label:'النقاط والفيزا', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
@@ -25079,6 +25146,7 @@ function renderAdmin(){
   if(tab==='settings' || tab==='reg') body = adminSettingsGroup('reg');
   else if(tab==='maint') body = adminSettingsGroup('maint');
   else if(tab==='gamecfg') body = adminSettingsGroup('gamecfg');
+  else if(tab==='medals') body = renderAdminMedalsTab();
   else if(tab==='points') body = renderAdminPointsTab();
   else if(tab==='identity') body = adminSettingsGroup('identity');
   else if(tab==='daily') body = adminSettingsGroup('daily');
@@ -27208,6 +27276,29 @@ function renderAttendanceScanPage(){
     </div>
   `;
 }
+/* رسالة نجاح تسجيل الحضور */
+function showAttOk(o){
+  try{ const old = document.getElementById('att-ok-ov'); if(old) old.remove(); }catch(e){}
+  const me = (typeof PARTICIPANTS!=='undefined' ? PARTICIPANTS : []).find(x=>x.id===state.pid);
+  const first = me ? String(me.name||'').trim().split(/\s+/)[0] : '';
+  const lines = ['ربنا يبارك في وجودك 🙏','وجودك بركة لينا كلنا ✨','فرحانين بيك النهارده 💛','ربنا يبارك حياتك وخدمتك 🙏'];
+  const ov = document.createElement('div'); ov.id = 'att-ok-ov'; ov.className = 'att-ok-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-live','polite');
+  ov.innerHTML = `<div class="att-ok-card">
+    <div class="att-ok-ring"><i></i><i></i><svg viewBox="0 0 52 52" class="att-ok-svg" aria-hidden="true"><circle cx="26" cy="26" r="23"/><path d="M15 27.5l8 8 15-17"/></svg></div>
+    <div class="att-ok-title">أنت رائع${first?' يا '+escapeHtml(first):''}! 🌟</div>
+    <div class="att-ok-sub">تم تسجيل حضورك</div>
+    <div class="att-ok-chips"><span>${escapeHtml(o.label||'')}</span>${o.pts>0?`<span class="gold">+${o.pts} نقطة 🪙</span>`:''}</div>
+    ${o.offline?'<div class="att-ok-note">مسجّل أوفلاين — هيتبعت أول ما النت يرجع</div>':''}
+    <div class="att-ok-line">${lines[Math.floor(Math.random()*lines.length)]}</div>
+    <button type="button" class="att-ok-btn">تمام</button>
+    <div class="att-ok-bar"><i></i></div></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>ov.classList.add('in'));
+  const close = ()=>{ if(!ov.parentNode) return; ov.classList.remove('in'); ov.classList.add('out'); setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 260); };
+  ov.addEventListener('click', e=>{ if(e.target===ov || e.target.closest('.att-ok-btn')) close(); });
+  setTimeout(close, 5200);
+  setTimeout(()=>{ try{ const r = ov.querySelector('.att-ok-card').getBoundingClientRect(); goldDustBurst(r.left+r.width/2, r.top+80, 22); }catch(e){} }, 220);
+}
 async function tryAttendance(codeRaw, typeArg){
   const type = ATT_TYPES[typeArg] ? typeArg : state.attType;
   const t = ATT_TYPES[type];
@@ -27245,7 +27336,7 @@ async function tryAttendance(codeRaw, typeArg){
     ATT_RECORDS = attOverlayPending(ATT_RECORDS);
     vibrate([18,40,18]);
     _apCelebrate = true; _apKey = null; apChime();
-    showToast('✅ اتسجّل حضورك في '+t.label+(pts>0 ? ' — +'+pts+' نقطة 🪙' : '')+' (أوفلاين — هيتبعت لما النت يرجع)');
+    showAttOk({label:c.name||t.label, pts, offline:true});
     render();
     return true;
   }
@@ -27257,7 +27348,7 @@ async function tryAttendance(codeRaw, typeArg){
   if(dup){ showToast('سجّلت حضورك في الجلسة دي قبل كده', true); render(); return false; }
   vibrate([18,40,18]);
   _apCelebrate = true; _apKey = null; apChime();
-  showToast('✅ تم تسجيل حضورك في '+t.label + (pts>0 ? ' — +'+pts+' نقطة 🪙' : ''));
+  showAttOk({label:c.name||t.label, pts});
   pushNotification(pid, 'تم تسجيل حضورك في '+(c.name||t.label) + (pts>0 ? ' وأخدت '+pts+' نقطة' : ''), '✅');
   render();
   return true;
@@ -27782,7 +27873,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='go-admin'){ go('admin'); }
   else if(action==='submit-login'){ doLogin(); }
   else if(action==='saved-login'){ savedAccountLogin(el.dataset.pid); }
-  else if(action==='saved-remove'){ savedAccountRemove(el.dataset.pid); }
+  else if(action==='saved-remove'){ e.preventDefault(); e.stopPropagation(); confirmRemoveSavedAccount(el.dataset.pid); }
   else if(action==='login-other'){ state._loginOther = true; render(); }
   else if(action==='login-back-cards'){ state._loginOther = false; render(); }
   else if(action==='go-signup'){ SU.step = 1; SU.dir = 1; SU._entered = false; SU._pct = null; SU._prev = null; state.view='signup'; render(); }
@@ -27927,6 +28018,18 @@ document.addEventListener('click', (e)=>{
   else if(action==='save-maint-msg'){ doSaveMaintMsg(); }
   else if(action==='toggle-friend-mode-locked'){ doToggleFriendModeLocked(); }
   else if(action==='toggle-game-enabled'){ doToggleGameEnabled(el.dataset.gid); }
+  else if(action==='adm-add-row'){
+    const d = admMedalsCollect(); const id = (el.dataset.kind==='medal'?'m':'c')+Date.now().toString(36);
+    if(el.dataset.kind==='medal'){ const last = d.medals[d.medals.length-1]; CONF_SETTINGS.medals = d.medals.concat([{id, icon:'🏆', name:'ميدالية جديدة', min:(last?last.min:0)+50}]); CONF_SETTINGS.challenges = d.challenges; }
+    else { CONF_SETTINGS.medals = d.medals.length?d.medals:CONF_SETTINGS.medals; CONF_SETTINGS.challenges = d.challenges.concat([{id, icon:'🎯', title:'تحدي جديد', type:'points', goal:50, reward:10}]); }
+    render();
+  }
+  else if(action==='adm-del-row'){
+    const d = admMedalsCollect(), id = el.dataset.id;
+    showConfirmDialog('متأكد إنك عايز تمسح العنصر ده؟', async ()=>{ if(el.dataset.kind==='medal') CONF_SETTINGS.medals = d.medals.filter(m=>m.id!==id); else CONF_SETTINGS.challenges = d.challenges.filter(c=>c.id!==id); await saveConfSettings(CONF_SETTINGS); render(); });
+  }
+  else if(action==='adm-save-medals'){ admMedalsSave('✅ اتحفظت الميداليات والتحديات'); }
+  else if(action==='adm-reset-medals'){ showConfirmDialog('ترجّع الميداليات للافتراضي (برونزية/فضية/ذهبية)؟', async ()=>{ CONF_SETTINGS.medals = null; await saveConfSettings(CONF_SETTINGS); showToast('اترجعت الافتراضية'); render(); }); }
   else if(action==='save-visa-settings'){ doSaveVisaSettings(); }
   else if(action==='save-name-font'){ doSaveNameFont(); }
   else if(action==='export-participants-xlsx'){ exportParticipantsXlsx(); }
@@ -28371,7 +28474,7 @@ function openAchievementCard(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
   const total = participantTotal(p.id);
   const tier = medalTier(total);
-  const tierIcon = tier===3?'👑':tier===2?'💫':'🥉';
+  const tierIcon = (getMedals()[tier-1]||getMedals()[0]).icon;
   const overlay = document.createElement('div');
   overlay.className='ach-overlay';
   overlay.innerHTML = `
@@ -31252,6 +31355,37 @@ function savedAccountsRefresh(){
     if(p.photo) savedAccountSetThumb(a.id, p.photo);
   });
   if(changed) savedAccountsSet(list);
+}
+/* تأكيد إزالة الحساب من الجهاز */
+function confirmRemoveSavedAccount(pid){
+  const sid = String(pid), a = savedAccountsGet().find(x=>x.id===sid); if(!a) return;
+  const live = PARTICIPANTS.find(x=>x.id===sid);
+  const name = (live && live.name) || a.name || 'حسابي';
+  const photo = a.thumb || (live && live.photo) || '';
+  const av = photo ? `<div class="sar-av" style="background-image:url('${String(photo).replace(/'/g,'%27')}')"></div>` : `<div class="sar-av sar-ini">${escapeHtml(initials(name))}</div>`;
+  const old = document.getElementById('sar-ov'); if(old) old.remove();
+  const ov = document.createElement('div'); ov.id = 'sar-ov'; ov.className = 'sar-ov'; ov.setAttribute('role','alertdialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','sar-t');
+  ov.innerHTML = `<div class="sar-card">
+    <div class="sar-grab"></div>
+    <div class="sar-who">${av}<span class="sar-badge">📱</span></div>
+    <div class="sar-name">${escapeHtml(name)}</div>
+    <div class="sar-title" id="sar-t">إزالة الحساب من الجهاز ده؟</div>
+    <div class="sar-body">هنشيل الحساب من الأجهزة المحفوظة هنا، وهتحتاج رقم الموبايل والباسورد عشان تدخل المرة الجاية.</div>
+    <div class="sar-safe"><span>🛡️</span><span>حسابك ونقاطك وبياناتك فاضلين محفوظين — الإزالة من الجهاز ده بس.</span></div>
+    <div class="sar-actions">
+      <button type="button" class="sar-cancel">إلغاء</button>
+      <button type="button" class="sar-ok">إزالة من الجهاز</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>ov.classList.add('in'));
+  const close = ()=>{ if(!ov.parentNode) return; ov.classList.remove('in'); ov.classList.add('out'); document.removeEventListener('keydown', onKey); setTimeout(()=>{ if(ov.parentNode) ov.remove(); }, 240); };
+  const onKey = e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', e=>{
+    if(e.target===ov || e.target.closest('.sar-cancel')){ close(); return; }
+    if(e.target.closest('.sar-ok')){ close(); savedAccountRemove(sid); }
+  });
+  const c = ov.querySelector('.sar-cancel'); if(c) setTimeout(()=>{ try{ c.focus({preventScroll:true}); }catch(e){} }, 120);
 }
 function savedAccountRemove(pid){
   savedAccountsSet(savedAccountsGet().filter(x=>x.id!==String(pid)));
@@ -35487,5 +35621,76 @@ html[data-theme="light"] ::-webkit-scrollbar{ width:8px; height:8px; } html[data
   upd(); new MutationObserver(upd).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 })();
 </script>
+<style id="amd-css">
+.amd-list{display:flex;flex-direction:column;gap:10px}
+.amd-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px;border-radius:16px;background:var(--bg-2);border:1px solid var(--border)}
+.amd-row .field{padding:10px 12px;border-radius:12px;font-size:14px;min-width:0}
+.amd-ico{width:54px!important;flex:none;text-align:center;font-size:20px!important}
+.amd-name{flex:1 1 120px}
+.amd-type{flex:1 1 130px}
+.amd-num{display:flex;flex-direction:column;gap:2px;flex:1 1 76px}
+.amd-num small{font-size:10.5px;color:var(--text-muted);text-align:center}
+.amd-num .field{text-align:center}
+.amd-del,.amd-lock{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:16px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
+.amd-lock{cursor:default;opacity:.7}
+.amd-actions{display:flex;gap:8px;margin-top:12px}.amd-actions .btn{flex:1;padding:12px}
+.amd-card{margin-bottom:14px}.amd-empty{text-align:center;padding:14px}
+</style>
+<style id="att-ok-css">
+/* ===== رسالة نجاح الحضور ===== */
+.att-ok-ov{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,10,36,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .25s ease}
+.att-ok-ov.in{opacity:1}.att-ok-ov.out{opacity:0}
+.att-ok-card{position:relative;overflow:hidden;width:min(340px,100%);padding:30px 22px 22px;border-radius:30px;text-align:center;color:var(--text);
+  background:radial-gradient(120% 70% at 50% 0%,rgba(95,224,164,.22),transparent 62%),linear-gradient(165deg,var(--surface),var(--surface-2));
+  border:1px solid rgba(95,224,164,.35);box-shadow:0 30px 70px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
+  transform:translateY(26px) scale(.92);transition:transform .45s cubic-bezier(.2,1.1,.3,1)}
+.att-ok-ov.in .att-ok-card{transform:none}
+.att-ok-ring{position:relative;width:92px;height:92px;margin:0 auto 14px;display:grid;place-items:center}
+.att-ok-ring i{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(95,224,164,.55);animation:attOkPulse 1.8s ease-out infinite}
+.att-ok-ring i+i{animation-delay:.6s}
+.att-ok-svg{position:relative;width:84px;height:84px;filter:drop-shadow(0 8px 16px rgba(30,158,107,.45))}
+.att-ok-svg circle{fill:rgba(95,224,164,.14);stroke:#5FE0A4;stroke-width:2.5;stroke-dasharray:145;stroke-dashoffset:145;animation:attOkDraw .6s .1s ease forwards}
+.att-ok-svg path{fill:none;stroke:#5FE0A4;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:44;stroke-dashoffset:44;animation:attOkDraw .4s .55s ease forwards}
+.att-ok-title{font:900 22px/1.35 Cairo,sans-serif;animation:attOkUp .5s .35s both}
+.att-ok-sub{margin-top:2px;font:700 15px Tajawal,Arial,sans-serif;color:var(--good);animation:attOkUp .5s .45s both}
+.att-ok-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:14px;animation:attOkUp .5s .55s both}
+.att-ok-chips span{padding:6px 14px;border-radius:99px;font:800 12.5px Cairo,sans-serif;background:rgba(127,127,160,.14);border:1px solid var(--border)}
+.att-ok-chips span.gold{background:linear-gradient(135deg,rgba(244,183,64,.28),rgba(244,183,64,.12));border-color:rgba(244,183,64,.5);color:var(--gold)}
+.att-ok-note{margin-top:10px;font:600 11.5px Tajawal,Arial,sans-serif;color:var(--text-muted)}
+.att-ok-line{margin-top:14px;font:600 13px Tajawal,Arial,sans-serif;color:var(--text-muted);animation:attOkUp .5s .65s both}
+.att-ok-btn{margin-top:16px;width:100%;padding:13px;border:0;border-radius:16px;font:800 14.5px Cairo,sans-serif;cursor:pointer;color:#06281b;background:linear-gradient(135deg,#BFF5DC,#5FE0A4);box-shadow:0 14px 24px -12px rgba(30,158,107,.7);animation:attOkUp .5s .75s both}
+.att-ok-btn:active{transform:scale(.97)}
+.att-ok-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(127,127,160,.15)}
+.att-ok-bar i{display:block;height:100%;background:linear-gradient(90deg,#5FE0A4,#F4B740);transform-origin:right;animation:attOkBar 5.2s linear forwards}
+@keyframes attOkDraw{to{stroke-dashoffset:0}}
+@keyframes attOkUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes attOkPulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@keyframes attOkBar{to{transform:scaleX(0)}}
+@media(prefers-reduced-motion:reduce){.att-ok-card,.att-ok-ring i,.att-ok-svg circle,.att-ok-svg path,.att-ok-title,.att-ok-sub,.att-ok-chips,.att-ok-line,.att-ok-btn{animation:none!important;transition:none!important;stroke-dashoffset:0!important;opacity:1!important}}
+</style>
+<style id="sar-css">
+/* ===== تأكيد إزالة الحساب ===== */
+.sar-ov{position:fixed;inset:0;z-index:10060;display:flex;align-items:flex-end;justify-content:center;padding:16px;background:rgba(8,10,36,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .22s ease}
+.sar-ov.in{opacity:1}.sar-ov.out{opacity:0}
+.sar-card{width:min(400px,100%);margin-bottom:max(8px,env(safe-area-inset-bottom));padding:12px 22px 22px;border-radius:28px;text-align:center;color:var(--text);
+  background:radial-gradient(120% 60% at 50% 0%,rgba(255,107,107,.16),transparent 65%),linear-gradient(165deg,var(--surface),var(--surface-2));
+  border:1px solid rgba(255,107,107,.3);box-shadow:0 30px 70px -20px rgba(0,0,0,.65);transform:translateY(40px) scale(.97);transition:transform .38s cubic-bezier(.2,1,.3,1)}
+.sar-ov.in .sar-card{transform:none}.sar-ov.out .sar-card{transform:translateY(30px)}
+.sar-grab{width:42px;height:4px;border-radius:4px;background:rgba(127,127,160,.35);margin:0 auto 16px}
+.sar-who{position:relative;width:76px;height:76px;margin:0 auto 10px}
+.sar-av{width:100%;height:100%;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--surface);box-shadow:0 0 0 2px rgba(255,107,107,.55),0 12px 22px -10px rgba(0,0,0,.5)}
+.sar-ini{display:grid;place-items:center;font:900 26px Cairo,sans-serif;color:#fff;background:linear-gradient(145deg,#845EC2,#3FDCC9)}
+.sar-badge{position:absolute;right:-6px;bottom:-4px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--surface);border:1px solid rgba(255,107,107,.45);box-shadow:0 6px 12px -6px rgba(0,0,0,.5)}
+.sar-name{font:700 13px Tajawal,Arial,sans-serif;color:var(--text-muted)}
+.sar-title{margin-top:6px;font:900 19px/1.4 Cairo,sans-serif}
+.sar-body{margin-top:8px;font:500 13.5px/1.7 Tajawal,Arial,sans-serif;color:var(--text-muted)}
+.sar-safe{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 13px;border-radius:16px;text-align:right;font:600 12.5px/1.6 Tajawal,Arial,sans-serif;background:rgba(95,224,164,.1);border:1px solid rgba(95,224,164,.3);color:var(--text)}
+.sar-actions{display:flex;gap:10px;margin-top:18px}
+.sar-actions button{flex:1;padding:14px 10px;border-radius:16px;font:800 14.5px Cairo,sans-serif;cursor:pointer;transition:transform .12s}
+.sar-actions button:active{transform:scale(.97)}
+.sar-cancel{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.sar-ok{border:0;color:#fff;background:linear-gradient(135deg,#FF8A7A,#E5484D);box-shadow:0 14px 24px -12px rgba(229,72,77,.7)}
+@media(prefers-reduced-motion:reduce){.sar-card,.sar-ov{transition:none}}
+</style>
 </body>
 </html>
