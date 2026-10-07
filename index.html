@@ -10992,6 +10992,11 @@ function renderMePage(){
   const tierName = mi.name, tierIcon = mi.icon;
   const nextAt = nx ? (+nx.min||0) : null;
   const pct = nx ? Math.min(100, Math.round(((total-(+mi.min||0))/Math.max(1,(+nx.min||0)-(+mi.min||0)))*100)) : 100;
+  const _A = window.fxAttStats ? window.fxAttStats(p.id) : null;
+  const attRate = _A ? _A.rate : (flat.length ? Math.round(attended*100/flat.length) : 0);
+  const lastN = _A ? _A.last : flat.slice(-7).map(f=>!!CHECKINS[p.id+'__'+f.session.id]);
+  const streakN = _A ? _A.streak : streak.current;
+  setTimeout(meAnimate, 40);
   const st = (ico,val,lab,cls,unit)=>`<div class="me-stat ${cls||''}"><div class="ico">${ico}</div><b>${val}${unit?`<small>${unit}</small>`:''}</b><span>${lab}</span></div>`;
   const link = (ico,page,label,cnt)=>`<button type="button" class="me-link" data-action="tile-nav" data-page="${page}"><span class="ico">${ico}</span><span class="t">${label}</span>${cnt?`<span class="cnt">${cnt}</span>`:''}${ICO.chev}</button>`;
   return `
@@ -11001,17 +11006,30 @@ function renderMePage(){
     </div>
     <div class="me-card" style="--me-cover:linear-gradient(135deg, ${AVATAR_COLOR}cc, ${AVATAR_COLOR}33 70%, transparent);">
       <div class="me-cover"></div>
-      ${meAvatarHtml(p,'me-av').replace('class="me-av"','class="me-av" data-action="open-my-avatar"')}
+      <div class="me-ring" style="--p:${pct}">
+        <svg viewBox="0 0 136 136" aria-hidden="true"><circle class="rt" cx="68" cy="68" r="64"/><circle class="rf" cx="68" cy="68" r="64" pathLength="100" style="--to:${100-pct}"/></svg>
+        ${meAvatarHtml(p,'me-av').replace('class="me-av"','class="me-av" data-action="open-my-avatar"')}
+        <span class="me-ring-tier" title="${escapeHtml(tierName)}">${tierIcon}</span>
+      </div>
       <div class="me-name">${escapeHtml(p.name)}</div>
       <div class="me-chips">
         <span class="me-chip gold">#${escapeHtml(p.id)}</span>
         ${title?`<span class="me-chip">🏷️ ${title}</span>`:''}
+        ${(()=>{ const e=myExtra(p.id), cp=cpOf(p.id)||{}, bd=e.birth||cp.birth, ph=e.phone||cp.phone; return (bd?`<span class="me-chip">🎂 ${escapeHtml(meFmtBirth(bd))}</span>`:'')+(ph?`<span class="me-chip" dir="ltr">📞 ${escapeHtml(ph)}</span>`:''); })()}
       </div>
+      ${myExtra(p.id).bio?`<div class="me-bio">${escapeHtml(myExtra(p.id).bio)}</div>`:''}
+      <button type="button" class="me-edit-btn" data-action="edit-my-profile">✏️ تعديل بياناتي</button>
     </div>
     <div class="me-stats">
-      ${st('⭐',total,'مجموع النقاط','pts','نقطة')}
-      ${st('🏆',rank>0?('#'+rank):'—','الترتيب','rank')}
+      ${st('⭐',`<span data-count="${total}">0</span>`,'مجموع النقاط','pts','نقطة')}
+      ${st('🏆',rank>0?(`#<span data-count="${rank}">0</span>`):'—','الترتيب','rank')}
+      ${st('🔥',`<span data-count="${streakN}">0</span>`,'حضور متتالي','streak','مرة')}
+      ${st('📈',`<span data-count="${attRate}">0</span>`,'نسبة الحضور','rate','%')}
     </div>
+    ${lastN.length?`<div class="me-week">
+      <div class="me-week-top"><span>${lastN.length?'آخر '+lastN.length+' اجتماعات':'سجل الاجتماعات'}</span><small>${lastN.filter(x=>x).length} من ${lastN.length}</small></div>
+      <div class="me-dots">${lastN.map((x,i)=>`<i class="${x?'on':''}" style="--i:${i}">${x?'✓':''}</i>`).join('')}</div>
+    </div>`:''}
     <div class="me-tier">
       <div class="me-tier-top"><span>${tierIcon} الميدالية ${escapeHtml(tierName)}</span><small>${nextAt?`باقي ${Math.max(0,nextAt-total)} نقطة لـ${nx.icon} ${escapeHtml(nx.name)}`:'وصلت لأعلى مستوى'}</small></div>
       <div class="me-bar"><i style="width:${pct}%"></i></div>
@@ -11022,6 +11040,79 @@ function renderMePage(){
     </div>
     <button type="button" class="btn btn-ghost me-logout" data-action="logout">${ICO.logout} تسجيل الخروج</button>
   `;
+}
+
+
+/* أنيميشن صفحة الملف الشخصي: عدّاد الأرقام + تعبئة الحلقة */
+function meAnimate(){
+  const root = document.querySelector('.me-card'); if(!root) return;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.me-stat [data-count]').forEach(el=>{
+    const to = +el.dataset.count || 0; if(reduce || to===0){ el.textContent = to; return; }
+    const t0 = performance.now(), dur = 900 + Math.min(700, to*2);
+    const f = now=>{ const t = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-t,3); el.textContent = Math.round(to*e); if(t<1) requestAnimationFrame(f); };
+    requestAnimationFrame(f);
+  });
+  const ring = document.querySelector('.me-ring');
+  if(ring && !ring._b){ ring._b = 1; ring.addEventListener('click', ()=>{ ring.classList.remove('pop'); void ring.offsetWidth; ring.classList.add('pop'); }); }
+}
+/* ---------- تعديل بيانات المخدوم من ملفه الشخصي ---------- */
+function meFmtBirth(v){ try{ const d=new Date(v+'T00:00:00'); return d.toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return v; } }
+function openEditMyProfile(){
+  const p = PARTICIPANTS.find(x=>x.id===state.pid); if(!p) return;
+  const e = myExtra(p.id);
+  const old = document.getElementById('emp-ov'); if(old) old.remove();
+  const ov = document.createElement('div'); ov.id='emp-ov'; ov.className='sar-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.innerHTML = `<div class="sar-card emp-card">
+    <div class="sar-grab"></div>
+    <div class="sar-title">تعديل بياناتي</div>
+    <div class="emp-av-row">
+      <div class="emp-av" id="emp-av" style="${p.photo?`background-image:url('${p.photo}')`:`background:${AVATAR_COLOR}`}">${p.photo?'':escapeHtml(initials(p.name))}</div>
+      <label class="emp-photo-btn">📷 تغيير الصورة<input type="file" accept="image/*" id="emp-photo" hidden></label>
+    </div>
+    <label class="emp-lab" for="emp-name">الاسم</label>
+    <input id="emp-name" class="field" maxlength="40" value="${escapeHtml(p.name)}" autocomplete="off">
+    <label class="emp-lab" for="emp-bio">نبذة عنك</label>
+    <textarea id="emp-bio" class="field" maxlength="140" rows="2" placeholder="جملة قصيرة عنك…">${escapeHtml(e.bio||'')}</textarea>
+    <label class="emp-lab" for="emp-phone">رقم التليفون</label>
+    <input id="emp-phone" class="field" type="tel" inputmode="tel" dir="ltr" maxlength="15" value="${escapeHtml(e.phone||(cpOf(p.id)||{}).phone||'')}" placeholder="01xxxxxxxxx">
+    <label class="emp-lab" for="emp-birth">تاريخ الميلاد</label>
+    <input id="emp-birth" class="field" type="date" value="${escapeHtml(e.birth||(cpOf(p.id)||{}).birth||'')}" max="${new Date().toISOString().slice(0,10)}">
+    <div class="sar-actions"><button type="button" class="sar-cancel">إلغاء</button><button type="button" class="sar-ok" id="emp-save">حفظ</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>ov.classList.add('in'));
+  let newPhoto = null;
+  const close = ()=>{ ov.classList.remove('in'); ov.classList.add('out'); setTimeout(()=>ov.remove(),260); };
+  ov.querySelector('#emp-photo').addEventListener('change', async ev=>{
+    newPhoto = await readImageFileToDataUrl(ev.target, 260);
+    if(newPhoto){ const a=ov.querySelector('#emp-av'); a.style.background=''; a.style.backgroundImage=`url('${newPhoto}')`; a.textContent=''; }
+  });
+  ov.addEventListener('click', async ev=>{
+    if(ev.target===ov || ev.target.closest('.sar-cancel')){ close(); return; }
+    if(!ev.target.closest('#emp-save')) return;
+    const btn = ev.target.closest('#emp-save'); if(btn.disabled) return;
+    const name = ov.querySelector('#emp-name').value.trim();
+    const phone = normalizeDigits(ov.querySelector('#emp-phone').value.trim()).replace(/[^0-9+]/g,'');
+    if(!name){ showToast('الاسم مينفعش يبقى فاضي', true); return; }
+    if(phone && phone.replace(/\D/g,'').length<8){ showToast('رقم التليفون مش صحيح', true); return; }
+    btn.disabled = true; btn.textContent = 'جاري الحفظ…';
+    e.bio = ov.querySelector('#emp-bio').value.trim();
+    e.phone = phone;
+    e.birth = ov.querySelector('#emp-birth').value || '';
+    let ok = true;
+    try{
+      await saveProfileExtra(PROFILE_EXTRA);
+      if(name !== p.name){
+        const o = PARTICIPANT_OVERRIDES[p.id] || (PARTICIPANT_OVERRIDES[p.id] = {});
+        o.name = name; p.name = name;
+        ok = (await saveParticipantOverrides(PARTICIPANT_OVERRIDES)) && ok;
+      }
+      if(newPhoto){ p.photo = newPhoto; ok = (await savePhotoIndividually(p.id, newPhoto)) && ok; }
+    }catch(err){ ok = false; }
+    close(); render();
+    showToast(ok ? 'تم حفظ بياناتك ✅' : '⚠️ حصلت مشكلة في الحفظ — جرّب تاني', !ok);
+  });
 }
 /* بيحوّل صورة base64 لرابط blob مرة واحدة — عشان الصور الكبيرة متتكررش جوه HTML الصفحة في كل رسم (ده كان سبب تقل إكس أو والألعاب) */
 function glvBlobUrl(d){
@@ -25159,6 +25250,7 @@ function renderAdmin(){
   else if(tab==='cardshop') body = renderAdminCardShopTab();
   else if(tab==='quizq') body = renderAdminQuizQuestionsTab();
   else if(tab==='structure') body = renderAdminStructureTab();
+  else if(window.FXADMIN && window.FXADMIN[tab]) body = window.FXADMIN[tab]();
   else if(tab==='attendance'){ body = renderAdminAttendanceTab(); if(!state.attNav || (!state.attNav.type && state.attNav.page!=='addtype')) body += adminSettingsGroup('attscan'); }
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
   let pageTitle = hubItem ? hubItem.label : 'لوحة المنظمين';
@@ -25771,6 +25863,7 @@ function render(){
   else if(state.view==='myphotos') html = renderMyPhotosPage();
   else if(state.view==='gallery') html = renderGalleryPage();
   else if(state.view==='gallery-album') html = renderGalleryAlbumPage();
+  else if(window.FXVIEWS && window.FXVIEWS[state.view]) html = window.FXVIEWS[state.view]();
   else if(state.view==='games') html = renderGamesHub();
   else if(state.view==='game-achievements') html = renderGameAchievements();
   else if(state.view==='game-leaderboard') html = renderGameLeaderboard();
@@ -27934,6 +28027,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-restore-builtin-theme'){ doAdminRestoreBuiltinTheme(el.dataset.k); }
   else if(action==='open-chat-image'){ openChatImageLightbox(el.dataset.media); }
   else if(action==='open-my-avatar'){ openMyAvatarLightbox(); }
+  else if(action==='edit-my-profile'){ openEditMyProfile(); }
   else if(action==='open-add-participant'){ state.addingParticipant = true; state._suggestedNewCode = null; render(); }
   else if(action==='close-add-participant'){ state.addingParticipant = false; render(); }
   else if(action==='regen-new-code'){ state._suggestedNewCode = null; render(); }
@@ -35723,6 +35817,746 @@ html[data-theme="light"] ::-webkit-scrollbar{ width:8px; height:8px; } html[data
 .adp-lab b{color:var(--danger)}
 .adp-in{margin-top:6px;text-align:center;font-weight:800}
 .sar-ok[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+.me-bio{ margin:10px 18px 0; text-align:center; font-size:13px; font-weight:600; color:var(--text-muted); line-height:1.6; position:relative; }
+.me-edit-btn{ appearance:none; margin:12px auto 4px; display:block; position:relative; padding:9px 20px; border-radius:99px; cursor:pointer; font-family:'Cairo',Tahoma,sans-serif; font-weight:800; font-size:13px; color:var(--gold); background:color-mix(in srgb,var(--gold) 12%,transparent); border:1px solid color-mix(in srgb,var(--gold) 40%,transparent); }
+.me-edit-btn:active{ transform:scale(.96); }
+.emp-card{ max-height:88vh; overflow-y:auto; text-align:right; }
+.emp-card .field{ margin-bottom:10px; padding:12px 14px; font-size:14px; }
+.emp-card textarea.field{ resize:none; font-family:inherit; }
+.emp-lab{ display:block; font-size:12px; font-weight:800; color:var(--text-muted); margin:4px 4px 5px; }
+.emp-av-row{ display:flex; align-items:center; gap:14px; margin:6px 0 12px; }
+.emp-av{ width:68px; height:68px; border-radius:50%; flex:none; background-size:cover; background-position:center; display:grid; place-items:center; font-weight:800; font-size:24px; color:#fff; border:2px solid var(--gold); }
+.emp-photo-btn{ cursor:pointer; padding:10px 16px; border-radius:14px; font-size:13px; font-weight:800; color:var(--text); background:var(--bg-2); border:1.5px solid var(--border); }
+
+.me-ring{ position:relative; width:136px; height:136px; margin:-68px auto 10px; z-index:1; }
+.me-ring svg{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); overflow:visible; }
+.me-ring circle{ fill:none; stroke-width:4; }
+.me-ring .rt{ stroke:rgba(255,255,255,.12); }
+html[data-theme="light"] .me-ring .rt{ stroke:rgba(20,33,61,.1); }
+.me-ring .rf{ stroke:var(--gold); stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; filter:drop-shadow(0 0 5px color-mix(in srgb,var(--gold) 70%,transparent)); animation:meRing 1.4s cubic-bezier(.22,1,.36,1) .25s forwards; }
+@keyframes meRing{ to{ stroke-dashoffset:var(--to); } }
+.me-ring .me-av{ position:absolute; inset:12px; width:auto; height:auto; margin:0; box-shadow:0 12px 26px rgba(0,0,0,.4); animation:meAvIn .7s cubic-bezier(.34,1.6,.5,1) both; }
+@keyframes meAvIn{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
+.me-ring.pop .me-av{ animation:mePop .55s cubic-bezier(.34,1.8,.5,1); }
+@keyframes mePop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.12) rotate(-3deg); } 100%{ transform:scale(1); } }
+.me-ring-tier{ position:absolute; bottom:2px; inset-inline-end:2px; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-size:19px; background:var(--surface); border:2px solid var(--gold); box-shadow:0 4px 12px rgba(0,0,0,.35); animation:meAvIn .6s cubic-bezier(.34,1.6,.5,1) .9s both; }
+.me-cover::before{ content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%); transform:translateX(-120%); animation:meShine 4.5s ease-in-out 1s infinite; }
+@keyframes meShine{ 0%{ transform:translateX(-120%); } 55%,100%{ transform:translateX(120%); } }
+.me-card{ animation:meRise .55s cubic-bezier(.2,1,.3,1) both; }
+.me-name{ animation:meRise .5s cubic-bezier(.2,1,.3,1) .15s both; }
+.me-chip{ animation:meRise .45s cubic-bezier(.2,1,.3,1) .3s both; }
+.me-stats{ grid-template-columns:1fr 1fr; }
+.me-stat{ transition:transform .25s cubic-bezier(.34,1.6,.5,1); }
+.me-stat:active{ transform:scale(.96); }
+.me-stat.streak{ --acc:#ff7a3d; --acc-rgb:255,122,61; }
+.me-stat.rate{ --acc:#7c9cff; --acc-rgb:124,156,255; }
+.me-stat.streak .ico{ animation:meFlame 1.6s ease-in-out infinite; }
+@keyframes meFlame{ 0%,100%{ transform:scale(1) rotate(-2deg); } 50%{ transform:scale(1.12) rotate(3deg); } }
+.me-stat b span{ font-variant-numeric:tabular-nums; }
+.me-week{ border-radius:20px; padding:14px 16px; margin-bottom:14px; background:var(--surface); border:1px solid var(--border); animation:meRise .5s cubic-bezier(.2,1,.3,1) .18s both; }
+.me-week-top{ display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13.5px; margin-bottom:12px; }
+.me-week-top small{ color:var(--text-muted); font-weight:600; font-size:11.5px; }
+.me-dots{ display:flex; gap:8px; justify-content:space-between; }
+.me-dots i{ flex:1; max-width:44px; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; font-style:normal; font-size:14px; font-weight:900; color:var(--text-muted); background:rgba(255,255,255,.06); border:1.5px dashed var(--border); animation:meDot .5s cubic-bezier(.34,1.8,.5,1) calc(.5s + var(--i)*.08s) both; }
+html[data-theme="light"] .me-dots i{ background:rgba(20,33,61,.05); }
+.me-dots i.on{ color:#1a1633; border:none; background:linear-gradient(150deg,var(--gold-2),var(--gold)); box-shadow:0 4px 10px -3px color-mix(in srgb,var(--gold) 70%,transparent); }
+@keyframes meDot{ from{ transform:scale(0); opacity:0; } to{ transform:none; opacity:1; } }
+.me-bar i{ position:relative; overflow:hidden; transform-origin:right; animation:meBar 1.2s cubic-bezier(.22,1,.36,1) .4s both; }
+html[dir="ltr"] .me-bar i{ transform-origin:left; }
+@keyframes meBar{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+.me-bar i::after{ content:''; position:absolute; inset:0; background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%); transform:translateX(-100%); animation:meShine 2.8s ease-in-out 1.6s infinite; }
+.me-link{ transition:background .2s, padding .25s; }
+.me-link:active{ padding-inline-start:20px; }
+@media (prefers-reduced-motion:reduce){ .me-card,.me-name,.me-chip,.me-week,.me-dots i,.me-bar i,.me-bar i::after,.me-cover::before,.me-ring-tier,.me-ring .me-av,.me-stat .ico{ animation:none !important; } .me-ring .rf{ animation:none; stroke-dashoffset:var(--to); } }
+/* ===== FX PACK ===== */
+.fx-av{ width:42px; height:42px; border-radius:50%; flex:none; background-size:cover; background-position:center; display:grid; place-items:center; font-weight:800; font-size:15px; color:#fff; border:1.5px solid color-mix(in srgb,var(--gold) 45%,transparent); }
+.fx-av.lg{ width:58px; height:58px; font-size:20px; }
+.fx-link{ appearance:none; background:none; border:none; color:var(--gold); font-family:inherit; font-weight:800; font-size:12.5px; cursor:pointer; padding:4px 8px; }
+.fx-hint{ font-size:12px; line-height:1.7; color:var(--text-muted); margin-bottom:10px; }
+.fx-sep{ font-weight:800; font-size:13px; margin:14px 0 8px; color:var(--gold); }
+.fx-form .field{ margin-bottom:8px; }
+.fx-old{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.fx-old small{ display:block; color:var(--text-muted); font-size:11.5px; margin-top:2px; }
+.fx-x{ appearance:none; width:38px; height:38px; flex:none; border-radius:12px; border:1px solid var(--border); background:var(--bg-2); color:var(--coral); font-weight:900; cursor:pointer; }
+/* افتقاد */
+.fx-care{ margin-bottom:10px; border-inline-start:4px solid var(--gold); }
+.fx-care.sev-hi{ border-inline-start-color:#ff5a5f; } .fx-care.sev-mid{ border-inline-start-color:#ff9a3d; }
+.fx-care-top{ display:flex; align-items:center; gap:10px; }
+.fx-care-nm{ flex:1; min-width:0; } .fx-care-nm b{ display:block; font-size:14.5px; } .fx-care-nm small{ color:var(--text-muted); font-size:11.5px; }
+.fx-sev{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:46px; height:46px; border-radius:14px; font-weight:900; font-size:18px; line-height:1; background:rgba(255,154,61,.14); color:#ff9a3d; }
+.sev-hi .fx-sev{ background:rgba(255,90,95,.14); color:#ff5a5f; } .fx-sev i{ font-style:normal; font-size:9px; font-weight:700; margin-top:2px; }
+.fx-care-acts{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 8px; }
+.fx-act{ appearance:none; text-decoration:none; font-family:inherit; font-size:12px; font-weight:800; padding:7px 12px; border-radius:99px; cursor:pointer; color:var(--text); background:var(--bg-2); border:1px solid var(--border); }
+.fx-act.wa{ color:#25d366; border-color:rgba(37,211,102,.4); } .fx-act.off{ opacity:.5; }
+.fx-cn{ font-size:13px !important; padding:10px 12px !important; resize:none; margin-bottom:8px; }
+.fx-care-btn{ width:100%; }
+.fx-care-done{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; font-size:12.5px; font-weight:800; color:var(--teal); }
+/* آية الاجتماع */
+.fx-verse{ position:relative; overflow:hidden; border-radius:22px; padding:16px 16px 16px; margin:14px 0; background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 22%,var(--surface)),var(--surface)); border:1px solid color-mix(in srgb,var(--gold) 35%,transparent); animation:fxRise .55s cubic-bezier(.2,1,.3,1) both; }
+.fx-v-head{ display:flex; justify-content:space-between; align-items:center; font-weight:900; font-size:13.5px; color:var(--gold); margin-bottom:10px; }
+.fx-v-head em{ font-style:normal; font-size:18px; }
+.fx-verse.open .fx-v-head em{ animation:fxTwinkle 1.8s ease-in-out infinite; }
+.fx-v-blur{ font-size:17px; line-height:2; font-weight:700; letter-spacing:1px; color:var(--text-muted); filter:blur(3.5px); user-select:none; text-align:center; }
+.fx-v-lock{ text-align:center; font-size:12.5px; color:var(--text-muted); margin:10px 0 12px; line-height:1.7; } .fx-v-lock b{ color:var(--gold); }
+.fx-v-btn{ appearance:none; display:block; margin:0 auto; border:none; cursor:pointer; padding:10px 22px; border-radius:99px; font-family:inherit; font-weight:900; font-size:13.5px; color:#1a1633; background:linear-gradient(150deg,var(--gold-2),var(--gold)); box-shadow:0 8px 18px -8px var(--gold); animation:fxNudge 2.6s ease-in-out infinite; }
+.fx-verse.locked::after{ content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.12) 50%,transparent 65%); transform:translateX(-120%); animation:meShine 4s ease-in-out 1s infinite; }
+.fx-v-text{ font-size:18px; line-height:2; font-weight:700; text-align:center; animation:fxReveal 1.1s cubic-bezier(.2,1,.3,1) both; }
+.fx-v-ref{ text-align:center; color:var(--gold); font-weight:800; font-size:13px; margin-top:6px; animation:fxReveal 1.1s .25s both; }
+@keyframes fxReveal{ from{ opacity:0; filter:blur(10px); transform:translateY(10px) scale(.96); } to{ opacity:1; filter:none; transform:none; } }
+.fx-v-q{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); display:flex; flex-direction:column; gap:8px; animation:fxReveal .8s .5s both; }
+.fx-v-q > b{ font-size:14px; } .fx-v-pts{ align-self:flex-start; font-size:11.5px; font-weight:900; color:#1a1633; background:var(--gold); padding:2px 10px; border-radius:99px; }
+.fx-v-o{ appearance:none; text-align:right; font-family:inherit; font-weight:700; font-size:14px; padding:11px 14px; border-radius:14px; cursor:pointer; color:var(--text); background:var(--bg-2); border:1.5px solid var(--border); transition:transform .15s, border-color .2s; }
+button.fx-v-o:active{ transform:scale(.97); border-color:var(--gold); }
+div.fx-v-o{ cursor:default; } .fx-v-o.ok{ border-color:#5FE0A4; background:rgba(95,224,164,.14); } .fx-v-o.bad{ border-color:#ff5a5f; background:rgba(255,90,95,.12); }
+.fx-v-res{ font-weight:900; font-size:13px; text-align:center; color:var(--text-muted); } .fx-v-res.ok{ color:#5FE0A4; }
+/* كروت الرئيسية */
+.fx-home{ appearance:none; width:100%; text-align:right; font-family:inherit; color:var(--text); cursor:pointer; display:block; border-radius:22px; padding:14px 16px; margin:12px 0; background:var(--surface); border:1px solid var(--border); animation:fxRise .55s cubic-bezier(.2,1,.3,1) both; }
+.fx-home:active{ transform:scale(.98); }
+.fx-h-top{ display:flex; justify-content:space-between; align-items:center; font-weight:900; font-size:14px; margin-bottom:10px; } .fx-h-top em{ font-style:normal; font-size:12px; color:var(--gold); }
+.fx-mrow{ display:flex; align-items:center; gap:8px; margin-bottom:7px; } .fx-mrow > span{ width:24px; text-align:center; } .fx-mrow small{ width:70px; font-size:11px; color:var(--text-muted); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fx-mrow i{ flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; } html[data-theme="light"] .fx-mrow i{ background:rgba(20,33,61,.08); }
+.fx-mrow b{ display:block; height:100%; border-radius:99px; background:var(--c); width:var(--w); transform-origin:right; animation:meBar 1s cubic-bezier(.22,1,.36,1) .3s both; }
+.fx-wb{ display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,color-mix(in srgb,var(--violet) 35%,var(--surface)),color-mix(in srgb,var(--teal) 20%,var(--surface))); }
+.fx-wb b{ display:block; font-size:14.5px; } .fx-wb small{ color:var(--text-muted); font-size:11.5px; } .fx-wb-e{ font-size:30px; animation:fxNudge 2.4s ease-in-out infinite; } .fx-wb i{ margin-inline-start:auto; font-style:normal; font-size:22px; color:var(--gold); }
+@keyframes fxRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+@keyframes fxNudge{ 0%,100%{ transform:none; } 50%{ transform:translateY(-3px) scale(1.04); } }
+@keyframes fxTwinkle{ 0%,100%{ transform:scale(1) rotate(0); } 50%{ transform:scale(1.3) rotate(15deg); } }
+/* تحدي الأسر */
+.fx-pick{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.fx-pick-b{ appearance:none; font-family:inherit; color:var(--text); cursor:pointer; border-radius:20px; padding:18px 10px; display:flex; flex-direction:column; align-items:center; gap:4px; background:color-mix(in srgb,var(--c) 14%,var(--surface)); border:1.5px solid color-mix(in srgb,var(--c) 50%,transparent); transition:transform .2s; animation:fxRise .5s both; }
+.fx-pick-b:active{ transform:scale(.95); } .fx-pick-b span{ font-size:38px; } .fx-pick-b small{ color:var(--text-muted); }
+.fx-myteam{ display:flex; align-items:center; gap:14px; border-radius:24px; padding:16px; margin:6px 0 4px; background:linear-gradient(140deg,color-mix(in srgb,var(--c) 30%,var(--surface)),var(--surface)); border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent); animation:fxRise .5s both; }
+.fx-mt-ico{ font-size:46px; animation:fxNudge 3s ease-in-out infinite; } .fx-mt-b{ flex:1; min-width:0; } .fx-mt-b small{ color:var(--text-muted); font-size:11px; display:block; } .fx-mt-b b{ font-size:19px; font-weight:900; display:block; } .fx-mt-b span{ font-size:12px; font-weight:700; color:var(--text-muted); }
+.fx-mt-n{ text-align:center; } .fx-mt-n b{ font-size:30px; font-weight:900; color:var(--gold); display:block; line-height:1.1; } .fx-mt-n small{ font-size:10px; color:var(--text-muted); display:block; max-width:96px; }
+.fx-board{ display:flex; flex-direction:column; gap:9px; }
+.fx-brow{ display:flex; align-items:center; gap:10px; padding:12px; border-radius:18px; background:var(--surface); border:1px solid var(--border); animation:fxRise .5s var(--d,0s) both; }
+.fx-brow.me{ border-color:color-mix(in srgb,var(--c) 70%,transparent); box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent); }
+.fx-b-rk{ width:30px; text-align:center; font-size:20px; font-weight:900; } .fx-b-ic{ font-size:28px; } .fx-b-mid{ flex:1; min-width:0; }
+.fx-b-top{ display:flex; justify-content:space-between; align-items:baseline; font-size:14px; } .fx-b-top em{ font-style:normal; font-size:10px; background:var(--c); color:#1a1633; padding:1px 7px; border-radius:99px; margin-inline-start:4px; font-weight:900; } .fx-b-top span{ font-weight:900; color:var(--c); } .fx-b-top small{ font-size:10px; color:var(--text-muted); }
+.fx-b-bar{ height:9px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin:7px 0 4px; } html[data-theme="light"] .fx-b-bar{ background:rgba(20,33,61,.08); }
+.fx-b-bar i{ display:block; height:100%; border-radius:99px; width:var(--w); background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 60%,#fff)); transform-origin:right; animation:meBar 1.2s cubic-bezier(.22,1,.36,1) .35s both; }
+.fx-b-sub{ font-size:11px; color:var(--text-muted); }
+.fx-stars{ padding:6px 12px; } .fx-star{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); } .fx-star:last-child{ border:none; }
+.fx-star .n{ width:20px; text-align:center; font-weight:900; color:var(--text-muted); } .fx-star b{ flex:1; font-size:13.5px; } .fx-star em{ font-style:normal; font-weight:900; color:var(--gold); } .fx-star.me b{ color:var(--gold); }
+.fx-trow{ display:flex; gap:8px; margin-bottom:8px; align-items:center; } .fx-ti{ width:76px !important; flex:none; text-align:center; font-size:20px !important; padding:8px !important; } .fx-tn{ flex:1; }
+.fx-prow{ display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:6px; border-radius:14px; background:var(--surface); border:1px solid var(--border); }
+.fx-pn{ flex:1; min-width:0; display:flex; align-items:center; gap:8px; } .fx-pn b{ font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .fx-asg{ width:140px !important; flex:none; padding:8px 10px !important; font-size:13px !important; margin:0 !important; }
+/* شارات القيم */
+.fx-left{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-radius:18px; background:var(--surface); border:1px solid var(--border); font-weight:800; font-size:13px; margin-bottom:6px; }
+.fx-left i{ font-style:normal; font-size:22px; filter:grayscale(1) opacity(.3); transition:.3s; margin-inline-start:4px; } .fx-left i.on{ filter:none; animation:fxTwinkle 2.4s ease-in-out infinite; }
+.fx-vchips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.fx-vchip{ display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px; font-size:12px; background:color-mix(in srgb,var(--gold) 13%,transparent); border:1px solid color-mix(in srgb,var(--gold) 38%,transparent); animation:meDot .5s cubic-bezier(.34,1.8,.5,1) calc(.3s + var(--i)*.08s) both; }
+.fx-vchip i{ font-style:normal; font-size:16px; } .fx-vchip b{ font-weight:800; } .fx-vchip em{ font-style:normal; font-weight:900; color:var(--gold); }
+.fx-top3{ display:flex; gap:10px; justify-content:center; } .fx-t3{ flex:1; max-width:110px; text-align:center; padding:12px 6px; border-radius:18px; background:var(--surface); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:4px; animation:fxRise .5s both; } .fx-t3 span{ font-size:20px; } .fx-t3 b{ font-size:13px; } .fx-t3 small{ font-size:11px; color:var(--text-muted); }
+.fx-people{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.fx-person{ appearance:none; font-family:inherit; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:16px; background:var(--surface); border:1px solid var(--border); text-align:right; } .fx-person:active{ background:color-mix(in srgb,var(--gold) 10%,var(--surface)); }
+.fx-person b{ flex:1; font-size:14px; } .fx-person span{ font-size:12px; color:var(--gold); font-weight:800; }
+.fx-vb-who{ display:flex; flex-direction:column; align-items:center; gap:6px; font-weight:900; font-size:16px; }
+.fx-vb-list{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.fx-vb-b{ appearance:none; font-family:inherit; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:16px; text-align:right; background:var(--bg-2); border:1.5px solid var(--border); transition:transform .15s,border-color .2s; }
+.fx-vb-b:active:not(:disabled){ transform:scale(.97); border-color:var(--gold); } .fx-vb-b:disabled{ opacity:.45; }
+.fx-vb-b i{ font-style:normal; font-size:28px; } .fx-vb-b span{ flex:1; } .fx-vb-b b{ display:block; font-size:14.5px; } .fx-vb-b small{ color:var(--text-muted); font-size:11.5px; } .fx-vb-b em{ font-style:normal; font-size:11px; font-weight:800; color:var(--teal); }
+.fx-me-vb{ border-radius:20px; padding:14px 16px; margin-bottom:14px; background:var(--surface); border:1px solid var(--border); animation:meRise .5s cubic-bezier(.2,1,.3,1) .22s both; }
+.fx-me-vb-top{ display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13.5px; margin-bottom:10px; } .fx-me-vb-top button{ appearance:none; background:none; border:none; font-family:inherit; font-weight:800; font-size:12px; color:var(--gold); cursor:pointer; }
+.fx-me-vb-empty{ text-align:center; font-size:12px; color:var(--text-muted); }
+/* ملخص الشهر */
+.fx-wsel{ display:flex; gap:8px; margin:4px 0 14px; } .fx-wsel button{ flex:1; appearance:none; font-family:inherit; font-weight:800; font-size:13px; padding:10px; border-radius:14px; cursor:pointer; color:var(--text-muted); background:var(--surface); border:1.5px solid var(--border); } .fx-wsel button.on{ color:var(--gold); border-color:var(--gold); background:color-mix(in srgb,var(--gold) 10%,var(--surface)); }
+.fx-wprev{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; } .fx-wprev div{ text-align:center; padding:14px 6px; border-radius:18px; background:var(--surface); border:1px solid var(--border); } .fx-wprev b{ display:block; font-size:24px; font-weight:900; color:var(--gold); } .fx-wprev small{ font-size:11px; color:var(--text-muted); }
+.fx-wgo{ width:100%; font-size:15px; padding:14px; }
+.fx-wr{ position:fixed; inset:0; z-index:10100; display:flex; flex-direction:column; color:#fff; transition:background .5s; animation:fxFade .35s both; overflow:hidden; touch-action:manipulation; user-select:none; }
+.fx-wr::before{ content:''; position:absolute; inset:-20%; background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.18),transparent 45%),radial-gradient(circle at 85% 85%,rgba(255,255,255,.12),transparent 40%); animation:fxDrift 9s ease-in-out infinite alternate; pointer-events:none; }
+@keyframes fxFade{ from{ opacity:0; } to{ opacity:1; } } @keyframes fxDrift{ to{ transform:translate(3%,4%) scale(1.08); } }
+.fx-w-bars{ position:relative; z-index:3; display:flex; gap:5px; padding:max(14px,env(safe-area-inset-top)) 14px 0; } .fx-w-bars i{ flex:1; height:3.5px; border-radius:9px; background:rgba(255,255,255,.28); overflow:hidden; } .fx-w-bars b{ display:block; height:100%; width:0; background:#fff; transform-origin:right; }
+.fx-w-bars i.done b{ width:100%; } .fx-w-bars i.run b{ width:100%; animation:fxProg linear forwards; } @keyframes fxProg{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+.fx-w-x{ position:absolute; z-index:5; top:max(26px,calc(env(safe-area-inset-top) + 12px)); inset-inline-start:14px; appearance:none; width:36px; height:36px; border-radius:50%; border:none; background:rgba(0,0,0,.28); color:#fff; font-size:15px; cursor:pointer; }
+.fx-w-stage{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:20px 28px; }
+.fx-w-tap{ position:absolute; inset:60px 0 0; z-index:4; display:flex; } .fx-w-tap span{ flex:1; } .fx-w-tap span:first-child{ flex:.35; }
+.fx-w-s{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; max-width:420px; }
+.fx-w-e{ font-size:92px; line-height:1; animation:fxPopIn .7s cubic-bezier(.34,1.8,.5,1) both; }
+.fx-w-t{ font-size:22px; font-weight:800; opacity:.92; animation:fxRise .6s .15s both; }
+.fx-w-big{ font-size:96px; font-weight:900; line-height:1.05; display:flex; align-items:baseline; gap:10px; animation:fxPopIn .7s .25s cubic-bezier(.34,1.6,.5,1) both; text-shadow:0 8px 30px rgba(0,0,0,.25); } .fx-w-big small{ font-size:22px; font-weight:800; opacity:.9; }
+.fx-w-sub{ font-size:16px; font-weight:700; line-height:1.8; opacity:.95; animation:fxRise .6s .5s both; }
+.fx-w-btns{ position:relative; z-index:6; display:flex; flex-direction:column; gap:10px; margin-top:16px; width:100%; animation:fxRise .6s .8s both; }
+.fx-w-btns button{ appearance:none; font-family:inherit; font-weight:900; font-size:15px; padding:13px; border-radius:99px; border:none; cursor:pointer; background:#fff; color:#1a1633; } .fx-w-btns button + button{ background:rgba(255,255,255,.18); color:#fff; }
+@keyframes fxPopIn{ from{ transform:scale(.4) rotate(-12deg); opacity:0; } to{ transform:none; opacity:1; } }
+@media (prefers-reduced-motion:reduce){ .fx-verse,.fx-home,.fx-brow,.fx-v-text,.fx-v-q,.fx-w-e,.fx-w-big,.fx-wr::before,.fx-pick-b,.fx-myteam,.fx-vchip,.fx-b-bar i,.fx-mrow b,.fx-v-btn,.fx-wb-e,.fx-mt-ico{ animation:none !important; } }
 </style>
+<script id="fx-pack-js">
+/* ===== FX PACK: افتقاد + آية الاجتماع + تحدي الأسر + ملخص شهري + شارات القيم ===== */
+(function(){
+'use strict';
+if(window.__fxPack) return; window.__fxPack = 1;
+
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var K = {care:'glavera-care-v1', teams:'glavera-teams-v1', sv:'glavera-sverse-v1', vb:'glavera-vbadge-v1'};
+var F = {care:{}, teams:{list:[],assign:{},base:{},round:null,hist:[]}, sv:{}, vb:{recv:{},given:{}}, t:0, busy:false, sig:''};
+var FXV = {};      /* صفحات المشارك */
+var FXA = {};      /* تابات الأدمن */
+window.FXVIEWS = FXV; window.FXADMIN = FXA;
+
+/* ---------- تخزين مشترك ---------- */
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null) return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){
+  try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? JSON.parse(cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }
+  catch(e){ return Promise.resolve(null); }
+}
+function relevantView(){
+  var v = state.view;
+  return !!FXV[v] || v==='profile' || v==='me' || (v==='admin' && state.adminUnlocked);
+}
+async function doLoad(){
+  try{
+    var r = await Promise.all([jg(K.care,{}), jg(K.teams,null), jg(K.sv,{}), jg(K.vb,null)]);
+    F.care = r[0] || {};
+    F.teams = Object.assign({list:[],assign:{},base:{},round:null,hist:[]}, r[1] || {});
+    F.sv = r[2] || {};
+    F.vb = Object.assign({recv:{},given:{}}, r[3] || {}); F.vb.recv = F.vb.recv||{}; F.vb.given = F.vb.given||{};
+    var sig = JSON.stringify([F.care,F.teams,F.sv,F.vb]), ch = sig!==F.sig; F.sig = sig; F.t = Date.now();
+    if(ch && relevantView()){
+      var a = document.activeElement;
+      if(!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) && !document.getElementById('fx-wr')) render();
+    }
+  }catch(e){ console.error('fx load', e); }
+}
+function load(force){
+  if(!force && Date.now()-F.t < 25000) return Promise.resolve();
+  var run = function(){ F.p = doLoad().then(function(){ F.p = null; }); return F.p; };
+  return F.p ? (force ? F.p.then(run) : F.p) : run();
+}
+function ensure(){ load(false); }
+function person(pid){ return PARTICIPANTS.find(function(p){ return String(p.id)===String(pid); }); }
+function av(p, cls){ return p ? meAvatarHtml(p, cls||'fx-av') : '<div class="'+(cls||'fx-av')+'"></div>'; }
+function weekKey(){ return Math.floor((Date.now() - 2*864e5) / (7*864e5)); }
+function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString('ar-EG', {day:'numeric', month:'long'}); }catch(e){ return ''; } }
+function ago(ts){
+  var d = Math.floor((Date.now()-ts)/864e5);
+  return d<=0 ? 'النهارده' : d===1 ? 'امبارح' : 'من '+d+' أيام';
+}
+function backRow(title){ return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">'+title+'</div></div>'; }
+function hero(ico, title, sub){ return '<div class="opinion-hero"><div class="opinion-hero-ico">'+ico+'</div><div class="opinion-hero-title">'+title+'</div><div class="opinion-hero-sub">'+sub+'</div></div>'; }
+
+/* ---------- جلسات الاجتماع والحضور ---------- */
+function sessions(type, closedOnly){
+  type = type || 'meeting';
+  var m = {}, c = (typeof ATT_CONFIG!=='undefined' && ATT_CONFIG) ? ATT_CONFIG[type] : null;
+  var cnt = {};
+  Object.values(ATT_RECORDS||{}).forEach(function(r){
+    if(!r || r.type!==type || !r.sid) return;
+    cnt[r.sid] = (cnt[r.sid]||0)+1;
+    var s = m[r.sid] || (m[r.sid] = {sid:r.sid, ts:r.ts||0, name:r.sname||''});
+    if(r.ts && (!s.ts || r.ts < s.ts)) s.ts = r.ts;
+  });
+  var list = Object.values(m).filter(function(s){ return (cnt[s.sid]||0) >= 2; });
+  if(closedOnly && c && c.open) list = list.filter(function(s){ return s.sid!==c.sessionId; });
+  return list.sort(function(a,b){ return a.ts-b.ts; });
+}
+function went(pid, sid, type){ return !!(ATT_RECORDS && ATT_RECORDS[pid+'__'+(type||'meeting')+'__'+sid]); }
+window.fxAttStats = function(pid){
+  var S = sessions('meeting', true), got = S.map(function(s){ return went(pid, s.sid); });
+  var cur = 0; for(var i=got.length-1; i>=0 && got[i]; i--) cur++;
+  var max = 0, run = 0; got.forEach(function(g){ run = g ? run+1 : 0; if(run>max) max = run; });
+  var all = Object.values(ATT_RECORDS||{}).filter(function(r){ return r && r.pid===pid; }).length;
+  var hit = got.filter(Boolean).length;
+  return {streak:cur, max:max, rate:S.length ? Math.round(hit*100/S.length) : 0, last:got.slice(-7), attended:all, sessions:S.length, hit:hit};
+};
+
+/* =====================================================================
+   2) الافتقاد (أدمن)
+   ===================================================================== */
+function careData(){
+  var S = sessions('meeting', true), todo = [], done = [], recovered = 0;
+  if(S.length < 2) return {S:S, todo:todo, done:done, recovered:0};
+  PARTICIPANTS.forEach(function(p){
+    var missed = 0, li = -1;
+    for(var i=S.length-1; i>=0; i--){ if(went(p.id, S[i].sid)){ li = i; break; } missed++; }
+    var c = F.care[p.id] || null, lastTs = li>=0 ? S[li].ts : 0;
+    if(missed >= 2){
+      var row = {p:p, missed:missed, lastTs:lastTs, never:li<0, c:c, contacted:!!(c && c.at && c.at >= lastTs)};
+      (row.contacted ? done : todo).push(row);
+    } else if(c && c.at && S.some(function(s){ return s.ts > c.at && went(p.id, s.sid); })) recovered++;
+  });
+  todo.sort(function(a,b){ return b.missed-a.missed || a.lastTs-b.lastTs; });
+  done.sort(function(a,b){ return b.c.at-a.c.at; });
+  return {S:S, todo:todo, done:done, recovered:recovered};
+}
+function phoneOf(pid){ var cp = (typeof cpOf==='function' && cpOf(pid)) || {}, e = PROFILE_EXTRA[pid] || {}; return (e.phone || cp.phone || '').toString(); }
+function waLink(ph){ var d = normalizeDigits(ph).replace(/\D/g,''); if(!d) return ''; if(d.charAt(0)==='0') d = '20'+d.slice(1); return 'https://wa.me/'+d; }
+FXA.care = function(){
+  ensure();
+  var D = careData(), f = adminSubGet('fxCareTab','todo');
+  if(D.S.length < 2) return adminEmptyState('💛','محتاج اجتماعين مسجّلين على الأقل','أول ما يكون عندك اجتماعين فيهم حضور، هتظهر هنا قايمة الافتقاد تلقائيًا');
+  var rows = (f==='done' ? D.done : f==='all' ? D.todo.concat(D.done) : D.todo);
+  var kp = adminKpis([
+    {num:D.todo.length, lab:'محتاجين افتقاد', cls:D.todo.length?'is-alert':'is-ok'},
+    {num:D.done.length, lab:'تم التواصل'},
+    {num:D.recovered, lab:'رجعوا بعد الافتقاد', cls:'is-ok'}
+  ]);
+  var tabs = adminSubTabs('fxCareTab', [{id:'todo',label:'لسه ('+D.todo.length+')'},{id:'done',label:'تم ('+D.done.length+')'},{id:'all',label:'الكل'}], f);
+  var list = rows.map(function(r){
+    var p = r.p, ph = phoneOf(p.id), wa = waLink(ph), sev = r.missed>=4 ? 'hi' : r.missed===3 ? 'mid' : 'lo';
+    return '<div class="card fx-care sev-'+sev+' fx-crow" data-pid="'+esc(p.id)+'">'
+      + '<div class="fx-care-top">'+av(p)+'<div class="fx-care-nm"><b>'+esc(p.name)+'</b><small>'
+      + (r.never ? 'ماحضرش أي اجتماع من الاجتماعات المسجلة' : 'آخر حضور: '+fmtDate(r.lastTs))+'</small></div>'
+      + '<span class="fx-sev" title="اجتماعات متتالية غايب عنها">'+r.missed+'<i>غياب</i></span></div>'
+      + '<div class="fx-care-acts">'
+      + (ph ? '<a class="fx-act" href="tel:'+esc(ph)+'">📞 اتصال</a>' : '<span class="fx-act off">📵 مفيش رقم</span>')
+      + (wa ? '<a class="fx-act wa" href="'+esc(wa)+'" target="_blank" rel="noopener">💬 واتساب</a>' : '')
+      + '<button type="button" class="fx-act" data-fx="care-msg" data-pid="'+esc(p.id)+'">💌 رسالة داخل التطبيق</button></div>'
+      + '<textarea id="fx-cn-'+esc(p.id)+'" class="field fx-cn" rows="2" placeholder="ملاحظة عن التواصل (مين كلّمه، إيه ظروفه…)">'+esc(r.c && r.c.note || '')+'</textarea>'
+      + (r.contacted
+          ? '<div class="fx-care-done">✅ تم التواصل '+ago(r.c.at)+'<button type="button" class="fx-link" data-fx="care-save" data-pid="'+esc(p.id)+'" data-keep="1">حفظ الملاحظة</button><button type="button" class="fx-link" data-fx="care-undo" data-pid="'+esc(p.id)+'">إلغاء</button></div>'
+          : '<button type="button" class="btn btn-primary fx-care-btn" data-fx="care-save" data-pid="'+esc(p.id)+'">✅ تم التواصل</button>')
+      + '</div>';
+  }).join('');
+  return kp + tabs
+    + (rows.length ? '<input type="text" class="field admin-search-input" data-filter-target=".fx-crow" placeholder="🔍 دوّر بالاسم…">' + list
+        : adminEmptyState(f==='done'?'🕊️':'🎉', f==='done'?'لسه ما اتسجّلش تواصل':'مفيش حد محتاج افتقاد دلوقتي', 'القايمة بتتحدّث تلقائيًا مع كل اجتماع'));
+};
+async function careSave(pid, keep){
+  var ta = document.getElementById('fx-cn-'+pid), note = ta ? ta.value.trim() : '';
+  await ju(K.care, function(o){ o = o||{}; var old = o[pid]||{}; o[pid] = {at: keep && old.at ? old.at : Date.now(), note:note, by:'admin'}; return o; });
+  showToast(keep ? 'اتحفظت الملاحظة' : 'اتسجّل التواصل ✅'); await load(true); render();
+}
+
+/* =====================================================================
+   3) آية الاجتماع (تتكشف بالحضور + سؤال بنقاط)
+   ===================================================================== */
+function curMeet(){ return (ATT_CONFIG && ATT_CONFIG.meeting && ATT_CONFIG.meeting.sessionId) ? ATT_CONFIG.meeting : null; }
+FXA.sverse = function(){
+  ensure();
+  var c = curMeet();
+  if(!c) return adminEmptyState('📜','مفيش جلسة اجتماع حالية','افتح «الحضور (QR)» وأنشئ يوم اجتماع الأول، وبعدين ارجع هنا وحط آية الجلسة');
+  var v = F.sv[c.sessionId] || {};
+  var o = v.opts || ['','',''];
+  var rest = Object.keys(F.sv).filter(function(k){ return k!==c.sessionId; }).sort(function(a,b){ return (F.sv[b].at||0)-(F.sv[a].at||0); }).slice(0,8);
+  return '<div class="card fx-form">'
+    + '<div class="fx-hint">الآية دي بتظهر للمشارك <b>مقفولة</b> لحد ما يسجّل حضوره في: <b>'+esc(c.name||'الاجتماع')+'</b>، وبعدها تتكشف بأنيميشن ويجاوب على سؤال ياخد عليه نقط.</div>'
+    + '<label class="emp-lab" for="fx-sv-text">نص الآية</label><textarea id="fx-sv-text" class="field" rows="3" placeholder="اكتب الآية…">'+esc(v.text||'')+'</textarea>'
+    + '<label class="emp-lab" for="fx-sv-ref">المرجع</label><input id="fx-sv-ref" class="field" value="'+esc(v.ref||'')+'" placeholder="مثال: يوحنا ١٥: ٥">'
+    + '<div class="fx-sep">سؤال سريع (اختياري)</div>'
+    + '<input id="fx-sv-q" class="field" value="'+esc(v.q||'')+'" placeholder="السؤال…">'
+    + [0,1,2].map(function(i){ return '<div class="fx-opt-row"><input type="radio" name="fx-sv-ans" value="'+i+'" '+((v.ans||0)===i?'checked':'')+'><input id="fx-sv-o'+i+'" class="field" value="'+esc(o[i]||'')+'" placeholder="الاختيار '+(i+1)+'"></div>'; }).join('')
+    + '<div class="fx-hint" style="margin-top:2px">الدايرة بتحدد الإجابة الصح.</div>'
+    + '<label class="emp-lab" for="fx-sv-pts">نقاط الإجابة الصح</label><input id="fx-sv-pts" class="field" type="number" min="0" max="100" value="'+(v.pts==null?5:v.pts)+'">'
+    + '<div class="sar-actions" style="margin-top:12px"><button type="button" class="btn btn-primary" data-fx="sv-save">💾 حفظ الآية</button>'
+    + (v.text ? '<button type="button" class="btn btn-ghost" data-fx="sv-del" data-sid="'+esc(c.sessionId)+'">🗑️ حذف</button>' : '')+'</div></div>'
+    + (rest.length ? '<div class="section-title">آيات سابقة</div>' + rest.map(function(k){ var x=F.sv[k]; return '<div class="card card-sm fx-old"><div><b>'+esc(x.name||'جلسة')+'</b><small>'+esc((x.text||'').slice(0,70))+'…</small></div><button type="button" class="fx-link" data-fx="sv-del" data-sid="'+esc(k)+'">حذف</button></div>'; }).join('') : '');
+};
+async function svSave(){
+  var c = curMeet(); if(!c) return;
+  var g = function(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  var text = g('fx-sv-text'); if(!text){ showToast('اكتب نص الآية', true); return; }
+  var q = g('fx-sv-q'), opts = [g('fx-sv-o0'), g('fx-sv-o1'), g('fx-sv-o2')];
+  var sel = document.querySelector('input[name="fx-sv-ans"]:checked'), ans = sel ? +sel.value : 0;
+  if(q && (opts.filter(Boolean).length<2 || !opts[ans])){ showToast('السؤال محتاج اختيارين على الأقل والإجابة الصح لازم تكون مكتوبة', true); return; }
+  var pts = Math.max(0, Math.min(100, parseInt(g('fx-sv-pts'),10)||0));
+  await ju(K.sv, function(o){ o = o||{}; o[c.sessionId] = {text:text, ref:g('fx-sv-ref'), q:q, opts:opts, ans:ans, pts:pts, name:c.name||'', at:Date.now()}; return o; });
+  showToast('اتحفظت آية الاجتماع 📜'); await load(true); render();
+}
+function verseCard(pid){
+  var c = curMeet(); if(!c) return '';
+  var v = F.sv[c.sessionId]; if(!v || !v.text) return '';
+  var open = (typeof attDone==='function') ? attDone(pid,'meeting') : went(pid, c.sessionId);
+  if(!open){
+    var fake = v.text.split(/\s+/).map(function(w){ return '•'.repeat(Math.max(2, Math.min(7, w.length))); }).join(' ');
+    return '<div class="fx-verse locked"><div class="fx-v-head"><span>📜 آية الاجتماع</span><em>🔒</em></div>'
+      + '<div class="fx-v-blur" aria-hidden="true">«'+fake+'»</div>'
+      + '<div class="fx-v-lock">سجّل حضورك النهارده عشان تكشف الآية'+(v.q&&v.pts?' وتجاوب على سؤال بـ <b>+'+v.pts+' نقطة</b>':'')+'</div>'
+      + '<button type="button" class="fx-v-btn" data-action="tile-nav" data-page="attendance">✅ سجّل حضورك</button></div>';
+  }
+  var ex = myExtra(pid), mine = (ex.sv||{})[c.sessionId], qh = '';
+  if(v.q){
+    if(mine){
+      qh = '<div class="fx-v-q"><b>'+esc(v.q)+'</b>'+v.opts.map(function(o,i){ return o ? '<div class="fx-v-o '+(i===v.ans?'ok':(i===mine.a?'bad':''))+'">'+(i===v.ans?'✓ ':(i===mine.a?'✗ ':''))+esc(o)+'</div>' : ''; }).join('')
+        + '<div class="fx-v-res '+(mine.ok?'ok':'')+'">'+(mine.ok ? '🎉 إجابة صح'+(v.pts?' — خدت +'+v.pts+' نقطة':'') : 'مش المرة دي — الإجابة الصح متعلّمة فوق 💛')+'</div></div>';
+    } else {
+      qh = '<div class="fx-v-q"><b>'+esc(v.q)+'</b>'+(v.pts?'<span class="fx-v-pts">+'+v.pts+' نقطة</span>':'')
+        + v.opts.map(function(o,i){ return o ? '<button type="button" class="fx-v-o" data-fx="sv-ans" data-i="'+i+'">'+esc(o)+'</button>' : ''; }).join('')+'</div>';
+    }
+  }
+  return '<div class="fx-verse open"><div class="fx-v-head"><span>📜 آية الاجتماع</span><em>✨</em></div>'
+    + '<div class="fx-v-text">«'+esc(v.text)+'»</div>'+(v.ref?'<div class="fx-v-ref">'+esc(v.ref)+'</div>':'')+qh+'</div>';
+}
+async function svAnswer(i){
+  var c = curMeet(), pid = state.pid; if(!c||!pid) return; var v = F.sv[c.sessionId]; if(!v) return;
+  var ex = myExtra(pid); ex.sv = ex.sv||{}; if(ex.sv[c.sessionId]) return;
+  var ok = i===v.ans; ex.sv[c.sessionId] = {a:i, ok:ok, t:Date.now()};
+  if(ok && v.pts>0){
+    ex.questsClaimed = ex.questsClaimed||{}; var key = 'sverse_'+c.sessionId;
+    if(!ex.questsClaimed[key]){ ex.questsClaimed[key] = true; BONUS[pid] = (BONUS[pid]||0)+v.pts; await saveBonus(BONUS); pushNotification(pid, 'جاوبت صح على سؤال آية الاجتماع +'+v.pts+' نقطة 📜','📜'); }
+  }
+  await saveProfileExtra(PROFILE_EXTRA);
+  try{ vibrate(ok?[20,15,30]:[40]); if(ok){ SND.coinChime(); goldDustBurst(innerWidth/2, innerHeight/2, 18); } }catch(e){}
+  render();
+}
+
+/* =====================================================================
+   5) تحدي الأسر
+   ===================================================================== */
+var TEAM_ICONS = ['🦁','🦅','🐑','🕊️','🔥','⚓','🌿','⭐','🛡️','🌊','👑','🕯️'];
+var TEAM_COLORS = ['#F4B740','#3FDCC9','#FF6B9D','#7C9CFF','#5FE0A4','#FF7A59','#9B8CFF','#FFD166'];
+function teamOf(pid){ var id = F.teams.assign[pid]; return F.teams.list.find(function(t){ return t.id===id; }) || null; }
+function gainOf(pid){
+  var tot = participantTotal(pid);
+  if(!F.teams.round) return tot;
+  var b = F.teams.base[pid]; return b==null ? 0 : Math.max(0, tot-b);
+}
+function teamBoard(){
+  var rows = F.teams.list.map(function(t, i){
+    var mem = PARTICIPANTS.filter(function(p){ return F.teams.assign[p.id]===t.id; });
+    var gains = mem.map(function(p){ return {p:p, g:gainOf(p.id)}; }).sort(function(a,b){ return b.g-a.g; });
+    var sum = gains.reduce(function(s,x){ return s+x.g; }, 0);
+    return {t:t, color:t.color||TEAM_COLORS[i%TEAM_COLORS.length], mem:mem, gains:gains, sum:sum, avg:mem.length ? sum/mem.length : 0};
+  }).sort(function(a,b){ return b.avg-a.avg || b.sum-a.sum; });
+  rows.forEach(function(r,i){ r.rank = i+1; });
+  return rows;
+}
+var MEDAL = ['🥇','🥈','🥉'];
+FXV.teams = function(){
+  ensure(); var pid = state.pid, B = teamBoard(), mine = teamOf(pid), me = mine ? B.find(function(r){ return r.t.id===mine.id; }) : null;
+  var h = backRow('تحدي الأسر') + hero('🛡️','تحدي الأسر', F.teams.round ? 'الجولة: '+esc(F.teams.round.name)+' · من '+fmtDate(F.teams.round.at) : 'نقط أسرتك = متوسط نقط أعضائها — كل واحد فارق');
+  if(!B.length) return h + '<div class="empty-note">لسه مفيش أسر اتعملت — المنظمين هيجهّزوها قريب</div>';
+  if(!mine){
+    return h + '<div class="section-title">اختار أسرتك</div><div class="fx-pick">'
+      + B.map(function(r){ return '<button type="button" class="fx-pick-b" style="--c:'+r.color+'" data-fx="team-join" data-id="'+esc(r.t.id)+'"><span>'+esc(r.t.icon)+'</span><b>'+esc(r.t.name)+'</b><small>'+r.mem.length+' عضو</small></button>'; }).join('')
+      + '</div><div class="hint">تقدر تختار مرة واحدة — لو غلطت كلّم المنظمين يغيّروها لك.</div>';
+  }
+  var mx = Math.max.apply(null, B.map(function(r){ return r.avg; }).concat([1]));
+  var myG = gainOf(pid), share = me.sum ? Math.round(myG*100/me.sum) : 0;
+  return h
+    + '<div class="fx-myteam" style="--c:'+me.color+'"><div class="fx-mt-ico">'+esc(me.t.icon)+'</div><div class="fx-mt-b"><small>أسرتك</small><b>'+esc(me.t.name)+'</b>'
+    + '<span>'+MEDAL[me.rank-1]+' المركز '+me.rank+' من '+B.length+' · '+me.mem.length+' عضو</span></div>'
+    + '<div class="fx-mt-n"><b data-cu="'+Math.round(myG)+'">0</b><small>نقطتك في الجولة · '+share+'% من أسرتك</small></div></div>'
+    + '<div class="section-title">الترتيب</div><div class="fx-board">'
+    + B.map(function(r, i){
+        var isMe = r.t.id===mine.id;
+        return '<div class="fx-brow '+(isMe?'me':'')+'" style="--c:'+r.color+';--d:'+(i*.12)+'s"><span class="fx-b-rk">'+(MEDAL[i]||'#'+r.rank)+'</span>'
+          + '<span class="fx-b-ic">'+esc(r.t.icon)+'</span><div class="fx-b-mid"><div class="fx-b-top"><b>'+esc(r.t.name)+(isMe?' <em>أسرتك</em>':'')+'</b><span>'+(Math.round(r.avg*10)/10)+' <small>متوسط</small></span></div>'
+          + '<div class="fx-b-bar"><i style="--w:'+Math.max(4, Math.round(r.avg*100/mx))+'%"></i></div><small class="fx-b-sub">'+r.mem.length+' عضو · مجموع '+Math.round(r.sum)+' نقطة</small></div></div>';
+      }).join('')+'</div>'
+    + '<div class="section-title">نجوم أسرتك</div><div class="card fx-stars">'
+    + me.gains.slice(0,5).map(function(x,i){ return '<div class="fx-star '+(String(x.p.id)===String(pid)?'me':'')+'"><span class="n">'+(i+1)+'</span>'+av(x.p)+'<b>'+esc(x.p.name)+'</b><em>+'+Math.round(x.g)+'</em></div>'; }).join('')+'</div>'
+    + (F.teams.hist && F.teams.hist.length ? '<div class="section-title">الجولات السابقة</div>'+F.teams.hist.slice(-3).reverse().map(function(h){ return '<div class="card card-sm fx-old"><div><b>'+esc(h.name)+'</b><small>🏆 الفايزة: '+esc(h.winner||'—')+'</small></div></div>'; }).join('') : '');
+};
+function teamsHome(pid){
+  if(F.teams.list.length < 2) return '';
+  var B = teamBoard(), mine = teamOf(pid), me = mine && B.find(function(r){ return r.t.id===mine.id; });
+  var mx = Math.max.apply(null, B.map(function(r){ return r.avg; }).concat([1]));
+  return '<button type="button" class="fx-home fx-th" data-action="tile-nav" data-page="teams"><div class="fx-h-top"><span>🛡️ تحدي الأسر</span><em>'+(me ? MEDAL[me.rank-1]+' أسرتك #'+me.rank : 'اختار أسرتك ›')+'</em></div>'
+    + '<div class="fx-mini">'+B.slice(0,3).map(function(r,i){ return '<div class="fx-mrow" style="--c:'+r.color+'"><span>'+esc(r.t.icon)+'</span><i><b style="--w:'+Math.max(5,Math.round(r.avg*100/mx))+'%"></b></i><small>'+esc(r.t.name)+'</small></div>'; }).join('')+'</div></button>';
+}
+function snakeAssign(all){
+  var list = F.teams.list; if(!list.length) return;
+  var pool = PARTICIPANTS.filter(function(p){ return all || !F.teams.assign[p.id]; }).map(function(p){ return {id:p.id, t:participantTotal(p.id)+Math.random()*.01}; }).sort(function(a,b){ return b.t-a.t; });
+  var n = list.length, cnt = {}; list.forEach(function(t){ cnt[t.id] = 0; });
+  PARTICIPANTS.forEach(function(p){ if(!all && F.teams.assign[p.id]) cnt[F.teams.assign[p.id]] = (cnt[F.teams.assign[p.id]]||0)+1; });
+  pool.forEach(function(x, i){
+    var rnd = Math.floor(i/n), pos = i%n, idx = rnd%2===0 ? pos : n-1-pos;
+    var tgt = list.slice().sort(function(a,b){ return cnt[a.id]-cnt[b.id]; })[0];
+    if(Math.abs(cnt[list[idx].id]-cnt[tgt.id]) <= 1) tgt = list[idx];
+    F.teams.assign[x.id] = tgt.id; cnt[tgt.id]++;
+  });
+}
+FXA.teams = function(){
+  ensure(); var T = F.teams, B = teamBoard();
+  var unassigned = PARTICIPANTS.filter(function(p){ return !T.assign[p.id]; }).length;
+  var h = adminKpis([{num:T.list.length, lab:'أسرة'},{num:PARTICIPANTS.length-unassigned, lab:'موزّعين'},{num:unassigned, lab:'من غير أسرة', cls:unassigned?'is-alert':'is-ok'}]);
+  h += adminSectionTitle('🛡️','الأسر');
+  h += '<div class="card fx-form">'+T.list.map(function(t,i){
+    return '<div class="fx-trow" data-tid="'+esc(t.id)+'"><select class="field fx-ti">'+TEAM_ICONS.map(function(ic){ return '<option '+(ic===t.icon?'selected':'')+'>'+ic+'</option>'; }).join('')+'</select>'
+      + '<input class="field fx-tn" value="'+esc(t.name)+'" maxlength="24"><button type="button" class="fx-x" data-fx="team-del" data-id="'+esc(t.id)+'" aria-label="حذف">✕</button></div>';
+  }).join('')
+  + '<div class="sar-actions" style="margin-top:10px"><button type="button" class="btn btn-ghost" data-fx="team-add">＋ أسرة جديدة</button>'+(T.list.length?'<button type="button" class="btn btn-primary" data-fx="team-save">💾 حفظ الأسماء</button>':'')+'</div></div>';
+  if(T.list.length >= 2){
+    h += adminSectionTitle('🎲','التوزيع');
+    h += '<div class="card fx-form"><div class="fx-hint">التوزيع الذكي بيرتّب الناس بنقطهم ويوزّعهم بالتبادل (Snake) عشان الأسر تبقى متكافئة.</div><div class="sar-actions">'
+      + '<button type="button" class="btn btn-primary" data-fx="team-auto" data-all="0">⚡ وزّع اللي من غير أسرة ('+unassigned+')</button>'
+      + '<button type="button" class="btn btn-ghost" data-fx="team-auto" data-all="1">🔄 إعادة توزيع الكل</button></div></div>';
+    h += adminSectionTitle('🏁','الجولة');
+    h += '<div class="card fx-form"><div class="fx-hint">'+(T.round?'الجولة الحالية: <b>'+esc(T.round.name)+'</b> بدأت '+fmtDate(T.round.at)+'. ':'مفيش جولة شغّالة — الترتيب حاليًا على إجمالي النقاط. ')+'بداية جولة جديدة بتصفّر عدّاد النقاط للأسر (نقط الناس نفسها ما بتتأثرش) وبتحفظ الفايزة.</div>'
+      + '<input id="fx-round-name" class="field" placeholder="اسم الجولة (مثال: تحدي أكتوبر)"><button type="button" class="btn btn-primary" style="margin-top:8px" data-fx="round-start">🏁 ابدأ جولة جديدة</button>'
+      + (T.round?'<button type="button" class="btn btn-ghost" style="margin-top:8px" data-fx="round-end">إنهاء الجولة وإعلان الفايزة</button>':'')+'</div>';
+    h += adminSectionTitle('👥','توزيع الأعضاء');
+    h += '<input type="text" class="field admin-search-input" data-filter-target=".fx-prow" placeholder="🔍 دوّر بالاسم…">'
+      + PARTICIPANTS.map(function(p){
+        return '<div class="fx-prow"><span class="fx-pn">'+av(p)+'<b>'+esc(p.name)+'</b></span><select class="field fx-asg" data-pid="'+esc(p.id)+'"><option value="">— بدون —</option>'
+          + T.list.map(function(t){ return '<option value="'+esc(t.id)+'" '+(T.assign[p.id]===t.id?'selected':'')+'>'+esc(t.icon)+' '+esc(t.name)+'</option>'; }).join('')+'</select></div>';
+      }).join('');
+  }
+  return h;
+};
+function teamSet(fn){ return ju(K.teams, function(o){ o = Object.assign({list:[],assign:{},base:{},round:null,hist:[]}, o||{}); fn(o); return o; }); }
+function snapBase(o){ o.base = {}; PARTICIPANTS.forEach(function(p){ o.base[p.id] = participantTotal(p.id); }); }
+function winnerName(){ var b = teamBoard(); return b.length && b[0].mem.length ? b[0].t.name : ''; }
+
+/* =====================================================================
+   9) شارات القيم
+   ===================================================================== */
+var VB = [
+  {k:'help',   i:'🤝', n:'إيده ممدودة', d:'دايمًا بيساعد'},
+  {k:'joy',    i:'😊', n:'روحه حلوة',   d:'بيفرّح اللي حواليه'},
+  {k:'faith',  i:'🙏', n:'ملتزم روحيًا', d:'مواظب وبيصلّي للكل'},
+  {k:'inspire',i:'🌟', n:'ملهم',        d:'بيشجّعني أبقى أحسن'},
+  {k:'serve',  i:'🕯️', n:'خدوم',        d:'بيخدم من قلبه'}
+];
+var VB_LIMIT = 3;
+function vbOf(pid){ return F.vb.recv[pid] || {}; }
+function vbCount(pid){ var r = vbOf(pid); return Object.keys(r).reduce(function(s,k){ return s+(r[k]||0); }, 0); }
+function vbLeft(pid){ var g = (F.vb.given[pid]||{})[weekKey()] || []; return Math.max(0, VB_LIMIT-g.length); }
+function vbChips(pid, big){
+  var r = vbOf(pid), got = VB.filter(function(b){ return r[b.k]>0; });
+  if(!got.length) return '';
+  return '<div class="fx-vchips '+(big?'big':'')+'">'+got.map(function(b,i){ return '<span class="fx-vchip" style="--i:'+i+'" title="'+esc(b.d)+'"><i>'+b.i+'</i><b>'+esc(b.n)+'</b><em>×'+r[b.k]+'</em></span>'; }).join('')+'</div>';
+}
+FXV.values = function(){
+  ensure(); var pid = state.pid, left = vbLeft(pid), q = (state.fxVq||'').trim();
+  var h = backRow('شارات القيم') + hero('🌟','شارات القيم','قدّر زميلك على أخلاقه — مش على نقطه. التقدير مجهول 💛');
+  h += '<div class="fx-left"><span>باقي لك هذا الأسبوع</span><div>'+[0,1,2].map(function(i){ return '<i class="'+(i<left?'on':'')+'">🌟</i>'; }).join('')+'</div></div>';
+  var mine = vbChips(pid, true);
+  h += '<div class="section-title">شاراتك</div>' + (mine ? '<div class="card">'+mine+'</div>' : '<div class="empty-note">لسه ما جاتلكش شارات — خلّيك حلو مع الناس وهتيجي 😉</div>');
+  var top = PARTICIPANTS.map(function(p){ return {p:p, n:vbCount(p.id)}; }).filter(function(x){ return x.n>0; }).sort(function(a,b){ return b.n-a.n; }).slice(0,3);
+  if(top.length) h += '<div class="section-title">الأكتر تقديرًا</div><div class="fx-top3">'+top.map(function(x,i){ return '<div class="fx-t3"><span>'+MEDAL[i]+'</span>'+av(x.p,'fx-av lg')+'<b>'+esc(x.p.name.split(' ')[0])+'</b><small>'+x.n+' شارة</small></div>'; }).join('')+'</div>';
+  h += '<div class="section-title">قدّر زميلك</div><input type="text" class="field admin-search-input" data-filter-target=".fx-person" placeholder="🔍 دوّر على اسم…">';
+  h += '<div class="fx-people">'+PARTICIPANTS.filter(function(p){ return String(p.id)!==String(pid); }).map(function(p){
+    return '<button type="button" class="fx-person" data-fx="vb-open" data-pid="'+esc(p.id)+'">'+av(p)+'<b>'+esc(p.name)+'</b><span>'+(left?'قدّره ›':'🔒')+'</span></button>';
+  }).join('')+'</div>';
+  return h;
+};
+function vbSheet(to){
+  var p = person(to); if(!p) return;
+  var left = vbLeft(state.pid), g = ((F.vb.given[state.pid]||{})[weekKey()]||[]);
+  if(!left){ showToast('خلّصت شارات الأسبوع ده — الأسبوع الجاي تتجدد 🌟', true); return; }
+  var old = document.getElementById('fx-vb-ov'); if(old) old.remove();
+  var ov = document.createElement('div'); ov.id='fx-vb-ov'; ov.className='sar-ov';
+  ov.innerHTML = '<div class="sar-card"><div class="sar-grab"></div><div class="fx-vb-who">'+av(p,'fx-av lg')+'<b>'+esc(p.name)+'</b></div>'
+    + '<div class="sar-title" style="margin:6px 0 4px;font-size:16px">إيه اللي شفته فيه؟</div><div class="fx-hint" style="text-align:center">باقي لك '+left+' من '+VB_LIMIT+' · مجهول</div>'
+    + '<div class="fx-vb-list">'+VB.map(function(b){ var used = g.some(function(x){ return String(x[0])===String(to) && x[1]===b.k; });
+        return '<button type="button" class="fx-vb-b" '+(used?'disabled':'')+' data-vb="'+b.k+'"><i>'+b.i+'</i><span><b>'+esc(b.n)+'</b><small>'+esc(b.d)+'</small></span>'+(used?'<em>اتدّى</em>':'')+'</button>'; }).join('')+'</div>'
+    + '<div class="sar-actions"><button type="button" class="sar-cancel">إلغاء</button></div></div>';
+  document.body.appendChild(ov); requestAnimationFrame(function(){ ov.classList.add('in'); });
+  var close = function(){ ov.classList.remove('in'); ov.classList.add('out'); setTimeout(function(){ ov.remove(); }, 260); };
+  ov.addEventListener('click', async function(e){
+    if(e.target===ov || e.target.closest('.sar-cancel')){ close(); return; }
+    var b = e.target.closest('[data-vb]'); if(!b || b.disabled) return;
+    b.disabled = true; var type = b.dataset.vb, me = state.pid, res = 'fail', wk = weekKey();
+    await ju(K.vb, function(o){
+      o = o||{}; o.recv = o.recv||{}; o.given = o.given||{};
+      var gm = o.given[me] || (o.given[me] = {}); Object.keys(gm).forEach(function(k){ if(+k!==wk) delete gm[k]; });
+      var list = gm[wk] || (gm[wk] = []);
+      if(list.length >= VB_LIMIT){ res='limit'; return o; }
+      if(list.some(function(x){ return String(x[0])===String(to) && x[1]===type; })){ res='dup'; return o; }
+      list.push([to, type]); o.recv[to] = o.recv[to]||{}; o.recv[to][type] = (o.recv[to][type]||0)+1; res = 'ok'; return o;
+    });
+    close(); await load(true);
+    if(res==='ok'){
+      var bd = VB.find(function(x){ return x.k===type; });
+      try{ pushNotification(to, 'حد من زمايلك شافك «'+bd.n+'» '+bd.i+' — كمّل يا حبيبي 💛', bd.i); }catch(e){}
+      try{ vibrate([15,30,15]); SND.coinChime(); goldDustBurst(innerWidth/2, innerHeight*0.6, 22); }catch(e){}
+      showToast('وصلت الشارة '+bd.i+' لـ'+p.name.split(' ')[0]);
+    } else showToast(res==='limit' ? 'خلّصت شارات الأسبوع' : res==='dup' ? 'اديتله الشارة دي قبل كده الأسبوع ده' : 'حصلت مشكلة — جرّب تاني', true);
+    render();
+  });
+}
+
+/* =====================================================================
+   8) ملخص الشهر (Wrapped)
+   ===================================================================== */
+function wrapData(pid, off){
+  var d = new Date(), a = new Date(d.getFullYear(), d.getMonth()+off, 1).getTime(), b = new Date(d.getFullYear(), d.getMonth()+off+1, 1).getTime();
+  var recs = Object.values(ATT_RECORDS||{}).filter(function(r){ return r && r.pid===pid && r.ts>=a && r.ts<b; });
+  var byType = {}; recs.forEach(function(r){ byType[r.type] = (byType[r.type]||0)+1; });
+  var fav = Object.keys(byType).sort(function(x,y){ return byType[y]-byType[x]; })[0] || null;
+  var S = sessions('meeting', true).filter(function(s){ return s.ts>=a && s.ts<b; }), hit = S.filter(function(s){ return went(pid, s.sid); }).length;
+  var run = 0, best = 0; S.forEach(function(s){ run = went(pid,s.sid) ? run+1 : 0; if(run>best) best = run; });
+  var pts = recs.reduce(function(s,r){ return s+(+r.pts||0); }, 0);
+  var ranked = rankedParticipants(), rank = ranked.findIndex(function(x){ return x.id===pid; })+1;
+  var t = teamOf(pid), B = t ? teamBoard() : [], tr = t ? B.find(function(r){ return r.t.id===t.id; }) : null;
+  var badges = vbCount(pid), tb = VB.slice().sort(function(x,y){ return (vbOf(pid)[y.k]||0)-(vbOf(pid)[x.k]||0); })[0];
+  var vs = Object.keys((myExtra(pid).sv)||{}).filter(function(k){ return myExtra(pid).sv[k].ok; }).length;
+  return {month:new Date(a).toLocaleDateString('ar-EG',{month:'long', year:'numeric'}), n:recs.length, byType:byType, fav:fav, meetings:S.length, hit:hit, best:best, pts:pts, total:participantTotal(pid), rank:rank, of:ranked.length,
+    team:t, teamRank:tr?tr.rank:0, teamOf:B.length, badges:badges, topBadge: badges && tb && vbOf(pid)[tb.k] ? tb : null, verses:vs, empty: recs.length===0};
+}
+FXV.wrapped = function(){
+  ensure(); var off = state.fxWm || 0, w = wrapData(state.pid, off);
+  return backRow('ملخصك الشهري') + hero('🎬','ملخص '+w.month,'شهرك في الاجتماع — بأرقامك إنت')
+    + '<div class="fx-wsel"><button type="button" class="'+(off===0?'on':'')+'" data-fx="wm" data-o="0">الشهر ده</button><button type="button" class="'+(off===-1?'on':'')+'" data-fx="wm" data-o="-1">الشهر اللي فات</button></div>'
+    + '<div class="fx-wprev"><div><b>'+w.n+'</b><small>مرة حضور</small></div><div><b>'+w.pts+'</b><small>نقطة من الحضور</small></div><div><b>#'+(w.rank||'—')+'</b><small>ترتيبك</small></div></div>'
+    + (w.empty ? '<div class="empty-note">مفيش حضور مسجّل في الشهر ده — لسه الفرصة موجودة 💛</div>' : '')
+    + '<button type="button" class="btn btn-primary fx-wgo" data-fx="wrap-go">▶ ابدأ ملخصي</button>';
+};
+function wrapSlides(w, name){
+  var T = ATT_TYPES||{}, fav = w.fav && T[w.fav] ? T[w.fav] : null, S = [];
+  S.push({bg:'linear-gradient(160deg,#2b1f6b,#845EC2 60%,#FF6B9D)', e:'🎬', t:'ملخص '+w.month, big:'', s:'يلا نشوف شهرك يا '+name.split(' ')[0]+' 💛'});
+  S.push({bg:'linear-gradient(160deg,#0f5c52,#3FDCC9)', e:'✅', t:'حضرت', big:w.n, unit:'مرة', s: fav ? 'وأكتر نشاط واظبت عليه: '+fav.icon+' '+fav.label : (w.n?'':'الشهر الجاي نبدأ بقوة 🌱')});
+  if(w.meetings) S.push({bg:'linear-gradient(160deg,#7a3b00,#F4B740)', e:'🔥', t:'سلسلة الحضور', big:w.best, unit:'اجتماع ورا بعض', s:'حضرت '+w.hit+' من '+w.meetings+' اجتماع ('+Math.round(w.hit*100/w.meetings)+'%)'});
+  S.push({bg:'linear-gradient(160deg,#5a1236,#FF6B9D)', e:'⭐', t:'نقطك الكلية', big:w.total, unit:'نقطة', s:'وأخدت '+w.pts+' نقطة من الحضور الشهر ده'});
+  S.push({bg:'linear-gradient(160deg,#17306b,#7C9CFF)', e:'🏆', t:'ترتيبك', big:w.rank?'#'+w.rank:'—', s:'من '+w.of+' مشارك'+(w.team?' · أسرتك '+w.team.icon+' '+w.team.name+(w.teamRank?' في المركز '+w.teamRank:''):'')});
+  if(w.badges || w.verses) S.push({bg:'linear-gradient(160deg,#3d2a00,#FFD166)', e:w.topBadge?w.topBadge.i:'🌟', t:'زمايلك شافوا فيك', big:w.badges, unit:'شارة قيم', s:(w.topBadge?'أكتر حاجة: «'+w.topBadge.n+'»':'')+(w.verses?(w.topBadge?' · ':'')+'جاوبت صح على '+w.verses+' سؤال آية 📜':'')});
+  S.push({bg:'linear-gradient(160deg,#1a1633,#3B4A7A 55%,#F4B740)', e:'🙏', t:'شكرًا إنك معانا', big:'', s:'ربنا يباركك ويكمّل معاك. شارك ملخصك مع أصحابك 👇', final:true});
+  return S;
+}
+function openWrapped(){
+  var pid = state.pid, p = person(pid), w = wrapData(pid, state.fxWm||0), S = wrapSlides(w, p.name), i = 0, DUR = 5200, timer = null;
+  var old = document.getElementById('fx-wr'); if(old) old.remove();
+  var ov = document.createElement('div'); ov.id = 'fx-wr'; ov.className = 'fx-wr';
+  ov.innerHTML = '<div class="fx-w-bars">'+S.map(function(){ return '<i><b></b></i>'; }).join('')+'</div><button type="button" class="fx-w-x" aria-label="إغلاق">✕</button><div class="fx-w-stage"></div><div class="fx-w-tap"><span data-d="-1"></span><span data-d="1"></span></div>';
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  var stage = ov.querySelector('.fx-w-stage'), bars = ov.querySelectorAll('.fx-w-bars i');
+  function close(){ clearTimeout(timer); ov.remove(); document.body.style.overflow = ''; }
+  function show(n){
+    clearTimeout(timer); if(n<0) n = 0; if(n>=S.length){ n = S.length-1; }
+    i = n; var s = S[n];
+    bars.forEach(function(b,k){ b.className = k<n ? 'done' : k===n ? 'run' : ''; var f = b.firstChild; f.style.animationDuration = DUR+'ms'; });
+    ov.style.background = s.bg;
+    stage.innerHTML = '<div class="fx-w-s '+(s.final?'final':'')+'"><div class="fx-w-e">'+s.e+'</div><div class="fx-w-t">'+esc(s.t)+'</div>'
+      + (s.big!==''&&s.big!=null ? '<div class="fx-w-big"><span '+(typeof s.big==='number'?'data-cu="'+s.big+'"':'')+'>'+(typeof s.big==='number'?0:esc(s.big))+'</span>'+(s.unit?'<small>'+esc(s.unit)+'</small>':'')+'</div>' : '')
+      + '<div class="fx-w-sub">'+esc(s.s)+'</div>'
+      + (s.final ? '<div class="fx-w-btns"><button type="button" data-w="share">📤 شارك ملخصي</button><button type="button" data-w="close">تمام</button></div>' : '')+'</div>';
+    countUp(stage);
+    try{ vibrate(8); }catch(e){}
+    if(!s.final) timer = setTimeout(function(){ show(n+1); }, DUR);
+  }
+  ov.addEventListener('click', function(e){
+    if(e.target.closest('.fx-w-x') || e.target.closest('[data-w="close"]')){ close(); return; }
+    if(e.target.closest('[data-w="share"]')){ shareWrapped(w, p); return; }
+    var t = e.target.closest('[data-d]'); if(t) show(i + (+t.dataset.d));
+  });
+  show(0);
+}
+function countUp(root){
+  root.querySelectorAll('[data-cu]').forEach(function(el){
+    var to = +el.dataset.cu || 0, t0 = performance.now(), dur = 900 + Math.min(900, to*3);
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent = to; return; }
+    (function f(now){ var t = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-t,3); el.textContent = Math.round(to*e); if(t<1 && document.body.contains(el)) requestAnimationFrame(f); })(t0);
+  });
+}
+function shareWrapped(w, p){
+  var c = document.createElement('canvas'); c.width = 1080; c.height = 1350; var x = c.getContext('2d');
+  var g = x.createLinearGradient(0,0,1080,1350); g.addColorStop(0,'#1a1633'); g.addColorStop(.55,'#3B4A7A'); g.addColorStop(1,'#F4B740'); x.fillStyle = g; x.fillRect(0,0,1080,1350);
+  x.textAlign = 'center'; x.direction = 'rtl'; x.fillStyle = '#fff';
+  var F2 = "'Cairo',Tahoma,sans-serif";
+  x.font = '800 54px '+F2; x.globalAlpha = .85; x.fillText('اجتماع جامعة', 540, 120); x.globalAlpha = 1;
+  x.font = '900 86px '+F2; x.fillText('ملخص '+w.month, 540, 270);
+  x.font = '800 60px '+F2; x.fillText(p.name, 540, 370);
+  var rows = [['✅','مرات الحضور', w.n], ['🔥','أطول سلسلة اجتماعات', w.best], ['⭐','إجمالي النقاط', w.total], ['🏆','الترتيب', w.rank?('#'+w.rank):'—'], ['🌟','شارات القيم', w.badges]];
+  rows.forEach(function(r, i){
+    var y = 470 + i*150;
+    x.fillStyle = 'rgba(255,255,255,.12)'; x.beginPath(); if(x.roundRect) x.roundRect(90, y, 900, 120, 36); else x.rect(90,y,900,120); x.fill();
+    x.fillStyle = '#fff'; x.textAlign = 'right'; x.font = '800 44px '+F2; x.fillText(r[0]+'  '+r[1], 960, y+76);
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '900 60px '+F2; x.fillText(String(r[2]), 130, y+82);
+  });
+  x.textAlign = 'center'; x.fillStyle = 'rgba(255,255,255,.8)'; x.font = '700 38px '+F2; x.fillText('بإدارة تي إبستولي ✝️', 540, 1290);
+  c.toBlob(async function(b){
+    if(!b){ showToast('تعذّر تجهيز الصورة', true); return; }
+    var f = new File([b], 'my-month.png', {type:'image/png'});
+    try{ if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], text:'ملخصي في اجتماع جامعة 💛'}); return; } }catch(e){ if(e && e.name==='AbortError') return; }
+    var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'my-month.png'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 8000); showToast('اتحفظت الصورة على جهازك ✅');
+  }, 'image/png');
+}
+function wrappedBanner(){
+  var d = new Date().getDate(); if(!(d>=26 || d<=4)) return '';
+  return '<button type="button" class="fx-home fx-wb" data-action="tile-nav" data-page="wrapped"><span class="fx-wb-e">🎬</span><div><b>ملخص شهرك جاهز!</b><small>شوف حضورك ونقطك وترتيبك في قصة قصيرة</small></div><i>›</i></button>';
+}
+
+/* =====================================================================
+   تركيب في الصفحات الموجودة
+   ===================================================================== */
+var _rp = window.renderProfile;
+window.renderProfile = function(){
+  ensure();
+  var h = _rp.apply(this, arguments), add = '';
+  try{ add = verseCard(state.pid) + teamsHome(state.pid) + wrappedBanner(); }catch(e){ console.error('fx home', e); }
+  var m = '<div class="brand-signature">', i = h.indexOf(m);
+  return i>=0 ? h.slice(0,i) + add + h.slice(i) : h + add;
+};
+var _rm = window.renderMePage;
+window.renderMePage = function(){
+  ensure();
+  var h = _rm.apply(this, arguments), add = '';
+  try{
+    var ch = vbChips(state.pid, true);
+    add = '<div class="fx-me-vb"><div class="fx-me-vb-top"><span>🌟 شارات القيم</span><button type="button" data-action="tile-nav" data-page="values">قدّر زميلك ›</button></div>'
+      + (ch || '<div class="fx-me-vb-empty">لسه ما جاتلكش شارات من زمايلك</div>') + '</div>';
+  }catch(e){}
+  var m = '<div class="me-links">', i = h.indexOf(m);
+  return i>=0 ? h.slice(0,i) + add + h.slice(i) : h + add;
+};
+/* أنيميشن الأرقام + أعمدة اللوحة بعد كل رسم */
+var _rd = window.render;
+function postRender(){ try{ var app = document.getElementById('app'); if(app) countUp(app); }catch(e){} }
+if(typeof _rd==='function'){ window.render = function(){ var r = _rd.apply(this, arguments); setTimeout(postRender, 30); return r; }; }
+
+/* عناصر القوائم */
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push(
+    {page:'teams',   icon:'🛡️', labelKey:'تحدي الأسر',  subKey:'أسرتك ضد الباقي',        color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+    {page:'values',  icon:'🌟', labelKey:'شارات القيم',  subKey:'قدّر زميلك على أخلاقه',  color:'linear-gradient(145deg,#FFD166,#FF6B9D)'},
+    {page:'wrapped', icon:'🎬', labelKey:'ملخصك الشهري', subKey:'شهرك بأرقامك',           color:'linear-gradient(145deg,#845EC2,#3FDCC9)'}
+  );
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.teams = BNAV_VIEW_TAB.values = BNAV_VIEW_TAB.wrapped = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push(
+    {group:'people',  tab:'care',   short:'مين غاب ومحتاج مكالمة', desc:'قايمة افتقاد ذكية بالغايبين اجتماعين أو أكتر ورا بعض مع اتصال وواتساب وملاحظات', icon:'💛', label:'الافتقاد', color:'linear-gradient(145deg,#FFB86B,#FF6B9D)'},
+    {group:'games',   tab:'teams',  short:'أسر وجولات وتوزيع ذكي',  desc:'تحدي الأسر: إنشاء أسر وتوزيع متكافئ وجولات', icon:'🛡️', label:'تحدي الأسر', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
+    {group:'content', tab:'sverse', short:'تتكشف بالحضور',          desc:'آية الاجتماع وسؤالها بنقاط', icon:'📜', label:'آية الاجتماع', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'}
+  );
+}
+
+/* ---------- أحداث ---------- */
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-fx]'); if(!el) return;
+  var a = el.dataset.fx, pid = el.dataset.pid;
+  if(a==='care-save') careSave(pid, el.dataset.keep==='1');
+  else if(a==='care-undo'){ ju(K.care, function(o){ o = o||{}; delete o[pid]; return o; }).then(function(){ return load(true); }).then(render); }
+  else if(a==='care-msg'){ pushNotification(pid, 'افتقدناك في الاجتماع 💛 مستنيينك المرة الجاية — ربنا يحفظك', '💛'); showToast('اتبعتت رسالة الافتقاد ✅'); }
+  else if(a==='sv-save') svSave();
+  else if(a==='sv-del'){ if(confirm('تحذف الآية دي؟')) ju(K.sv, function(o){ o = o||{}; delete o[el.dataset.sid]; return o; }).then(function(){ return load(true); }).then(render); }
+  else if(a==='sv-ans') svAnswer(+el.dataset.i);
+  else if(a==='team-join'){
+    var id = el.dataset.id; if(F.teams.assign[state.pid]) return;
+    teamSet(function(o){ if(!o.assign[state.pid]) o.assign[state.pid] = id; }).then(function(){ return load(true); }).then(function(){ showToast('نوّرت أسرتك الجديدة 🛡️'); render(); });
+  }
+  else if(a==='team-add'){
+    teamSet(function(o){ if(o.list.length>=8) return; var n = o.list.length; o.list.push({id:'t'+Date.now().toString(36), name:'أسرة '+(n+1), icon:TEAM_ICONS[n%TEAM_ICONS.length], color:TEAM_COLORS[n%TEAM_COLORS.length]}); }).then(function(){ return load(true); }).then(render);
+  }
+  else if(a==='team-save'){
+    var rows = document.querySelectorAll('.fx-trow'); var upd = {};
+    rows.forEach(function(r){ upd[r.dataset.tid] = {name:r.querySelector('.fx-tn').value.trim(), icon:r.querySelector('.fx-ti').value}; });
+    teamSet(function(o){ o.list.forEach(function(t){ var u = upd[t.id]; if(u){ if(u.name) t.name = u.name; t.icon = u.icon; } }); }).then(function(){ return load(true); }).then(function(){ showToast('اتحفظت الأسر ✅'); render(); });
+  }
+  else if(a==='team-del'){
+    if(!confirm('تحذف الأسرة دي؟ أعضاؤها هيبقوا من غير أسرة.')) return;
+    teamSet(function(o){ o.list = o.list.filter(function(t){ return t.id!==el.dataset.id; }); Object.keys(o.assign).forEach(function(k){ if(o.assign[k]===el.dataset.id) delete o.assign[k]; }); }).then(function(){ return load(true); }).then(render);
+  }
+  else if(a==='team-auto'){
+    var all = el.dataset.all==='1'; if(all && !confirm('إعادة توزيع الكل هتمسح التوزيع الحالي. متأكد؟')) return;
+    teamSet(function(o){ var keep = F.teams; F.teams = o; snakeAssign(all); F.teams = keep; }).then(function(){ return load(true); }).then(function(){ showToast('اتوزّعوا بالتساوي ⚡'); render(); });
+  }
+  else if(a==='round-start'){
+    var nm = (document.getElementById('fx-round-name')||{}).value; nm = (nm||'').trim() || ('جولة '+new Date().toLocaleDateString('ar-EG',{month:'long'}));
+    if(!confirm('تبدأ جولة «'+nm+'»؟ عدّاد نقط الأسر هيتصفّر.')) return;
+    teamSet(function(o){ if(o.round){ var keep = F.teams; F.teams = o; var w = winnerName(); F.teams = keep; o.hist = (o.hist||[]).concat([{name:o.round.name, winner:w, at:Date.now()}]).slice(-10); } snapBase(o); o.round = {name:nm, at:Date.now()}; }).then(function(){ return load(true); }).then(function(){ showToast('بدأت الجولة 🏁'); render(); });
+  }
+  else if(a==='round-end'){
+    if(!confirm('تنهي الجولة وتعلن الفايزة؟')) return;
+    teamSet(function(o){ if(!o.round) return; var keep = F.teams; F.teams = o; var w = winnerName(); F.teams = keep; o.hist = (o.hist||[]).concat([{name:o.round.name, winner:w, at:Date.now()}]).slice(-10); o.round = null; o.base = {}; }).then(function(){ return load(true); }).then(function(){ showToast('اتسجّلت الفايزة 🏆'); render(); });
+  }
+  else if(a==='vb-open') vbSheet(pid);
+  else if(a==='wm'){ state.fxWm = +el.dataset.o; render(); }
+  else if(a==='wrap-go') openWrapped();
+});
+document.addEventListener('change', function(e){
+  var s = e.target.closest && e.target.closest('.fx-asg'); if(!s) return;
+  var pid = s.dataset.pid, v = s.value;
+  teamSet(function(o){ if(v) o.assign[pid] = v; else delete o.assign[pid]; }).then(function(){ return load(true); });
+});
+window.fxLoad = load;
+load(true);
+})();
+
+</script>
 </body>
 </html>
