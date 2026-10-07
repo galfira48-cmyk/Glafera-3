@@ -4108,6 +4108,110 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .arr-txt{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .arr-txt b{ font-size:13.5px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .arr-txt small{ font-size:10.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .att-smart-scan{ display:flex; align-items:center; gap:12px; width:100%; margin:0 0 12px; padding:12px 14px; border:0; border-radius:16px; font-family:inherit; text-align:start; color:#fff; background:linear-gradient(120deg,#5A67D8,#7C9CFF); box-shadow:0 8px 22px rgba(90,103,216,.35); -webkit-tap-highlight-color:transparent; cursor:pointer; }
+  .att-smart-scan:active{ transform:scale(.98); }
+  .att-smart-scan .ass-ico{ flex:0 0 auto; width:44px; height:44px; display:grid; place-items:center; font-size:22px; border-radius:13px; background:rgba(255,255,255,.2); }
+  .att-smart-scan .ass-txt{ flex:1; display:flex; flex-direction:column; gap:2px; }
+  .att-smart-scan .ass-txt b{ font-size:14.5px; font-weight:900; }
+  .att-smart-scan .ass-txt small{ font-size:11px; opacity:.88; font-weight:600; }
+  .att-smart-scan .ass-go{ font-size:26px; opacity:.85; }
+  .ass-ov{ position:fixed; inset:0; z-index:99999; background:#0b0a24; display:flex; flex-direction:column; align-items:center; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); gap:10px; overflow:auto; }
+  .ass-top{ width:100%; max-width:440px; display:flex; align-items:center; justify-content:space-between; color:#fff; }
+  .ass-top b{ font-size:15px; font-weight:900; }
+  .ass-top .ass-cnt{ font-size:12px; font-weight:800; padding:4px 10px; border-radius:99px; background:rgba(255,255,255,.14); }
+  .ass-cam{ position:relative; width:100%; max-width:440px; aspect-ratio:1/1; border-radius:22px; overflow:hidden; background:#000; }
+  .ass-cam video{ width:100%; height:100%; object-fit:cover; }
+  .ass-frame{ position:absolute; inset:16%; border:3px solid rgba(255,255,255,.85); border-radius:22px; box-shadow:0 0 0 999px rgba(0,0,0,.35); pointer-events:none; }
+  .ass-flash{ position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .35s; }
+  .ass-flash.ok{ background:rgba(46,204,113,.55); opacity:1; transition:none; }
+  .ass-flash.bad{ background:rgba(231,76,60,.55); opacity:1; transition:none; }
+  .ass-res{ width:100%; max-width:440px; min-height:58px; padding:12px 14px; border-radius:16px; color:#fff; font-size:14px; font-weight:700; line-height:1.6; text-align:center; background:rgba(255,255,255,.1); }
+  .ass-res.ok{ background:rgba(46,204,113,.25); } .ass-res.warn{ background:rgba(241,196,15,.25); } .ass-res.bad{ background:rgba(231,76,60,.28); }
+  .ass-log{ width:100%; max-width:440px; display:flex; flex-direction:column; gap:6px; }
+  .ass-log div{ display:flex; justify-content:space-between; padding:8px 12px; border-radius:12px; background:rgba(255,255,255,.08); color:#fff; font-size:12.5px; font-weight:700; }
+  .ass-log small{ opacity:.7; }
+  .ass-welcome{ position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; pointer-events:none; background:rgba(11,10,36,.72); animation:assFade .25s ease both; }
+  .ass-welcome.out{ animation:assFadeOut .3s ease both; }
+  .ass-wcard{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:26px 30px; border-radius:26px; background:linear-gradient(160deg,#fff,#f1fff7); color:#12331f; text-align:center; max-width:86%; box-shadow:0 20px 60px rgba(46,204,113,.45); animation:assPop .55s cubic-bezier(.2,1.4,.4,1) both; }
+  .ass-wcheck{ width:84px; height:84px; }
+  .ass-wcheck circle{ fill:#2ecc71; transform-origin:center; animation:assCirc .5s cubic-bezier(.2,1.4,.4,1) both; }
+  .ass-wcheck path{ fill:none; stroke:#fff; stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:60; stroke-dashoffset:60; animation:assDraw .45s .25s ease forwards; }
+  .ass-wname{ font-size:21px; font-weight:900; line-height:1.4; }
+  .ass-wmsg{ font-size:14px; font-weight:800; color:#1e8f4e; }
+  .ass-conf{ position:absolute; top:50%; left:50%; width:9px; height:9px; border-radius:2px; opacity:0; animation:assConf .9s ease-out forwards; }
+  @keyframes assFade{ from{opacity:0} to{opacity:1} }
+  @keyframes assFadeOut{ from{opacity:1} to{opacity:0} }
+  @keyframes assPop{ 0%{ transform:scale(.4); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
+  @keyframes assCirc{ 0%{ transform:scale(0) } 100%{ transform:scale(1) } }
+  @keyframes assDraw{ to{ stroke-dashoffset:0 } }
+  @keyframes assConf{ 0%{ opacity:1; transform:translate(0,0) rotate(0) } 100%{ opacity:0; transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) } }
+  .ass-close{ width:100%; max-width:440px; height:46px; border:0; border-radius:14px; font-family:inherit; font-weight:900; font-size:14px; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); }
+  .ai-chart{ display:flex; align-items:flex-end; gap:6px; height:150px; padding-top:6px; direction:ltr; }
+  .ai-bar{ flex:1; min-width:0; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; }
+  .ai-bar i{ display:block; width:100%; max-width:26px; border-radius:7px 7px 3px 3px; background:linear-gradient(180deg,#7C9CFF,#5A67D8); min-height:6px; }
+  .ai-bar b{ font-size:10.5px; font-weight:900; } .ai-bar small{ font-size:8.5px; opacity:.65; white-space:nowrap; }
+  .ai-sug{ display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid rgba(128,128,128,.18); } .ai-sug:last-child{ border:0; }
+  .ai-sug span{ font-size:20px; } .ai-sug p{ margin:0; font-size:13px; font-weight:700; line-height:1.6; }
+  .ai-fc{ display:flex; align-items:center; gap:12px; } .ai-fc b{ font-size:34px; font-weight:900; color:var(--gold-2); } .ai-fc span{ font-size:12.5px; font-weight:700; line-height:1.6; }
+  .ai-risk{ padding:10px; border-radius:14px; margin-bottom:8px; background:rgba(128,128,128,.10); border-inline-start:4px solid #f1c40f; }
+  .ai-risk.hi{ border-inline-start-color:#e74c3c; background:rgba(231,76,60,.09); }
+  .ai-r-top{ display:flex; align-items:center; gap:10px; } .ai-r-top .arr-txt{ flex:1; min-width:0; }
+  .ai-score{ font-weight:900; font-size:15px; padding:4px 9px; border-radius:10px; background:rgba(128,128,128,.16); }
+  .ai-r-act{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ai-btn{ display:inline-flex; align-items:center; gap:4px; padding:7px 12px; border-radius:11px; border:0; font-family:inherit; font-size:11.5px; font-weight:800; color:inherit; background:rgba(128,128,128,.16); text-decoration:none; cursor:pointer; }
+  .ai-btn.wa{ background:#1f9d55; color:#fff; } .ai-nophone{ font-size:11px; opacity:.6; padding:7px 4px; }
+  .ai-an{ padding:9px 12px; border-radius:12px; margin-bottom:6px; font-size:12.5px; font-weight:700; line-height:1.6; background:rgba(241,196,15,.15); } .ai-an.high{ background:rgba(231,76,60,.18); }
+  .ai-ask{ display:flex; gap:8px; align-items:center; } .ai-ask .field{ flex:1; min-width:0; }
+  .ai-mic{ flex:0 0 auto; width:44px; height:44px; border-radius:13px; border:0; font-size:19px; background:rgba(128,128,128,.16); cursor:pointer; } .ai-mic.on{ background:#e74c3c; animation:assPulse 1s infinite; }
+  .ai-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; } .ai-chip{ padding:6px 11px; border-radius:99px; border:1px solid rgba(128,128,128,.4); background:transparent; color:inherit; font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+  .ai-out{ margin-top:10px; font-size:13px; font-weight:600; line-height:1.7; } .ai-out:empty{ display:none; } .ai-out .ai-a{ opacity:.75; font-size:12px; }
+  .ai-ol{ margin:6px 0 0; padding-inline-start:22px; } .ai-ul{ margin:6px 0 0; padding-inline-start:20px; opacity:.85; }
+  .ai-msg{ margin:6px 0 8px; padding:10px 12px; border-radius:12px; background:rgba(128,128,128,.13); }
+  .ass-picks{ width:100%; max-width:440px; display:flex; flex-wrap:wrap; gap:6px; } .ass-picks:empty{ display:none; }
+  .ass-pick{ padding:8px 14px; border-radius:12px; border:0; font-family:inherit; font-weight:800; font-size:13px; background:#fff; color:#17143f; }
+  .ass-undo{ width:100%; max-width:440px; height:44px; border:2px dashed rgba(255,255,255,.5); border-radius:14px; background:transparent; color:#fff; font-family:inherit; font-weight:900; font-size:13.5px; }
+  .ass-row{ width:100%; max-width:440px; } .ass-voice{ width:100%; height:44px; border:0; border-radius:14px; font-family:inherit; font-weight:800; font-size:13px; color:#fff; background:rgba(255,255,255,.14); } .ass-voice.on{ background:#e74c3c; animation:assPulse 1s infinite; }
+  .ass-wav{ width:92px; height:92px; border-radius:50%; background-size:cover; background-position:center; border:4px solid #2ecc71; box-shadow:0 6px 18px rgba(46,204,113,.45); }
+  .ass-wchips{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; } .ass-wchips span{ padding:5px 11px; border-radius:99px; font-size:12px; font-weight:800; background:#e8fff1; color:#1e8f4e; }
+  .ass-wpts{ font-size:13px; font-weight:800; color:#8a6a00; }
+  @keyframes assPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(231,76,60,.6) } 50%{ box-shadow:0 0 0 8px rgba(231,76,60,0) } }
+  .arr-av.ph{ background-size:cover; background-position:center; color:transparent; }
+  .arr-streak{ color:#e67e22; font-weight:800; }
+  .att-chips{ flex-wrap:wrap; }
+  .att-sticky{ position:sticky; top:0; z-index:6; padding:6px 0 2px; background:var(--bg); }
+  .att-roster-row{ position:relative; touch-action:pan-y; transition:transform .18s ease, background .2s; border-inline-start:4px solid transparent; }
+  .att-roster-row.is-in{ border-inline-start-color:var(--good); }
+  .att-roster-row.st-risk{ border-inline-start-color:#f1c40f; }
+  .att-roster-row.st-hi{ border-inline-start-color:#e74c3c; }
+  .att-roster-row.swp-go{ background:rgba(46,204,113,.14); } .att-roster-row.swp-undo{ background:rgba(231,76,60,.12); }
+  .att-fab{ position:fixed; z-index:900; inset-inline-start:16px; bottom:calc(88px + env(safe-area-inset-bottom)); width:58px; height:58px; border:0; border-radius:50%; display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,#5A67D8,#7C9CFF); box-shadow:0 10px 26px rgba(90,103,216,.5); -webkit-tap-highlight-color:transparent; cursor:pointer; }
+  .att-fab:active{ transform:scale(.92); }
+  .att-smart-scan svg, .att-fab svg, .ass-tool svg{ width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .aa-anim{ animation:aaIn .32s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes aaIn{ from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+  .ai-skel{ height:64px; border-radius:16px; margin:10px 0; background:linear-gradient(100deg,rgba(128,128,128,.10) 30%,rgba(128,128,128,.22) 50%,rgba(128,128,128,.10) 70%); background-size:200% 100%; animation:aiSkel 1.2s linear infinite; } .ai-skel.s2{ height:110px; }
+  @keyframes aiSkel{ from{ background-position:200% 0 } to{ background-position:-200% 0 } }
+  .ai-btn{ min-height:40px; } .ai-chip{ min-height:34px; }
+  .ai-svg{ width:100%; height:auto; display:block; direction:ltr; } .ai-svg .ai-g{ cursor:pointer; } .ai-svg text{ font-family:inherit; fill:currentColor; }
+  .ai-tip{ min-height:20px; margin-top:8px; font-size:12px; font-weight:700; text-align:center; opacity:.85; }
+  .ai-cmp{ display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12.5px; font-weight:800; } .ai-cmp > span:first-child{ width:92px; flex:0 0 auto; }
+  .ai-cmp-bar{ flex:1; height:12px; border-radius:99px; background:rgba(128,128,128,.18); overflow:hidden; } .ai-cmp-bar i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#7C9CFF,#5A67D8); }
+  .ai-heat{ overflow-x:auto; } .ai-heat summary{ cursor:pointer; font-weight:800; font-size:13px; padding:4px 0; }
+  .ai-hrow{ display:flex; align-items:center; gap:3px; margin:3px 0; direction:ltr; } .ai-hrow .nm{ width:96px; flex:0 0 auto; font-size:11px; font-weight:700; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:rtl; padding-inline-end:6px; }
+  .ai-hrow i{ width:15px; height:15px; border-radius:4px; background:rgba(128,128,128,.2); flex:0 0 auto; } .ai-hrow i.y{ background:#2ecc71; }
+  .ai-sug{ position:relative; } .ai-sug .x{ margin-inline-start:auto; flex:0 0 auto; width:30px; height:30px; border:0; border-radius:50%; background:rgba(128,128,128,.16); color:inherit; font-size:14px; cursor:pointer; }
+  .ai-sug .go{ margin-top:6px; }
+  .ass-frame i{ position:absolute; width:26px; height:26px; border:4px solid #fff; transition:border-color .2s; } .ass-frame .c1{ top:-3px; inset-inline-start:-3px; border-right:0; border-bottom:0; border-top-left-radius:18px; } .ass-frame .c2{ top:-3px; inset-inline-end:-3px; border-left:0; border-bottom:0; border-top-right-radius:18px; } .ass-frame .c3{ bottom:-3px; inset-inline-start:-3px; border-right:0; border-top:0; border-bottom-left-radius:18px; } .ass-frame .c4{ bottom:-3px; inset-inline-end:-3px; border-left:0; border-top:0; border-bottom-right-radius:18px; }
+  .ass-frame{ border-color:transparent; overflow:visible; } .ass-line{ position:absolute; left:6%; right:6%; height:3px; border-radius:3px; background:linear-gradient(90deg,transparent,#7CFFB2,transparent); box-shadow:0 0 12px #7CFFB2; animation:assScan 2s ease-in-out infinite alternate; }
+  @keyframes assScan{ from{ top:6% } to{ top:94% } }
+  .ass-frame.lock i{ border-color:#2ecc71; } .ass-frame.lock .ass-line{ animation-play-state:paused; background:#2ecc71; }
+  .ass-prog{ width:100%; max-width:440px; color:#fff; } .ass-prog > div:first-child{ display:flex; justify-content:space-between; font-size:12px; font-weight:800; margin-bottom:5px; opacity:.9; }
+  .ass-pbar{ height:8px; border-radius:99px; background:rgba(255,255,255,.16); overflow:hidden; } .ass-pbar i{ display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,#2ecc71,#7CFFB2); transition:width .5s ease; }
+  .ass-tools{ width:100%; max-width:440px; display:flex; gap:8px; } .ass-tool{ flex:1; height:44px; border:0; border-radius:14px; display:flex; align-items:center; justify-content:center; gap:6px; font-family:inherit; font-weight:800; font-size:12.5px; color:#fff; background:rgba(255,255,255,.14); cursor:pointer; } .ass-tool.on{ background:#f1c40f; color:#221900; }
+  .ass-ov.compact .ass-log, .ass-ov.compact .ass-row{ display:none; }
+  .ass-wcard.fire{ background:linear-gradient(160deg,#fff,#fff1e0); box-shadow:0 20px 60px rgba(255,140,0,.5); } .ass-wcard.bd{ background:linear-gradient(160deg,#fff,#ffe9f4); box-shadow:0 20px 60px rgba(232,67,147,.5); } .ass-wcard.back{ background:linear-gradient(160deg,#fff,#fff8dc); box-shadow:0 20px 60px rgba(241,196,15,.5); }
+  .ass-wav{ width:112px !important; height:112px !important; }
+  @media (prefers-reduced-motion:reduce){ .aa-anim,.ass-line,.ass-welcome,.ass-wcard,.ass-conf,.ai-skel,.ai-mic.on,.ass-voice.on{ animation:none !important; } .ass-conf{ display:none; } .att-roster-row{ transition:none; } }
   .arr-btn{ flex:0 0 auto; min-width:70px; height:38px; padding:0 14px; border-radius:12px; font-family:inherit; font-weight:900; font-size:12.5px; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); border:0; -webkit-tap-highlight-color:transparent; }
   .arr-btn:active{ transform:scale(.94); }
   .arr-btn.in{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; line-height:1.1; color:#BFF5DC; background:rgba(95,224,164,.14); border:1px solid rgba(95,224,164,.45); }
@@ -25430,7 +25534,7 @@ function renderAdmin(){
     const an = state.attNav;
     if(an && an.page==='addtype') pageTitle = 'نشاط جديد';
     else if(an && an.type && ATT_TYPES[an.type]){
-      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : ATT_TYPES[an.type].label;
+      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
     }
   } else if(tab==='opinions'){
     if(state.viewingOpinionId){
@@ -27724,7 +27828,14 @@ async function tryAttendance(codeRaw, typeArg){
 
 /* ---------- لوحة الأدمن ---------- */
 function attAdminType(){ const v = state.attNav && state.attNav.type; return ATT_TYPES[v] ? v : 'mass'; }
+let _attAnimKey = '';
 function renderAdminAttendanceTab(){
+  const html = renderAdminAttendanceTabInner(); const nav = state.attNav || {}; const key = (nav.type||'')+'/'+(nav.page||'home');
+  const anim = key!==_attAnimKey; _attAnimKey = key;
+  const showFab = nav.type && ATT_KEYS.includes(nav.type) && attCfg(nav.type) && ['home',undefined,'who','insights','audit'].includes(nav.page);
+  return '<div class="'+(anim?'aa-anim':'')+'">'+html+'</div>'+(showFab?'<button type="button" class="att-fab" data-action="att-admin-scan" data-type="'+nav.type+'" aria-label="مسح سريع">'+ATT_SCAN_SVG+'</button>':'');
+}
+function renderAdminAttendanceTabInner(){
   const nav = state.attNav || (state.attNav = {type:null, page:'home'});
   if(!_attLoadedOnce) return `<div class="empty-note">جارٍ التحميل...</div>`;
   const cntOf = (k,c)=> c ? Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===k && r.sid===c.sessionId).length : 0;
@@ -27752,7 +27863,7 @@ function renderAdminAttendanceTab(){
   const c = attCfg(type);
   if(!c){
     const failed = _attInitFailedAt>0 && !_attInitBusy;
-    return `<div class="card" style="text-align:center;"><div class="empty-note">${failed?'تعذر تجهيز كود الحضور — اتأكد من الإنترنت وجرّب تاني':'جارٍ تجهيز كود الحضور...'}</div><button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-init" data-type="${type}">🔄 تجهيز الكود الآن</button></div>`;
+    return `<div class="card" style="text-align:center;"><div class="empty-note">${failed?'تعذر تجهيز كود الحضور — اتأكد من الإنترنت وجرّب تاني':'<div class="ai-skel"></div><div class="ai-skel s2"></div>جارٍ تجهيز كود الحضور...'}</div><button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-init" data-type="${type}">🔄 تجهيز الكود الآن</button></div>`;
   }
   const recs = Object.entries(ATT_RECORDS||{}).filter(([k,r])=>r && r.type===type && r.sid===c.sessionId)
     .map(([k,r])=>Object.assign({key:k}, r)).sort((a,b)=>b.ts-a.ts);
@@ -27778,23 +27889,31 @@ function renderAdminAttendanceTab(){
   /* ---------- تسجيل يدوي ---------- */
   if(nav.page==='manual'){
     const cntIn = here.size, cntOut = total - cntIn;
-    const list = PARTICIPANTS.filter(p=> R.f==='all' || (R.f==='present') === here.has(p.id));
+    const riskM = attRiskMap(type);
+    const riskN = PARTICIPANTS.filter(p=>!here.has(p.id) && riskM[p.id] && riskM[p.id].streak>=2).length;
+    let list = PARTICIPANTS.filter(p=> R.f==='risk' ? (!here.has(p.id) && riskM[p.id] && riskM[p.id].streak>=2) : (R.f==='all' || (R.f==='present') === here.has(p.id)));
+    if(R.s==='alpha') list = list.slice().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ar'));
+    else if(R.s==='risk') list = list.slice().sort((a,b)=>((riskM[b.id]||{}).score||0)-((riskM[a.id]||{}).score||0));
     const RLIM = 250, recOf = {}; recs.forEach(r=>{ recOf[r.pid] = r; });
     const rows = list.slice(0,RLIM).map(p=>{
       const r = recOf[p.id];
       const btn = r
         ? `<button type="button" class="arr-btn in" data-action="att-admin-del" data-type="${type}" data-key="${escapeHtml(r.key)}" aria-label="إلغاء حضور ${escapeHtml(p.name)}"><span>✓</span><small>${attFmtTime(r.ts)}</small></button>`
         : `<button type="button" class="arr-btn" data-action="att-admin-quick" data-type="${type}" data-pid="${escapeHtml(String(p.id))}">سجّل</button>`;
-      return `<div class="att-roster-row ${r?'is-in':''}" data-search="${escapeHtml(((p.name||'')+' '+p.id).toLowerCase())}">
-        <span class="arr-av">${escapeHtml((p.name||'?').trim().charAt(0))}</span>
-        <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(String(p.id))}${r&&r.manual?' · يدوي':''}</small></div>
+      const rk = riskM[p.id], hasPh = p.photo && /^(data:|https?:|blob:)/.test(String(p.photo));
+      return `<div class="att-roster-row ${r?'is-in':(rk&&rk.streak>=2?(rk.score>=65?'st-hi':'st-risk'):'')}" data-search="${escapeHtml(((p.name||'')+' '+p.id+' '+attNormAr(p.name)).toLowerCase())}">
+        <span class="arr-av${hasPh?' ph':''}"${hasPh?` style="background-image:url('${escapeHtml(String(p.photo).replace(/'/g,'%27'))}')"`:''}>${escapeHtml((p.name||'?').trim().charAt(0))}</span>
+        <div class="arr-txt"><b>${escapeHtml(p.name||'')}</b><small>${escapeHtml(String(p.id))}${r&&r.voice?' · صوت':r&&r.manual?' · يدوي':''}${!r&&rk&&rk.streak>=2?` <span class="arr-streak">· غاب ${rk.streak} جلسات</span>`:''}</small></div>
         ${btn}
       </div>`;
     }).join('');
     const chipF = (id,lab,n)=>`<button type="button" class="att-chip ${R.f===id?'on':''}" data-action="att-admin-rf" data-f="${id}">${lab}<b>${n}</b></button>`;
-    return `<input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دوّر بالاسم أو الكود..." style="margin:0 0 12px;" />
+    const sortLab = {def:'الافتراضي', alpha:'أبجدي', risk:'الأخطر'}[R.s||'def'];
+    return `<button type="button" class="att-smart-scan" data-action="att-admin-scan" data-type="${type}"><span class="ass-ico">${ATT_SCAN_SVG}</span><span class="ass-txt"><b>مسح ذكي بالـ QR</b><small>وجّه الكاميرا على كارت المخدوم وهيتسجّل حضوره فورًا</small></span><span class="ass-go">‹</span></button>
+      <div class="att-sticky"><input type="text" class="field admin-search-input" data-filter-target=".att-roster-row" placeholder="🔍 دوّر بالاسم أو الكود..." style="margin:0 0 8px;" /></div>
       <div class="att-roster">
-        <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('all','الكل',total)}</div>
+        <div class="att-chips">${chipF('absent','لم يحضروا',cntOut)}${chipF('present','حضروا',cntIn)}${chipF('risk','💛 افتقاد',riskN)}${chipF('all','الكل',total)}<button type="button" class="att-chip" data-action="att-admin-rs">↕ ${sortLab}</button></div>
+        <div class="hint" style="margin:0 0 8px">اسحب الصف يمين أو شمال لتسجيل الحضور أو التراجع عنه</div>
         <div class="att-roster-list">${rows || `<div class="empty-note">${R.f==='absent'?'🎉 كل المخدومين سجّلوا حضورهم':'مفيش أسماء في الفلتر ده'}</div>`}</div>
         ${list.length>RLIM ? `<div class="hint">معروض أول ${RLIM} من ${list.length} — استخدم البحث</div>` : ''}
       </div>`;
@@ -27813,6 +27932,8 @@ function renderAdminAttendanceTab(){
       <div class="card">${rows || '<div class="empty-note">لسه محدش سجّل حضوره</div>'}</div>
       <button type="button" class="btn btn-outline" style="margin-top:12px;width:100%;" data-action="att-admin-export" data-type="${type}">⬇️ تصدير كشف الحضور (Excel / CSV)</button>`;
   }
+  if(nav.page==='insights') return attInsightsHtml(type, c);
+  if(nav.page==='audit') return attAuditHtml(type);
   /* ---------- صفحة النشاط ---------- */
   const hist = (c.history||[]).slice().reverse().slice(0,10).map(h=>{
     const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===h.sessionId).length;
@@ -27847,6 +27968,8 @@ function renderAdminAttendanceTab(){
     <div class="aa-grid" style="margin-top:14px;">
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${recs.length} حضروا</small></button>
+      <button type="button" class="aa-tile" data-action="att-admin-page" data-page="insights" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#B388FF,#7C4DFF)">🧠</span><b>التحليلات الذكية</b><small>خطر الغياب · توقع · مساعد</small></button>
+      <button type="button" class="aa-tile" data-action="att-admin-page" data-page="audit" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#FFB86B,#E67E22)">🛡️</span><b>سجل التدقيق</b><small>مين عمل إيه ومتى</small></button>
     </div>
     ${hist ? `<div class="aa-sec"><b>الأيام السابقة</b></div><div class="card">${hist}</div>` : ''}
     <button type="button" class="btn btn-ghost" style="margin-top:18px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">مسح كل سجلات ${escapeHtml(t.label)}</button>
@@ -27892,13 +28015,411 @@ function attPrintCode(type){
     <\/script></body></html>`);
   w.document.close();
 }
+/* =====================================================================
+   ذكاء الحضور: تحليلات، خطر الغياب، توقع، كشف الشذوذ، تدقيق، مساعد، ماسح متطوّر
+   ===================================================================== */
+const ATT_AUDIT_KEY = 'glavera-att-audit';
+let ATT_AUDIT = [];
+function attNormAr(s){ return String(s||'').toLowerCase().replace(/[ً-ٰٟـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/\s+/g,' ').trim(); }
+function attDevId(){ try{ let d = localStorage.getItem('glv-att-dev'); if(!d){ d = 'D'+Math.random().toString(36).slice(2,6).toUpperCase(); localStorage.setItem('glv-att-dev', d); } return d; }catch(e){ return 'D?'; } }
+async function attAuditLog(act, pid, type, extra){
+  try{ await window.storage.update(ATT_AUDIT_KEY, cur=>{ let a = []; try{ a = cur ? JSON.parse(cur) : []; }catch(e){ a = []; } if(!Array.isArray(a)) a = []; a.push(Object.assign({ts:Date.now(), act, pid, type, dev:attDevId()}, extra||{})); if(a.length>400) a = a.slice(-400); return JSON.stringify(a); }, true); }catch(e){}
+}
+async function attAuditLoad(){ try{ const r = await window.storage.get(ATT_AUDIT_KEY, true); ATT_AUDIT = (r && r.value) ? (JSON.parse(r.value)||[]) : []; }catch(e){ ATT_AUDIT = []; } }
+function attPById(id){ return PARTICIPANTS.find(x=>String(x.id)===String(id)) || null; }
+function attPhoneOf(p){ try{ const cp = (typeof cpOf==='function' && cpOf(p.id)) || {}; const ex = (typeof PROFILE_EXTRA!=='undefined' && PROFILE_EXTRA[p.id]) || {}; return normalizePhone(cp.phone || ex.phone || ''); }catch(e){ return ''; } }
+function attBirthMD(p){ try{ const cp = (typeof cpOf==='function' && cpOf(p.id)) || {}; const ex = (typeof PROFILE_EXTRA!=='undefined' && PROFILE_EXTRA[p.id]) || {}; const m = String(cp.birth || ex.birth || '').match(/(\d{4})-(\d{1,2})-(\d{1,2})/); return m ? {m:+m[2], d:+m[3]} : null; }catch(e){ return null; } }
+function attIsBirthdayToday(p){ const b = attBirthMD(p); if(!b) return false; const n = new Date(); return b.m===n.getMonth()+1 && b.d===n.getDate(); }
+const ATT_STOP = new Set(['سجل','سجلي','سجلو','حضر','حضور','حضره','حضرها','ضيف','رساله','افتقاد','ل','لل','لي','يا','مين','هو','هي','عن','ملخص','تقرير','شوف','اعمل','اعملي','اكتب','اكتبلي','كلمه','الي','اللي']);
+function attFindByName(q){
+  const toks = attNormAr(q).split(' ').map(t=>t.replace(/^ل(?=.{3,})/,'')).filter(t=>t.length>1 && !ATT_STOP.has(t));
+  if(!toks.length) return [];
+  const hits = PARTICIPANTS.filter(p=>{ const n = attNormAr(p.name); return toks.every(t=>n.includes(t)); });
+  hits.sort((a,b)=>{ const na = attNormAr(a.name), nb = attNormAr(b.name); return (nb.startsWith(toks[0])?1:0)-(na.startsWith(toks[0])?1:0) || na.length-nb.length; });
+  return hits;
+}
+/* ---------- الجلسات والحضور ---------- */
+function attSessions(type){
+  const c = attCfg(type), by = {}, meta = {};
+  Object.values(ATT_RECORDS||{}).forEach(r=>{ if(r && r.type===type){ (by[r.sid] = by[r.sid] || new Set()).add(r.pid); } });
+  ((c&&c.history)||[]).forEach(h=>{ meta[h.sessionId] = {sid:h.sessionId, name:h.name, t:h.startedAt}; });
+  if(c) meta[c.sessionId] = {sid:c.sessionId, name:c.name, t:c.startedAt, cur:true, open:!!c.open};
+  Object.keys(by).forEach(sid=>{ if(!meta[sid]){ let t = 0; Object.values(ATT_RECORDS).forEach(r=>{ if(r && r.sid===sid && r.type===type && (!t || r.ts<t)) t = r.ts; }); meta[sid] = {sid, name:'جلسة سابقة', t}; } });
+  return Object.values(meta).map(m=>{ m.set = by[m.sid] || new Set(); m.n = m.set.size; return m; }).filter(m=>m.n>0 || m.cur).sort((a,b)=>a.t-b.t);
+}
+function attDoneSessions(type){ return attSessions(type).filter(s=>s.n>0 && !(s.cur && s.open)); }
+function attStreakNow(type, pid){ const S = attSessions(type).filter(s=>s.n>0); let n = 0; for(let i=S.length-1;i>=0 && S[i].set.has(pid);i--) n++; return n; }
+function attAbsRunBefore(type, pid){ const S = attSessions(type).filter(s=>s.n>0); if(S.length<2) return 0; const last = S.length-1; if(!S[last].set.has(pid)) return 0; let n = 0, i = last-1; while(i>=0 && !S[i].set.has(pid)){ n++; i--; } return i>=0 ? n : 0; }
+function attRisk(type){
+  const all = attDoneSessions(type), S = all.slice(-8), n = S.length;
+  if(all.length<2) return {n:all.length, list:[], never:[]};
+  const list = [], never = [];
+  PARTICIPANTS.forEach(p=>{
+    const hist = all.map(s=>s.set.has(p.id)?1:0), att = S.map(s=>s.set.has(p.id)?1:0);
+    const ever = hist.some(x=>x);
+    if(!ever){ if(all.length>=3) never.push(p); return; }
+    const overall = hist.reduce((a,b)=>a+b,0)/hist.length;
+    let ws = 0, w = 0; att.forEach((v,i)=>{ const wt = 1+i*2/Math.max(1,n-1); ws += v*wt; w += wt; });
+    const recent = ws/w; let streak = 0; for(let i=hist.length-1;i>=0 && !hist[i];i--) streak++;
+    const drop = Math.max(0, overall-recent);
+    const score = Math.max(0, Math.min(100, Math.round(100*(0.5*(1-recent) + 0.3*Math.min(streak,4)/4 + 0.2*Math.min(1,drop*2)))));
+    let lastS = null; for(let i=all.length-1;i>=0;i--){ if(hist[i]){ lastS = all[i]; break; } }
+    list.push({p, score, streak, overall, recent, last:lastS ? lastS.t : 0});
+  });
+  list.sort((a,b)=>b.score-a.score || b.streak-a.streak);
+  return {n:all.length, list, never};
+}
+function attRiskMap(type){ const m = {}; try{ attRisk(type).list.forEach(x=>{ m[x.p.id] = x; }); }catch(e){} return m; }
+function attForecast(type){
+  const S = attDoneSessions(type); if(S.length<3) return null;
+  const counts = S.map(s=>s.n), last = counts.slice(-5);
+  let ws = 0, w = 0; last.forEach((v,i)=>{ ws += v*(i+1); w += (i+1); });
+  let exp = ws/w;
+  const a3 = counts.slice(-3), p3 = counts.slice(-6,-3);
+  if(p3.length===3){ const tr = (a3.reduce((x,y)=>x+y,0)-p3.reduce((x,y)=>x+y,0))/3; exp += tr*0.4; }
+  const dow = new Date(S[S.length-1].t).getDay(), same = S.filter(s=>new Date(s.t).getDay()===dow).slice(-4);
+  if(same.length>=3) exp = (exp + same.reduce((x,s)=>x+s.n,0)/same.length)/2;
+  const mean = last.reduce((x,y)=>x+y,0)/last.length, sd = Math.sqrt(last.reduce((x,y)=>x+(y-mean)*(y-mean),0)/last.length);
+  const tot = PARTICIPANTS.length || 1; exp = Math.max(0, Math.min(tot, exp));
+  return {exp:Math.round(exp), lo:Math.max(0, Math.round(exp-sd)), hi:Math.min(tot, Math.round(exp+sd)), pct:Math.round(exp/tot*100)};
+}
+function attAnomalies(type){
+  const out = [], S = attSessions(type).slice(-6), recs = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type);
+  S.forEach(s=>{
+    const rs = recs.filter(r=>r.sid===s.sid).sort((a,b)=>a.ts-b.ts); if(rs.length<3) return;
+    const man = rs.filter(r=>r.manual);
+    for(let i=0;i+7<man.length;i++){ if(man[i+7].ts-man[i].ts<=20000){ out.push({sev:'high', txt:'⚡ 8 تسجيلات يدوية في أقل من 20 ثانية في «'+(s.name||'')+'» — ممكن تكون تسجيلات بالجملة'}); break; } }
+    if(s.t){ const far = rs.filter(r=>r.ts-s.t>10*3600*1000).length; if(far) out.push({sev:'mid', txt:'🕒 '+far+' تسجيل بعد أكتر من 10 ساعات من بداية «'+(s.name||'')+'»'}); }
+    const devs = {}; man.forEach(r=>{ if(r.dev) devs[r.dev] = (devs[r.dev]||0)+1; });
+    Object.keys(devs).forEach(d=>{ if(rs.length>=10 && devs[d]/rs.length>0.7) out.push({sev:'mid', txt:'📱 الجهاز '+d+' سجّل '+Math.round(devs[d]/rs.length*100)+'% من حضور «'+(s.name||'')+'» يدويًا'}); });
+  });
+  return out.slice(0,8);
+}
+function attMsgFor(p, streak, actName){
+  const fn = (p.name||'').trim().split(/\s+/)[0] || 'حبيبي', act = actName || 'الاجتماع';
+  const v = streak>=3
+    ? ['وحشتنا يا '+fn+' 💛 بقالك '+streak+' مرات مش معانا في '+act+'. كله تمام؟ ننتظرك المرة الجاية!', 'إزيك يا '+fn+'؟ لاحظنا غيابك الفترة اللي فاتت، وبصراحة مكانك فاضي في '+act+' 🌿 لو محتاج أي حاجة قولنا.']
+    : ['إزيك يا '+fn+'؟ ما شفناكش في '+act+' المرة اللي فاتت 🌸 يا رب تكون بخير، نستناك المرة الجاية.', 'وحشتنا يا '+fn+' 💛 كان نفسنا تكون معانا في '+act+'. ربنا يباركك.'];
+  return v[Math.floor(Math.random()*v.length)];
+}
+function attWaLink(phone, text){ if(!phone) return ''; let d = phone; if(d.startsWith('0')) d = '20'+d.slice(1); return 'https://wa.me/'+d+'?text='+encodeURIComponent(text); }
+function attShortDate(t){ try{ return new Date(t).toLocaleDateString('ar-EG',{day:'numeric', month:'short'}); }catch(e){ return ''; } }
+/* ---------- صفحة التحليلات الذكية ---------- */
+function attSuggestions(type, c, risk, fc, anom){
+  const out = [], recsN = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && c && r.sid===c.sessionId).length;
+  const hi = risk.list.filter(x=>x.streak>=2 && x.score>=55).length;
+  if(c && c.open && fc && c.startedAt && Date.now()-c.startedAt>45*60000 && recsN < fc.exp*0.6) out.push({id:'late', ic:'📉', t:'الحضور النهارده ('+recsN+') أقل من المتوقع (~'+fc.exp+'). ممكن تبعت تذكير للغايبين.', go:'ai-sec-risk', goLab:'افتح قايمة الافتقاد'});
+  if(hi) out.push({id:'risk', ic:'💛', t:hi+' مخدوم غابوا جلستين أو أكتر ورا بعض ومحتاجين افتقاد.', go:'ai-sec-risk', goLab:'افتح قايمة الافتقاد'});
+  if(anom.length) out.push({id:'anom', ic:'🛡️', t:'فيه '+anom.length+' تنبيه محتاج مراجعة في سجل الحضور.', go:'ai-sec-anom', goLab:'اعرض التنبيهات'});
+  const bd = PARTICIPANTS.filter(attIsBirthdayToday); if(bd.length) out.push({id:'bd', ic:'🎂', t:'النهارده عيد ميلاد: '+bd.slice(0,4).map(p=>p.name).join('، ')+(bd.length>4?' و'+(bd.length-4)+' آخرين':'')});
+  const keep = PARTICIPANTS.filter(p=>attStreakNow(type,p.id)>=4).length; if(keep) out.push({id:'keep', ic:'🔥', t:keep+' مخدوم حاضرين 4 جلسات ورا بعض — يستاهلوا كلمة تشجيع.'});
+  return out;
+}
+function attChartSvg(last12){
+  const n = last12.length; if(!n) return '<div class="empty-note">لسه مفيش جلسات كفاية للرسم</div>';
+  const W = 320, H = 150, top = 22, bot = 24, ph = H-top-bot, mx = Math.max(1, ...last12.map(s=>s.n)), mn = Math.min(...last12.map(s=>s.n)), slot = W/n, bw = Math.min(26, slot*0.62);
+  const ys = last12.map(s=>top+ph-(s.n/mx)*ph);
+  const ma = last12.map((s,i)=>{ const a = last12.slice(Math.max(0,i-1), i+2), v = a.reduce((x,y)=>x+y.n,0)/a.length; return [slot*i+slot/2, top+ph-(v/mx)*ph]; });
+  let g = '';
+  last12.forEach((s,i)=>{
+    const x = slot*i+(slot-bw)/2, h = Math.max(4,(s.n/mx)*ph), y = top+ph-h, col = (n>1 && s.n===mx) ? '#2ecc71' : (n>1 && s.n===mn && mn!==mx) ? '#e67e22' : '#6C7BE8';
+    g += '<g class="ai-g" data-tip="'+escapeHtml((s.name||'جلسة')+' · '+attShortDate(s.t)+' · '+s.n+' حضور')+'"><rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="6" fill="'+col+'" opacity="'+(s.cur?.6:1)+'"/><rect x="'+(slot*i)+'" y="0" width="'+slot+'" height="'+H+'" fill="transparent"/><text x="'+(slot*i+slot/2)+'" y="'+(y-5)+'" text-anchor="middle" font-size="10" font-weight="800">'+s.n+'</text><text x="'+(slot*i+slot/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" opacity=".65">'+escapeHtml(attShortDate(s.t))+'</text></g>';
+  });
+  const pts = ma.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  return '<svg class="ai-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="رسم حضور آخر الجلسات">'+g+(n>2?'<polyline points="'+pts+'" fill="none" stroke="#F4B740" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4" pointer-events="none"/>':'')+'</svg><div class="ai-tip" id="ai-tip">المس عمود لعرض تفاصيل الجلسة · الخط المنقّط هو الاتجاه العام</div>';
+}
+function attHeatHtml(type, risk){
+  const done = attDoneSessions(type).slice(-10); if(done.length<2) return '';
+  const rows = risk.list.slice(0,40).map(x=>'<div class="ai-hrow"><span class="nm">'+escapeHtml(x.p.name||'')+'</span>'+done.map(s=>'<i class="'+(s.set.has(x.p.id)?'y':'')+'" title="'+escapeHtml(attShortDate(s.t))+'"></i>').join('')+'</div>').join('');
+  return '<div class="aa-sec"><b>🗓️ خريطة الحرارة (الأخطر أولًا)</b></div><div class="card ai-heat"><details><summary>اعرض حضور كل مخدوم عبر آخر '+done.length+' جلسات</summary><div style="margin-top:8px">'+rows+'</div><div class="hint" style="margin:8px 0 0">المربع الأخضر = حضر، الرمادي = غاب</div></details></div>';
+}
+function attCompareHtml(){
+  const rows = ATT_KEYS.map(k=>{ const d = attDoneSessions(k); if(!d.length || !ATT_TYPES[k]) return ''; const tot = PARTICIPANTS.length||1, avg = Math.round(d.reduce((a,s)=>a+s.n,0)/d.length/tot*100); return '<div class="ai-cmp"><span>'+ATT_TYPES[k].icon+' '+escapeHtml(ATT_TYPES[k].label)+'</span><div class="ai-cmp-bar"><i style="width:'+Math.min(100,avg)+'%"></i></div><b>'+avg+'%</b></div>'; }).join('');
+  return rows ? '<div class="aa-sec"><b>⚖️ مقارنة الأنشطة (متوسط الحضور)</b></div><div class="card">'+rows+'</div>' : '';
+}
+function attInsightsHtml(type, c){
+  const t = ATT_TYPES[type], total = PARTICIPANTS.length || 1;
+  const done = attDoneSessions(type), risk = attRisk(type), fc = attForecast(type), anom = attAnomalies(type);
+  attDailyBackup();
+  const dis = state.attDis || (state.attDis = {});
+  const sug = attSuggestions(type, c, risk, fc, anom).filter(x=>!dis[x.id]);
+  const last12 = attSessions(type).filter(s=>s.n>0).slice(-12);
+  const avg = done.length ? Math.round(done.reduce((a,s)=>a+s.n,0)/done.length/total*100) : 0;
+  const best = done.slice().sort((a,b)=>b.n-a.n)[0], worst = done.slice().sort((a,b)=>a.n-b.n)[0];
+  const kpis = adminKpis([{num:avg+'%', lab:'متوسط الحضور'},{num:done.length, lab:'جلسات متحلّلة'},{num:fc?('~'+fc.exp):'—', lab:'المتوقع الجاية'}]);
+  const sugH = sug.length ? sug.map(x=>'<div class="ai-sug"><span>'+x.ic+'</span><div style="flex:1;min-width:0"><p>'+escapeHtml(x.t)+'</p>'+(x.go?'<button type="button" class="ai-btn go" data-action="att-admin-jump" data-type="'+type+'" data-target="'+x.go+'">'+escapeHtml(x.goLab||'افتح')+'</button>':'')+'</div><button type="button" class="x" data-action="att-admin-dis" data-type="'+type+'" data-id="'+x.id+'" aria-label="إخفاء">✕</button></div>').join('') : '<div class="empty-note">✅ مفيش اقتراحات دلوقتي</div>';
+  const fcH = fc ? '<div class="ai-fc"><b>~'+fc.exp+'</b><span>مخدوم متوقع (بين '+fc.lo+' و '+fc.hi+') — '+fc.pct+'% من الإجمالي</span></div>' : '<div class="hint" style="margin:0">محتاج 3 جلسات على الأقل عشان التوقع يتحسب</div>';
+  const watch = risk.list.filter(x=>x.score>=40).slice(0,30);
+  const riskH = watch.length ? watch.map(x=>{
+    const lvl = x.score>=65 ? 'hi' : 'mid', ph = attPhoneOf(x.p), msg = attMsgFor(x.p, x.streak, c&&c.name);
+    return '<div class="ai-risk '+lvl+'"><div class="ai-r-top"><span class="arr-av">'+escapeHtml((x.p.name||'?').trim().charAt(0))+'</span><div class="arr-txt"><b>'+escapeHtml(x.p.name||'')+'</b><small>غاب '+x.streak+' جلسة ورا بعض · آخر حضور '+(x.last?escapeHtml(attShortDate(x.last)):'—')+' · التزام '+Math.round(x.overall*100)+'%</small></div><span class="ai-score">'+x.score+'</span></div>'
+      +'<div class="ai-r-act">'+(ph?'<a class="ai-btn" href="tel:'+ph+'">📞 اتصال</a><a class="ai-btn wa" href="'+attWaLink(ph,msg)+'" target="_blank" rel="noopener">💬 واتساب</a>':'<span class="ai-nophone">مفيش رقم محفوظ</span>')+'<button type="button" class="ai-btn" data-action="att-admin-msgcopy" data-type="'+type+'" data-msg="'+escapeHtml(msg)+'">📋 نسخ الرسالة</button></div></div>';
+  }).join('') : '<div class="empty-note">'+(risk.n<2?'محتاج جلستين مكتملتين على الأقل للتحليل':'🎉 مفيش حد في خطر دلوقتي')+'</div>';
+  const anH = anom.length ? anom.map(a=>'<div class="ai-an '+a.sev+'">'+escapeHtml(a.txt)+'</div>').join('') : '<div class="empty-note">✅ مفيش أي نشاط مشبوه</div>';
+  return kpis
+   +'<div class="aa-sec"><b>💡 اقتراحات ذكية</b></div><div class="card">'+sugH+'</div>'
+   +'<div class="aa-sec"><b>🔮 توقع الجلسة الجاية</b></div><div class="card">'+fcH+'</div>'
+   +'<div class="aa-sec"><b>📊 الحضور في آخر الجلسات</b></div><div class="card">'+attChartSvg(last12)+(best&&worst&&done.length>1?'<div class="hint" style="margin:10px 0 0">أعلى حضور: '+best.n+' ('+escapeHtml(attShortDate(best.t))+') · أقل حضور: '+worst.n+' ('+escapeHtml(attShortDate(worst.t))+')</div>':'')+'</div>'
+   +attCompareHtml()
+   +'<div class="aa-sec"><b>🤖 اسأل المساعد</b></div><div class="card">'
+     +'<div class="ai-ask"><input type="text" class="field" id="att-ask-input" placeholder="مثال: مين غاب آخر 3 جلسات؟" autocomplete="off" style="margin:0"><button type="button" class="ai-mic" id="att-ask-mic" data-action="att-admin-askmic" data-type="'+type+'" aria-label="تحدّث">🎤</button><button type="button" class="btn btn-primary" style="width:auto;padding:0 16px;margin:0" data-action="att-admin-ask" data-type="'+type+'">اسأل</button></div>'
+     +'<div class="ai-chips">'+['مين غاب آخر 3 جلسات','مين حضر النهارده','كام حضر','مين الأكثر مواظبة','توقع الجلسة الجاية','عيد ميلاد النهارده'].map(q=>'<button type="button" class="ai-chip" data-action="att-admin-askq" data-type="'+type+'" data-q="'+q+'">'+q+'</button>').join('')+'</div>'
+     +'<div class="ai-out" id="att-ask-out"></div></div>'
+   +'<div class="aa-sec" id="ai-sec-risk"><b>💛 أولى بالافتقاد</b></div><div class="card" style="padding:10px">'+riskH+(risk.never.length?'<div class="hint" style="margin:10px 4px 0">'+risk.never.length+' مخدوم لم يحضروا أي جلسة مسجّلة.</div>':'')+'</div>'
+   +attHeatHtml(type, risk)
+   +'<div class="aa-sec" id="ai-sec-anom"><b>🛡️ كشف التحايل والشذوذ</b></div><div class="card">'+anH+'</div>'
+   +'<div class="aa-sec"><b>💾 النسخ الاحتياطي</b></div><div class="card"><div class="hint" style="margin:0 0 10px;text-align:start">نسخة كاملة من سجلات الحضور والإعدادات. بتتحفظ نسخة تلقائية يوميًا على الجهاز ده.</div><div style="display:flex;gap:8px"><button type="button" class="btn btn-outline" style="flex:1;margin:0" data-action="att-admin-backup" data-type="'+type+'">⬇️ تنزيل نسخة</button><button type="button" class="btn btn-outline" style="flex:1;margin:0" data-action="att-admin-restore" data-type="'+type+'">⬆️ استرجاع من ملف</button></div><input type="file" id="att-restore-file" accept="application/json,.json" style="display:none"></div>';
+}
+function attAuditHtml(type){
+  const lbl = {reg:'تسجيل حضور', scan:'تسجيل بالـ QR', voice:'تسجيل صوتي', del:'حذف تسجيل', undo:'تراجع', restore:'استرجاع نسخة'};
+  const rows = ATT_AUDIT.slice().reverse().filter(a=>!type || a.type===type || a.act==='restore').slice(0,120).map(a=>{
+    const p = a.pid ? attPById(a.pid) : null;
+    return '<div class="audit-row" data-search="'+escapeHtml(attNormAr((p?p.name:'')+' '+(lbl[a.act]||a.act)))+'"><div class="audit-left">'+escapeHtml(p?p.name:(a.pid||'—'))+'<div class="audit-sub">'+(lbl[a.act]||escapeHtml(a.act))+' · جهاز '+escapeHtml(a.dev||'؟')+(a.how?' · '+escapeHtml(a.how):'')+'</div></div><div class="audit-time">'+attFmtTime(a.ts)+'</div></div>';
+  }).join('');
+  return '<input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دوّر بالاسم أو نوع العملية..." style="margin:0 0 12px;" /><div class="card">'+(rows||'<div class="empty-note">لسه مفيش عمليات مسجّلة (بتبدأ تتسجّل من دلوقتي)</div>')+'</div>';
+}
+/* ---------- نسخ احتياطي ---------- */
+function attDailyBackup(){ try{ const k = 'glv-att-autobak', today = new Date().toDateString(); const o = JSON.parse(localStorage.getItem(k)||'null'); if(o && o.day===today) return; if(!ATT_RECORDS || !Object.keys(ATT_RECORDS).length) return; localStorage.setItem(k, JSON.stringify({day:today, ts:Date.now(), cfg:ATT_CONFIG, rec:ATT_RECORDS})); }catch(e){} }
+function attDoBackup(){
+  const data = {v:1, ts:Date.now(), cfg:ATT_CONFIG, rec:ATT_RECORDS, audit:ATT_AUDIT};
+  const blob = new Blob([JSON.stringify(data)], {type:'application/json'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'attendance-backup-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  showToast('✅ تم تنزيل النسخة الاحتياطية');
+}
+function attDoRestore(file, type){
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    let d; try{ d = JSON.parse(fr.result); }catch(e){ showToast('الملف مش صالح', true); return; }
+    if(!d || typeof d.rec!=='object' || typeof d.cfg!=='object'){ showToast('الملف مش نسخة حضور صالحة', true); return; }
+    showConfirmDialog('هتتبدّل كل سجلات وإعدادات الحضور الحالية بنسخة '+attFmtTime(d.ts)+' ('+Object.keys(d.rec).length+' تسجيل). متأكد؟', async ()=>{
+      const ok1 = await attRecUpdate(o=>{ Object.keys(o).forEach(k=>delete o[k]); Object.assign(o, d.rec); });
+      const ok2 = await attCfgUpdate(o=>{ Object.keys(o).forEach(k=>delete o[k]); Object.assign(o, d.cfg); });
+      if(ok1 && ok2) attAuditLog('restore', null, type, {how:attFmtTime(d.ts)});
+      showToast(ok1&&ok2 ? '✅ تم الاسترجاع' : 'تعذر الاسترجاع — تحقق من الاتصال', !(ok1&&ok2)); render();
+    }, {confirmLabel:'استرجع'});
+  };
+  fr.readAsText(file);
+}
+/* ---------- المساعد (محلي — من غير إنترنت أو مفاتيح) ---------- */
+function attListHtml(names, cap){ cap = cap||30; if(!names.length) return '<div class="ai-a">مفيش حد</div>'; return '<ol class="ai-ol">'+names.slice(0,cap).map(n=>'<li>'+escapeHtml(n)+'</li>').join('')+'</ol>'+(names.length>cap?'<div class="ai-a">و '+(names.length-cap)+' آخرين…</div>':''); }
+function attAnswer(qRaw, type){
+  const q = attNormAr(qRaw), c = attCfg(type), S = attSessions(type).filter(s=>s.n>0), done = attDoneSessions(type), total = PARTICIPANTS.length || 1;
+  const digits = (String(qRaw).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).match(/\d+/)||[])[0];
+  if(!q) return 'اكتب سؤالك أو دوس على أحد الأسئلة الجاهزة.';
+  if(/عيد ميلاد|ميلاد/.test(q)){ const b = PARTICIPANTS.filter(attIsBirthdayToday).map(p=>p.name); return b.length ? '🎂 النهارده:'+attListHtml(b) : 'مفيش أعياد ميلاد النهارده (أو تواريخ الميلاد مش مسجّلة).'; }
+  if(/توقع|الجايه|القادمه|هيحضر/.test(q)){ const f = attForecast(type); return f ? '🔮 المتوقع حوالي <b>'+f.exp+'</b> مخدوم (بين '+f.lo+' و '+f.hi+')، يعني '+f.pct+'% من الإجمالي.' : 'محتاج 3 جلسات مكتملة على الأقل عشان أقدر أتوقع.'; }
+  if(/مواظب|اكتر حضور|افضل حضور|ملتزم/.test(q)){ if(done.length<2) return 'محتاج جلستين على الأقل.'; const r = PARTICIPANTS.map(p=>({p, n:done.filter(s=>s.set.has(p.id)).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,10); return '🏅 الأكثر مواظبة (من '+done.length+' جلسة):'+attListHtml(r.map(x=>x.p.name+' — '+x.n+' مرة')); }
+  if(/غاب|غايب|غياب|منقطع|مجاش|ماجاش/.test(q)){
+    const n = Math.max(1, Math.min(done.length, +digits || (/اخر جلسه|اخر مره|اخر اجتماع/.test(q)?1:2)));
+    if(!done.length) return 'مفيش جلسات مكتملة للتحليل.';
+    const L = done.slice(-n), res = PARTICIPANTS.filter(p=>L.every(s=>!s.set.has(p.id)) && (/كان|مواظب|ديما|دايما/.test(q) ? done.some(s=>s.set.has(p.id)) : true)).map(p=>p.name);
+    return '📋 غابوا آخر '+n+' جلسة'+(n>1?'(ات)':'')+' ('+res.length+'):'+attListHtml(res);
+  }
+  if(/كام|عدد|نسبه/.test(q) && /حضر|حضور|حاضر/.test(q)){ const cur = S.length ? S[S.length-1] : null; if(!cur) return 'مفيش حضور مسجّل لسه.'; return 'حضر <b>'+cur.n+'</b> من '+total+' ('+Math.round(cur.n/total*100)+'%) في «'+escapeHtml(cur.name||'')+'».'; }
+  if(/حضر|حاضر|وصل/.test(q) && /النهارده|اليوم|الجلسه|دلوقتي|دلوقت/.test(q)){ const cur = c && S.find(s=>s.sid===c.sessionId); if(!cur) return 'لسه محدش اتسجّل.'; return '✅ حضروا ('+cur.n+'):'+attListHtml(Array.from(cur.set).map(id=>(attPById(id)||{}).name||id)); }
+  if(/رساله|افتقاد|كلمه/.test(q)){
+    const f = attFindByName(qRaw);
+    if(f.length>=1){ const p = f[0], rk = attRiskMap(type)[p.id], st = rk ? rk.streak : 1, m = attMsgFor(p, st, c&&c.name), ph = attPhoneOf(p), wa = attWaLink(ph, m);
+      return '✉️ رسالة لـ <b>'+escapeHtml(p.name)+'</b>:<div class="ai-msg">'+escapeHtml(m)+'</div>'+(wa?'<a class="ai-btn wa" href="'+wa+'" target="_blank" rel="noopener">💬 ابعتها واتساب</a>':'<div class="ai-a">مفيش رقم محفوظ للمخدوم ده.</div>'); }
+    const hi = attRisk(type).list.filter(x=>x.score>=55).slice(0,15).map(x=>x.p.name); return hi.length ? '💛 أولى بالافتقاد:'+attListHtml(hi)+'<div class="ai-a">اكتب «رسالة افتقاد لـ [اسم]» وأجهّزها.</div>' : 'مفيش حد في خطر دلوقتي 🎉';
+  }
+  const f = attFindByName(qRaw);
+  if(f.length){ const p = f[0], h = done.map(s=>s.set.has(p.id)?1:0), cnt = h.reduce((a,b)=>a+b,0), rk = attRiskMap(type)[p.id];
+    return '👤 <b>'+escapeHtml(p.name)+'</b>'+(f.length>1?' <small>(فيه '+(f.length-1)+' أسماء تانية مشابهة)</small>':'')+'<br>حضر '+cnt+' من '+done.length+' جلسة'+(done.length?' ('+Math.round(cnt/done.length*100)+'%)':'')+'<br>حاضر حاليًا في السلسلة: '+attStreakNow(type,p.id)+' جلسة'+(rk?'<br>درجة خطر الغياب: '+rk.score+'/100':''); }
+  return 'مش فاهم السؤال 🤔 جرّب:<ul class="ai-ul"><li>مين غاب آخر 3 جلسات؟</li><li>مين حضر النهارده؟</li><li>كام حضر؟</li><li>مين الأكثر مواظبة؟</li><li>رسالة افتقاد لـ مينا</li><li>اسم مخدوم لعرض ملخصه</li></ul>';
+}
+function attVoiceStart(onAlts, onEnd){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ showToast('المتصفح مش بيدعم الأوامر الصوتية — جرّب Chrome', true); return null; }
+  try{ const r = new SR(); r.lang = 'ar-EG'; r.interimResults = false; r.maxAlternatives = 3;
+    r.onresult = e=>{ try{ onAlts(Array.from(e.results[0]).map(a=>a.transcript)); }catch(x){} };
+    r.onerror = ()=>{ showToast('ما سمعتش كويس — حاول تاني', true); };
+    r.onend = ()=>{ onEnd && onEnd(); }; r.start(); return r; }catch(e){ showToast('تعذر تشغيل الميكروفون', true); return null; }
+}
+/* ---------- تسجيل موحّد (للماسح والصوت) مع أوفلاين وتدقيق ---------- */
+async function attRecord(type, p, how){
+  const cur = attCfg(type); if(!cur) return {ok:false, err:'noses'};
+  const t = ATT_TYPES[type], rkey = attRecKey(p.id, type, cur.sessionId); let dup = false;
+  const rec = {pid:p.id, type, sid:cur.sessionId, sname:cur.name||t.label, ts:Date.now(), pts:attPtsOfCfg(type,cur), dev:attDevId()};
+  if(how==='scan') rec.scan = true; else if(how==='voice'){ rec.voice = true; rec.manual = true; } else rec.manual = true;
+  if(ATT_RECORDS && ATT_RECORDS[rkey]) return {ok:true, dup:true, key:rkey};
+  const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = rec; });
+  if(!ok){
+    if(!attPendGet().some(x=>attRecKey(x.pid,x.type,x.sid)===rkey)) attPendSet(attPendGet().concat([{pid:p.id, type, sid:cur.sessionId, sname:rec.sname, ts:rec.ts, pts:rec.pts}]));
+    ATT_RECORDS = attOverlayPending(ATT_RECORDS); attAuditLog(how==='voice'?'voice':'scan', p.id, type, {how:'أوفلاين'});
+    return {ok:true, pending:true, key:rkey, cur};
+  }
+  if(dup) return {ok:true, dup:true, key:rkey};
+  attAuditLog(how==='voice'?'voice':'scan', p.id, type, {how:how==='voice'?'صوت':'QR'});
+  try{ pushNotification(p.id, 'تم تسجيل حضورك في '+rec.sname+(rec.pts>0?' وأخدت '+rec.pts+' نقطة':''), '✅'); }catch(e){}
+  return {ok:true, key:rkey, cur, pts:rec.pts};
+}
+function attCardInfo(type, p, pts){
+  const out = {chips:[], pts:0, rank:0};
+  try{ out.pts = participantTotal(p.id); const rk = rankedParticipants(); out.rank = rk.findIndex(x=>x.id===p.id)+1; }catch(e){}
+  const st = attStreakNow(type, p.id), sess = attSessions(type).filter(s=>s.n>0), seen = sess.filter(s=>s.set.has(p.id)).length, gap = attAbsRunBefore(type, p.id);
+  if(seen===1) out.chips.push('🌟 أول حضور له');
+  else if(gap>=3) out.chips.push('💛 رجع بعد غياب '+gap+' جلسات');
+  if(st>=3) out.chips.push('🔥 '+st+' جلسات ورا بعض');
+  if(attIsBirthdayToday(p)) out.chips.push('🎂 عيد ميلاد سعيد!');
+  return out;
+}
+/* ---------- الماسح المتطوّر ---------- */
+function attOpenQrScanner(type){
+  const c = attCfg(type), t = ATT_TYPES[type];
+  if(!c || !t){ showToast('مفيش يوم/جلسة مفتوحة للتسجيل', true); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ showToast('المتصفح مش بيدعم الكاميرا — افتح الرابط عبر الإنترنت (https)', true); return; }
+  const ov = document.createElement('div'); ov.className = 'ass-ov'; ov.setAttribute('dir','rtl');
+  ov.innerHTML = '<div class="ass-top"><b>📷 مسح ذكي — '+escapeHtml(c.name||t.label)+'</b><span class="ass-cnt" id="ass-cnt">0 اتسجّلوا</span></div>'
+    +'<div class="ass-prog"><div><span id="ass-ptxt"></span><span id="ass-ppct"></span></div><div class="ass-pbar"><i id="ass-pfill"></i></div></div>'
+    +'<div class="ass-cam"><video id="ass-v" playsinline muted></video><div class="ass-frame" id="ass-frame"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><u class="ass-line"></u></div><div class="ass-flash" id="ass-fl"></div></div>'
+    +'<div class="ass-res" id="ass-res">وجّه الكاميرا على QR كارت المخدوم — تقدر تمسح أكتر من كارت مع بعض</div>'
+    +'<div class="ass-picks" id="ass-picks"></div>'
+    +'<button type="button" class="ass-undo" id="ass-undo" style="display:none"></button>'
+    +'<div class="ass-tools"><button type="button" class="ass-tool" id="ass-torch" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 2h6l-1 6h-4zM10 8v3l-2 3v7h8v-7l-2-3V8"/></svg>فلاش</button><button type="button" class="ass-tool" id="ass-zoom" style="display:none"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg><span id="ass-zt">×1</span></button><button type="button" class="ass-tool" id="ass-compact">وضع الزحمة</button></div>'
+    +'<div class="ass-row"><button type="button" class="ass-voice" id="ass-voice">🎤 أمر صوتي: «سجّل حضور …»</button></div>'
+    +'<div class="ass-log" id="ass-log"></div>'
+    +'<button type="button" class="ass-close" id="ass-x">إنهاء المسح</button>';
+  document.body.appendChild(ov);
+  const $ = s=>ov.querySelector(s), v = $('#ass-v'), res = $('#ass-res'), fl = $('#ass-fl'), log = $('#ass-log'), cntEl = $('#ass-cnt'), picks = $('#ass-picks'), undoB = $('#ass-undo');
+  let stream = null, track = null, run = true, busy = false, cnt = 0, wTimer = null, uTimer = null, lastUndo = null, seenT = {}, rec = null;
+  function stop(){ run = false; try{ stream && stream.getTracks().forEach(tr=>tr.stop()); }catch(e){} try{ rec && rec.stop(); }catch(e){} clearTimeout(wTimer); clearInterval(uTimer); }
+  function close(){ stop(); ov.remove(); try{ render(); }catch(e){} }
+  $('#ass-x').onclick = close;
+  const frameEl = $('#ass-frame');
+  function lockFrame(){ frameEl.classList.add('lock'); clearTimeout(lockFrame._t); lockFrame._t = setTimeout(()=>frameEl.classList.remove('lock'), 700); }
+  function paintProg(){ const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===c.sessionId).length, tot = PARTICIPANTS.length||1; $('#ass-ptxt').textContent = 'حضر '+n+' من '+tot; $('#ass-ppct').textContent = Math.round(n/tot*100)+'%'; $('#ass-pfill').style.width = Math.min(100,Math.round(n/tot*100))+'%'; }
+  paintProg();
+  $('#ass-compact').onclick = function(){ ov.classList.toggle('compact'); this.classList.toggle('on'); };
+  function flash(k){ fl.className = 'ass-flash '+k; setTimeout(()=>{ fl.className = 'ass-flash'; }, 380); }
+  function say(k, html){ res.className = 'ass-res '+k; res.innerHTML = html; }
+  function tone(list){ try{ const A = window.AudioContext||window.webkitAudioContext, x = new A(), t0 = x.currentTime; list.forEach(n=>{ const o = x.createOscillator(), g = x.createGain(); o.type = n[2]||'sine'; o.frequency.value = n[0]; g.gain.setValueAtTime(0,t0+n[1]); g.gain.linearRampToValueAtTime(.18,t0+n[1]+.02); g.gain.exponentialRampToValueAtTime(.0001,t0+n[1]+.3); o.connect(g); g.connect(x.destination); o.start(t0+n[1]); o.stop(t0+n[1]+.35); }); setTimeout(()=>{ try{ x.close(); }catch(e){} },900); }catch(e){} }
+  const okSound = ()=>tone([[784,0],[1047,.11],[1319,.22]]), errSound = ()=>tone([[240,0,'triangle'],[180,.14,'triangle']]);
+  function welcome(items){
+    const old = $('.ass-welcome'); if(old) old.remove(); clearTimeout(wTimer);
+    const w = document.createElement('div'); w.className = 'ass-welcome';
+    const cols = ['#2ecc71','#f1c40f','#7C9CFF','#e84393','#ff9f43']; let conf = '';
+    for(let i=0;i<22;i++){ const ang = Math.random()*Math.PI*2, d = 90+Math.random()*130; conf += '<i class="ass-conf" style="background:'+cols[i%cols.length]+';--dx:'+Math.round(Math.cos(ang)*d)+'px;--dy:'+Math.round(Math.sin(ang)*d-30)+'px;--rot:'+Math.round(Math.random()*540)+'deg;animation-delay:'+(Math.random()*.15).toFixed(2)+'s"></i>'; }
+    const f = items[0], p = f.p, info = f.info; const wcls = items.length===1 ? (info.chips.some(x=>x.indexOf('🎂')>=0)?'bd':info.chips.some(x=>x.indexOf('💛')>=0)?'back':info.chips.some(x=>x.indexOf('🔥')>=0)?'fire':'') : '';
+    const av = p.photo ? '<span class="ass-wav" style="background-image:url(\''+String(p.photo).replace(/'/g,"%27")+'\')"></span>' : '';
+    const extra = items.length>1 ? '<div class="ass-wchips"><span>+ '+(items.length-1)+' كمان: '+escapeHtml(items.slice(1,4).map(x=>x.p.name.split(' ')[0]).join('، '))+'</span></div>' : '';
+    const chips = items.length===1 && info.chips.length ? '<div class="ass-wchips">'+info.chips.map(x=>'<span>'+escapeHtml(x)+'</span>').join('')+'</div>' : '';
+    const pts = items.length===1 && info.pts ? '<div class="ass-wpts">⭐ '+info.pts+' نقطة'+(info.rank?' · الترتيب '+info.rank:'')+'</div>' : '';
+    w.innerHTML = conf+'<div class="ass-wcard '+wcls+'">'+av+(av?'':'<svg class="ass-wcheck" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><path d="M28 52 L44 68 L72 36"/></svg>')+'<div class="ass-wname">'+escapeHtml(p.name||'')+'</div><div class="ass-wmsg">تم تسجيل حضورك ✨ أهلاً بيك</div>'+pts+chips+extra+'</div>';
+    $('.ass-cam').appendChild(w); wTimer = setTimeout(()=>{ w.classList.add('out'); setTimeout(()=>w.remove(),320); }, items.length===1 && info.chips.length ? 2600 : 1900);
+  }
+  function offerUndo(items){
+    lastUndo = items.map(x=>x.key); let s = 10; const label = items.length===1 ? items[0].p.name.split(' ')[0] : items.length+' مخدومين';
+    undoB.style.display = ''; const paint = ()=>{ undoB.textContent = '↩️ تراجع عن '+label+' ('+s+')'; }; paint(); clearInterval(uTimer);
+    uTimer = setInterval(()=>{ s--; if(s<=0){ clearInterval(uTimer); undoB.style.display = 'none'; lastUndo = null; } else paint(); }, 1000);
+  }
+  undoB.onclick = async ()=>{
+    if(!lastUndo) return; const keys = lastUndo.slice(); lastUndo = null; clearInterval(uTimer); undoB.style.display = 'none';
+    const ok = await attRecUpdate(o=>{ keys.forEach(k=>{ delete o[k]; }); });
+    if(ok){ keys.forEach(k=>{ const pid = k.split('__')[0]; attAuditLog('undo', pid, type, {how:'تراجع فوري'}); }); cnt = Math.max(0, cnt-keys.length); cntEl.textContent = cnt+' اتسجّلوا'; paintProg(); say('warn','↩️ تم التراجع'); }
+    else { attPendSet(attPendGet().filter(x=>keys.indexOf(attRecKey(x.pid,x.type,x.sid))<0)); say('bad','❌ تعذر التراجع — تحقق من الاتصال'); }
+  };
+  function findP(raw){
+    const id = String(raw||'').trim(); if(!id) return null;
+    let p = PARTICIPANTS.find(x=>String(x.id)===id) || PARTICIPANTS.find(x=>String(x.id).toLowerCase()===id.toLowerCase());
+    if(!p){ const toks = id.split(/[\s\/?#&=:,;|]+/).filter(Boolean); p = PARTICIPANTS.find(x=>toks.indexOf(String(x.id))>=0); }
+    return p || null;
+  }
+  async function processMany(raws, how){
+    if(busy) return; busy = true;
+    try{
+      const okItems = [], dups = [], unknown = [];
+      for(const raw of raws){
+        const key = String(raw.p ? raw.p.id : raw).trim(); const now = Date.now();
+        if(seenT[key] && now-seenT[key]<3500) continue; seenT[key] = now;
+        const p = raw.p || findP(key);
+        if(!p){ unknown.push(key); continue; }
+        const r = await attRecord(type, p, how||'scan');
+        if(!r.ok){ say('bad','❌ تعذر الحفظ — تحقق من الاتصال'); flash('bad'); errSound(); continue; }
+        if(r.dup){ dups.push(p); continue; }
+        okItems.push({p, key:r.key, info:attCardInfo(type, p, r.pts), pending:r.pending});
+      }
+      if(okItems.length){
+        cnt += okItems.length; cntEl.textContent = cnt+' اتسجّلوا'; paintProg(); lockFrame(); flash('ok'); vibrate(40); okSound(); welcome(okItems); offerUndo(okItems);
+        say('ok','✅ <b>'+escapeHtml(okItems.map(x=>x.p.name).slice(0,3).join('، '))+'</b> اتسجّل حضوره'+(okItems.some(x=>x.pending)?' <small>(محفوظ أوفلاين وهيتبعت لما النت يرجع)</small>':'')+(okItems.length>3?' و'+(okItems.length-3)+' آخرين':''));
+        okItems.forEach(x=>{ const row = document.createElement('div'); row.innerHTML = '<span>'+escapeHtml(x.p.name||'')+'</span><small>'+attFmtTime(Date.now())+'</small>'; log.insertBefore(row, log.firstChild); });
+        while(log.children.length>4) log.removeChild(log.lastChild);
+      } else if(dups.length){ errSound(); flash('bad'); vibrate([60,40,60]); say('warn','⚠️ <b>'+escapeHtml(dups[0].name||'')+'</b> متسجّل حضوره قبل كده'+(dups.length>1?' (+'+(dups.length-1)+')':'')); }
+      else if(unknown.length){ errSound(); flash('bad'); vibrate([60,40,60]); say('bad','❌ الكود ده مش تبع أي مخدوم'); }
+    } finally { busy = false; }
+  }
+  /* أوامر صوتية */
+  function onVoice(alts){
+    picks.innerHTML = '';
+    for(const a of alts){
+      const n = attNormAr(a);
+      if(/تراجع|الغي|الغاء|امسح/.test(n)){ if(lastUndo) undoB.click(); else say('warn','مفيش حاجة للتراجع عنها'); return; }
+      const hits = attFindByName(a); if(!hits.length) continue;
+      if(hits.length===1){ say('ok','🎤 «'+escapeHtml(a)+'»'); processMany([{p:hits[0]}], 'voice'); return; }
+      say('warn','🎤 «'+escapeHtml(a)+'» — اختار المخدوم:');
+      hits.slice(0,5).forEach(p=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'ass-pick'; b.textContent = p.name; b.onclick = ()=>{ picks.innerHTML = ''; processMany([{p}], 'voice'); }; picks.appendChild(b); });
+      return;
+    }
+    errSound(); say('bad','🎤 ما لقيتش اسم مطابق لـ «'+escapeHtml(alts[0]||'')+'»');
+  }
+  $('#ass-voice').onclick = ()=>{ const b = $('#ass-voice'); if(rec){ try{ rec.stop(); }catch(e){} return; } b.classList.add('on'); b.textContent = '🎤 بسمعك… قول الاسم'; rec = attVoiceStart(onVoice, ()=>{ rec = null; b.classList.remove('on'); b.textContent = '🎤 أمر صوتي: «سجّل حضور …»'; }); if(!rec){ b.classList.remove('on'); b.textContent = '🎤 أمر صوتي: «سجّل حضور …»'; } };
+  (async ()=>{
+    try{ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}}, audio:false}); }
+    catch(e){ say('bad','تعذر فتح الكاميرا — اسمح بإذن الكاميرا وحاول تاني (تقدر تستخدم الأمر الصوتي)'); return; }
+    if(!run){ stop(); return; }
+    v.srcObject = stream; await v.play().catch(()=>{});
+    try{ track = stream.getVideoTracks()[0]; const caps = (track.getCapabilities && track.getCapabilities()) || {};
+      if(caps.torch){ const tb = $('#ass-torch'); tb.style.display = ''; let on = false; tb.onclick = async ()=>{ try{ on = !on; await track.applyConstraints({advanced:[{torch:on}]}); tb.classList.toggle('on', on); }catch(e){ on = false; showToast('الفلاش مش متاح على الكاميرا دي', true); } }; }
+      if(caps.zoom){ const zb = $('#ass-zoom'); zb.style.display = ''; const zmin = caps.zoom.min||1, zmax = Math.min(caps.zoom.max||1, 4), steps = [zmin, zmin+(zmax-zmin)/2, zmax]; let zi = 0; zb.onclick = async ()=>{ zi = (zi+1)%3; try{ await track.applyConstraints({advanced:[{zoom:steps[zi]}]}); $('#ass-zt').textContent = '×'+(Math.round(steps[zi]*10)/10); zb.classList.toggle('on', zi>0); }catch(e){} }; }
+    }catch(e){}
+    let det = null; try{ if(window.BarcodeDetector) det = new BarcodeDetector({formats:['qr_code']}); }catch(e){}
+    const cv = document.createElement('canvas'), cx = cv.getContext('2d',{willReadFrequently:true});
+    (async function loop(){
+      if(!run) return;
+      try{
+        if(v.readyState>=2 && v.videoWidth){
+          if(det){ const r = await det.detect(v); if(r && r.length){ lockFrame(); await processMany(r.map(x=>x.rawValue), 'scan'); } }
+          else if(window.jsQR){ cv.width = v.videoWidth; cv.height = v.videoHeight; cx.drawImage(v,0,0); const d = cx.getImageData(0,0,cv.width,cv.height), q = jsQR(d.data,d.width,d.height); if(q && q.data){ lockFrame(); await processMany([q.data], 'scan'); } }
+        }
+      }catch(e){}
+      setTimeout(loop, det?120:200);
+    })();
+  })();
+}
+
+
+/* ---------- لمس الرسم + سحب صفوف التسجيل ---------- */
+document.addEventListener('click', e=>{ const g = e.target.closest && e.target.closest('.ai-g'); if(!g) return; const tip = document.getElementById('ai-tip'); if(tip) tip.textContent = g.getAttribute('data-tip')||''; });
+(function attSwipeInit(){
+  let row = null, x0 = 0, y0 = 0, dx = 0, drag = false;
+  document.addEventListener('pointerdown', e=>{ const r = e.target.closest && e.target.closest('.att-roster-row'); if(!r || (e.target.closest && e.target.closest('button,a,input'))) return; row = r; x0 = e.clientX; y0 = e.clientY; dx = 0; drag = false; }, {passive:true});
+  document.addEventListener('pointermove', e=>{ if(!row) return; dx = e.clientX-x0; const dy = e.clientY-y0; if(!drag && Math.abs(dx)>14 && Math.abs(dx)>Math.abs(dy)*1.6) drag = true; if(!drag) return; row.style.transition = 'none'; row.style.transform = 'translateX('+Math.max(-110,Math.min(110,dx))+'px)'; row.classList.toggle('swp-go', Math.abs(dx)>70 && !row.classList.contains('is-in')); row.classList.toggle('swp-undo', Math.abs(dx)>70 && row.classList.contains('is-in')); }, {passive:true});
+  function end(){ if(!row) return; const r = row; row = null; r.style.transition = ''; r.style.transform = ''; r.classList.remove('swp-go','swp-undo'); if(drag && Math.abs(dx)>70){ const b = r.querySelector('.arr-btn'); if(b){ vibrate(25); b.click(); } } drag = false; }
+  document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
+})();
 async function attAdminAction(action, el){
   if(!state.adminUnlocked) return;
   const type = el.dataset.type || attAdminType(); const t = ATT_TYPES[type]; if(!t) return;
   const saveToast = (ok, msg)=>{ showToast(ok ? msg : 'تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', !ok); render(); };
   
   if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
-  if(action==='att-admin-page'){ state.attNav = state.attNav || {type, page:'home'}; state.attNav.page = el.dataset.page; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-scan'){ attOpenQrScanner(type); return; }
+  if(action==='att-admin-msgcopy'){ const m = el.dataset.msg||''; try{ await navigator.clipboard.writeText(m); showToast('📋 تم نسخ الرسالة'); }catch(e){ showToast(m); } return; }
+  if(action==='att-admin-ask' || action==='att-admin-askq'){
+    const inp = document.getElementById('att-ask-input'); if(action==='att-admin-askq' && inp) inp.value = el.dataset.q||'';
+    const out = document.getElementById('att-ask-out'); if(out) out.innerHTML = attAnswer(inp?inp.value:(el.dataset.q||''), type); return;
+  }
+  if(action==='att-admin-askmic'){
+    if(el._rec){ try{ el._rec.stop(); }catch(e){} return; }
+    el.classList.add('on');
+    el._rec = attVoiceStart(a=>{ const inp = document.getElementById('att-ask-input'); if(inp) inp.value = a[0]; const out = document.getElementById('att-ask-out'); if(out) out.innerHTML = attAnswer(a[0], type); }, ()=>{ el._rec = null; el.classList.remove('on'); });
+    if(!el._rec) el.classList.remove('on'); return;
+  }
+  if(action==='att-admin-dis'){ (state.attDis = state.attDis || {})[el.dataset.id] = 1; render(); return; }
+  if(action==='att-admin-jump'){ const tg = document.getElementById(el.dataset.target); if(tg){ tg.scrollIntoView({behavior:'smooth', block:'start'}); } return; }
+  if(action==='att-admin-backup'){ attDoBackup(); return; }
+  if(action==='att-admin-restore'){ const f = document.getElementById('att-restore-file'); if(f){ f.onchange = ()=>{ if(f.files && f.files[0]) attDoRestore(f.files[0], type); f.value = ''; }; f.click(); } return; }
+  if(action==='att-admin-page'){ state.attNav = state.attNav || {type, page:'home'}; state.attNav.page = el.dataset.page; if(el.dataset.page==='audit') attAuditLoad().then(()=>{ try{ render(); }catch(e){} }); render(); try{ window.scrollTo(0,0); }catch(e){} return; }
   if(action==='att-admin-logo-auto'){ state.attLogoAuto = !!el.checked; return; }
   if(action==='att-admin-logo-del'){
     showConfirmDialog('هتحذف لوجو «'+t.label+'» ويرجع للأيقونة العادية.', async ()=>{
@@ -27992,7 +28513,9 @@ async function attAdminAction(action, el){
   else if(action==='att-admin-del'){
     const key = el.dataset.key;
     showConfirmDialog('تحذف تسجيل الحضور ده؟', async ()=>{
+      const old = (ATT_RECORDS||{})[key];
       const ok = await attRecUpdate(o=>{ delete o[key]; });
+      if(ok) attAuditLog('del', old&&old.pid, type, {how:old&&old.manual?'كان يدوي':'كان QR'});
       saveToast(ok, 'تم حذف التسجيل');
     }, {confirmLabel:'حذف'});
   }
@@ -28008,16 +28531,19 @@ async function attAdminAction(action, el){
     if(!p){ showToast('المشارك ده مش موجود', true); return; }
     const c = attCfg(type); if(!c) return;
     const rkey = attRecKey(p.id, type, c.sessionId); let dup = false;
-    const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, pts:attPtsOfCfg(type,c)}; });
+    const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, dev:attDevId(), pts:attPtsOfCfg(type,c)}; });
     if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); return; }
+    if(ok) attAuditLog('reg', p.id, type, {how:'يدوي'});
     saveToast(ok, 'تم تسجيل حضور '+p.name);
   }
+  else if(action==='att-admin-rs'){ const R = (state.attRoster = state.attRoster || {f:'absent'}); R.s = ({def:'alpha', alpha:'risk', risk:'def'})[R.s||'def']; render(); }
   else if(action==='att-admin-rf'){ (state.attRoster = state.attRoster || {f:'absent'}).f = el.dataset.f; render(); }
   else if(action==='att-admin-quick'){
     const p = PARTICIPANTS.find(x=>String(x.id)===el.dataset.pid); const c = attCfg(type); if(!p || !c) return;
     const rkey = attRecKey(p.id, type, c.sessionId); let dup = false;
-    const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, pts:attPtsOfCfg(type,c)}; });
+    const ok = await attRecUpdate(o=>{ dup = !!o[rkey]; if(!dup) o[rkey] = {pid:p.id, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), manual:true, dev:attDevId(), pts:attPtsOfCfg(type,c)}; });
     if(ok && dup){ showToast(p.name+' متسجل قبل كده', true); render(); return; }
+    if(ok) attAuditLog('reg', p.id, type, {how:'يدوي'});
     saveToast(ok, '✓ '+p.name);
   }
   else if(action==='att-admin-undo'){
@@ -28027,6 +28553,7 @@ async function attAdminAction(action, el){
     const pn = (PARTICIPANTS.find(x=>x.id===last[1].pid)||{}).name || last[1].pid;
     showConfirmDialog('تتراجع عن تسجيل حضور '+pn+'؟', async ()=>{
       const ok = await attRecUpdate(o=>{ delete o[last[0]]; });
+      if(ok) attAuditLog('undo', last[1].pid, type, {how:'تراجع عن آخر تسجيل'});
       saveToast(ok, 'تم التراجع');
     }, {confirmLabel:'تراجع'});
   }
@@ -28083,6 +28610,7 @@ document.addEventListener('keydown', (e)=>{
   if((e.key==='Enter' || e.key===' ') && e.target && e.target.classList && e.target.classList.contains('att-glass')){ e.preventDefault(); e.target.click(); return; }
   if(e.key !== 'Enter' || !e.target) return;
   if(e.target.id==='att-manual-input'){ e.preventDefault(); tryAttendance(e.target.value, state.attType); }
+  else if(e.target.id==='att-ask-input'){ e.preventDefault(); const b = document.querySelector('[data-action="att-admin-ask"]'); if(b) b.click(); }
   else if(e.target.id==='att-add-input'){ e.preventDefault(); const b = document.querySelector('[data-action="att-admin-add"]'); if(b) b.click(); }
   else if(e.target.id==='att-pts-input'){ e.preventDefault(); const b = document.querySelector('[data-action="att-admin-save-points"]'); if(b) b.click(); }
   else if(e.target.id==='att-name-input'){ e.preventDefault(); const b = document.querySelector('[data-action="att-admin-save-name"]'); if(b) b.click(); }
@@ -28786,7 +29314,7 @@ document.addEventListener('input', (e)=>{
     if(sel){
       document.querySelectorAll(sel).forEach(item=>{
         const hay = (item.dataset.search||'').toLowerCase();
-        item.style.display = (!q || hay.includes(q)) ? '' : 'none';
+        item.style.display = (!q || hay.includes(q) || attNormAr(hay).includes(attNormAr(q))) ? '' : 'none';
       });
       if(sel==='.admin-hub-tile'){
         let anyVisible = false;
