@@ -35435,5 +35435,57 @@ html[data-theme="light"] .ghu-ico{background:rgba(0,0,0,.05)}
 html[data-theme="light"] .ghu-count,html[data-theme="light"] .ghu-tag{color:#8a5a00}
 html[data-theme="light"] .ghu-bar{background:rgba(0,0,0,.08)}
 </style>
+<style id="cap-css">
+/* ===== كل الإمكانات — الوضع النهاري الاحترافي ===== */
+.cap-grid > .cap-tile:last-child:nth-child(odd){ grid-column:1/-1; aspect-ratio:auto; min-height:148px; }
+.cap-tile{ animation:cap-in .5s cubic-bezier(.2,.8,.2,1) both; }
+.cap-tile:nth-child(2){animation-delay:.06s}.cap-tile:nth-child(3){animation-delay:.12s}.cap-tile:nth-child(4){animation-delay:.18s}.cap-tile:nth-child(5){animation-delay:.24s}.cap-tile:nth-child(6){animation-delay:.3s}.cap-tile:nth-child(n+7){animation-delay:.36s}
+@keyframes cap-in{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.cap-tile{animation:none}}
+html[data-theme="light"] .cap-tile{ gap:9px; background:linear-gradient(165deg,#fff,#fbf8f1); border:1px solid rgba(15,33,71,.08); -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 1px 2px rgba(15,33,71,.06),0 14px 28px -14px rgba(15,33,71,.24),inset 0 1px 0 #fff; }
+html[data-theme="light"] .cap-tile::before{ opacity:.11; -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%); mask-image:linear-gradient(180deg,#000,transparent 85%); }
+html[data-theme="light"] .cap-tile::after{ top:auto; bottom:0; left:24%; width:52%; height:3px; border-radius:3px 3px 0 0; background:var(--cap-color,#E8B94A); opacity:.9; }
+html[data-theme="light"] .cap-tile-ico{ width:54px; height:54px; border-radius:18px; box-shadow:0 10px 20px -6px rgba(15,33,71,.38),inset 0 1px 0 rgba(255,255,255,.5); }
+html[data-theme="light"] .cap-tile-lab{ font-size:13.5px; color:#0f2147; }
+html[data-theme="light"] .cap-tile-sub{ font-weight:500; color:#6c6a7d; }
+html[data-theme="light"] .cap-tile:active{ transform:scale(.96); box-shadow:0 1px 2px rgba(15,33,71,.08),0 8px 16px -10px rgba(15,33,71,.3),inset 0 1px 0 #fff; }
+</style>
+<style id="light-pro-css">
+/* ===== الوضع النهاري الراقي — طبقة تصميم عامة للموقع كله ===== */
+html[data-theme="light"]{ color-scheme:light;
+  --bg:#F7F4EC; --bg-2:#EFEADB; --surface:#FFFFFF; --surface-2:#FBF9F3;
+  --border:rgba(20,33,61,.09); --text:#14213D; --text-muted:#6B6F85;
+  --gold:#B8801C; --gold-2:#E2AE4A;
+  --a-shadow-tile:0 10px 24px -16px rgba(20,33,61,.28),inset 0 1px 0 #fff;
+  --a-shadow-tile-active:0 3px 10px -6px rgba(20,33,61,.25),inset 0 1px 0 #fff;
+  --a-shadow-ico:0 8px 16px -6px rgba(20,33,61,.3),inset 0 1px 0 rgba(255,255,255,.45);
+  --a-focus-ring:0 0 0 3px rgba(184,128,28,.2); }
+html[data-theme="light"] body{ background:radial-gradient(60% 40% at 12% 0%,rgba(226,174,74,.16),transparent 70%),radial-gradient(50% 40% at 100% 14%,rgba(14,156,139,.09),transparent 70%),linear-gradient(180deg,#FAF8F2 0%,#F3EFE3 55%,#F8F5EC 100%); background-attachment:fixed; }
+html[data-theme="light"] ::selection{ background:rgba(184,128,28,.22); color:#14213D; }
+html[data-theme="light"] .top-bar{ background:rgba(247,244,236,.82); -webkit-backdrop-filter:blur(18px) saturate(160%); backdrop-filter:blur(18px) saturate(160%); border-bottom:1px solid rgba(20,33,61,.07); box-shadow:0 8px 20px -18px rgba(20,33,61,.35); }
+html[data-theme="light"] .card, html[data-theme="light"] .nav-tile{ background:linear-gradient(180deg,#fff,#FCFAF5); border:1px solid rgba(20,33,61,.07);
+  box-shadow:0 1px 2px rgba(20,33,61,.05),0 16px 32px -20px rgba(20,33,61,.28),inset 0 1px 0 #fff; }
+html[data-theme="light"] .nav-tile:active, html[data-theme="light"] .card:active{ box-shadow:0 1px 2px rgba(20,33,61,.06),0 8px 16px -12px rgba(20,33,61,.3),inset 0 1px 0 #fff; }
+html[data-theme="light"] .icon-btn{ background:#fff; border:1px solid rgba(20,33,61,.08); box-shadow:0 1px 2px rgba(20,33,61,.06),0 8px 16px -10px rgba(20,33,61,.3); color:var(--text); }
+html[data-theme="light"] .chip, html[data-theme="light"] .pill{ background:#fff; border:1px solid rgba(20,33,61,.09); box-shadow:0 1px 2px rgba(20,33,61,.04); }
+html[data-theme="light"] .field{ background:#fff; border:1.5px solid rgba(20,33,61,.10); box-shadow:inset 0 1px 2px rgba(20,33,61,.04); color:var(--text); }
+html[data-theme="light"] .field::placeholder{ color:#9A9CAE; }
+html[data-theme="light"] .field:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(184,128,28,.16); outline:none; }
+html[data-theme="light"] .btn:not(.btn-outline){ box-shadow:0 14px 24px -14px rgba(20,33,61,.45),inset 0 1px 0 rgba(255,255,255,.35); }
+html[data-theme="light"] .btn-outline{ background:#fff; box-shadow:0 1px 2px rgba(20,33,61,.05); }
+html[data-theme="light"] .section-title{ color:var(--text); }
+html[data-theme="light"] .hint{ color:var(--text-muted); }
+html[data-theme="light"] hr, html[data-theme="light"] .divider{ border-color:rgba(20,33,61,.08); }
+html[data-theme="light"] ::-webkit-scrollbar{ width:8px; height:8px; } html[data-theme="light"] ::-webkit-scrollbar-thumb{ background:rgba(20,33,61,.18); border-radius:8px; }
+</style>
+<script id="light-pro-js">
+(function themeColorMeta(){
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(!m){ m=document.createElement('meta'); m.name='theme-color'; document.head.appendChild(m); }
+  function upd(){ m.setAttribute('content', document.documentElement.dataset.theme==='light' ? '#F7F4EC' : '#171449'); }
+  upd(); new MutationObserver(upd).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
 </body>
 </html>
