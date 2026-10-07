@@ -7225,6 +7225,8 @@ const VISA_TX_META = {
   shop_card:{label:'شراء تصميم كارد', ico:'🎨', sign:-1, cat:'shop'},
   shop_custom:{label:'طلب كارد مخصص', ico:'✨', sign:-1, cat:'shop'},
   game_win:{label:'جائزة لعبة', ico:'🏆', sign:1, cat:'game'},
+  eco_out:{label:'استثمار وتوفير', ico:'📈', sign:-1, cat:'wallet'},
+  eco_in:{label:'عائد استثمار', ico:'💹', sign:1, cat:'wallet'},
   game_fee:{label:'رسوم لعبة', ico:'🎮', sign:-1, cat:'game'},
   game_penalty:{label:'غرامة انسحاب', ico:'🚪', sign:-1, cat:'game'},
   game_comp:{label:'تعويض انسحاب', ico:'🎁', sign:1, cat:'game'},
@@ -8008,7 +8010,8 @@ function renderVisaPage(){
         <button type="button" class="${tab==='deposit'?'on':''}" data-action="visa-tab" data-t="deposit"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>إيداع</button>
         <button type="button" class="${tab==='withdraw'?'on':''}" data-action="visa-tab" data-t="withdraw"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M4 20h16"/></svg>سحب</button>
         <button type="button" class="${tab==='transfer'?'on':''}" data-action="visa-tab" data-t="transfer"><svg class="vp-tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg>تحويل</button>
-      </div>`;
+      </div>
+      <button type="button" class="btn btn-ghost" style="margin:10px 0;" data-eco="open">📈 الاستثمار والاقتصاد</button>`;
   const tChips = [25,50,100,bal].filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${v===bal?'الكل':v}</button>`).join('');
   const transferPanel = `
@@ -25869,6 +25872,7 @@ function render(){
   else if(state.view==='game-leaderboard') html = renderGameLeaderboard();
   else if(state.view==='room-lobby') html = renderRoomLobby();
   else if(state.view==='visa') html = renderVisaPage();
+  else if(state.view==='eco') html = (window.renderEcoPage?renderEcoPage():'');
   else if(state.view==='visa-history') html = renderVisaHistoryPage();
   else if(state.view==='games-solo') html = renderSoloGames();
   else if(state.view==='games-solo-cat') html = renderSoloGamesInCategory();
@@ -36557,6 +36561,155 @@ window.fxLoad = load;
 load(true);
 })();
 
+</script>
+<script id="eco-module">
+(function(){
+const K='glv-eco',W=6048e5,H=36e5,T=()=>Date.now(),fl=Math.floor;
+const ST=[{id:'g',n:'🎮 ألعاب جلافيرا',b:100,s:1},{id:'c',n:'🛍️ متجر الشوب',b:60,s:2.3},{id:'t',n:'🚌 رحلات وفعاليات',b:150,s:3.7},{id:'m',n:'🎬 ميديا واستوديو',b:80,s:5.1}];
+let E={},U={},tab='w',ok=false,tx=[];
+const pid=()=>state.pid,esc=x=>escapeHtml(x==null?'':x);
+const val=id=>((document.getElementById(id)||{}).value||'').trim(),num=id=>fl(Number(val(id))||0);
+const uk=()=>'glv-eco-u-'+pid(),hr=()=>fl(T()/H);
+async function rd(k){try{const r=await window.storage.get(k,true);return r&&r.value?JSON.parse(r.value):{};}catch(e){return{};}}
+async function upd(k,fn){
+  const ap=c=>{let o={};try{o=c?JSON.parse(c):{};}catch(e){}if(!o||typeof o!=='object')o={};if(fn(o)===false)return;return JSON.stringify(o);};
+  try{
+    if(window.storage.update)return !!(await window.storage.update(k,ap,true));
+    const c=await window.storage.get(k,true),v=ap(c?c.value:null);if(v===undefined)return false;await window.storage.set(k,v,true);return true;
+  }catch(e){return false;}
+}
+async function sv(fn){fn(U);await upd(uk(),o=>{Object.assign(o,U);});}
+async function wal(d,note){
+  if(d<0&&visaExpired(pid())){showExpiredDialog();return false;}
+  const r=await adjustSharedNumber('glavera-visa-wallet',pid(),d,d<0?0:undefined);
+  if(r!=='ok'){showToast(r==='short'?'رصيد الفيزا مش كفاية':'حصلت مشكلة، حاول تاني',true);return false;}
+  WALLET[pid()]=(WALLET[pid()]||0)+d;
+  try{logVisaTx([{pid:pid(),type:d<0?'eco_out':'eco_in',amount:Math.abs(d),balAfter:WALLET[pid()],note}]);}catch(e){}
+  return true;
+}
+/* الخزنة: كل الفوايد والرواتب بتتدفع منها (سقف طبيعي ضد التضخم) والضريبة 2% بتروح لصندوق العطاء */
+async function take(want,tax){let got=0;await upd(K,o=>{const p=Math.min(Math.max(0,want),o.vault||0);o.vault=(o.vault||0)-p;const t=tax?fl(p*.02):0;o.charity=(o.charity||0)+t;got=p-t;});return got;}
+async function give(n){await upd(K,o=>{o.vault=(o.vault||0)+n;});}
+function sec(title,fn){
+  showPinEntryModal({title,text:'اكتب الرقم السري (CVV) لتأكيد العملية',onSubmit:async p=>{if(!(await verifyVisaPin(pid(),p)))return false;await fn();return true;}});
+}
+async function load(){
+  if(!visaCreated(pid())){go('visa');return;}
+  [E,U]=await Promise.all([rd(K),rd(uk())]);
+  E.rate=E.rate??2;E.d7=E.d7??5;E.d30=E.d30??25;U.sav=U.sav||0;U.dep=U.dep||[];U.hold=U.hold||{};U.cost=U.cost||{};
+  WALLET=await loadWallet();
+  if(U.sav>0){U.st=U.st||T();const wk=fl((T()-U.st)/W);if(wk>=1){const g=await take(fl(U.sav*E.rate/100)*wk,true);await sv(u=>{u.sav+=g;u.st+=wk*W;});}}
+  try{const t=await loadVisaTx();tx=t[pid()]||[];}catch(e){tx=[];}
+  ok=true;render();
+}
+async function reload(){await load();}
+/* أسعار الأسهم: معادلة موحّدة بالساعة (نفس السعر عند كل المشاركين) + تأثير الأخبار لمدة 24 ساعة */
+function pr(s,h,nw){let p=s.b*(1+.22*Math.sin(h/9+s.s)+.1*Math.sin(h/3.1+2*s.s));const n=E.news;if(nw&&n&&(n.st===s.id||n.st==='*')&&T()-n.ts<864e5)p*=1+(Number(n.pct)||0)/100;return Math.max(5,fl(p));}
+function spark(s){
+  const h=hr(),v=[];for(let i=23;i>=0;i--)v.push(pr(s,h-i,i===0));
+  const mn=Math.min(...v),mx=Math.max(...v),pts=v.map((y,i)=>(i*4.6).toFixed(1)+','+(28-(y-mn)/((mx-mn)||1)*26).toFixed(1)).join(' ');
+  const ch=Math.round((v[23]/v[0]-1)*100);
+  return `<svg viewBox="0 0 106 30" width="100" height="30"><polyline fill="none" stroke="${ch>=0?'#22c55e':'#ef4444'}" stroke-width="2" points="${pts}"/></svg><div style="font-size:11px;color:${ch>=0?'#22c55e':'#ef4444'}">${ch>=0?'▲':'▼'} ${Math.abs(ch)}% / 24 ساعة</div>`;
+}
+function tips(bal,inv,net){
+  const t=[],sp=tx.filter(x=>T()-x.ts<W&&((VISA_TX_META[x.type]||{}).sign<0)).reduce((a,x)=>a+x.amount,0);
+  if(bal>100&&!U.sav)t.push('رصيدك '+bal+' نقطة واقف من غير شغل. حوّل جزء للتوفير ياخد فايدة كل أسبوع.');
+  if(net&&inv/net>.4)t.push('استثماراتك '+Math.round(inv/net*100)+'% من ثروتك. وزّع على أكتر من سهم.');
+  if(sp>0&&sp>bal)t.push('صرفت '+sp+' نقطة الأسبوع ده، أكتر من رصيدك الحالي. راجع مصاريفك.');
+  if(U.goal&&U.goal.t&&net>=U.goal.t)t.push('🎉 وصلت لهدفك «'+esc(U.goal.n)+'»!');
+  if(!t.length)t.push('وضعك كويس. كمّل ادخار منتظم وثبّت جزء في وديعة.');
+  return t;
+}
+const C='background:rgba(127,127,127,.12);border-radius:16px;padding:14px;margin:10px 0;',R='display:flex;justify-content:space-between;align-items:center;gap:8px;';
+const B=(a,l,x,g)=>`<button type="button" class="btn ${g?'btn-ghost':'btn-primary'}" style="padding:8px 12px;font-size:13px;" data-eco="${a}" ${x||''}>${l}</button>`;
+const IN=(id,ph)=>`<input id="${id}" class="field" type="number" inputmode="numeric" min="1" placeholder="${ph}" style="margin:6px 0;">`;
+const TX=(id,ph)=>`<input id="${id}" class="field" type="text" placeholder="${ph}" style="margin:6px 0;">`;
+function tW(bal,inv,net){
+  const g=U.goal,gp=g&&g.t?Math.min(100,Math.round(net/g.t*100)):0;
+  const deps=U.dep.map((d,i)=>{const done=d.end<=T();return `<div style="${R}margin:6px 0;"><span>🔒 ${d.a} نقطة · فايدة ${d.r}%</span>${done?B('dclaim','استلم','data-i="'+i+'"'):'<span style="font-size:12px;opacity:.7;">باقي '+Math.ceil((d.end-T())/864e5)+' يوم</span>'}</div>`;}).join('');
+  return `<div style="${C}"><b>💰 حساب التوفير</b><div style="font-size:12px;opacity:.75;">فايدة ${E.rate}% أسبوعيًا · رصيدك: <b>${U.sav}</b> نقطة</div>${IN('e-a','المبلغ')}<div style="${R}">${B('sin','إيداع')}${B('sout','سحب','',1)}</div></div>
+  <div style="${C}"><b>🔐 ودائع مقفولة</b><div style="font-size:12px;opacity:.75;">أسبوع بفايدة ${E.d7}% · شهر بفايدة ${E.d30}%</div>${deps}${IN('e-d','مبلغ الوديعة (10 نقاط أو أكتر)')}<div style="${R}">${B('dep','قفل أسبوع','data-d="7"')}${B('dep','قفل شهر','data-d="30"')}</div></div>
+  <div style="${C}"><b>🎯 هدفي</b>${g&&g.t?`<div style="${R}"><span>${esc(g.n)}</span><span>${gp}%</span></div><div style="height:8px;border-radius:8px;background:rgba(127,127,127,.25);overflow:hidden;margin-top:6px;"><div style="height:100%;width:${gp}%;background:#22c55e;"></div></div>`:''}${TX('g-n','اسم الهدف')}${IN('g-t','المطلوب بالنقاط')}${B('goal','حفظ الهدف')}</div>
+  <div style="${C}"><b>💡 نصايح ذكية</b>${tips(bal,inv,net).map(x=>`<div style="margin-top:6px;font-size:13px;">• ${x}</div>`).join('')}</div>`;
+}
+function tM(bal,inv,net){
+  const n=E.news,nw=n&&n.t&&T()-n.ts<864e5?`<div style="${C}background:rgba(250,204,21,.18);">📰 ${esc(n.t)}</div>`:'';
+  return nw+`<div style="font-size:12px;opacity:.75;margin:6px 2px;">سقف المخاطرة: الأسهم مش تعدّي 50% من ثروتك · عمولة الشراء 1%</div>`+ST.map(s=>{
+    const p=pr(s,hr(),1),q=U.hold[s.id]||0,pl=q?p*q-U.cost[s.id]:0;
+    return `<div style="${C}"><div style="${R}"><b>${s.n}</b><b>${p} نقطة</b></div><div style="${R}">${spark(s)}<div style="font-size:12px;text-align:left;">${q?'عندك '+q+'<br>'+(pl>=0?'ربح ':'خسارة ')+Math.abs(pl):'لسه ماشتريتش'}</div></div><div style="${R};margin-top:8px;">${B('buy','شراء 1','data-id="'+s.id+'" data-q="1"')}${B('buy','شراء 5','data-id="'+s.id+'" data-q="5"')}${q?B('sell','بيع الكل','data-id="'+s.id+'"','1'):''}</div></div>`;}).join('');
+}
+function tC(){
+  const jobs=E.jobs||[],my=jobs.find(j=>j.id===U.job),left=my?Math.ceil((U.jt+W-T())/864e5):0;
+  const myBox=my?`<div style="${R}"><span>وظيفتك: <b>${esc(my.t)}</b> (${my.pay} نقطة/أسبوع)</span>${left<=0?B('jpay','استلم الراتب'):'<span style="font-size:12px;opacity:.7;">باقي '+left+' يوم</span>'}</div>`:'<div style="font-size:12px;opacity:.75;">لسه معندكش وظيفة. اختار واحدة:</div>';
+  const list=jobs.filter(j=>j.id!==U.job).map(j=>`<div style="${R}margin-top:8px;"><span>${esc(j.t)} · ${j.pay} نقطة/أسبوع</span>${B('jtake','قدّم','data-id="'+j.id+'"')}</div>`).join('');
+  const pj=(E.proj||[]).map(x=>{const v=Object.keys(x.v||{}).length;return `<div style="${R}margin-top:8px;"><span>${esc(x.t)} · ${v} صوت</span>${B('vote','صوّت','data-id="'+x.id+'"',(x.v||{})[pid()])}</div>`;}).join('');
+  const dn=(E.done||[]).slice(-3).reverse().map(d=>`<div style="font-size:12px;opacity:.75;margin-top:4px;">✅ اتموّل: ${esc(d.t)} (${d.a} نقطة)</div>`).join('');
+  return `<div style="${C}"><b>💼 الوظايف</b>${myBox}${list}</div>
+  <div style="${C}"><b>🤝 صندوق العطاء</b><div style="font-size:12px;opacity:.75;">2% من كل الأرباح بتتجمع هنا. الرصيد: <b>${E.charity||0}</b> نقطة. صوّت للمشروع اللي يستاهل التمويل.</div>${pj||'<div style="font-size:12px;opacity:.7;margin-top:6px;">مفيش مشاريع مقترحة لسه.</div>'}${dn}</div>
+  <div style="${C}font-size:12px;opacity:.75;">قريبًا: شركات المشاركين وسوق الخدمات.</div>`;
+}
+function tA(){
+  const w=Object.values(WALLET).map(Number).filter(x=>x>0).sort((a,b)=>b-a),tot=w.reduce((a,b)=>a+b,0),top=w.slice(0,Math.max(1,Math.ceil(w.length/10))).reduce((a,b)=>a+b,0),sh=tot?Math.round(top/tot*100):0,v=E.vault||0,s=[];
+  if(v<tot*.05)s.push('الخزنة ضعيفة. قلّل الفايدة أو ضيف نقاط للخزنة.');
+  if(sh>60)s.push('أغنى 10% معاهم '+sh+'% من النقاط. اعمل حدث مكافآت أو زوّد الوظايف.');
+  if(!s.length)s.push('الاقتصاد متوازن حاليًا.');
+  const jb=(E.jobs||[]).map(j=>`<div style="${R}margin-top:6px;"><span>${esc(j.t)} · ${j.pay}</span>${B('jdel','حذف','data-id="'+j.id+'"','1')}</div>`).join('');
+  const pj=(E.proj||[]).map(x=>`<div style="${R}margin-top:6px;"><span>${esc(x.t)} · ${Object.keys(x.v||{}).length}</span>${B('pdel','حذف','data-id="'+x.id+'"','1')}</div>`).join('');
+  return `<div style="${C}"><b>🏦 البنك المركزي</b><div style="margin-top:6px;font-size:13px;">إجمالي النقاط في الفيزا: <b>${tot}</b><br>الخزنة: <b>${v}</b> · صندوق العطاء: <b>${E.charity||0}</b><br>أغنى 10%: <b>${sh}%</b></div>${s.map(x=>`<div style="margin-top:6px;font-size:13px;">🤖 ${x}</div>`).join('')}</div>
+  <div style="${C}"><b>⚙️ الفوايد (٪)</b>${IN('a-r','أسبوعية للتوفير (الحالي '+E.rate+')')}${IN('a-7','وديعة أسبوع (الحالي '+E.d7+')')}${IN('a-30','وديعة شهر (الحالي '+E.d30+')')}${B('arate','حفظ')}</div>
+  <div style="${C}"><b>➕ تغذية الخزنة</b>${IN('a-v','عدد النقاط')}${B('avault','إضافة')}</div>
+  <div style="${C}"><b>📰 خبر اقتصادي</b>${TX('n-t','نص الخبر')}<select id="n-s" class="field" style="margin:6px 0;"><option value="*">كل الأسهم</option>${ST.map(s=>`<option value="${s.id}">${s.n}</option>`).join('')}</select><input id="n-p" class="field" type="number" placeholder="التأثير ٪ (مثلًا 15 أو -10)" style="margin:6px 0;">${B('anews','نشر لمدة 24 ساعة')}</div>
+  <div style="${C}"><b>💼 وظيفة جديدة</b>${TX('j-t','اسم الوظيفة')}${IN('j-p','الراتب الأسبوعي')}${B('jadd','إضافة')}${jb}</div>
+  <div style="${C}"><b>🤝 مشروع للتصويت</b>${TX('p-t','اسم المشروع')}${B('padd','إضافة')}${pj}${B('pfund','تمويل المشروع الفائز','','1')}</div>`;
+}
+window.renderEcoPage=function(){
+  const back=`<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">الاقتصاد والاستثمار</div></div>`;
+  if(!ok)return back+`<div class="vp-panel" style="text-align:center;">جاري التحميل…</div>`;
+  const bal=WALLET[pid()]||0,inv=ST.reduce((a,s)=>a+(U.hold[s.id]||0)*pr(s,hr(),1),0),lk=U.dep.reduce((a,d)=>a+d.a,0),net=bal+U.sav+lk+inv;
+  const tabs=[['w','💰 محفظتي'],['m','📈 السوق'],['c','🏙️ المدينة']].concat(state.adminUnlocked?[['a','🏦 البنك']]:[]);
+  return back+`<div style="${C}background:linear-gradient(135deg,#1e3a8a,#7c3aed);color:#fff;"><div style="font-size:12px;opacity:.85;">إجمالي ثروتك</div><div style="font-size:30px;font-weight:800;">${net} نقطة</div><div style="${R}font-size:12px;margin-top:6px;"><span>فيزا ${bal}</span><span>توفير ${U.sav}</span><span>ودائع ${lk}</span><span>أسهم ${inv}</span></div></div>
+  <div style="display:flex;gap:6px;overflow-x:auto;">${tabs.map(t=>`<button type="button" class="btn ${tab===t[0]?'btn-primary':'btn-ghost'}" style="padding:8px 12px;font-size:13px;white-space:nowrap;" data-eco="tab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>`
+  +(tab==='w'?tW(bal,inv,net):tab==='m'?tM(bal,inv,net):tab==='c'?tC():(state.adminUnlocked?tA():''));
+};
+document.addEventListener('click',async e=>{
+  const el=e.target.closest&&e.target.closest('[data-eco]');if(!el)return;
+  const a=el.dataset.eco,d=el.dataset,p=pid(),adm=state.adminUnlocked;
+  if(a==='open'){ok=false;go('eco');load();return;}
+  if(a==='tab'){tab=d.v;render();return;}
+  const done=m=>{if(m)showToast(m);return reload();};
+  if(a==='sin'){const n=num('e-a');if(n<=0)return showToast('اكتب المبلغ',true);sec('إيداع في التوفير',async()=>{if(await wal(-n,'إيداع توفير')){await sv(u=>{if(!u.sav)u.st=T();u.sav+=n;});done('اتودّع '+n+' نقطة');}});}
+  else if(a==='sout'){const n=num('e-a');if(n<=0||n>U.sav)return showToast('المبلغ غير صحيح',true);await sv(u=>{u.sav-=n;});if(await wal(n,'سحب توفير'))done('رجع '+n+' نقطة للفيزا');else done();}
+  else if(a==='dep'){const n=num('e-d'),days=+d.d;if(n<10)return showToast('أقل وديعة 10 نقاط',true);sec('قفل وديعة',async()=>{if(await wal(-n,'وديعة '+days+' يوم')){await sv(u=>{u.dep.push({a:n,end:T()+days*864e5,r:days===7?E.d7:E.d30});});done('اتقفلت الوديعة');}});}
+  else if(a==='dclaim'){const x=U.dep[+d.i];if(!x||x.end>T())return;const g=await take(fl(x.a*x.r/100),true);await sv(u=>{u.dep.splice(+d.i,1);});await wal(x.a+g,'استلام وديعة');done('استلمت '+(x.a+g)+' نقطة');}
+  else if(a==='goal'){const n=val('g-n'),t=num('g-t');if(!n||t<=0)return showToast('اكتب الهدف والمبلغ',true);await sv(u=>{u.goal={n,t};});done('اتحفظ الهدف');}
+  else if(a==='buy'){
+    const s=ST.find(x=>x.id===d.id),q=+d.q,pc=pr(s,hr(),1),cost=pc*q,fee=Math.max(1,fl(cost*.01)),bal=WALLET[p]||0;
+    const inv=ST.reduce((t,x)=>t+(U.hold[x.id]||0)*pr(x,hr(),1),0),net=bal+U.sav+U.dep.reduce((t,x)=>t+x.a,0)+inv;
+    if(inv+cost>net*.5)return showToast('سقف المخاطرة: الأسهم متعدّيش 50% من ثروتك',true);
+    sec('شراء '+q+' من '+s.n,async()=>{if(await wal(-(cost+fee),'شراء أسهم')){await give(fee);await sv(u=>{u.hold[s.id]=(u.hold[s.id]||0)+q;u.cost[s.id]=(u.cost[s.id]||0)+cost;});done('اتشترى');}});
+  }
+  else if(a==='sell'){
+    const s=ST.find(x=>x.id===d.id),q=U.hold[s.id]||0;if(!q)return;const basis=U.cost[s.id]||0,proceeds=pr(s,hr(),1)*q,g=proceeds-basis;let pay=proceeds;
+    await upd(K,o=>{if(g>0){const t=Math.min(g,o.vault||0);o.vault=(o.vault||0)-t;const tax=fl(t*.02);o.charity=(o.charity||0)+tax;pay=basis+t-tax;}else{o.vault=(o.vault||0)-g;}});
+    await sv(u=>{delete u.hold[s.id];delete u.cost[s.id];});await wal(pay,'بيع أسهم');done('اتباع بـ '+pay+' نقطة');
+  }
+  else if(a==='jtake'){await sv(u=>{u.job=d.id;u.jt=T();});done('اتقدّمت للوظيفة');}
+  else if(a==='jpay'){const j=(E.jobs||[]).find(x=>x.id===U.job);if(!j||T()-U.jt<W)return;const g=await take(j.pay,false);if(g<=0)return showToast('الخزنة فاضية حاليًا',true);await sv(u=>{u.jt=T();});await wal(g,'راتب '+j.t);done('استلمت راتب '+g+' نقطة');}
+  else if(a==='vote'){await upd(K,o=>{(o.proj||[]).forEach(x=>{x.v=x.v||{};delete x.v[p];if(x.id===d.id)x.v[p]=1;});});done('اتسجّل صوتك');}
+  else if(adm){
+    if(a==='arate')await upd(K,o=>{const r=val('a-r'),w=val('a-7'),m=val('a-30');if(r!=='')o.rate=Math.max(0,Number(r));if(w!=='')o.d7=Math.max(0,Number(w));if(m!=='')o.d30=Math.max(0,Number(m));});
+    else if(a==='avault'){const n=num('a-v');if(n>0)await give(n);}
+    else if(a==='anews'){const t=val('n-t');if(!t)return;await upd(K,o=>{o.news={t,st:val('n-s'),pct:Math.max(-30,Math.min(30,Number(val('n-p'))||0)),ts:T()};});}
+    else if(a==='jadd'){const t=val('j-t'),n=num('j-p');if(!t||n<=0)return;await upd(K,o=>{(o.jobs=o.jobs||[]).push({id:'j'+T(),t,pay:n});});}
+    else if(a==='jdel')await upd(K,o=>{o.jobs=(o.jobs||[]).filter(x=>x.id!==d.id);});
+    else if(a==='padd'){const t=val('p-t');if(!t)return;await upd(K,o=>{(o.proj=o.proj||[]).push({id:'p'+T(),t,v:{}});});}
+    else if(a==='pdel')await upd(K,o=>{o.proj=(o.proj||[]).filter(x=>x.id!==d.id);});
+    else if(a==='pfund')await upd(K,o=>{const l=(o.proj||[]).slice().sort((x,y)=>Object.keys(y.v||{}).length-Object.keys(x.v||{}).length)[0];if(!l||!o.charity)return false;(o.done=o.done||[]).push({t:l.t,a:o.charity,ts:T()});o.charity=0;o.proj=o.proj.filter(x=>x.id!==l.id);});
+    else return;
+    done('اتحفظ');
+  }
+});
+})();
 </script>
 </body>
 </html>
