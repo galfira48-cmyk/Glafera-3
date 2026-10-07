@@ -315,33 +315,29 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   /* ---------- professional "Next" pill button (post-round transition) ---------- */
   #app{transition:opacity .22s ease;}
 
-  /* ============ شريط التنقل السفلي — "الفقاعة السائلة" ============ */
-  #bnav{ position:fixed; left:0; right:0; bottom:0; z-index:90; display:none; justify-content:center; pointer-events:none; padding:0 10px calc(10px + env(safe-area-inset-bottom,0px)); transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .3s; }
+  /* ============ شريط التنقل السفلي — "الكبسولة الزجاجية" ============ */
+  #bnav{ position:fixed; left:0; right:0; bottom:0; z-index:90; display:none; justify-content:center; pointer-events:none; padding:0 12px calc(12px + env(safe-area-inset-bottom,0px)); transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .3s; }
   #bnav.show{ display:flex; animation:bnavIn .6s cubic-bezier(.22,1,.36,1) both; }
   #bnav.hide{ transform:translateY(150%); opacity:0; }
   @keyframes bnavIn{ from{ transform:translateY(130%); opacity:0; } to{ transform:none; opacity:1; } }
   body.kb-open #bnav{ display:none !important; }
-  .bnav-bar{ pointer-events:auto; position:relative; width:100%; max-width:456px; height:66px; margin-top:28px; display:grid; grid-template-columns:repeat(5,1fr); padding:0 16px; filter:drop-shadow(0 14px 16px rgba(0,0,0,.42)) drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
-  html[data-theme="light"] .bnav-bar{ filter:drop-shadow(0 12px 14px rgba(30,24,10,.2)) drop-shadow(0 2px 3px rgba(30,24,10,.12)); }
-  .bnav-bg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
-  .bnav-bg path{ fill:var(--surface); fill-opacity:.97; stroke:var(--gold); stroke-opacity:.28; stroke-width:1; }
-  .bnav-orb{ position:absolute; top:-28px; left:0; width:56px; height:56px; border-radius:50%; z-index:3; pointer-events:none; display:flex; align-items:center; justify-content:center; color:#1a1633; will-change:transform,left;
-    background:linear-gradient(150deg,var(--gold-2) 0%,var(--gold) 100%);
-    box-shadow:0 10px 22px -6px color-mix(in srgb,var(--gold) 65%,transparent), inset 0 1.5px 1px rgba(255,255,255,.55), inset 0 -4px 7px rgba(120,80,0,.22); }
+  .bnav-bar{ pointer-events:auto; position:relative; width:100%; max-width:440px; height:64px; display:grid; grid-template-columns:repeat(5,1fr); padding:6px; border-radius:26px; background:color-mix(in srgb,var(--surface) 80%,transparent); -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5); border:1px solid color-mix(in srgb,var(--gold) 24%,transparent); box-shadow:0 14px 30px -10px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07); }
+  html[data-theme="light"] .bnav-bar{ box-shadow:0 12px 26px -10px rgba(30,24,10,.28), inset 0 1px 0 rgba(255,255,255,.7); }
+  .bnav-pill{ position:absolute; top:6px; bottom:6px; left:0; width:60px; border-radius:20px; z-index:1; pointer-events:none; will-change:transform,left,width;
+    background:linear-gradient(160deg,color-mix(in srgb,var(--gold-2) 30%,transparent),color-mix(in srgb,var(--gold) 16%,transparent));
+    border:1px solid color-mix(in srgb,var(--gold) 45%,transparent); box-shadow:0 0 18px -4px color-mix(in srgb,var(--gold) 55%,transparent), inset 0 1px 0 rgba(255,255,255,.18); }
   @keyframes bnavPulse{ 0%{ transform:scale(.8); opacity:.5; } 100%{ transform:scale(1.3); opacity:0; } }
-  .bnav-orb svg{ width:26px; height:26px; fill:rgba(26,22,51,.18); stroke:#1a1633; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; animation:bnavPop .5s cubic-bezier(.34,1.8,.5,1); }
-  @keyframes bnavPop{ from{ transform:scale(.3) rotate(-30deg); opacity:0; } to{ transform:none; opacity:1; } }
   .bnav-item{ appearance:none; border:none; background:none; cursor:pointer; font-family:'Cairo',Tahoma,sans-serif; color:var(--text-muted); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; height:100%; padding:0; position:relative; z-index:2; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; transition:color .3s; }
   .bnav-ico{ width:30px; height:26px; display:flex; align-items:center; justify-content:center; position:relative; transition:transform .45s cubic-bezier(.34,1.7,.5,1), opacity .25s; }
   .bnav-ico svg{ width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
-  .bnav-ico svg .d, .bnav-orb svg .d{ fill:currentColor; fill-opacity:.16; }
+  .bnav-ico svg .d{ fill:currentColor; fill-opacity:.16; }
   .bnav-qi svg{ width:20px; height:20px; fill:none; stroke:var(--gold); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .bnav-lab{ font-size:10.5px; white-space:nowrap; font-weight:700; line-height:1; transition:transform .4s cubic-bezier(.34,1.6,.5,1); }
   .bnav-item:active .bnav-ico{ transform:scale(.8); }
   .bnav-item.active{ color:var(--gold); }
-  .bnav-item.active .bnav-ico{ opacity:0; transform:translateY(14px) scale(.4); }
-  .bnav-item.active .bnav-lab{ font-weight:800; transform:translateY(-1px); }
-  .bnav-dot{ position:absolute; top:11px; inset-inline-end:calc(50% - 20px); width:9px; height:9px; border-radius:50%; background:var(--danger); border:2px solid var(--surface); }
+  .bnav-item.active .bnav-ico{ transform:translateY(-1px) scale(1.12); }
+  .bnav-item.active .bnav-lab{ font-weight:800; }
+  .bnav-dot{ position:absolute; top:9px; inset-inline-end:calc(50% - 20px); width:9px; height:9px; border-radius:50%; background:var(--danger); border:2px solid var(--surface); }
   .bnav-dot::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--danger); animation:bnavPulse 1.6s ease-out infinite; }
   .bnav-quick{ position:fixed; z-index:91; left:0; right:0; bottom:0; margin:0 auto; width:100%; max-width:480px; padding:8px 14px calc(16px + env(safe-area-inset-bottom,0px));
     border-radius:28px 28px 0 0; background:color-mix(in srgb,var(--surface) 97%,transparent); -webkit-backdrop-filter:blur(24px) saturate(1.3); backdrop-filter:blur(24px) saturate(1.3);
@@ -378,7 +374,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   input, textarea, select, [contenteditable=""], [contenteditable="true"], .selectable, .selectable *{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
   #app.has-bnav{ padding-bottom:120px; }
   body.has-bnav .toast{ bottom:calc(104px + env(safe-area-inset-bottom,0px)); }
-  @media (prefers-reduced-motion: reduce){ #bnav, #bnav.show, .bnav-orb::after, .bnav-orb svg, .bnav-ico, .bnav-quick, .bnav-quick button{ animation:none !important; transition:none !important; } }
+  @media (prefers-reduced-motion: reduce){ #bnav, #bnav.show, .bnav-ico, .bnav-pill, .bnav-quick, .bnav-quick button{ animation:none !important; transition:none !important; } }
   #app.screen-fade-out{opacity:0;}
   .btn-next-pro{display:flex; align-items:center; justify-content:center; gap:10px;
     width:fit-content; margin:18px auto 0; padding:12px 16px 12px 24px; border-radius:999px; direction:ltr;
@@ -25642,15 +25638,11 @@ let _bnLastY = 0, _bnPress = null;
 const _bn = {x:null, raf:0};
 function bnavDraw(cx, sq){
   const bar = document.querySelector('#bnav .bnav-bar'); if(!bar) return;
-  const W = bar.offsetWidth, H = bar.offsetHeight, R = 20;
-  const rn = 33, f = 6;                         /* نصف قطر التجويف (الكرة 28 + فراغ 5) ونعومة الحواف */
-  const k = Math.sqrt((rn+f)*(rn+f) - f*f);     /* بداية انحناء الحافة أفقيًا */
-  const tx = rn*k/(rn+f), ty = rn*f/(rn+f);     /* نقطة التقاء الانحناء بالدائرة */
-  const c = Math.max(R+k, Math.min(W-R-k, cx));
-  const path = `M${R},0 H${c-k} A${f},${f} 0 0 1 ${c-tx},${ty} A${rn},${rn} 0 0 0 ${c+tx},${ty} A${f},${f} 0 0 1 ${c+k},0 H${W-R} Q${W},0 ${W},${R} V${H-R} Q${W},${H} ${W-R},${H} H${R} Q0,${H} 0,${H-R} V${R} Q0,0 ${R},0 Z`;
-  const svg = bar.querySelector('.bnav-bg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.firstChild.setAttribute('d', path);
-  const o = bar.querySelector('.bnav-orb'); o.style.left = (c-28)+'px';
-  o.style.transform = `scale(${1+sq*.6}, ${1-sq*.45})`;
+  const act = bar.querySelector('.bnav-item.active');
+  const w = act ? act.offsetWidth - 6 : 60;
+  const p = bar.querySelector('.bnav-pill'); if(!p) return;
+  p.style.width = w+'px'; p.style.left = (cx - w/2)+'px';
+  p.style.transform = `scale(${1+sq*.5}, ${1-sq*.25})`;
 }
 function bnavMoveGlide(snap){
   const bar = document.querySelector('#bnav .bnav-bar'); if(!bar) return;
@@ -25680,7 +25672,7 @@ function updateBottomNav(){
   if(!visible){ bnavCloseQuick(); return; }
   nav.classList.remove('hide');
   if(!nav.querySelector('.bnav-bar')){
-    nav.innerHTML = `<div class="bnav-bar"><svg class="bnav-bg"><path d=""/></svg><div class="bnav-orb"></div>${BNAV_TABS.map(t=>`
+    nav.innerHTML = `<div class="bnav-bar"><div class="bnav-pill"></div>${BNAV_TABS.map(t=>`
       <button type="button" class="bnav-item" data-action="bnav" data-page="${t.page}" aria-label="${t.label}">
         <span class="bnav-ico">${t.ico}</span><span class="bnav-lab">${t.label}</span>${t.badge?'<i class="bnav-dot" hidden></i>':''}
       </button>`).join('')}</div>`;
@@ -25696,9 +25688,7 @@ function updateBottomNav(){
     const on = b.dataset.page===active; b.classList.toggle('active', on);
     if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
   });
-  const tab = BNAV_TABS.find(t=>t.page===active), orb = nav.querySelector('.bnav-orb');
-  if(tab && orb.dataset.p!==active){ orb.dataset.p = active; orb.innerHTML = tab.ico; }
-  let live=false; try{ live = !!autoDetectLiveSession(); }catch(e){}
+    let live=false; try{ live = !!autoDetectLiveSession(); }catch(e){}
   const dot = nav.querySelector('.bnav-dot'); if(dot) dot.hidden = !live || active==='attendance';
   requestAnimationFrame(()=>bnavMoveGlide());
 }
