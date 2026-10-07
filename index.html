@@ -4649,7 +4649,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes premiereSheen{0%{background-position:0% 0;} 100%{background-position:220% 0;}}
   .top3-ico{font-size:16px; margin-inline-end:4px;}
 
-  /* ---------- wall (حائط جلافيرا) ---------- */
+  /* ---------- wall (حائط الاجتماع) ---------- */
   .wall-compose{ position:relative; padding:16px; border-radius:24px; overflow:hidden;
     background:linear-gradient(150deg, rgba(255,255,255,.10), rgba(255,255,255,.025) 60%);
     border:1px solid rgba(255,255,255,.16);
@@ -7892,7 +7892,7 @@ function visaCardHtml(pid, draft, isNew){
   const vcVip = c.theme!=='custom' && cardThemeTier(c.theme)==='vip';
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
-      <div class="vc-top"><span class="vc-brand">Glafira</span><span class="vc-tag">GAME CARD</span></div>
+      <div class="vc-top"><span class="vc-brand">Egtemaa Gamaa</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid">${isNew ? '<span class="vc-chip"></span>' : `<span class="vc-chip vc-chip-code" data-action="visa-chip" role="button" tabindex="0" aria-label="الشريحة الصفراء — صاحبك يمسحها عشان يستلم منك"><img alt="" src="${chipStaticSrc(pid)}"></span>`}<svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
         <span class="vc-num">${String(numDisplay).split(' ').map(g=>`<i>${g}</i>`).join('')}</span>
@@ -8230,7 +8230,7 @@ function vtxDownloadCsv(){
 }
 function vtxStatementText(pid, list){
   const holder = (VISA_CARDS[pid]||{}).holder || (PARTICIPANTS.find(x=>x.id===pid)||{}).name || '';
-  const lines = ['كشف حساب فيزا Glafira', 'الاسم: '+holder, 'الرصيد الحالي: '+(WALLET[pid]||0)+' نقطة', 'الفلتر: '+vtxLabelForFilters(), '—————————————'];
+  const lines = ['كشف حساب فيزا اجتماع جامعة', 'الاسم: '+holder, 'الرصيد الحالي: '+(WALLET[pid]||0)+' نقطة', 'الفلتر: '+vtxLabelForFilters(), '—————————————'];
   list.forEach(tx=>{
     const m = VISA_TX_META[tx.type] || {label:tx.type, sign:1};
     lines.push(vtxDate(tx.ts)+' '+vtxTime(tx.ts)+' | '+m.label+(tx.note?' ('+tx.note+')':'')+' | '+(m.sign>0?'+':'−')+tx.amount+' | الرصيد '+tx.balAfter+' | '+vtxRef(tx));
@@ -8256,18 +8256,18 @@ function vtxStatementHtml(pid, list){
     if(m.sign>0) inS += tx.amount; else outS += tx.amount;
     return `<tr><td>${vtxDate(tx.ts)}<br><small>${vtxTime(tx.ts)}</small></td><td>${m.label}${tx.note?'<br><small>'+escapeHtml(tx.note)+'</small>':''}</td><td class="${m.sign>0?'p':'n'}" dir="ltr">${m.sign>0?'+':'−'}${tx.amount}</td><td dir="ltr">${tx.balAfter}</td><td dir="ltr"><small>${vtxRef(tx)}</small></td></tr>`;
   }).join('');
-  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب Glafira</title><style>
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف حساب اجتماع جامعة</title><style>
     body{font-family:Tahoma,Arial,sans-serif;color:#1b1b2b;margin:24px;} h1{margin:0 0 4px;font-size:22px;} .sub{color:#666;font-size:12px;margin-bottom:14px;}
     .box{display:flex;gap:10px;margin:12px 0 16px;} .box div{flex:1;border:1px solid #ddd;border-radius:10px;padding:8px 10px;font-size:12px;} .box b{display:block;font-size:17px;margin-top:2px;}
     table{width:100%;border-collapse:collapse;font-size:12px;} th{background:#f2f0e8;text-align:right;padding:7px;border-bottom:2px solid #d9d2b8;} td{padding:7px;border-bottom:1px solid #eee;vertical-align:top;} small{color:#777;}
     .p{color:#0a8f5b;font-weight:700;} .n{color:#c0392b;font-weight:700;} .foot{margin-top:16px;font-size:11px;color:#888;}
   </style></head><body>
-    <h1>💳 كشف حساب فيزا Glafira</h1>
+    <h1>💳 كشف حساب فيزا اجتماع جامعة</h1>
     <div class="sub">${holder} · بطاقة •••• ${last4} · صدر في ${vtxDate(Date.now())} ${vtxTime(Date.now())}</div>
     <div class="sub">${vtxLabelForFilters()}</div>
     <div class="box"><div>الرصيد الحالي<b>${WALLET[pid]||0}</b></div><div>إجمالي الوارد<b class="p">+${inS}</b></div><div>إجمالي الصادر<b class="n">−${outS}</b></div><div>عدد العمليات<b>${list.length}</b></div></div>
     <table><thead><tr><th>التاريخ</th><th>العملية</th><th>المبلغ</th><th>الرصيد</th><th>المرجع</th></tr></thead><tbody>${body}</tbody></table>
-    <div class="foot">هذا الكشف صادر تلقائيًا من تطبيق Glafera 3.</div>
+    <div class="foot">هذا الكشف صادر تلقائيًا من تطبيق اجتماع جامعة.</div>
   </body></html>`;
 }
 function vtxPrintStatement(){
@@ -10803,7 +10803,7 @@ function renderWelcome(){
       <div class="welcome-greeting">${timeGreeting()}${p?', '+escapeHtml(p.name.split(' ')[0]):''}</div>
       <div class="welcome-crest ${CONF_SETTINGS.logo?'has-custom-logo':''}">${confLogoHtml()}</div>
       <div class="welcome-en-pre">WELCOME TO</div>
-      <div class="welcome-en-title">Glafera</div>
+      <div class="welcome-en-title">Egtemaa Gamaa</div>
       <div class="welcome-rule"><span></span><i>III</i><span></span></div>
       <div class="welcome-photo-frame">
         <div class="welcome-photo-frame-ring"></div>
@@ -30904,7 +30904,7 @@ async function doPrintPointCodes(value, sessionId){
   <div class="doc-header">
     ${sessionName ? `<div class="doc-session-name">📌 ${escapeHtml(sessionName)}</div>` : ''}
     <div class="doc-eyebrow">GLAVERA III &nbsp;·&nbsp; POINT VOUCHERS</div>
-    <div class="doc-title">أكواد نقاط جلافيرا</div>
+    <div class="doc-title">أكواد نقاط الاجتماع</div>
     <div class="doc-rule"></div>
     <div class="doc-meta">
       <span>القيمة: <b>${value} نقطة</b></span>
@@ -32922,7 +32922,7 @@ function aiMarkSvg(variant){
       + (name ? ln('المشارك', escapeHtml(name)) : '') + (card ? ln('البطاقة','•••• <bdi dir="ltr">'+escapeHtml(card)+'</bdi>') : '')
       + '<hr>' + ln('العملية', escapeHtml(R.kind)) + (R.note ? ln('التفاصيل', escapeHtml(R.note)) : '') + ln('الرصيد بعد العملية', R.bal + ' نقطة')
       + '<hr><div class="cf-total"><span>الإجمالي</span><span dir="ltr">'+(R.amount>0 ? (neg?'−':'+')+R.amount+' نقطة' : 'مجاني')+'</span></div>'
-      + bars(R.ref) + '<div class="cf-refn">'+escapeHtml(R.ref)+'</div><div class="cf-thx">شكرًا لاستخدامك جلافيرا</div>'
+      + bars(R.ref) + '<div class="cf-refn">'+escapeHtml(R.ref)+'</div><div class="cf-thx">شكرًا لاستخدامك الاجتماع</div>'
       + '<div class="cf-stamp">'+(R.stamp || (R.amount<=0 ? 'مجاني' : (neg?'مدفوع':'مُستلم')))+'</div></div>';
   }
   function drawReceipt(){
@@ -36565,7 +36565,7 @@ load(true);
 <script id="eco-module">
 (function(){
 const K='glv-eco',W=6048e5,H=36e5,T=()=>Date.now(),fl=Math.floor;
-const ST=[{id:'g',n:'🎮 ألعاب جلافيرا',b:100,s:1},{id:'c',n:'🛍️ متجر الشوب',b:60,s:2.3},{id:'t',n:'🚌 رحلات وفعاليات',b:150,s:3.7},{id:'m',n:'🎬 ميديا واستوديو',b:80,s:5.1}];
+const ST=[{id:'g',n:'🎮 ألعاب الاجتماع',b:100,s:1},{id:'c',n:'🛍️ متجر الشوب',b:60,s:2.3},{id:'t',n:'🚌 رحلات وفعاليات',b:150,s:3.7},{id:'m',n:'🎬 ميديا واستوديو',b:80,s:5.1}];
 let anim=false,lastNet=0,lastP={},E={},U={},LB={},A={},tab='w',ok=false,tx=[],nt=false;const BD=[{k:'sv',n:'🐜 مدّخر ذكي',c:()=>U.sav>=100},{k:'in',n:'📈 مستثمر',c:()=>Object.keys(U.hold).length>=1},{k:'dv',n:'🧩 محفظة متنوعة',c:()=>Object.keys(U.hold).length>=3},{k:'pt',n:'🔒 مستثمر صبور',c:()=>(U.pdone||0)>=1},{k:'cr',n:'🏅 ثقة عالية',c:()=>U.cr>=80},{k:'co',n:'🏢 صاحب شركة',c:()=>(E.cos||[]).some(c=>c.own===pid())}];
 const sty=document.createElement('style');sty.textContent='@keyframes ecoUp{from{opacity:0;transform:translateY(12px)}}@keyframes ecoDonut{from{stroke-dasharray:0 188.5}}@keyframes ecoDraw{from{stroke-dashoffset:140}}@keyframes ecoRing{from{stroke-dashoffset:214}}@keyframes ecoFlashG{0%{background:rgba(34,197,94,.5)}100%{background:transparent}}@keyframes ecoFlashR{0%{background:rgba(239,68,68,.5)}100%{background:transparent}}@keyframes ecoCoin{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(540deg)}}@keyframes ecoPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}.eco-in>*{animation:ecoUp .4s ease both}.eco-in>*:nth-child(2){animation-delay:.06s}.eco-in>*:nth-child(3){animation-delay:.12s}.eco-in>*:nth-child(n+4){animation-delay:.18s}.eco-sp polyline{stroke-dasharray:140;animation:ecoDraw .9s ease both}.eco-c{position:fixed;z-index:99999;pointer-events:none;font-size:22px;animation:ecoCoin 1.1s ease-out forwards}@media(prefers-reduced-motion:reduce){.eco-in>*,.eco-sp polyline,.eco-c{animation:none!important}}';document.head.appendChild(sty);
 const fmt=n=>Number(n||0).toLocaleString('en-US');
@@ -36722,7 +36722,7 @@ function tR(){
 }
 function tI(){
   const ix=Math.round(ST.reduce((a,s)=>a+pr(s,hr(),1)/s.b,0)/ST.length*100),bs=ST.map(s=>[s,Math.round((pr(s,hr(),1)/pr(s,hr()-24,0)-1)*100)]).sort((a,b)=>b[1]-a[1]),f=x=>(x[1]>=0?'+':'')+x[1]+'%';
-  return `<div style="${C}"><div style="${R}"><b>📊 مؤشر جلافيرا</b><b style="color:${ix>=100?'#22c55e':'#ef4444'};">${ix}</b></div><div style="font-size:12px;opacity:.8;margin-top:4px;">الأقوى: ${bs[0][0].n} (${f(bs[0])}) · الأضعف: ${bs[3][0].n} (${f(bs[3])})</div></div>`;
+  return `<div style="${C}"><div style="${R}"><b>📊 مؤشر الاجتماع</b><b style="color:${ix>=100?'#22c55e':'#ef4444'};">${ix}</b></div><div style="font-size:12px;opacity:.8;margin-top:4px;">الأقوى: ${bs[0][0].n} (${f(bs[0])}) · الأضعف: ${bs[3][0].n} (${f(bs[3])})</div></div>`;
 }
 function tK(){
   const r=U.rk||.5;
@@ -37003,7 +37003,7 @@ function rank(c){
 function report(c){
   const U=c.U,h=U.hist||[],td=fl(Date.now()/864e5);let b=h[0];h.forEach(x=>{if(x.d<=td-7)b=x;});
   const dl=b?c.net-b.v:0,pc=b?Math.round(dl/Math.max(b.v,1)*100):0,hs=c.ST.filter(s=>U.hold[s.id]).map(s=>[s.n,Math.round((c.pr(s,c.hr(),1)*U.hold[s.id]/Math.max(U.cost[s.id],1)-1)*100)]).sort((a,b)=>b[1]-a[1]);
-  const t='📊 تقريري الاستثماري الأسبوعي\n💰 ثروتي: '+c.net.toLocaleString('en-US')+' نقطة ('+(pc>=0?'+':'')+pc+'% هذا الأسبوع)\n'+(hs.length?'⭐ أفضل مركز: '+hs[0][0]+' ('+hs[0][1]+'%)\n':'')+'💸 مصاريفي: '+spend(c).w7+' نقطة\n🔥 '+((U.ds||{}).n||0)+' يوم متتالي · 🏅 ثقة '+U.cr+'/100\n#جلافيرا';
+  const t='📊 تقريري الاستثماري الأسبوعي\n💰 ثروتي: '+c.net.toLocaleString('en-US')+' نقطة ('+(pc>=0?'+':'')+pc+'% هذا الأسبوع)\n'+(hs.length?'⭐ أفضل مركز: '+hs[0][0]+' ('+hs[0][1]+'%)\n':'')+'💸 مصاريفي: '+spend(c).w7+' نقطة\n🔥 '+((U.ds||{}).n||0)+' يوم متتالي · 🏅 ثقة '+U.cr+'/100\n#الاجتماع';
   window.__ecoRepText=t;
   return card(c,'📰 تقريري الأسبوعي','<div style="font-size:13px;line-height:1.9;white-space:pre-line;margin-top:6px;">'+c.esc(t)+'</div><button type="button" class="btn btn-primary" style="margin-top:8px;padding:8px 12px;font-size:13px;" onclick="ecoRep()">📤 شارك التقرير</button>');
 }
@@ -37018,7 +37018,7 @@ function policy(c){
   return card(c,'🧪 محاكي قرارات الأدمن','<div style="'+sm()+'">جرّب الفايدة قبل ما تطبّقها وشوف أثرها على الخزنة.</div><input id="pl-r" class="field" type="number" placeholder="الفايدة الأسبوعية المقترحة %" value="'+(c.E.rate||0)+'" oninput="ecoPol('+sup+','+v+')" style="margin:6px 0;"><input id="pl-s" type="range" min="5" max="100" value="30" oninput="ecoPol('+sup+','+v+')" style="width:100%;"><div style="'+sm()+'">نسبة النقاط المتوقع توفيرها (الافتراضي 30%)</div><div id="pl-o" style="font-size:13px;margin-top:8px;">اكتب نسبة الفايدة…</div>');
 }
 
-window.ecoEvents=[['🎮 بطولة ألعاب كبرى اتعلنت!','g',12],['🛍️ عروض تخفيضات كبيرة في الشوب','c',10],['🚌 رحلة جماعية اتلغت','t',-12],['🎬 فيديو الميديا حقق انتشار كبير','m',15],['📉 ركود اقتصادي مؤقت','*',-8],['🚀 انتعاش اقتصادي عام','*',8],['⚠️ عطل فني في متجر الشوب','c',-15],['🏆 فريق الميديا فاز بجائزة','m',10],['🎉 إقبال كبير على الفعاليات','t',14],['🧯 أزمة سيولة في ألعاب جلافيرا','g',-10]];
+window.ecoEvents=[['🎮 بطولة ألعاب كبرى اتعلنت!','g',12],['🛍️ عروض تخفيضات كبيرة في الشوب','c',10],['🚌 رحلة جماعية اتلغت','t',-12],['🎬 فيديو الميديا حقق انتشار كبير','m',15],['📉 ركود اقتصادي مؤقت','*',-8],['🚀 انتعاش اقتصادي عام','*',8],['⚠️ عطل فني في متجر الشوب','c',-15],['🏆 فريق الميديا فاز بجائزة','m',10],['🎉 إقبال كبير على الفعاليات','t',14],['🧯 أزمة سيولة في ألعاب الاجتماع','g',-10]];
 function events(c){
   return card(c,'🎲 مولّد الأحداث الاقتصادية','<div style="'+sm()+'">بيطلّق خبر عشوائي من '+window.ecoEvents.length+' حدث بتأثير بين -15% و+15% على سهم أو كل الأسهم لمدة 24 ساعة.</div>'+(c.E.news&&c.E.news.t?'<div style="font-size:12px;margin-top:6px;">الخبر الحالي: '+c.esc(c.E.news.t)+' ('+c.E.news.pct+'%)</div>':'')+'<div style="margin-top:8px;">'+c.B('aev','🎲 أطلق حدث عشوائي')+'</div>');
 }
@@ -37146,7 +37146,7 @@ function hof(c){
   const P=Object.values((c.LB||{}).p||{});if(P.length<2)return card(c,'🏛️ لوحة الشرف','<div style="'+sm()+'margin-top:6px;">محتاج مشاركين أكتر عشان تظهر المقارنات.</div>');
   const by=function(f){return P.slice().sort(f);},best=by(function(a,b){return b.r-a.r;}).slice(0,3),calm=by(function(a,b){return(a.d||0)-(b.d||0);}).filter(function(x){return x.r>0;}).slice(0,3),risky=by(function(a,b){return(b.d||0)-(a.d||0);}).filter(function(x){return(x.d||0)>0;}).slice(0,2),avg=Math.round(P.reduce(function(a,x){return a+x.r;},0)/P.length),up=P.filter(function(x){return x.r>0;}).length;
   const M=['🥇','🥈','🥉'],ln=function(a,k){return a.map(function(x,i){return M[i]+' '+c.esc(x.n)+(k==='r'?' ('+(x.r>=0?'+':'')+x.r+'%)':' (هبوط '+(x.d||0)+'%)');}).join('\n');};
-  window.__ecoHof='🏛️ لوحة شرف مستثمري جلافيرا\n\n📈 الأكثر نموًا:\n'+ln(best,'r')+(calm.length?'\n\n🧘 الأكثر ثباتًا:\n'+ln(calm,'d'):'')+'\n\nمتوسط النمو '+avg+'% · '+up+' من '+P.length+' رابحين';
+  window.__ecoHof='🏛️ لوحة شرف مستثمري الاجتماع\n\n📈 الأكثر نموًا:\n'+ln(best,'r')+(calm.length?'\n\n🧘 الأكثر ثباتًا:\n'+ln(calm,'d'):'')+'\n\nمتوسط النمو '+avg+'% · '+up+' من '+P.length+' رابحين';
   const sec=function(t,a,k){return a.length?'<div style="margin-top:10px;"><b style="font-size:13px;">'+t+'</b>'+a.map(function(x,i){return '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>'+M[i]+' '+c.esc(x.n)+'</span><span>'+(k==='r'?(x.r>=0?'+':'')+x.r+'%':'هبوط '+(x.d||0)+'%')+'</span></div>';}).join('')+'</div>':'';};
   return card(c,'🏛️ لوحة شرف المستثمرين','<div style="'+sm()+'margin-top:4px;">متوسط النمو <b>'+avg+'%</b> · '+up+' رابح من '+P.length+'</div>'+sec('📈 الأكثر نموًا',best,'r')+sec('🧘 الأكثر ثباتًا (رابحين بأقل هبوط)',calm,'d')+(risky.length?'<div style="'+sm()+'margin-top:10px;">⚠️ أعلى هبوط: '+risky.map(function(x){return c.esc(x.n)+' ('+x.d+'%)';}).join('، ')+'</div>':'')+'<div style="margin-top:10px;"><button type="button" class="btn btn-primary" style="padding:8px 12px;font-size:13px;" onclick="ecoHofShare()">📢 شارك لوحة الشرف</button></div>');
 }
