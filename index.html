@@ -8154,7 +8154,7 @@ function visaCardHtml(pid, draft, isNew){
   const vcVip = c.theme!=='custom' && cardThemeTier(c.theme)==='vip';
   return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
     <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
-      <div class="vc-top"><span class="vc-brand">Egtemaa Gamaa</span><span class="vc-tag">GAME CARD</span></div>
+      <div class="vc-top"><span class="vc-brand">Te- epistoly</span><span class="vc-tag">GAME CARD</span></div>
       <div class="vc-mid">${isNew ? '<span class="vc-chip"></span>' : `<span class="vc-chip vc-chip-code" data-action="visa-chip" role="button" tabindex="0" aria-label="الشريحة الصفراء — صاحبك يمسحها عشان يستلم منك"><img alt="" src="${chipStaticSrc(pid)}"></span>`}<svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
         <span class="vc-num">${String(numDisplay).split(' ').map(g=>`<i>${g}</i>`).join('')}</span>
