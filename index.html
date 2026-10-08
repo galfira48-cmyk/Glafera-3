@@ -13095,8 +13095,19 @@ function achMetrics(tx){
 const ACH = {ready:false, loading:false, m:{}, unlocked:{}};
 function achLocalKey(){ return 'glv_ach_'+state.pid; }
 function achStored(){ try{ return JSON.parse(localStorage.getItem(achLocalKey())||'null'); }catch(e){ return null; } }
+/* تحميل بيانات صفحة الألعاب في الخلفية: بنعمل render مرة واحدة وبس لو فيه حاجة اتغيّرت فعلًا (بدل 3 تحديثات ورا بعض) */
+function gamesQuietLoad(){
+  const snap = ()=>{ try{ return JSON.stringify([GAME_ROOMS, OWNED_CARD_THEMES, VISA_CARDS]); }catch(e){ return ''; } };
+  const before = snap();
+  Promise.all([
+    loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS = r; }).catch(()=>{}),
+    loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES = o; }).catch(()=>{}),
+    loadVisaCards().then(v=>{ VISA_CARDS = v; }).catch(()=>{})
+  ]).then(()=>{ if(state.view==='games' && snap() !== before) render(); });
+}
 async function achRefresh(popup){
   if(!state.pid || ACH.loading) return; ACH.loading = true;
+  const _achWasReady = ACH.ready, _achBefore = (()=>{ try{ return JSON.stringify([ACH.m, ACH.unlocked]); }catch(e){ return ''; } })();
   try{
     const tx = (await loadVisaTx())[state.pid] || [];
     ACH.m = achMetrics(tx);
@@ -13111,8 +13122,9 @@ async function achRefresh(popup){
     }
     if(stored && popup && fresh.length) achPopQueue(fresh.slice(0,3));
   }catch(e){}
+  const _achAfter = (()=>{ try{ return JSON.stringify([ACH.m, ACH.unlocked]); }catch(e){ return ''; } })();
   ACH.loading = false; ACH.ready = true;
-  if(state.view==='game-achievements' || state.view==='games') render();
+  if(state.view==='game-achievements' || (state.view==='games' && (!_achWasReady || _achAfter !== _achBefore))) render();
 }
 function achPopQueue(list){ list.forEach((d,i)=> setTimeout(()=>achPop(d), i*5200)); }
 function achPop(d){
@@ -26163,11 +26175,7 @@ function bnavGo(page){
   if(state.view!==page) return; /* لو الخانة مقفولة go() بترجع من غير ما تتنقل */
   /* التنقل بين خانات الشريط مش بيكدّس history: الرجوع دايمًا للرئيسية */
   state.history = (page==='profile') ? [] : [{view:'profile', dayId:state.dayId, sessionId:state.sessionId, lbTab:state.lbTab}];
-  if(page==='games'){
-    loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); });
-    loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); });
-    loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); });
-  }
+  if(page==='games'){ gamesQuietLoad(); }
   window.scrollTo({top:0});
 }
 /* اخفاء الشريط وقت ما الكيبورد مفتوح عشان ما يطلعش فوقه */
@@ -29313,7 +29321,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='reflex-toggle-leaderboard'){ state.reflexLeaderboardOpen = !state.reflexLeaderboardOpen; render(); }
   else if(action==='dock-nav'){ navDockTap(el, el.dataset.page); }
   else if(action==='bnav'){ bnavGo(el.dataset.page); }
-  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ loadGameRooms().then(r=>pruneAbandonedGameRooms(r)).then(r=>{ GAME_ROOMS=r; if(state.view==='games') render(); }); loadOwnedCardThemes().then(o=>{ OWNED_CARD_THEMES=o; if(state.view==='games') render(); }); loadVisaCards().then(v=>{ VISA_CARDS=v; if(state.view==='games') render(); }); } }
+  else if(action==='tile-nav'){ go(el.dataset.page); if(el.dataset.page==='games'){ gamesQuietLoad(); } }
   else if(action==='toggle-radial-menu'){ state.radialMenuOpen = !state.radialMenuOpen; render(); }
   else if(action==='radial-tap'){
     if(suppressNextRadialClick){ suppressNextRadialClick = false; }
