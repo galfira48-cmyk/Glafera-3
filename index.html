@@ -6248,6 +6248,69 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .domino-tile{position:relative;}
   .domino-tile.drawn{animation:dtDrawn .55s cubic-bezier(.34,1.56,.64,1);}
   @keyframes dtDrawn{0%{transform:translateY(-28px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
+
+  /* ===================== DOMINO PRO LOOK ===================== */
+  .domino-board{border-radius:26px; background:
+      radial-gradient(90% 70% at 50% 18%, rgba(255,255,255,.10), transparent 60%),
+      radial-gradient(120% 120% at 50% 35%, #23876f 0%, #155a4b 55%, #0a3430 100%);
+    box-shadow:inset 0 0 0 2px rgba(255,226,150,.55), inset 0 0 0 7px #4a2d17, inset 0 0 0 9px rgba(244,183,64,.45), inset 0 22px 46px rgba(0,0,0,.45), 0 14px 34px rgba(0,0,0,.45);}
+  .domino-board::before{opacity:.55; background-image:radial-gradient(rgba(255,255,255,.08) 1px, transparent 1.5px), repeating-linear-gradient(45deg, rgba(255,255,255,.018) 0 2px, transparent 2px 5px); background-size:14px 14px, auto;}
+  .domino-board::after{content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit; box-shadow:inset 0 0 70px rgba(0,0,0,.5);}
+  .db-in{inset:5.2%;}
+  .dt-in{border-radius:9px; background:linear-gradient(165deg,#FFFFFA 0%,#F3EBD3 55%,#E2D7B8 100%); border:1px solid rgba(60,40,10,.38);
+    box-shadow:0 3px 0 #b9ab85, 0 6px 8px rgba(0,0,0,.5), inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -2px 3px rgba(120,90,30,.18);}
+  .dt-pip{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7));}
+  .dt-pip{fill:#2b2440;} .dt-pip.p1{fill:#2b7bff;} .dt-pip.p2{fill:#17a35a;} .dt-pip.p3{fill:#e5383b;}
+  .dt-pip.p4{fill:#8a4bd8;} .dt-pip.p5{fill:#f08a1c;} .dt-pip.p6{fill:#0f8f9e;}
+  .dt-spin{fill:url(#none); fill:#d9a233; stroke:#8a5d10; stroke-width:1.5;}
+  .dt-div{stroke:rgba(43,36,64,.5); stroke-width:2.5;}
+  .dt.new .dt-in{box-shadow:0 3px 0 #b9ab85, 0 0 0 3px rgba(244,183,64,.9), 0 0 18px rgba(244,183,64,.75), 0 6px 8px rgba(0,0,0,.5), inset 0 1.5px 0 #fff;}
+  .dt-ghost{border-radius:10px; box-shadow:0 0 14px currentColor;}
+  .dt-ghost.gl{color:#3FDCC9;} .dt-ghost.gr{color:#F4B740;}
+
+  .domino-tile{border-radius:11px; background:linear-gradient(165deg,#FFFFFA 0%,#F3EBD3 55%,#E2D7B8 100%); border:1px solid rgba(60,40,10,.4);
+    box-shadow:0 4px 0 #b9ab85, 0 8px 10px rgba(0,0,0,.4), inset 0 1.5px 0 rgba(255,255,255,.95); transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;}
+  .domino-tile .domino-half:first-child{border-bottom:2px solid rgba(43,36,64,.45);}
+  .domino-tile::before{content:''; position:absolute; left:50%; top:50%; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; z-index:2; pointer-events:none;
+    background:radial-gradient(circle at 35% 30%, #ffe9a6, #c98d1c 70%); box-shadow:0 0 0 1px rgba(110,70,10,.55);}
+  .domino-tile.playable{transform:translateY(-6px); box-shadow:0 4px 0 #b9ab85, 0 0 0 2.5px var(--gold), 0 0 18px rgba(244,183,64,.65); animation:dmPlayable 1.6s ease-in-out infinite;}
+  @keyframes dmPlayable{0%,100%{box-shadow:0 4px 0 #b9ab85, 0 0 0 2.5px var(--gold), 0 0 10px rgba(244,183,64,.4);} 50%{box-shadow:0 4px 0 #b9ab85, 0 0 0 2.5px #ffe08a, 0 0 22px rgba(244,183,64,.85);}}
+  .domino-tile:disabled:not(.playable){opacity:.5; filter:saturate(.6) brightness(.92);}
+  .domino-tile:not(:disabled):active{transform:translateY(-2px) scale(.94);}
+  .dpip{background:radial-gradient(circle at 35% 30%, #5b5378, #2b2440 70%); box-shadow:0 1px 0 rgba(255,255,255,.7);}
+  .dpip.empty{background:transparent; box-shadow:none;}
+  .domino-half.h1 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #8cb8ff, #2b7bff 70%);}
+  .domino-half.h2 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #7fe3ac, #17a35a 70%);}
+  .domino-half.h3 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #ff9a9c, #e5383b 70%);}
+  .domino-half.h4 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #c9a2f5, #8a4bd8 70%);}
+  .domino-half.h5 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #ffc680, #f08a1c 70%);}
+  .domino-half.h6 .dpip:not(.empty){background:radial-gradient(circle at 35% 30%, #7fdce6, #0f8f9e 70%);}
+
+  .domino-back{width:15px; height:24px; border-radius:4px; border:1px solid rgba(255,255,255,.35); box-shadow:0 2px 0 rgba(0,0,0,.35);
+    background:repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 2px, transparent 2px 5px), linear-gradient(145deg, var(--violet), #5b49d6); position:relative;}
+  .domino-back::after{content:''; position:absolute; left:2px; right:2px; top:50%; height:1px; background:rgba(255,255,255,.55);}
+
+  .domino-hand-label{display:flex; align-items:center; justify-content:space-between;}
+  .dm-hsum{background:rgba(244,183,64,.14); border:1px solid rgba(244,183,64,.5); color:var(--gold); border-radius:999px; padding:2px 10px; font-size:12px; font-weight:800;}
+  .domino-hand{gap:8px; padding:12px 2px 14px; background:linear-gradient(180deg, transparent, rgba(0,0,0,.14)); border-radius:16px;}
+
+  .dm-prog{display:flex; flex-direction:column; gap:6px; margin:2px 0 10px; padding:9px 12px; border-radius:14px; background:var(--surface); border:1px solid var(--border);}
+  .dm-prow{display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800; color:var(--text-muted);}
+  .dm-prow>span{width:52px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .dm-prow b{min-width:58px; text-align:left; direction:ltr; color:var(--text); font-family:'Cairo',sans-serif; font-weight:900; font-size:13px;}
+  .dm-prow b small{color:var(--text-muted); font-weight:700; font-size:10.5px;}
+  .dm-bar{position:relative; flex:1; height:10px; border-radius:99px; background:rgba(255,255,255,.07); box-shadow:inset 0 1px 3px rgba(0,0,0,.45); overflow:hidden; direction:ltr;}
+  .dm-bar i{display:block; height:100%; border-radius:99px; transition:width .7s cubic-bezier(.22,1,.36,1);}
+  .dm-bar i.me{background:linear-gradient(90deg,#27b8a6,#3FDCC9);} .dm-bar i.op{background:linear-gradient(90deg,#d99a1c,#F4B740);}
+  .dm-bar u{position:absolute; top:0; bottom:0; left:50%; width:1px; background:rgba(255,255,255,.18);}
+
+  .dm-ends{display:flex; align-items:center; justify-content:center; gap:10px; margin:-4px 0 8px; font-weight:900; font-size:13px; direction:ltr;}
+  .dm-ends span{min-width:46px; text-align:center; padding:3px 10px; border-radius:999px; border:1.5px solid; font-family:'Cairo',sans-serif;}
+  .dm-ends .l{color:#3FDCC9; background:rgba(63,220,201,.12);} .dm-ends .r{color:#F4B740; background:rgba(244,183,64,.12);}
+  .dm-ends em{font-style:normal; font-size:11px; color:var(--text-muted); font-weight:700;}
+
+  .domino-result{border-color:var(--gold); background:linear-gradient(160deg, rgba(244,183,64,.16), rgba(155,140,255,.16)); box-shadow:0 10px 28px rgba(0,0,0,.35);}
+  .dr-title{font-size:18px;} .dr-sub{margin-bottom:8px;} .dr-sub b{color:var(--gold); font-size:15px;}
   /* ===================== UNO (landscape table view) ===================== */
   .uno-stage{position:fixed; inset:0; z-index:70; background:#08150d; overflow:hidden;}
   .uno-rotor{position:fixed; top:50%; left:50%; width:100vh; height:100vw; transform:translate(-50%,-50%) rotate(90deg); transform-origin:center center; overflow:hidden;}
@@ -18990,7 +19053,7 @@ const DOMINO_PIPS = {0:[],1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1
 function dominoHalfHtml(n){
   let dots='';
   for(let i=1;i<=9;i++){ dots += (DOMINO_PIPS[n]||[]).indexOf(i)>-1 ? '<i class="dpip"></i>' : '<i class="dpip empty"></i>'; }
-  return `<span class="domino-half">${dots}</span>`;
+  return `<span class="domino-half h${n}">${dots}</span>`;
 }
 function dominoFullSet(){
   const s=[]; for(let a=0;a<=6;a++) for(let b=a;b<=6;b++) s.push({a,b});
@@ -19042,9 +19105,20 @@ function dominoPlaceTile(side, idx, player, g){
   g.passStreak = 0;
   hand.splice(idx,1);
 }
-function initDominoGame(){
+const DOMINO_TARGET = 100;
+function dominoProgressHtml(myLbl, myScore, oppLbl, oppScore){
+  const p = v=>Math.max(0, Math.min(100, Math.round((v||0)/DOMINO_TARGET*100)));
+  const row = (lbl, sc, cls)=>`<div class="dm-prow"><span>${lbl}</span><div class="dm-bar"><i class="${cls}" style="width:${p(sc)}%"></i><u></u></div><b>${sc||0}<small>/${DOMINO_TARGET}</small></b></div>`;
+  return `<div class="dm-prog">${row(myLbl, myScore, 'me')}${row(oppLbl, oppScore, 'op')}</div>`;
+}
+function dominoEndsHtml(ends){
+  if(!ends) return '';
+  return `<div class="dm-ends"><span class="l">🟢 ${ends.left}</span><em>الأطراف المفتوحة</em><span class="r">${ends.right} 🟠</span></div>`;
+}   /* أول واحد يجمع 100 نقطة هو اللي بيكسب اللعبة */
+function dominoPips(hand){ return hand.reduce((s,t)=>s+t.a+t.b,0); }
+function initDominoGame(fresh){
   const prevMode = state.domino ? state.domino.mode : 'ai';
-  const prevScore = state.domino ? {r:state.domino.scoreR, y:state.domino.scoreY, d:state.domino.scoreD} : {r:0,y:0,d:0};
+  const prevScore = (state.domino && !fresh) ? {r:state.domino.scoreR, y:state.domino.scoreY, d:state.domino.scoreD} : {r:0,y:0,d:0};
   const deck = shuffleArray(dominoFullSet());
   const handR = deck.splice(0,7);
   const handY = deck.splice(0,7);
@@ -19063,19 +19137,24 @@ function initDominoGame(){
     busy:false, pendingIdx:null, passStreak:0,
     mustDraw:false, mustPass:false, note:null, carryNote:null, lastDrawn:null, drawnAnim:false,
     yardOpen:false, yardAnim:false, yardReveal:false,
-    ptsR:0, ptsY:0
+    ptsR:0, ptsY:0, roundGain:0, matchOver:false, matchWinner:null
   };
 }
 function dominoEndRound(res){
   const g = state.domino;
   g.winner = res.winner; g.blocked = !!res.blocked;
   g.busy = false; g.mustDraw = false; g.mustPass = false; g.pendingIdx = null; g.yardOpen = false; g.yardReveal = false;
-  g.ptsR = g.hands.R.reduce((s,t)=>s+t.a+t.b,0);
-  g.ptsY = g.hands.Y.reduce((s,t)=>s+t.a+t.b,0);
+  g.ptsR = dominoPips(g.hands.R);
+  g.ptsY = dominoPips(g.hands.Y);
+  g.roundGain = 0;
   if(res.winner==='draw'){ g.scoreD++; SND.click(); }
   else{
-    if(res.winner==='R') g.scoreR++; else g.scoreY++;
-    vibrate([20,20,30]);
+    /* الكاسب بياخد مجموع نقط القطع اللي فضلت مع الخصم */
+    const gain = res.winner==='R' ? g.ptsY : g.ptsR;
+    g.roundGain = gain;
+    if(res.winner==='R') g.scoreR += gain; else g.scoreY += gain;
+    if(g.scoreR>=DOMINO_TARGET || g.scoreY>=DOMINO_TARGET){ g.matchOver = true; g.matchWinner = res.winner; }
+    vibrate(g.matchOver ? [30,30,30,30,60] : [20,20,30]);
     SND.coinChime();
     if(res.winner==='R' || g.mode==='2p'){ launchConfetti(); }
   }
@@ -19309,10 +19388,10 @@ function dominoTileSvg(a,b,vert){
   const W = vert?100:200, H = vert?200:100;
   let s = `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">`;
   s += vert ? `<line x1="12" y1="100" x2="88" y2="100" class="dt-div"/>` : `<line x1="100" y1="12" x2="100" y2="88" class="dt-div"/>`;
-  const put = (v,ox,oy)=>{ (DPIP_XY[v]||[]).forEach(p=>{ s += `<circle cx="${ox+p[0]}" cy="${oy+p[1]}" r="9.5" class="dt-pip"/>`; }); };
+  const put = (v,ox,oy)=>{ (DPIP_XY[v]||[]).forEach(p=>{ s += `<circle cx="${ox+p[0]}" cy="${oy+p[1]}" r="9.5" class="dt-pip p${v}"/>`; }); };
   put(a,0,0);
   put(b, vert?0:100, vert?100:0);
-  if(a===b) s += `<circle cx="${vert?50:100}" cy="${vert?100:50}" r="5" class="dt-spin"/>`;
+  s += `<circle cx="${vert?50:100}" cy="${vert?100:50}" r="${a===b?6:4.5}" class="dt-spin"/>`;
   return s + '</svg>';
 }
 function dominoGhostSvg(slot, val){
@@ -19433,10 +19512,23 @@ function renderDominoGame(){
       <button type="button" class="btn btn-outline dsp-r" data-action="domino-side" data-side="right">🟠 الطرف اللي عليه ${g.ends.right}</button>
     </div>` : '';
   const oppName = g.mode==='ai' ? 'الجهاز' : 'اللاعب 2';
+  if(g.matchOver){
+    statusText = g.matchWinner==='R'
+      ? `🏆 كسبت اللعبة! وصلت ${DOMINO_TARGET} نقطة`
+      : (g.mode==='ai' ? `🤖 الجهاز وصل ${DOMINO_TARGET} نقطة وكسب اللعبة` : `🏆 اللاعب 2 وصل ${DOMINO_TARGET} نقطة وكسب اللعبة`);
+  }
+  let roundSub = '';
+  if(g.winner==='draw') roundSub = 'تعادل، محدش أخد نقط في الجولة دي';
+  else if(g.winner){
+    const winLbl = g.winner==='R' ? 'انت' : oppName;
+    const loseLbl = g.winner==='R' ? oppName : 'انت';
+    roundSub = `${winLbl} خد <b>+${g.roundGain}</b> نقطة (مجموع قطع ${loseLbl} اللي فضلت)`;
+  }
   const resultHtml = g.winner ? `
     <div class="domino-result">
       <div class="dr-title">${statusText}</div>
-      ${g.blocked ? `<div class="dr-sub">نقطك: ${g.ptsR} • نقط ${oppName}: ${g.ptsY} (الأقل هو اللي بيكسب)</div>` : '<div class="dr-sub">عايز تلعب تاني؟</div>'}
+      <div class="dr-sub">${roundSub}</div>
+      <div class="dr-sub">الإجمالي: انت ${g.scoreR} • ${oppName} ${g.scoreY} (الهدف ${DOMINO_TARGET})</div>
       ${nextProBtn('domino-reset')}
     </div>` : '';
   const passHtml = g.mustPass ? `<button type="button" class="btn btn-primary" style="width:100%;margin:12px 0 0;" data-action="domino-pass">⏭️ عدّي الدور</button>` : '';
@@ -19455,6 +19547,7 @@ function renderDominoGame(){
       <div class="xo-score-pill draw"><span>تعادل</span><b>${g.scoreD}</b></div>
       ${g.mode==='ai' ? scorePill(gameAiAvatar(), g.scoreY, 'o', !g.winner && g.turn==='Y') : `<div class="xo-score-pill o${(!g.winner && g.turn==='Y')?' turn':''}"><span>🟡 لاعب 2</span><b>${g.scoreY}</b></div>`}
     </div>
+    ${dominoProgressHtml(g.mode==='2p'?'لاعب 1':'انت', g.scoreR, oppName, g.scoreY)}
     <div class="domino-opp-row">
       <span class="domino-opp-label">${inactiveLabel} • ${inactiveCount} قطعة</span>
       <div class="domino-opp-tiles">${backTiles}</div>
@@ -19464,10 +19557,11 @@ function renderDominoGame(){
       ${g.winner ? '' : dominoFabHtml(g, humanTurn)}
       ${boardHtml}
     </div>
+    ${g.winner ? '' : dominoEndsHtml(g.ends)}
     ${pendingButtons}
     ${g.winner ? resultHtml : ''}
     ${passHtml}
-    <div class="domino-hand-label">${g.mode==='2p' ? (activePlayer==='R'?'قطع اللاعب 1 (انت):':'قطع اللاعب 2 (مرر الجهاز له):') : 'قطعك:'}</div>
+    <div class="domino-hand-label"><span>${g.mode==='2p' ? (activePlayer==='R'?'قطع اللاعب 1 (انت):':'قطع اللاعب 2 (مرر الجهاز له):') : 'قطعك:'}</span><span class="dm-hsum" title="مجموع نقط قطعك">🧮 ${dominoPips(activeHand)} نقطة</span></div>
     <div class="domino-hand">${handHtml}</div>
   `;
 }
@@ -21352,7 +21446,7 @@ async function createGameRoom(gameType, paid){
     const boneyard = deck;
     Object.assign(room, {hands:{host:hostHand, guest:guestHand}, boneyard, chain:[], ends:null,
       turn:'host', round:0, winner:null, blocked:false, pendingIdx:null, passStreak:0,
-      scoreHost:0, scoreGuest:0, scoreDraw:0});
+      scoreHost:0, scoreGuest:0, scoreDraw:0, roundGain:0, matchOver:false, matchWinner:null});
   } else if(gameType==='ludo'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], ludo:null});
   } else if(gameType==='uno'){
@@ -21734,8 +21828,14 @@ async function doRoomRpsNext(){
 function roomDominoEndRound(room, winner, blocked){
   room.winner = winner;
   room.blocked = !!blocked;
-  if(winner==='draw') room.scoreDraw++;
-  else if(winner==='host') room.scoreHost++; else room.scoreGuest++;
+  room.ptsHost = dominoPips(room.hands.host);
+  room.ptsGuest = dominoPips(room.hands.guest);
+  room.roundGain = 0;
+  if(winner==='draw'){ room.scoreDraw = (room.scoreDraw||0)+1; return; }
+  const gain = winner==='host' ? room.ptsGuest : room.ptsHost;
+  room.roundGain = gain;
+  if(winner==='host') room.scoreHost = (room.scoreHost||0) + gain; else room.scoreGuest = (room.scoreGuest||0) + gain;
+  if((room.scoreHost||0)>=DOMINO_TARGET || (room.scoreGuest||0)>=DOMINO_TARGET){ room.matchOver = true; room.matchWinner = winner; }
 }
 function roomDominoAdvance(room){
   if(room.hands.host.length===0){ roomDominoEndRound(room, 'host'); return; }
@@ -21806,6 +21906,7 @@ async function doRoomDominoNext(){
   GAME_ROOMS = await loadGameRooms();
   const room = GAME_ROOMS[state.roomCode];
   if(!room) return;
+  if(room.matchOver){ room.scoreHost = 0; room.scoreGuest = 0; room.scoreDraw = 0; room.matchOver = false; room.matchWinner = null; }
   const deck = shuffleArray(dominoFullSet());
   const hostHand = deck.splice(0,7);
   const guestHand = deck.splice(0,7);
@@ -24065,6 +24166,20 @@ function renderRoomDomino(){
   else if(isPendingMine) statusText = 'القطعة دي بتتحط في الطرفين، اختار فين 👇';
   else if(isMyTurn) statusText = 'دورك! اختار قطعة 👇';
   else statusText = '⏳ دور صاحبك...';
+  if(room.matchOver){
+    statusText = room.matchWinner===myRole ? `🏆 كسبت اللعبة! وصلت ${DOMINO_TARGET} نقطة` : `😅 صاحبك وصل ${DOMINO_TARGET} نقطة وكسب اللعبة`;
+  }
+  let roundSub = '';
+  if(room.winner==='draw') roundSub = 'تعادل، محدش أخد نقط في الجولة دي';
+  else if(room.winner) roundSub = `${room.winner===myRole?'انت':'صاحبك'} خد <b>+${room.roundGain||0}</b> نقطة (مجموع قطع ${room.winner===myRole?'صاحبك':'انت'} اللي فضلت)`;
+  const myTotal = myRole==='host'?room.scoreHost:room.scoreGuest, oppTotal = myRole==='host'?room.scoreGuest:room.scoreHost;
+  const roomResultHtml = room.winner ? `
+    <div class="domino-result">
+      <div class="dr-title">${statusText}</div>
+      <div class="dr-sub">${roundSub}</div>
+      <div class="dr-sub">الإجمالي: انت ${myTotal} • صاحبك ${oppTotal} (الهدف ${DOMINO_TARGET})</div>
+      ${nextProBtn('room-domino-next')}
+    </div>` : '';
   const pendingButtons = isPendingMine ? `
     <div class="domino-side-picker">
       <button type="button" class="btn btn-outline dsp-l" data-action="room-domino-side" data-side="left">🟢 الطرف اللي عليه ${room.ends.left}</button>
@@ -24084,13 +24199,15 @@ function renderRoomDomino(){
       <span class="domino-opp-label">${gameAvatar(oppId,'','sm')} • ${oppCount} قطعة</span>
       <div class="domino-opp-tiles">${backTiles}</div>
     </div>
-    <div class="hint" style="text-align:center;">باقي في الكومة: ${room.boneyard.length} قطعة</div>
-    <div class="xo-status">${statusText}</div>
+    ${dominoProgressHtml('انت', myTotal, 'صاحبك', oppTotal)}
+    <div class="hint" style="text-align:center;">🎴 باقي في الكومة: ${room.boneyard.length} قطعة</div>
+    ${room.winner ? '' : `<div class="xo-status">${statusText}</div>`}
     ${dominoBoardHtml(room.chain, room.origin, {ends:room.ends, ghosts:(isMyTurn && !!room.ends), pick:isPendingMine, sideAction:'room-domino-side'})}
+    ${room.winner ? '' : dominoEndsHtml(room.ends)}
     ${pendingButtons}
-    <div class="domino-hand-label">قطعك:</div>
+    ${roomResultHtml}
+    <div class="domino-hand-label"><span>قطعك:</span><span class="dm-hsum">🧮 ${dominoPips(myHand)} نقطة</span></div>
     <div class="domino-hand">${handHtml}</div>
-    ${room.winner ? nextProBtn('room-domino-next') : ''}
   `;
 }
 
@@ -29530,13 +29647,13 @@ document.addEventListener('click', (e)=>{
     const m = el.dataset.mode;
     if(state.domino && state.domino.mode!==m){
       state.domino.mode = m;
-      initDominoGame();
+      initDominoGame(true);
       dominoProcessTurn(true);
     }
     render();
   }
   else if(action==='domino-reset'){
-    if(state.domino){ initDominoGame(); dominoProcessTurn(true); }
+    if(state.domino){ initDominoGame(state.domino.matchOver); dominoProcessTurn(true); }
     render();
   }
   else if(action==='memory-card'){ doMemoryFlip(parseInt(el.dataset.idx,10)); }
