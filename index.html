@@ -4212,6 +4212,65 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .ass-wcard.fire{ background:linear-gradient(160deg,#fff,#fff1e0); box-shadow:0 20px 60px rgba(255,140,0,.5); } .ass-wcard.bd{ background:linear-gradient(160deg,#fff,#ffe9f4); box-shadow:0 20px 60px rgba(232,67,147,.5); } .ass-wcard.back{ background:linear-gradient(160deg,#fff,#fff8dc); box-shadow:0 20px 60px rgba(241,196,15,.5); }
   .ass-wav{ width:112px !important; height:112px !important; }
   @media (prefers-reduced-motion:reduce){ .aa-anim,.ass-line,.ass-welcome,.ass-wcard,.ass-conf,.ai-skel,.ai-mic.on,.ass-voice.on{ animation:none !important; } .ass-conf{ display:none; } .att-roster-row{ transition:none; } }
+  .sx-wrap{ display:flex; flex-direction:column; gap:12px; margin:0 0 14px; }
+  .sx-card{ padding:14px; border-radius:20px; background:var(--surface); border:1px solid var(--border); animation:aaIn .4s both; }
+  .sx-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; } .sx-h b{ font-size:14.5px; font-weight:900; }
+  .sx-pill{ padding:4px 11px; border-radius:99px; font-size:12.5px; font-weight:900; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); } .sx-pill em{ font-style:normal; font-size:11px; margin-inline-start:4px; } .sx-pill em.up{ color:#0d6b3a; } .sx-pill em.dn{ color:#a02424; }
+  .sx-sub{ font-size:12px; font-weight:700; color:var(--text-muted); line-height:1.6; }
+  .sx-dots{ display:flex; gap:6px; margin-bottom:10px; } .sx-dots i{ flex:1; height:30px; border-radius:10px; display:grid; place-items:center; font-style:normal; font-size:13px; font-weight:900; color:#fff; background:rgba(128,128,128,.18); } .sx-dots i.on{ background:linear-gradient(135deg,#ff9a3c,#ff5e3a); box-shadow:0 4px 12px rgba(255,120,50,.35); } .sx-dots i.now{ outline:2px solid var(--gold); outline-offset:2px; }
+  .sx-bar{ height:10px; border-radius:99px; background:rgba(128,128,128,.2); overflow:hidden; } .sx-bar i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--teal),var(--good)); transition:width .8s cubic-bezier(.2,1,.3,1); }
+  .sx-chal.done{ border-color:var(--good); box-shadow:0 0 0 1px var(--good) inset; }
+  .sx-rival{ display:flex; align-items:center; gap:10px; } .sx-rt{ flex:1; min-width:0; } .sx-rt b{ display:block; font-size:13px; font-weight:900; line-height:1.5; } .sx-rt small{ font-size:11px; color:var(--text-muted); font-weight:700; }
+  .sx-av{ flex:0 0 auto; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-weight:900; background:rgba(128,128,128,.22) center/cover; }
+  .sx-btn{ flex:0 0 auto; min-height:38px; padding:0 14px; border:0; border-radius:12px; font-family:inherit; font-weight:900; font-size:12.5px; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); cursor:pointer; } .sx-btn:disabled{ opacity:.6; } .sx-btn.big{ width:100%; margin-top:14px; min-height:46px; font-size:14px; }
+  .sx-badges{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .sx-badge{ position:relative; padding:10px 4px 8px; border-radius:16px; border:1px solid var(--border); background:rgba(128,128,128,.08); color:inherit; font-family:inherit; text-align:center; cursor:pointer; filter:grayscale(1); opacity:.6; }
+  .sx-badge.on{ filter:none; opacity:1; background:linear-gradient(160deg,rgba(244,183,64,.2),rgba(244,183,64,.05)); border-color:var(--gold); animation:sxPop .5s both; }
+  .sx-badge .ic{ display:block; font-size:28px; line-height:1.2; } .sx-badge b{ display:block; font-size:11px; font-weight:800; margin-top:3px; line-height:1.3; }
+  .sx-badge i{ display:block; height:4px; margin:6px 10px 0; border-radius:4px; background:rgba(128,128,128,.25); overflow:hidden; } .sx-badge i u{ display:block; height:100%; background:var(--gold); }
+  @keyframes sxPop{ 0%{ transform:scale(.8); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
+  .sx-hrow{ margin:8px 0; } .sx-ht{ display:block; font-size:12px; font-weight:900; color:var(--text-muted); margin-bottom:5px; } .sx-hl{ display:flex; flex-wrap:wrap; gap:6px; } .sx-hp{ padding:6px 11px; border-radius:99px; font-size:12.5px; font-weight:800; background:rgba(128,128,128,.14); } .sx-hp small{ opacity:.65; font-weight:700; }
+  .sx-set{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); cursor:pointer; } .sx-set b{ display:block; font-size:13px; font-weight:800; } .sx-set small{ display:block; font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px; line-height:1.5; }
+  .sx-chk{ flex:0 0 auto; width:22px; height:22px; accent-color:var(--gold); }
+  .sx-modal{ position:fixed; inset:0; z-index:100000; display:flex; align-items:center; justify-content:center; background:rgba(8,6,28,.78); animation:assFade .25s both; }
+  .sx-modal .ass-conf{ top:46%; }
+  .sx-mc{ width:min(86vw,340px); padding:26px 22px; border-radius:26px; text-align:center; background:var(--surface); color:var(--text); border:2px solid var(--gold); box-shadow:0 20px 70px rgba(244,183,64,.4); animation:assPop .55s cubic-bezier(.2,1.4,.4,1) both; }
+  .sx-mi{ font-size:64px; line-height:1.2; animation:sxPop .6s .1s both; } .sx-mt{ font-size:19px; font-weight:900; margin-top:6px; } .sx-ms{ font-size:13px; font-weight:700; color:var(--text-muted); margin-top:6px; line-height:1.6; }
+  .me-card.sx-t{ box-shadow:0 0 0 1.5px var(--sx-c), 0 16px 44px -14px var(--sx-c); }
+  .glx-idbtn{ border-color:var(--sx-c, var(--border)) !important; }
+  .glx-3d{ box-shadow:0 0 0 2px var(--sx-c, transparent), 0 20px 60px -10px var(--sx-c, transparent); border-radius:24px; }
+  @media (prefers-reduced-motion:reduce){ .sx-card,.sx-badge.on,.sx-modal,.sx-mc,.sx-mi{ animation:none !important; } .sx-bar i{ transition:none; } }
+  .rw-ov{ position:fixed; inset:0; z-index:9600; display:flex; flex-direction:column; align-items:center; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); gap:12px; overflow:auto; color:#fff; direction:rtl; font-family:'Cairo','Tajawal',sans-serif;
+    background:radial-gradient(120% 70% at 50% -10%, #4b3bb8 0%, transparent 60%), radial-gradient(90% 60% at 100% 100%, #0f6f8f55 0%, transparent 60%), linear-gradient(180deg,#171248 0%,#0a0924 100%); user-select:none; -webkit-user-select:none; }
+  .rw-top{ width:100%; max-width:460px; display:flex; align-items:center; gap:10px; }
+  .rw-x{ width:42px; height:42px; border:0; border-radius:13px; color:#fff; font-size:18px; background:rgba(255,255,255,.14); cursor:pointer; }
+  .rw-ttl{ flex:1; font-size:17px; font-weight:900; text-align:center; }
+  .rw-help{ width:42px; height:42px; border:0; border-radius:13px; color:#fff; font-size:17px; font-weight:900; background:rgba(255,255,255,.14); cursor:pointer; }
+  .rw-stats{ width:100%; max-width:460px; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .rw-st{ padding:8px 4px; border-radius:14px; text-align:center; background:rgba(255,255,255,.1); } .rw-st small{ display:block; font-size:10px; opacity:.75; font-weight:700; } .rw-st b{ font-size:16px; font-weight:900; }
+  .rw-stage{ position:relative; width:100%; max-width:460px; aspect-ratio:1/0.82; border-radius:28px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.28); border:2px solid rgba(255,255,255,.14); box-shadow:inset 0 0 60px rgba(124,156,255,.15); }
+  .rw-stage.go{ border-color:#7CFFB2; } .rw-stage.bad{ animation:rwShake .4s; border-color:#ff6b6b; } .rw-stage.good{ border-color:#2ecc71; box-shadow:0 0 40px rgba(46,204,113,.5), inset 0 0 60px rgba(46,204,113,.2); }
+  .rw-letter{ position:absolute; font-size:clamp(84px,30vw,150px); font-weight:900; line-height:1; text-shadow:0 8px 30px rgba(124,156,255,.7); animation:rwPop .3s cubic-bezier(.2,1.4,.4,1) both; }
+  .rw-dots{ position:absolute; bottom:14px; left:0; right:0; display:flex; gap:7px; justify-content:center; direction:ltr; }
+  .rw-dots i{ width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.2); transition:background .2s, transform .2s; } .rw-dots i.on{ background:#7CFFB2; transform:scale(1.15); } .rw-dots i.cur{ background:#fff; transform:scale(1.4); }
+  .rw-msg{ position:absolute; top:12px; left:0; right:0; text-align:center; font-size:13px; font-weight:800; opacity:.9; padding:0 14px; }
+  .rw-big{ font-size:clamp(34px,11vw,56px); font-weight:900; text-align:center; padding:0 12px; line-height:1.4; }
+  .rw-timer{ width:100%; max-width:460px; height:10px; border-radius:99px; background:rgba(255,255,255,.14); overflow:hidden; } .rw-timer i{ display:block; height:100%; width:100%; border-radius:99px; background:linear-gradient(90deg,#2ecc71,#f1c40f,#e74c3c); background-size:300% 100%; transition:width .25s linear; }
+  .rw-in{ width:100%; max-width:460px; display:flex; gap:8px; }
+  .rw-in input{ flex:1; min-width:0; height:54px; border-radius:16px; border:2px solid rgba(255,255,255,.25); background:rgba(255,255,255,.1); color:#fff; font-family:inherit; font-size:22px; font-weight:800; text-align:center; outline:none; } .rw-in input:focus{ border-color:#7CFFB2; } .rw-in input:disabled{ opacity:.45; }
+  .rw-btn{ height:54px; padding:0 20px; border:0; border-radius:16px; font-family:inherit; font-size:15px; font-weight:900; color:#221900; background:linear-gradient(95deg,#F4B740,#FFDE94); cursor:pointer; } .rw-btn:disabled{ opacity:.45; }
+  .rw-btn.alt{ color:#fff; background:rgba(255,255,255,.16); } .rw-btn.full{ width:100%; max-width:460px; }
+  .rw-row{ width:100%; max-width:460px; display:flex; gap:8px; }
+  .rw-row .rw-btn{ flex:1; height:46px; font-size:13px; }
+  .rw-card{ width:100%; max-width:460px; padding:16px; border-radius:22px; background:rgba(255,255,255,.1); text-align:center; line-height:1.8; font-size:14px; font-weight:700; }
+  .rw-res{ width:100%; max-width:460px; display:flex; flex-direction:column; gap:6px; }
+  .rw-rr{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:14px; background:rgba(255,255,255,.09); font-size:13px; font-weight:800; } .rw-rr b{ flex:1; } .rw-rr small{ opacity:.7; font-weight:700; } .rw-rr.ok{ border-inline-start:4px solid #2ecc71; } .rw-rr.no{ border-inline-start:4px solid #e74c3c; }
+  .rw-score{ font-size:46px; font-weight:900; color:#FFDE94; }
+  .rw-ban{ padding:5px 12px; border-radius:99px; font-size:12px; font-weight:800; background:rgba(255,255,255,.12); display:inline-block; margin:2px; }
+  @keyframes rwPop{ 0%{ transform:scale(.3) rotate(-8deg); opacity:0 } 100%{ transform:scale(1) rotate(0); opacity:1 } }
+  @keyframes rwShake{ 0%,100%{ transform:translateX(0) } 25%{ transform:translateX(-10px) } 75%{ transform:translateX(10px) } }
+  @media (prefers-reduced-motion:reduce){ .rw-letter,.rw-stage.bad{ animation:none !important; } .rw-timer i{ transition:none; } }
+  .game-win-overlay{ z-index:9800 !important; }
   .arr-btn{ flex:0 0 auto; min-width:70px; height:38px; padding:0 14px; border-radius:12px; font-family:inherit; font-weight:900; font-size:12.5px; color:#221900; background:linear-gradient(95deg,var(--gold),var(--gold-2)); border:0; -webkit-tap-highlight-color:transparent; }
   .arr-btn:active{ transform:scale(.94); }
   .arr-btn.in{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; line-height:1.1; color:#BFF5DC; background:rgba(95,224,164,.14); border:1px solid rgba(95,224,164,.45); }
@@ -13345,7 +13404,7 @@ const GAME_CATEGORIES = [
 const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', backgammon:'board', snakes:'board',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
+  memory:'mind', revword:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party',
 };
@@ -13418,6 +13477,7 @@ const GAMES_CATALOG = [
   {id:'ludo', icon:'🎲', logo:'ludo-logo.png', title:'لودو', sub:'من 2 لـ 4 لاعبين • ضد الجهاز أو أصحابك', color:'linear-gradient(145deg,#3a2a12,#0c0b16)'},
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
+  {id:'revword', icon:'🔄', title:'الكلمة المعكوسة', sub:'الحروف بتظهر حرف حرف بالعكس — اجمعها واكتب الكلمة قبل الوقت', color:'linear-gradient(145deg,#6C4DFF,#3FDCC9)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم ولد وبنت وحيوان وجماد ونبات وبلد — رحلة من 3 مراحل، اختار وقت كل مرحلة وكل ما يقل تتضاعف النقط', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
@@ -27833,7 +27893,8 @@ function renderAdminAttendanceTab(){
   const html = renderAdminAttendanceTabInner(); const nav = state.attNav || {}; const key = (nav.type||'')+'/'+(nav.page||'home');
   const anim = key!==_attAnimKey; _attAnimKey = key;
   const showFab = nav.type && ATT_KEYS.includes(nav.type) && attCfg(nav.type) && ['home',undefined,'who','insights','audit'].includes(nav.page);
-  return '<div class="'+(anim?'aa-anim':'')+'">'+html+'</div>'+(showFab?'<button type="button" class="att-fab" data-action="att-admin-scan" data-type="'+nav.type+'" aria-label="مسح سريع">'+ATT_SCAN_SVG+'</button>':'');
+  const sxc = (!nav.type && typeof window.sxAdminCard==='function') ? window.sxAdminCard() : '';
+  return '<div class="'+(anim?'aa-anim':'')+'">'+html+sxc+'</div>'+(showFab?'<button type="button" class="att-fab" data-action="att-admin-scan" data-type="'+nav.type+'" aria-label="مسح سريع">'+ATT_SCAN_SVG+'</button>':'');
 }
 function renderAdminAttendanceTabInner(){
   const nav = state.attNav || (state.attNav = {type:null, page:'home'});
@@ -28960,6 +29021,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='stack'){ openStackGame(); return; }
     if(gid==='blocky'){ openBlockyGame(); return; }
     if(gid==='millionaire'){ openMillionaireGame(); return; }
+    if(gid==='revword'){ openRevWordGame(); return; }
     if(gid==='xo'){ initXoGame(); xoStartPick(450); }
     else if(gid==='connect4'){ initConnect4Game(); c4SoloPick('R', 450); }
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
@@ -37991,6 +38053,393 @@ function hof(c){
 }
 
 window.ecoSmart={sig,user:userView,admin:function(c){return admin(c)+policy(c)+events(c)+aadmin(c)+(function(){try{return hof(c);}catch(e){return '';}})();}};
+})();
+</script>
+
+<script>
+/* =====================================================================
+   صفحة المخدوم الذكية: شارات، سلسلة أسابيع، تحدي أسبوعي، منافس، لوحة شرف،
+   تنبيهات، ثيم المستوى، وخصوصية
+   ===================================================================== */
+(function(){
+'use strict';
+var P='glv-sx-', DAY=864e5;
+function ls(k){ try{ return localStorage.getItem(P+k); }catch(e){ return null; } }
+function lw(k,v){ try{ localStorage.setItem(P+k, v); }catch(e){} }
+function jg(k,d){ try{ var v=JSON.parse(ls(k)); return v==null?d:v; }catch(e){ return d; } }
+function jw(k,v){ lw(k, JSON.stringify(v)); }
+function esc(s){ return escapeHtml(String(s==null?'':s)); }
+function first(n){ return String(n||'').trim().split(/\s+/)[0]||''; }
+function me(){ return PARTICIPANTS.find(function(x){ return x.id===state.pid; }); }
+function ex(pid){ return (typeof PROFILE_EXTRA!=='undefined' && PROFILE_EXTRA[pid]) || {}; }
+function hidden(pid){ return !!ex(pid).sxHide; }
+function nameOf(p){ return hidden(p.id) ? 'زميل' : first(p.name); }
+function nAr(n){ try{ return Number(n).toLocaleString('ar-EG'); }catch(e){ return String(n); } }
+var SX={hof:true, rival:true, badges:true, challenge:true};
+(function(){ var o=jg('cfg',{}); Object.keys(SX).forEach(function(k){ if(o[k]===false) SX[k]=false; }); })();
+var _loadT=0;
+function loadCfg(){
+  if(Date.now()-_loadT<60000) return; _loadT=Date.now();
+  try{ window.storage.get('glavera-sx-settings', true).then(function(r){
+    if(!r||!r.value) return; var o=JSON.parse(r.value), ch=false;
+    Object.keys(SX).forEach(function(k){ var v=o[k]!==false; if(SX[k]!==v){ SX[k]=v; ch=true; } });
+    jw('cfg', SX); if(ch && state.view==='me' && !(document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) { try{ render(); }catch(e){} }
+  }).catch(function(){}); }catch(e){}
+}
+function recsOf(pid){ var out=[]; try{ Object.keys(ATT_RECORDS||{}).forEach(function(k){ var r=ATT_RECORDS[k]; if(r && r.pid===pid) out.push(r); }); }catch(e){} return out; }
+function wk(ts){ var d=new Date(ts); d.setHours(0,0,0,0); d.setDate(d.getDate()-((d.getDay()+1)%7)); return d.getTime(); }
+function weekSet(pid){ var s={}; recsOf(pid).forEach(function(r){ var w=wk(r.ts); s[w]=(s[w]||0)+1; }); return s; }
+function weekStreak(pid){
+  var S=weekSet(pid), now=wk(Date.now()), w=now, alive=true, cur=0;
+  if(!S[w]){ w=wk(now-3*DAY); alive=!!S[w]; }
+  while(S[w]){ cur++; w=wk(w-3*DAY); }
+  var keys=Object.keys(S).map(Number).sort(function(a,b){return a-b;}), best=0, run=0, prev=0;
+  keys.forEach(function(k){ run=(prev && wk(prev+9*DAY)===k)?run+1:1; if(run>best) best=run; prev=k; });
+  var dots=[], w2=now; for(var i=0;i<8;i++){ dots.unshift(!!S[w2]); w2=wk(w2-3*DAY); }
+  return {cur:alive?cur:0, best:best, thisWeek:S[now]||0, dots:dots, alive:alive};
+}
+function sessionsMap(){ var m={}; try{ Object.keys(ATT_RECORDS||{}).forEach(function(k){ var r=ATT_RECORDS[k]; if(!r) return; var key=r.type+'|'+r.sid, o=m[key]||(m[key]={type:r.type, sid:r.sid, t:r.ts, n:0, set:{}}); if(r.ts<o.t) o.t=r.ts; o.n++; o.set[r.pid]=r; }); }catch(e){} return m; }
+function statsOf(pid){
+  var recs=recsOf(pid), M=sessionsMap(), sessions=Object.keys(M).map(function(k){ return M[k]; }).sort(function(a,b){ return a.t-b.t; });
+  var firstN=0; sessions.forEach(function(s){ if(s.n>=5 && s.set[pid] && s.set[pid].ts===s.t) firstN++; });
+  var types={}; recs.forEach(function(r){ types[r.type]=1; });
+  var returned=false; Object.keys(types).forEach(function(ty){ var seen=false, gap=0; sessions.filter(function(s){ return s.type===ty; }).forEach(function(s){ if(s.set[pid]){ if(seen && gap>=3) returned=true; seen=true; gap=0; } else if(seen) gap++; }); });
+  var total=0, rank=0; try{ total=participantTotal(pid); rank=rankedParticipants().findIndex(function(x){ return x.id===pid; })+1; }catch(e){}
+  var ss=0; try{ ss=computeStreak(pid).current; }catch(e){}
+  var att=recs.length; try{ att=Math.max(att, flatSessions().filter(function(f){ return CHECKINS[pid+'__'+f.session.id]; }).length); }catch(e){}
+  return {recs:recs, att:att, firstN:firstN, nTypes:Object.keys(types).length, returned:returned, total:total, rank:rank, ss:ss, ws:weekStreak(pid), cheers:(ex(pid).cheersGiven||0), chal:Object.keys(jg('chal_'+pid,{})).length};
+}
+var BADGES=[
+  {id:'first', ic:'🌱', n:'أول حضور', d:'سجّل حضورك أول مرة', t:function(s){ return [s.att,1]; }},
+  {id:'a10', ic:'🏅', n:'10 حضور', d:'احضر 10 مرات', t:function(s){ return [s.att,10]; }},
+  {id:'a25', ic:'🏆', n:'25 حضور', d:'احضر 25 مرة', t:function(s){ return [s.att,25]; }},
+  {id:'s3', ic:'🔥', n:'مواظب', d:'3 جلسات أو أسابيع ورا بعض', t:function(s){ return [Math.max(s.ss,s.ws.best),3]; }},
+  {id:'w4', ic:'⚡', n:'شهر كامل', d:'4 أسابيع ورا بعض', t:function(s){ return [s.ws.best,4]; }},
+  {id:'w10', ic:'💎', n:'ماسة المواظبة', d:'10 أسابيع ورا بعض', t:function(s){ return [s.ws.best,10]; }},
+  {id:'early', ic:'🌟', n:'أول الواصلين', d:'كن أول واحد يسجّل في جلسة', t:function(s){ return [s.firstN,1]; }},
+  {id:'back', ic:'💛', n:'رجعت لينا', d:'ارجع بعد غياب 3 جلسات', t:function(s){ return [s.returned?1:0,1]; }},
+  {id:'all', ic:'🎯', n:'كل الأنشطة', d:'احضر 3 أنواع أنشطة', t:function(s){ return [Math.min(s.nTypes,3),3]; }},
+  {id:'p100', ic:'⭐', n:'100 نقطة', d:'اجمع 100 نقطة', t:function(s){ return [s.total,100]; }},
+  {id:'p500', ic:'👑', n:'500 نقطة', d:'اجمع 500 نقطة', t:function(s){ return [s.total,500]; }},
+  {id:'cheer', ic:'🤝', n:'مشجّع', d:'شجّع 5 زملاء', t:function(s){ return [s.cheers,5]; }},
+  {id:'chal', ic:'🚀', n:'منجز التحديات', d:'أنجز 3 تحديات أسبوعية', t:function(s){ return [s.chal,3]; }}
+];
+function badgeState(s){ return BADGES.map(function(b){ var v=b.t(s); return {b:b, v:Math.min(v[0],v[1]), max:v[1], ok:v[0]>=v[1]}; }); }
+function challengeOf(pid, s){
+  var now=wk(Date.now()), S=weekSet(pid), ws=s.ws, vals=[], w=now, c;
+  for(var i=0;i<4;i++){ w=wk(w-3*DAY); vals.push(S[w]||0); }
+  var last=vals[0], avg=vals.reduce(function(a,b){return a+b;},0)/4, ever=Object.keys(S).length>0;
+  if(!ever) c={t:'أول خطوة 🌱', d:'سجّل حضورك مرة واحدة الأسبوع ده', goal:1};
+  else if(last===0 && ws.best>=1) c={t:'ارجع لينا 💛', d:'ما حضرتش الأسبوع اللي فات — احضر مرة الأسبوع ده', goal:1};
+  else if(ws.cur>=3) c={t:'حافظ على سلسلتك 🔥', d:'ضيف أسبوع جديد لسلسلتك ('+nAr(ws.cur+1)+' أسابيع)', goal:1};
+  else { var g=Math.max(1, Math.min(3, Math.round(avg)+1)); c={t:'تحدي الأسبوع 🎯', d:'احضر '+nAr(g)+(g>2?' جلسات':' جلسة')+' الأسبوع ده', goal:g}; }
+  c.key=String(now); c.have=Math.min(c.goal, ws.thisWeek); c.done=ws.thisWeek>=c.goal; return c;
+}
+function rankInfo(pid, s){
+  var out={delta:null, rival:null, behind:null}, snap=jg('rk_'+pid,null), now=Date.now();
+  if(s.rank>0){
+    if(!snap){ jw('rk_'+pid,{cur:{ts:now,rank:s.rank},prev:null}); }
+    else{ if(now-snap.cur.ts>=7*DAY){ snap={cur:{ts:now,rank:s.rank},prev:snap.cur}; jw('rk_'+pid,snap); }
+      var base=snap.prev||(now-snap.cur.ts>=DAY?snap.cur:null); if(base) out.delta=base.rank-s.rank; }
+  }
+  try{ var R=rankedParticipants(), i=R.findIndex(function(x){ return x.id===pid; });
+    if(i>0 && s.total>0){ var a=R[i-1]; out.rival={p:a, gap:Math.max(1,a.total-s.total+1)}; }
+    if(i>=0 && i<R.length-1 && s.total>0 && R[i+1].total>0){ out.behind={p:R[i+1], lead:s.total-R[i+1].total}; }
+  }catch(e){}
+  return out;
+}
+function hofData(){
+  var cnt={}, week={}, now=wk(Date.now()), cut=Date.now()-30*DAY;
+  try{ Object.keys(ATT_RECORDS||{}).forEach(function(k){ var r=ATT_RECORDS[k]; if(!r) return; if(r.ts>cut) cnt[r.pid]=(cnt[r.pid]||0)+1; if(wk(r.ts)===now) week[r.pid]=(week[r.pid]||0)+1; }); }catch(e){}
+  function top(m,min){ return Object.keys(m).filter(function(k){ return m[k]>=min; }).sort(function(a,b){ return m[b]-m[a]; }).slice(0,3).map(function(k){ return {p:PARTICIPANTS.find(function(x){return x.id===k;}), n:m[k]}; }).filter(function(x){ return x.p; }); }
+  var pts=[]; try{ pts=rankedParticipants().slice(0,3).filter(function(x){ return x.total>0; }); }catch(e){}
+  return {pts:pts.map(function(x){ return {p:x,n:x.total}; }), month:top(cnt,2), week:top(week,1)};
+}
+var TIERC=['#CD7F32','#C0C8D8','#F4B740','#9B8CFF','#3FDCC9','#FF7A59'];
+function tierColor(total){ try{ return TIERC[Math.min(TIERC.length-1, medalTier(total)-1)]; }catch(e){ return TIERC[0]; } }
+function avSmall(p){ var ph=p.photo && /^(data:|https?:|blob:)/.test(String(p.photo)) && !hidden(p.id); return '<span class="sx-av"'+(ph?' style="background-image:url(\''+String(p.photo).replace(/'/g,'%27')+'\')"':'')+'>'+(ph?'':esc(hidden(p.id)?'؟':(p.name||'?').trim().charAt(0)))+'</span>'; }
+function section(){
+  var p=me(); if(!p) return '';
+  loadCfg();
+  var s=statsOf(p.id), ws=s.ws, html='', ok=badgeState(s), earned=ok.filter(function(x){ return x.ok; });
+  html+='<div class="sx-card"><div class="sx-h"><b>🔥 سلسلة الأسابيع</b><span class="sx-pill">'+nAr(ws.cur)+' '+(ws.cur>2&&ws.cur<11?'أسابيع':'أسبوع')+'</span></div>'
+    +'<div class="sx-dots">'+ws.dots.map(function(d,i){ return '<i class="'+(d?'on':'')+(i===7?' now':'')+'">'+(d?'✓':'')+'</i>'; }).join('')+'</div>'
+    +'<div class="sx-sub">أطول سلسلة ليك: '+nAr(ws.best)+' · '+(ws.thisWeek?'حضرت الأسبوع ده ✅':(ws.cur>0?'⚠️ ما حضرتش الأسبوع ده لسه — احضر عشان ما تخسرش السلسلة':'ابدأ سلسلتك بحضور الأسبوع ده'))+'</div></div>';
+  if(SX.challenge){ var c=challengeOf(p.id,s), pc=Math.round(c.have/c.goal*100);
+    html+='<div class="sx-card sx-chal'+(c.done?' done':'')+'"><div class="sx-h"><b>'+esc(c.t)+'</b><span class="sx-pill">'+nAr(c.have)+'/'+nAr(c.goal)+'</span></div><div class="sx-sub" style="margin:0 0 8px">'+esc(c.d)+'</div><div class="sx-bar"><i style="width:'+pc+'%"></i></div>'+(c.done?'<div class="sx-sub" style="margin-top:8px;color:var(--good)">🎉 أنجزت تحدي الأسبوع! تحدي جديد الأسبوع الجاي</div>':'')+'</div>'; }
+  if(SX.rival){ var ri=rankInfo(p.id,s), mv=ri.delta;
+    html+='<div class="sx-card"><div class="sx-h"><b>🏁 ترتيبك</b><span class="sx-pill">'+(s.rank?'#'+nAr(s.rank):'—')+(mv?(' <em class="'+(mv>0?'up':'dn')+'">'+(mv>0?'▲':'▼')+nAr(Math.abs(mv))+'</em>'):'')+'</span></div>'
+      +(ri.rival?'<div class="sx-rival">'+avSmall(ri.rival.p)+'<div class="sx-rt"><b>فاضل لك '+nAr(ri.rival.gap)+' نقطة تعدّي '+esc(nameOf(ri.rival.p))+'</b><small>اللي قدامك في الترتيب</small></div><button type="button" class="sx-btn" data-sx-cheer="'+esc(ri.rival.p.id)+'">👏 شجّعه</button></div>':(s.rank===1&&s.total>0?'<div class="sx-sub">🥇 أنت في المركز الأول، حافظ عليه!</div>':'<div class="sx-sub">اجمع نقاط عشان يظهر لك منافسك</div>'))
+      +(ri.behind?'<div class="sx-sub" style="margin-top:8px">متقدّم على '+esc(nameOf(ri.behind.p))+' بـ '+nAr(ri.behind.lead)+' نقطة</div>':'')+'</div>'; }
+  if(SX.badges){
+    html+='<div class="sx-card"><div class="sx-h"><b>🎖️ شاراتي</b><span class="sx-pill">'+nAr(earned.length)+'/'+nAr(ok.length)+'</span></div><div class="sx-badges">'
+      +ok.map(function(x){ return '<button type="button" class="sx-badge'+(x.ok?' on':'')+'" data-sx-badge="'+esc(x.b.n+' — '+x.b.d+(x.ok?' ✅':' ('+nAr(x.v)+'/'+nAr(x.max)+')'))+'"><span class="ic">'+x.b.ic+'</span><b>'+esc(x.b.n)+'</b>'+(x.ok?'':'<i><u style="width:'+Math.round(x.v/x.max*100)+'%"></u></i>')+'</button>'; }).join('')+'</div></div>';
+  }
+  if(SX.hof){ var h=hofData(), blk=function(t,arr,u){ return arr.length?'<div class="sx-hrow"><span class="sx-ht">'+t+'</span><div class="sx-hl">'+arr.map(function(x,i){ return '<span class="sx-hp">'+['🥇','🥈','🥉'][i]+' '+esc(nameOf(x.p))+' <small>'+nAr(x.n)+' '+u+'</small></span>'; }).join('')+'</div></div>':''; };
+    var inner=blk('⭐ الأعلى نقاطًا',h.pts,'نقطة')+blk('📅 متميز الأسبوع',h.week,'حضور')+blk('🔥 مواظب الشهر',h.month,'حضور');
+    if(inner) html+='<div class="sx-card"><div class="sx-h"><b>🏛️ لوحة الشرف</b></div>'+inner+'</div>'; }
+  var np=(typeof Notification!=='undefined')?Notification.permission:'unsupported';
+  html+='<div class="sx-card"><div class="sx-h"><b>🔔 تنبيهات وخصوصية</b></div>'
+    +'<div class="sx-set"><div><b>تنبيه لما الحضور يتفتح</b><small>'+(np==='granted'?'مفعّل — هيجيلك تنبيه والتطبيق مفتوح أو في الخلفية':(np==='denied'?'محظور من إعدادات المتصفح':(np==='unsupported'?'المتصفح مش بيدعم التنبيهات':'بيشتغل والتطبيق مفتوح أو في الخلفية')))+'</small></div>'+(np==='default'?'<button type="button" class="sx-btn" data-sx-notif="1">فعّل</button>':'')+'</div>'
+    +'<label class="sx-set"><div><b>إخفاء اسمي وصورتي من لوحة الشرف</b><small>هيظهر اسمك لزمايلك «زميل» بس</small></div><input type="checkbox" class="sx-chk" data-sx-hide="1"'+(hidden(p.id)?' checked':'')+'></label>'
+    +'<div class="sx-sub" style="margin-top:8px">الأسماء بتظهر لزمايلك الأولى بس، ومفيش تعرّف على الوجه ولا مشاركة بياناتك مع أي حد.</div></div>';
+  setTimeout(function(){ try{ checkBadges(); }catch(e){} }, 300);
+  return '<div class="sx-wrap">'+html+'</div>';
+}
+var _chkSig='';
+function celebrate(ic, title, sub){
+  var o=document.createElement('div'); o.className='sx-modal'; var cols=['#2ecc71','#f1c40f','#7C9CFF','#e84393','#ff9f43'], conf='';
+  for(var i=0;i<26;i++){ var a=Math.random()*Math.PI*2, d=100+Math.random()*160; conf+='<i class="ass-conf" style="background:'+cols[i%5]+';--dx:'+Math.round(Math.cos(a)*d)+'px;--dy:'+Math.round(Math.sin(a)*d-40)+'px;--rot:'+Math.round(Math.random()*540)+'deg;animation-delay:'+(Math.random()*.2).toFixed(2)+'s"></i>'; }
+  o.innerHTML=conf+'<div class="sx-mc"><div class="sx-mi">'+ic+'</div><div class="sx-mt">'+esc(title)+'</div><div class="sx-ms">'+esc(sub)+'</div><button type="button" class="sx-btn big">تمام 👏</button></div>';
+  o.addEventListener('click', function(e){ if(e.target===o || (e.target.closest&&e.target.closest('.sx-btn'))) o.remove(); });
+  document.body.appendChild(o); try{ vibrate([30,40,30]); }catch(e){} try{ SND.success(); }catch(e){}
+  setTimeout(function(){ if(o.parentNode) o.remove(); }, 9000);
+}
+function checkBadges(){
+  var p=me(); if(!p || state.adminUnlocked) return;
+  var sig=Object.keys(ATT_RECORDS||{}).length+'|'+state.pid; if(sig===_chkSig) return; _chkSig=sig;
+  var s=statsOf(p.id), st=badgeState(s), ids=st.filter(function(x){ return x.ok; }).map(function(x){ return x.b.id; }), seen=jg('bd_'+p.id,null);
+  if(seen===null){ jw('bd_'+p.id, ids); }
+  else{ var nw=st.filter(function(x){ return x.ok && seen.indexOf(x.b.id)<0; });
+    if(nw.length){ jw('bd_'+p.id, ids); var b=nw[0].b; celebrate(b.ic,'شارة جديدة: '+b.n, b.d+(nw.length>1?' (+'+(nw.length-1)+' شارة كمان)':'')); try{ pushNotification(p.id,'كسبت شارة «'+b.n+'» '+b.ic,b.ic); }catch(e){} } }
+  var c=challengeOf(p.id,s), dn=jg('chal_'+p.id,{});
+  if(c.done && !dn[c.key]){ dn[c.key]=1; jw('chal_'+p.id,dn); if(seen!==null){ celebrate('🎯','أنجزت تحدي الأسبوع!','برافو، استمر على كده'); try{ pushNotification(p.id,'أنجزت تحدي الأسبوع 🎯','🎯'); }catch(e){} } }
+}
+var _open={}, _init=false;
+function watch(){
+  try{
+    var p=me(); if(!p || state.adminUnlocked) return;
+    ATT_KEYS.forEach(function(k){
+      var c=ATT_CONFIG && ATT_CONFIG[k], now=!!(c && c.open), was=_open[k];
+      if(_init && now && was===false && !attDone(p.id,k)){
+        var t=ATT_TYPES[k]||{label:k}, msg='الحضور اتفتح دلوقتي: '+(t.label||k);
+        try{ showToast('🔔 '+msg); }catch(e){} try{ pushNotification(p.id, msg+' — سجّل حضورك','🔔'); }catch(e){}
+        try{ if(typeof Notification!=='undefined' && Notification.permission==='granted') new Notification('تنبيه حضور',{body:msg, tag:'att-'+k}); }catch(e){}
+      }
+      if(c) _open[k]=now;
+    });
+    if(!_init && ATT_CONFIG && Object.keys(ATT_CONFIG).length) _init=true;
+    weeklySummary(p);
+    if(state.view==='me'||state.view==='profile') checkBadges();
+  }catch(e){}
+}
+function weeklySummary(p){
+  var now=wk(Date.now()), key='sum_'+p.id; if(jg(key,0)===now) return;
+  var recs=recsOf(p.id); if(!recs.length || !_init){ return; }
+  var prevW=wk(now-3*DAY), mine=recs.filter(function(r){ return wk(r.ts)===prevW; });
+  jw(key, now);
+  var pts=mine.reduce(function(a,r){ return a+(+r.pts||0); },0), rank=0; try{ rank=rankedParticipants().findIndex(function(x){ return x.id===p.id; })+1; }catch(e){}
+  var txt=mine.length ? 'ملخص أسبوعك: حضرت '+nAr(mine.length)+' مرة وكسبت '+nAr(pts)+' نقطة'+(rank?'، ترتيبك #'+nAr(rank):'')+' 📊' : 'وحشتنا الأسبوع اللي فات 💛 تعالى نشوفك الأسبوع ده';
+  try{ pushNotification(p.id, txt, '📊'); }catch(e){}
+}
+var _rm=window.renderMePage;
+window.renderMePage=function(){
+  var h=_rm.apply(this,arguments); try{
+    var p=me(); if(!p) return h; var s=statsOf(p.id), col=tierColor(s.total);
+    document.documentElement.style.setProperty('--sx-c', col);
+    h=h.replace('<div class="me-card"','<div class="me-card sx-t"');
+    h=h.replace('<div class="me-links">', section()+'<div class="me-links">');
+  }catch(e){}
+  return h;
+};
+window.sxAdminCard=function(){
+  var rows=[['hof','🏛️ لوحة الشرف للمخدومين'],['rival','🏁 المنافس وحركة الترتيب'],['badges','🎖️ الشارات'],['challenge','🎯 التحدي الأسبوعي']];
+  return '<div class="aa-sec"><b>👤 ميزات صفحة المخدوم</b></div><div class="card">'+rows.map(function(r){ return '<label class="sx-set"><div><b>'+r[1]+'</b></div><input type="checkbox" class="sx-chk" data-sx-adm="'+r[0]+'"'+(SX[r[0]]?' checked':'')+'></label>'; }).join('')+'<div class="hint" style="margin:8px 0 0;text-align:start">لو عايز تخفي حاجة تسبب ضغط على الأصغر، أطفئها من هنا وهتختفي عند الكل.</div></div>';
+};
+document.addEventListener('click', function(e){
+  var t=e.target.closest && e.target.closest('[data-sx-badge],[data-sx-cheer],[data-sx-notif]'); if(!t) return;
+  if(t.hasAttribute('data-sx-badge')){ try{ showToast(t.getAttribute('data-sx-badge')); }catch(x){} return; }
+  if(t.hasAttribute('data-sx-notif')){ try{ Notification.requestPermission().then(function(){ try{ render(); }catch(x){} }); }catch(x){ showToast('المتصفح مش بيدعم التنبيهات', true); } return; }
+  var pid=t.getAttribute('data-sx-cheer'), p=me(), k='cheer_'+pid+'_'+new Date().toDateString(); if(!p) return;
+  if(ls(k)){ showToast('شجّعته النهارده بالفعل 💛', true); return; }
+  lw(k,'1'); try{ pushNotification(pid, first(p.name)+' شجّعك 👏 كمّل!','👏'); }catch(x){}
+  try{ var e2=myExtra(p.id); e2.cheersGiven=(e2.cheersGiven||0)+1; saveProfileExtra(PROFILE_EXTRA); }catch(x){}
+  t.textContent='✓ اتبعت'; t.disabled=true; try{ SND.cheer(); vibrate(15); }catch(x){}
+});
+document.addEventListener('change', function(e){
+  var t=e.target; if(!t || !t.hasAttribute) return;
+  if(t.hasAttribute('data-sx-hide')){ var p=me(); if(!p) return; myExtra(p.id).sxHide=!!t.checked; try{ saveProfileExtra(PROFILE_EXTRA); showToast(t.checked?'اتخفى اسمك من لوحة الشرف':'اسمك هيظهر في لوحة الشرف'); }catch(x){} return; }
+  if(t.hasAttribute('data-sx-adm')){ var k=t.getAttribute('data-sx-adm'); SX[k]=!!t.checked; jw('cfg',SX);
+    try{ window.storage.set('glavera-sx-settings', JSON.stringify(SX), true).then(function(){ showToast('تم الحفظ'); }); }catch(x){} }
+});
+setInterval(watch, 4000); setTimeout(watch, 2500);
+})();
+</script>
+
+<script>
+/* =====================================================================
+   لعبة الكلمة المعكوسة: الحروف بتظهر حرف حرف من الآخر للأول، والمطلوب
+   تجمعها في دماغك وتكتب الكلمة قبل ما الوقت يخلص. صعوبة متكيّفة وتكرار ذكي للأخطاء.
+   ===================================================================== */
+(function(){
+'use strict';
+var WORDS=[
+ /* كنيسة وعبادة */
+ ['صلاة','ch'],['كنيسة','ch'],['شمعة','ch'],['بخور','ch'],['انجيل','ch'],['صليب','ch'],['قداس','ch'],['تسبحة','ch'],['مذبح','ch'],['قربان','ch'],['اعتراف','ch'],['توبة','ch'],['ايقونة','ch'],['جرس','ch'],['كاهن','ch'],['شماس','ch'],['اسقف','ch'],['بطريرك','ch'],['راهب','ch'],['دير','ch'],['تسبيح','ch'],['بركة','ch'],['قيامة','ch'],['ميلاد','ch'],['معمودية','ch'],['صوم','ch'],['شعانين','ch'],['عشاء','ch'],['رسول','ch'],['كتاب','ch'],['مزمور','ch'],['صلبان','ch'],['ملاك','ch'],['سماء','ch'],['ملكوت','ch'],['خلاص','ch'],['فداء','ch'],['شفاعة','ch'],['اعياد','ch'],
+ /* شخصيات الكتاب المقدس */
+ ['ابراهيم','bi'],['اسحق','bi'],['يعقوب','bi'],['يوسف','bi'],['موسى','bi'],['هارون','bi'],['داود','bi'],['سليمان','bi'],['ايليا','bi'],['اليشع','bi'],['دانيال','bi'],['يونان','bi'],['اشعياء','bi'],['ارمياء','bi'],['بطرس','bi'],['بولس','bi'],['يوحنا','bi'],['متى','bi'],['مرقس','bi'],['لوقا','bi'],['توما','bi'],['فيلبس','bi'],['اندراوس','bi'],['مريم','bi'],['مرثا','bi'],['اليصابات','bi'],['حنة','bi'],['راحيل','bi'],['سارة','bi'],['هاجر','bi'],['نوح','bi'],['ادم','bi'],['حواء','bi'],['هابيل','bi'],['قايين','bi'],['شمشون','bi'],['جدعون','bi'],['صموئيل','bi'],['راعوث','bi'],['استير','bi'],['ايوب','bi'],['زكا','bi'],['لعازر','bi'],['برنابا','bi'],['تيموثاوس','bi'],['استفانوس','bi'],['نيقوديموس','bi'],['زكريا','bi'],['سمعان','bi'],
+ /* أماكن */
+ ['القدس','pl'],['الناصرة','pl'],['الجليل','pl'],['سيناء','pl'],['مصر','pl'],['بابل','pl'],['اريحا','pl'],['حبرون','pl'],['كنعان','pl'],['صهيون','pl'],['الكرمل','pl'],['حرمون','pl'],['يهوذا','pl'],['اورشليم','pl'],['قانا','pl'],['عمواس','pl'],['دمشق','pl'],['انطاكية','pl'],['روما','pl'],['افسس','pl'],['قورنثوس','pl'],['الاسكندرية','pl'],['الاردن','pl'],['بيتعنيا','pl'],['جثسيماني','pl'],['الجلجثة','pl'],['سدوم','pl'],['نينوى','pl'],
+ /* فضائل */
+ ['محبة','vi'],['سلام','vi'],['فرح','vi'],['ايمان','vi'],['رجاء','vi'],['تواضع','vi'],['صبر','vi'],['وداعة','vi'],['طهارة','vi'],['خدمة','vi'],['شكر','vi'],['رحمة','vi'],['امانة','vi'],['عفة','vi'],['لطف','vi'],['حكمة','vi'],['نعمة','vi'],['غفران','vi'],['عطاء','vi'],['تقوى','vi'],['شجاعة','vi'],['صدق','vi'],['اخلاص','vi'],['قناعة','vi'],['ثبات','vi'],
+ /* طبيعة وحيوانات */
+ ['حمامة','na'],['خروف','na'],['اسد','na'],['نسر','na'],['جبل','na'],['نهر','na'],['بحر','na'],['نجمة','na'],['شجرة','na'],['زيتون','na'],['عنب','na'],['قمح','na'],['ورد','na'],['سحاب','na'],['مطر','na'],['شمس','na'],['قمر','na'],['صحراء','na'],['عصفور','na'],['غزال','na'],['جمل','na'],['حوت','na'],['سمكة','na'],['فراشة','na'],['نخلة','na'],
+ /* أشياء */
+ ['سفينة','ob'],['مفتاح','ob'],['سلم','ob'],['كرسي','ob'],['شباك','ob'],['باب','ob'],['قلم','ob'],['مدرسة','ob'],['حقيبة','ob'],['ساعة','ob'],['مصباح','ob'],['خاتم','ob'],['تاج','ob'],['سيف','ob'],['درع','ob'],['مائدة','ob'],['كوب','ob'],['خبز','ob'],['عسل','ob'],['زيت','ob'],['كنز','ob'],['خريطة','ob'],['طريق','ob'],['جسر','ob'],['حديقة','ob']
+];
+var CATS={ch:'كنيسة وعبادة ⛪',bi:'شخصية من الكتاب 📖',pl:'مكان 📍',vi:'فضيلة 💛',na:'طبيعة وحيوان 🌿',ob:'شيء من حولنا 🧰'};
+var RARE='ضظذغخثشصعحقط', ROUNDS=5, G=null, T=[];
+function esc(s){ return escapeHtml(String(s==null?'':s)); }
+function norm(s){ return String(s||'').toLowerCase().replace(/[ً-ٰٟـ\s]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي'); }
+function diffOf(w){ var n=w.length, r=0; for(var i=0;i<n;i++){ if(RARE.indexOf(w[i])>=0) r++; } return n+r*0.4; }
+function stats(){ try{ return state.pid ? myGameStats(state.pid) : {}; }catch(e){ return {}; } }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function later(fn,ms){ var id=setTimeout(fn,ms); T.push(id); return id; }
+function clearT(){ T.forEach(clearTimeout); T=[]; if(G&&G.tick){ clearInterval(G.tick); G.tick=null; } }
+function snd(n){ try{ SND[n](); }catch(e){} }
+function today(){ return new Date().toDateString(); }
+function dayKey(){ return 'glv-rw-day-'+(state.pid||'x'); }
+function rewardsLeft(){ var max=(window.GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloRevSessions)||3; try{ var o=JSON.parse(localStorage.getItem(dayKey())||'null'); if(o&&o.d===today()) return Math.max(0,max-o.n); }catch(e){} return max; }
+function useReward(){ try{ var o=JSON.parse(localStorage.getItem(dayKey())||'null'); var n=(o&&o.d===today())?o.n:0; localStorage.setItem(dayKey(), JSON.stringify({d:today(), n:n+1})); }catch(e){} }
+/* ---------- اختيار الكلمة بذكاء ---------- */
+function pickWord(){
+  var st=stats(), skill=G.skill, target=3+skill*0.55, seen=G.seen, missed=(st.revMissed||[]).filter(function(w){ return seen.indexOf(w)<0 && G.used.indexOf(w)<0; });
+  var pool=WORDS.filter(function(x){ return G.used.indexOf(x[0])<0; });
+  if(missed.length && Math.random()<0.35){ var m=missed[Math.floor(Math.random()*missed.length)], f=WORDS.filter(function(x){ return x[0]===m; })[0]; if(f && diffOf(f[0])<=target+2) return f; }
+  var fresh=pool.filter(function(x){ return seen.indexOf(x[0])<0; }); if(fresh.length>=8) pool=fresh;
+  pool.sort(function(a,b){ return Math.abs(diffOf(a[0])-target)-Math.abs(diffOf(b[0])-target); });
+  var top=pool.slice(0,6); return top[Math.floor(Math.random()*top.length)];
+}
+function speedMs(){ return clamp(1000-G.skill*68, 360, 1000); }
+function answerSecs(len){ return clamp(7+len*2.2-G.skill*0.35, 7, 30); }
+/* ---------- بناء الواجهة ---------- */
+function open(){
+  close(true);
+  var st=stats(), skill=clamp(+st.revSkill||2, 0, 10);
+  G={ skill:skill, skill0:skill, round:0, score:0, streak:0, bestStreak:0, results:[], used:[], seen:(st.revSeen||[]).slice(-50), missed:(st.revMissed||[]).slice(), phase:'intro', ov:null };
+  var ov=document.createElement('div'); ov.className='rw-ov'; ov.id='rw-ov'; document.body.appendChild(ov); G.ov=ov;
+  snd('click'); intro();
+}
+function close(silent){
+  clearT(); var ov=document.getElementById('rw-ov'); if(ov) ov.remove();
+  if(G && !silent){ save(); snd('back'); } G=null;
+}
+function save(){
+  if(!G || !state.pid) return; try{
+    var st=stats(); st.revSkill=Math.round(G.skill*100)/100; st.revSeen=G.seen.slice(-60); st.revMissed=G.missed.slice(-30);
+    st.revPlayed=(st.revPlayed||0)+(G.finished?1:0); if(G.finished && G.score>(st.revBest||0)) st.revBest=G.score;
+    saveGameStats(GAME_STATS);
+  }catch(e){}
+}
+function head(title){ return '<div class="rw-top"><button type="button" class="rw-x" data-rw="close" aria-label="إغلاق">✕</button><div class="rw-ttl">'+esc(title||'الكلمة المعكوسة 🔄')+'</div><button type="button" class="rw-help" data-rw="help" aria-label="شرح">؟</button></div>'; }
+function statsBar(){ return '<div class="rw-stats"><div class="rw-st"><small>الجولة</small><b>'+Math.min(G.round+1,ROUNDS)+'/'+ROUNDS+'</b></div><div class="rw-st"><small>النقاط</small><b>'+G.score+'</b></div><div class="rw-st"><small>سلسلة</small><b>🔥'+G.streak+'</b></div><div class="rw-st"><small>المستوى</small><b>'+Math.floor(G.skill)+'</b></div></div>'; }
+function intro(){
+  var st=stats(), left=rewardsLeft(), cap=(window.GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloRevMax)||30;
+  G.ov.innerHTML=head()+'<div class="rw-card"><div style="font-size:54px">🔄</div><b style="font-size:17px">الحروف هتظهر قدامك حرف حرف — بالعكس!</b><br>ركّز، اجمعها في دماغك، واكتب الكلمة الصح قبل ما الوقت يخلص.<div style="margin-top:10px"><span class="rw-ban">'+ROUNDS+' جولات</span><span class="rw-ban">مستواك '+Math.floor(G.skill)+'</span>'+(st.revBest?'<span class="rw-ban">أفضل نتيجة '+st.revBest+'</span>':'')+'</div><div style="margin-top:8px;font-size:12.5px;opacity:.85">'+(left>0?'جايزة حتى '+cap+' نقطة — متبقي لك '+left+' جولة مكافأة النهارده':'خلصت جوايز النهارده، تقدر تلعب للتدريب 💪')+'</div></div>'
+    +'<button type="button" class="rw-btn full" data-rw="start">يلا نبدأ 🚀</button><button type="button" class="rw-btn alt full" data-rw="help">إزاي أتفوق؟</button>';
+  G.phase='intro';
+}
+function help(){
+  var o=document.createElement('div'); o.className='rw-ov'; o.style.zIndex=9700; o.id='rw-help';
+  o.innerHTML=head('إزاي تلعب؟').replace('data-rw="close"','data-rw="helpx"').replace(/<button[^>]*data-rw="help"[^>]*>.*?<\/button>/,'')
+   +'<div class="rw-card" style="text-align:start">① هتشوف حرف واحد بس كل مرة، ويختفي.<br>② الحروف بتيجي <b>من الآخر للأول</b>، يعني أول حرف تشوفه هو آخر حرف في الكلمة.<br>③ اكتب الكلمة <b>معدولة</b> من أولها لآخرها.<br>④ عدد النقط تحت بيقولك الكلمة فيها كام حرف.<br>⑤ ليك <b>إعادة واحدة</b> بتقلّل نقاط الجولة، ومحاولتين للكتابة.<br>⑥ كل ما تجاوب صح وسريع الصعوبة بتزيد، وغلطاتك بترجع لك بعدين للتدريب.<br><b>💡 نصيحة:</b> اكتب الحروف في دماغك على صف من اليمين، وانت بتستقبل الحرف الجديد حطه على الشمال.</div><button type="button" class="rw-btn full" data-rw="helpx">فهمت 👍</button>';
+  document.body.appendChild(o);
+}
+function startRound(){
+  clearT(); var w=pickWord(); if(!w){ finish(); return; }
+  var word=w[0], cat=w[1]; G.used.push(word);
+  G.cur={ word:word, cat:cat, letters:word.split('').reverse(), replayed:false, tries:0, t0:0, total:answerSecs(word.length), done:false, hinted:false };
+  G.ov.innerHTML=head()+statsBar()
+   +'<div class="rw-stage" id="rw-stage"><div class="rw-msg" id="rw-msg">'+(G.skill<3?esc(CATS[cat]):'جهّز نفسك…')+'</div><div class="rw-big" id="rw-big">'+(G.round+1)+'</div><div class="rw-dots" id="rw-dots">'+word.split('').map(function(){ return '<i></i>'; }).join('')+'</div></div>'
+   +'<div class="rw-timer"><i id="rw-bar"></i></div>'
+   +'<div class="rw-in"><input id="rw-input" type="text" inputmode="text" lang="ar" dir="rtl" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="اكتب الكلمة هنا" disabled><button type="button" class="rw-btn" id="rw-go" data-rw="submit" disabled>تمام</button></div>'
+   +'<div class="rw-row"><button type="button" class="rw-btn alt" id="rw-replay" data-rw="replay" disabled>🔁 إعادة الحروف</button><button type="button" class="rw-btn alt" data-rw="skip">⏭️ تخطّي</button></div>';
+  G.phase='intro-round'; snd('click');
+  later(function(){ playLetters(false); }, 900);
+}
+function playLetters(isReplay){
+  var c=G.cur, stage=document.getElementById('rw-stage'), big=document.getElementById('rw-big'), msg=document.getElementById('rw-msg'), dots=document.querySelectorAll('#rw-dots i');
+  if(!stage) return; G.phase='showing'; var sp=speedMs(), gap=130, i=0, random=G.skill>=4;
+  var inp=document.getElementById('rw-input'); if(inp) inp.disabled=true; var gb=document.getElementById('rw-go'); if(gb) gb.disabled=true; var rb=document.getElementById('rw-replay'); if(rb) rb.disabled=true;
+  dots.forEach(function(d){ d.className=''; }); if(msg) msg.textContent='ركّز… الحروف بالعكس 👀'; if(big) big.remove();
+  function show(){
+    var old=stage.querySelector('.rw-letter'); if(old) old.remove();
+    if(i>=c.letters.length){ later(afterLetters, 350); return; }
+    var el=document.createElement('div'); el.className='rw-letter'; el.textContent=c.letters[i];
+    if(random){ var dx=(Math.random()-.5)*60, dy=(Math.random()-.5)*36; el.style.transform='translate('+dx+'%,'+dy+'%)'; el.style.setProperty('--x',dx); }
+    el.style.color=['#fff','#FFDE94','#7CFFB2','#9fc2ff','#ffb3d1'][G.skill>=6?Math.floor(Math.random()*5):0];
+    stage.appendChild(el); snd('click'); dots.forEach(function(d,k){ d.className=k<i?'on':(k===i?'cur':''); }); i++;
+    later(function(){ var l=stage.querySelector('.rw-letter'); if(l) l.remove(); later(show, gap); }, sp);
+  }
+  show();
+}
+function afterLetters(){
+  var c=G.cur, stage=document.getElementById('rw-stage'); if(!stage||!G) return;
+  stage.classList.add('go'); document.querySelectorAll('#rw-dots i').forEach(function(d){ d.className='on'; });
+  var msg=document.getElementById('rw-msg'); if(msg) msg.textContent='اكتب الكلمة دلوقتي ✍️';
+  var big=document.createElement('div'); big.className='rw-big'; big.id='rw-big'; big.textContent='؟'; stage.appendChild(big);
+  var inp=document.getElementById('rw-input'); inp.disabled=false; inp.value=''; inp.focus(); document.getElementById('rw-go').disabled=false;
+  var rb=document.getElementById('rw-replay'); rb.disabled=c.replayed; G.phase='answer'; c.t0=Date.now(); c.paused=0;
+  clearInterval(G.tick); G.tick=setInterval(tick, 200);
+}
+function tick(){
+  var c=G&&G.cur; if(!c||G.phase!=='answer') return; var el=(Date.now()-c.t0)/1000, left=c.total-el, bar=document.getElementById('rw-bar');
+  if(bar) bar.style.width=clamp(left/c.total*100,0,100)+'%';
+  if(!c.hinted && el>c.total*0.45 && G.skill>=3){ c.hinted=true; var m=document.getElementById('rw-msg'); if(m) m.textContent='تلميح: '+CATS[c.cat]; }
+  if(left<=0){ endRound(false,'timeout'); }
+}
+function replay(){
+  var c=G.cur; if(!c||c.replayed||G.phase!=='answer') return; c.replayed=true; clearInterval(G.tick); G.tick=null;
+  var st=document.getElementById('rw-stage'); if(st) st.classList.remove('go'); var big=document.getElementById('rw-big'); if(big) big.remove();
+  playLetters(true);
+}
+function submit(){
+  var c=G&&G.cur; if(!c||G.phase!=='answer') return; var inp=document.getElementById('rw-input'), v=norm(inp.value); if(!v) return;
+  if(v===norm(c.word)){ endRound(true); return; }
+  c.tries++; var st=document.getElementById('rw-stage'); inp.value='';
+  if(c.tries>=2){ endRound(false,'wrong'); return; }
+  if(st){ st.classList.remove('bad'); void st.offsetWidth; st.classList.add('bad'); } snd('error'); try{ vibrate([40,30,40]); }catch(e){}
+  var m=document.getElementById('rw-msg'); if(m) m.textContent='مش دي 🤔 فاضل لك محاولة واحدة';
+}
+function endRound(ok, why){
+  var c=G.cur; if(!c||c.done) return; c.done=true; clearInterval(G.tick); G.tick=null; G.phase='between';
+  var el=c.t0?(Date.now()-c.t0)/1000:c.total, rem=clamp(1-el/c.total,0,1), pts=0, gain;
+  if(ok){
+    G.streak++; G.bestStreak=Math.max(G.bestStreak,G.streak);
+    pts=Math.round((10+c.word.length*2)*(1+G.skill*0.1)*(0.5+0.5*rem)*(c.replayed?0.7:1)*(1+Math.min(G.streak-1,5)*0.1));
+    gain=(c.replayed?0.15:0.35)+rem*0.3; G.skill=clamp(G.skill+gain,0,10); G.score+=pts; snd('success'); try{ vibrate(30); }catch(e){}
+    G.missed=G.missed.filter(function(x){ return x!==c.word; });
+  } else {
+    G.streak=0; G.skill=clamp(G.skill-0.4,0,10); snd('error'); if(G.missed.indexOf(c.word)<0) G.missed.push(c.word);
+  }
+  if(G.seen.indexOf(c.word)<0) G.seen.push(c.word);
+  G.results.push({word:c.word, ok:ok, pts:pts, why:why, replayed:c.replayed, secs:Math.round(el*10)/10});
+  var stage=document.getElementById('rw-stage'); if(stage){ stage.classList.remove('go'); stage.classList.add(ok?'good':'bad'); var big=document.getElementById('rw-big'); if(big){ big.innerHTML=esc(c.word)+'<div style="font-size:15px;margin-top:6px;color:'+(ok?'#7CFFB2':'#ffb3b3')+'">'+(ok?('صح! +'+pts):(why==='timeout'?'الوقت خلص ⏰':'غلط ❌'))+'</div>'; } var m=document.getElementById('rw-msg'); if(m) m.textContent=ok?'برافو 👏':'الحروف اللي ظهرت: '+c.letters.join(' ← '); }
+  var inp=document.getElementById('rw-input'); if(inp) inp.disabled=true;
+  G.round++;
+  later(function(){ if(G.round>=ROUNDS) finish(); else startRound(); }, ok?1500:2600);
+}
+function finish(){
+  clearT(); G.finished=true; var ok=G.results.filter(function(r){ return r.ok; }).length, cap=(window.GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloRevMax)||30;
+  var canReward=rewardsLeft()>0 && ok>=2 && !!state.pid, reward=canReward?Math.min(cap, Math.floor(G.score/6)):0;
+  var st=stats(), newBest=G.score>(st.revBest||0);
+  save();
+  var lvlTxt=G.skill>G.skill0+0.2?'⬆️ مستواك زاد!':(G.skill<G.skill0-0.2?'⬇️ هنراجع شوية ونرجع أقوى':'مستواك ثابت');
+  G.ov.innerHTML=head('النتيجة')+'<div class="rw-card"><div class="rw-score">'+G.score+'</div>'+ok+' من '+ROUNDS+' صح · أطول سلسلة '+G.bestStreak+'<div style="margin-top:8px"><span class="rw-ban">'+lvlTxt+'</span>'+(newBest?'<span class="rw-ban">🏅 رقم قياسي جديد</span>':'')+(reward?'<span class="rw-ban">🎁 +'+reward+' نقطة</span>':'')+'</div>'+(!reward&&ok<2?'<div style="font-size:12px;opacity:.8;margin-top:6px">محتاج تجاوب جولتين صح على الأقل عشان تاخد جايزة</div>':'')+'</div>'
+   +'<div class="rw-res">'+G.results.map(function(r){ return '<div class="rw-rr '+(r.ok?'ok':'no')+'"><span>'+(r.ok?'✅':'❌')+'</span><b>'+esc(r.word)+'</b><small>'+(r.ok?(r.secs+' ث'+(r.replayed?' · إعادة':'')+' · +'+r.pts):(r.why==='timeout'?'الوقت خلص':'غلط'))+'</small></div>'; }).join('')+'</div>'
+   +(G.results.some(function(r){ return !r.ok; })?'<div class="rw-card" style="font-size:12.5px">📌 الكلمات اللي غلطت فيها هترجع لك في الجولات الجاية للتدريب.</div>':'')
+   +'<button type="button" class="rw-btn full" data-rw="again">العب تاني 🔄</button><button type="button" class="rw-btn alt full" data-rw="close">خروج</button>';
+  if(reward){ useReward(); try{ awardSoloGamePoints(reward, 'خلّصت الكلمة المعكوسة'); }catch(e){} }
+}
+document.addEventListener('click', function(e){
+  var t=e.target.closest&&e.target.closest('[data-rw]'); if(!t) return; var a=t.getAttribute('data-rw');
+  if(a==='close'){ close(); } else if(a==='help'){ help(); } else if(a==='helpx'){ var h=document.getElementById('rw-help'); if(h) h.remove(); }
+  else if(a==='start'){ if(G) startRound(); } else if(a==='again'){ if(G){ var st=stats(); G.round=0; G.score=0; G.streak=0; G.bestStreak=0; G.results=[]; G.used=[]; G.finished=false; G.skill0=G.skill; G.seen=(st.revSeen||G.seen).slice(-50); startRound(); } }
+  else if(a==='submit'){ submit(); } else if(a==='replay'){ replay(); }
+  else if(a==='skip'){ if(G&&G.cur&&G.phase!=='between'){ if(G.phase==='answer') endRound(false,'skip'); else { clearT(); G.cur.done=true; G.results.push({word:G.cur.word, ok:false, pts:0, why:'skip'}); G.streak=0; G.round++; if(G.round>=ROUNDS) finish(); else startRound(); } } }
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='rw-input'){ e.preventDefault(); submit(); } });
+window.openRevWordGame=open;
 })();
 </script>
 
