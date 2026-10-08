@@ -39018,5 +39018,93 @@ if(typeof _r==='function'){
 setTimeout(function(){ try{ build(); }catch(e){} },300);
 })();
 </script>
+<style id="mp-pro-css">
+/* ===== ملفي: لوحة النقاط والترتيب الاحترافية ===== */
+.mp-dash{display:flex;flex-direction:column;gap:10px;margin:0 0 12px}
+.mp-hero{display:grid;grid-template-columns:1.15fr 1fr;gap:10px}
+.mp-box{--c:var(--gold);--c-rgb:244,183,64;position:relative;overflow:hidden;isolation:isolate;border-radius:22px;padding:14px 14px 13px;text-align:right;
+  background:linear-gradient(155deg,rgba(var(--c-rgb),.20),var(--surface) 62%);border:1px solid rgba(var(--c-rgb),.34);
+  box-shadow:0 12px 26px -14px rgba(var(--c-rgb),.6),inset 0 1px 0 rgba(255,255,255,.08)}
+.mp-box::after{content:'';position:absolute;z-index:-1;width:150px;height:150px;left:-50px;bottom:-70px;border-radius:50%;background:radial-gradient(circle,rgba(var(--c-rgb),.26),transparent 68%)}
+.mp-rank{--c:var(--teal);--c-rgb:63,220,201}
+.mp-lab{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--text-muted)}
+.mp-lab i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:rgba(var(--c-rgb),.22);border:1px solid rgba(var(--c-rgb),.45)}
+.mp-big{direction:ltr;display:flex;align-items:baseline;justify-content:flex-end;gap:4px;margin:8px 0 2px;font-family:'Cairo',sans-serif;font-weight:900;font-size:44px;line-height:1.05;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff 0%,var(--c) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mp-big small{font-size:24px;font-weight:900;opacity:.9}
+html[data-theme="light"] .mp-big{background:none;color:var(--c)}
+.mp-sub{font-size:11.5px;font-weight:700;color:var(--text-muted)}
+.mp-sub b{color:var(--c);font-weight:900}
+.mp-note{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:12.5px;font-weight:700;line-height:1.5}
+.mp-note .e{flex:none;width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:18px;background:rgba(63,220,201,.14);border:1px solid rgba(63,220,201,.35)}
+.mp-note b{color:var(--teal);font-weight:900}
+.mp-medal{padding:13px 14px;border-radius:20px;background:var(--surface);border:1px solid var(--border)}
+.mp-mtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;font-size:12px;font-weight:800;color:var(--text-muted)}
+.mp-mtop b{color:var(--gold);font-weight:900}
+.mp-mrow{display:flex;align-items:center;gap:10px}
+.mp-tier{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:46px;font-size:10.5px;font-weight:800}
+.mp-tier span{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:21px;background:radial-gradient(circle at 30% 25%,rgba(244,183,64,.4),rgba(244,183,64,.08) 70%);border:1.5px solid var(--gold);box-shadow:0 0 14px rgba(244,183,64,.3)}
+.mp-tier.nx{opacity:.6}.mp-tier.nx span{background:rgba(255,255,255,.06);border:1.5px dashed var(--border);box-shadow:none;filter:grayscale(.6)}
+.mp-track{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;position:relative}
+html[data-theme="light"] .mp-track{background:rgba(20,33,61,.1)}
+.mp-track i{position:absolute;top:0;bottom:0;right:0;border-radius:99px;background:linear-gradient(270deg,var(--gold-2),var(--gold));animation:mpFill 1.2s cubic-bezier(.22,1,.36,1) .3s both;transform-origin:right}
+.mp-track i::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);transform:translateX(-100%);animation:meShine 2.8s ease-in-out 1.6s infinite}
+@keyframes mpFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.mp-mini{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mp-m{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;background:var(--surface);border:1px solid var(--border)}
+.mp-m i{font-style:normal;flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:18px}
+.mp-m.s i{background:rgba(255,122,61,.16)}.mp-m.r i{background:rgba(124,156,255,.16)}
+.mp-m div{line-height:1.25}.mp-m strong{font-family:'Cairo',sans-serif;font-weight:900;font-size:18px;font-variant-numeric:tabular-nums}
+.mp-m strong small{font-size:11px;color:var(--text-muted);font-weight:700;margin-inline-start:3px}
+.mp-m span{display:block;font-size:11px;font-weight:700;color:var(--text-muted)}
+@media (max-width:360px){.mp-big{font-size:36px}.mp-hero{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:reduce){.mp-track i,.mp-track i::after{animation:none!important}}
+</style>
+<script id="mp-pro-js">
+(function(){
+'use strict';
+function g(sel,at){var e=document.querySelector(sel);return e?(+e.getAttribute(at)||0):0;}
+function build(){
+  if(typeof state==='undefined'||state.view!=='me') return;
+  var old=document.querySelector('.me-stats'); if(!old||document.querySelector('.mp-dash')) return;
+  var pid=state.pid, total=participantTotal(pid), ranked=rankedParticipants(), n=ranked.length;
+  var rank=ranked.findIndex(function(x){return x.id===pid;})+1;
+  var streak=g('.me-stat.streak [data-count]','data-count'), rate=g('.me-stat.rate [data-count]','data-count');
+  var ms=getMedals(), t=medalTier(total), mi=ms[t-1]||ms[0], nx=ms[t]||null;
+  var pct=nx?Math.min(100,Math.max(0,Math.round((total-(+mi.min||0))/Math.max(1,(+nx.min||0)-(+mi.min||0))*100))):100;
+  var note='',ne='🏁';
+  if(rank===1){ne='🥇';var l=n>1?total-participantTotal(ranked[1].id):0;
+    note=n<2?'أنت <b>أول</b> المشاركين، كمّل كده!':(l>0?'أنت في <b>الصدارة</b> ومتقدم بـ <b>'+l+'</b> نقطة عن المركز الثاني':'أنت في <b>الصدارة</b> بالتعادل، نقطة واحدة تفرق!');}
+  else if(rank>1){ne=rank===2?'🥈':rank===3?'🥉':'📈';var gp=participantTotal(ranked[rank-2].id)-total;
+    note=gp>0?'باقي <b>'+gp+'</b> نقطة وتوصل للمركز <b>#'+(rank-1)+'</b>':'متعادل في النقاط مع اللي قدامك، نقطة زيادة تعدّيه!';}
+  else note='لسه مفيش ترتيب ليك، اجمع نقاط وهتظهر.';
+  var h='<div class="mp-dash">'
+   +'<div class="mp-hero">'
+   +'<div class="mp-box mp-pts"><div class="mp-lab"><i>⭐</i>إجمالي النقاط</div><div class="mp-big"><span class="mp-count" data-to="'+total+'">0</span></div><div class="mp-sub">نقطة مكتسبة</div></div>'
+   +'<div class="mp-box mp-rank"><div class="mp-lab"><i>🏆</i>الترتيب</div><div class="mp-big">'+(rank?'<small>#</small><span class="mp-count" data-to="'+rank+'">0</span>':'—')+'</div><div class="mp-sub">من بين <b>'+n+'</b> مشارك</div></div>'
+   +'</div>'
+   +'<div class="mp-note"><span class="e">'+ne+'</span><span>'+note+'</span></div>'
+   +'<div class="mp-medal"><div class="mp-mtop"><span>مسار الميداليات</span><span>'+(nx?'باقي <b>'+Math.max(0,(+nx.min||0)-total)+'</b> نقطة':'<b>أعلى مستوى 🎉</b>')+'</span></div>'
+   +'<div class="mp-mrow"><div class="mp-tier"><span>'+mi.icon+'</span>'+mi.name+'</div><div class="mp-track"><i style="width:'+pct+'%"></i></div>'
+   +(nx?'<div class="mp-tier nx"><span>'+nx.icon+'</span>'+nx.name+'</div>':'')+'</div></div>'
+   +'<div class="mp-mini"><div class="mp-m s"><i>🔥</i><div><strong>'+streak+'<small>مرة</small></strong><span>حضور متتالي</span></div></div>'
+   +'<div class="mp-m r"><i>📈</i><div><strong>'+rate+'<small>%</small></strong><span>نسبة الحضور</span></div></div></div>'
+   +'</div>';
+  var tmp=document.createElement('div'); tmp.innerHTML=h;
+  old.parentNode.insertBefore(tmp.firstChild,old); old.remove();
+  var tier=document.querySelector('.me-tier'); if(tier) tier.remove();
+  var red=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.mp-count').forEach(function(el){
+    var to=+el.getAttribute('data-to')||0; if(red||!to){el.textContent=to;return;}
+    var t0=performance.now(),d=900+Math.min(700,to*2);
+    (function f(now){var k=Math.min(1,(now-t0)/d);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);})(t0);
+  });
+}
+var _r=window.render;
+if(typeof _r==='function'){window.render=function(){var r=_r.apply(this,arguments);try{build();}catch(e){}setTimeout(function(){try{build();}catch(e){}},120);return r;};}
+setTimeout(function(){try{build();}catch(e){}},400);
+})();
+</script>
+
 </body>
 </html>
