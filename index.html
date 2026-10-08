@@ -9599,7 +9599,7 @@ async function loadGamePointsSettings(){
   const fallback = {first:100, second:50, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25,
     soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
-    soloNumGuessReward:100, soloNumGuessMaxTries:3,
+    soloNumGuessReward:100, soloNumGuessMaxTries:6,
     soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
     soloSnlReward:30, soloSnlWinsNeeded:3,
     visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
@@ -10078,7 +10078,7 @@ let CONF_SETTINGS = {ended:false, verseText:null, verseRef:null, dailyVerses:{},
 let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25,
   soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
-  soloNumGuessReward:100, soloNumGuessMaxTries:3,
+  soloNumGuessReward:100, soloNumGuessMaxTries:6,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
   soloSnlReward:30, soloSnlWinsNeeded:3,
   soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
@@ -13538,7 +13538,7 @@ const GAMES_CATALOG = [
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'revword', icon:'🔄', title:'الكلمة المعكوسة', sub:'الحروف بتظهر حرف حرف بالعكس — اجمعها واكتب الكلمة قبل الوقت', color:'linear-gradient(145deg,#6C4DFF,#3FDCC9)'},
-  {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 3 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
+  {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 6 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم ولد وبنت وحيوان وجماد ونبات وبلد — رحلة من 3 مراحل، اختار وقت كل مرحلة وكل ما يقل تتضاعف النقط', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
   {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
@@ -13566,7 +13566,7 @@ function allToggleableGames(){
 }
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
-  memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 3 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
+  memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 6 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
   bus:'حرف عشوائي و6 خانات: اسم ولد واسم بنت وحيوان وجماد ونبات وبلد/دولة — رحلة من 3 مراحل، إنت بتختار وقت كل مرحلة: وقت أقل = نقط مضاعفة. لو جمعت أكتر من الجهاز تكسب مكافأة بتكبر مع المخاطرة',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
@@ -14763,7 +14763,7 @@ function renderReflexLeaderboard(){
 
 /* ============================= GAMES: NUMBER GUESS ============================= */
 function initNumberGame(){
-  const maxTries = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessMaxTries)||3;
+  const maxTries = 6; /* عدد التخمينات ثابت = 6 */
   state.numguess = { target: 1+Math.floor(Math.random()*100), tries:0, maxTries, guesses:[], finished:false, won:false, guessVal:'' };
 }
 async function saveNumberBestIfNeeded(tries){
@@ -14807,7 +14807,7 @@ function numberKeyTap(k){
 function renderNumberGame(){
   if(!state.numguess) initNumberGame();
   const g = state.numguess;
-  const maxTries = g.maxTries || (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessMaxTries) || 3;
+  const maxTries = g.maxTries || 6;
   const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessReward)||0;
   const stats = state.pid ? myGameStats(state.pid) : {};
   const bestLine = stats.numberBest ? `أفضل نتيجة لك: ${stats.numberBest} محاولة` : `خمّن الرقم من ${maxTries} محاولات بس واكسب ${reward} نقطة 🏅`;
@@ -38623,5 +38623,89 @@ window.openRevWordGame=open;
 
 
 
+
+<style id="mx-compact-css">
+/* ===== صفحة ملفي: نسخة مضغوطة (تابات بدل صفحة طويلة) ===== */
+.me-cover{height:46px}
+.me-ring{width:88px;height:88px;margin:-44px auto 6px}
+.me-ring .me-av{inset:8px}
+.me-ring-tier{width:28px;height:28px;font-size:15px}
+.me-card{padding:0 14px 12px;margin:6px 0 10px}
+.me-name{font-size:18px}
+.me-chips{margin-top:6px;gap:6px}
+.me-chip{padding:3px 10px;font-size:11.5px}
+.me-edit-btn{margin:8px auto 0;padding:6px 16px;font-size:12px}
+.me-stats{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.me-stat{padding:9px 4px 8px;border-radius:16px}
+.me-stat .ico{display:none}
+.me-stat b{font-size:19px;gap:2px;margin:0;flex-wrap:wrap}
+.me-stat b small{font-size:9.5px}
+.me-stat span{font-size:10.5px}
+.me-tier{padding:10px 14px;margin-bottom:10px}
+.me-tier-top{margin-bottom:7px;font-size:12.5px}
+.mx-row{display:flex;gap:8px;margin:0 0 10px}
+.mx-row .glx-sbar{flex:1;width:auto;margin:0;padding:9px 10px;font-size:12.5px;justify-content:center}
+.glx-idbtn{margin-bottom:8px !important;padding-top:8px !important;padding-bottom:8px !important}
+.mx-tabs{margin:0 0 12px}
+.mx-bar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.mx-bar::-webkit-scrollbar{display:none}
+.mx-tb{flex:1 0 auto;padding:8px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted,inherit);font-family:'Cairo',Tahoma,sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.mx-tb.on{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.mx-panel{display:none;flex-direction:column;gap:10px}
+.mx-panel.on{display:flex}
+.mx-panel>*{margin:0 !important}
+.mx-panel .me-week{padding:10px 14px}
+.me-links{display:grid;grid-template-columns:1fr 1fr;margin-bottom:10px}
+.me-links .me-link{border-bottom:none;border-inline-start:1px solid var(--border);padding:11px 12px}
+.me-links .me-link:first-child{border-inline-start:none}
+.me-logout{margin-bottom:6px}
+</style>
+<script id="mx-compact-js">
+(function(){
+'use strict';
+var TAB='act';
+var NAMES=[['act','🔥 نشاطي'],['bdg','🎖️ شاراتي'],['hof','🏛️ الشرف'],['set','🔔 إعدادات']];
+function build(){
+  if(typeof state==='undefined' || state.view!=='me') return;
+  var card=document.querySelector('.me-card'); if(!card) return;
+  var root=card.parentElement; if(!root || root.querySelector(':scope > .mx-tabs')) return;
+  var links=root.querySelector(':scope > .me-links'); if(!links) return;
+  var sb=[].slice.call(root.querySelectorAll(':scope > .glx-sbar'));
+  if(sb.length){ var row=document.createElement('div'); row.className='mx-row'; root.insertBefore(row, sb[0]); sb.forEach(function(b){ row.appendChild(b); }); }
+  var P={act:[],bdg:[],hof:[],set:[]};
+  var chal=root.querySelector(':scope > .glx-chal'); if(chal) P.act.push(chal);
+  var wk=root.querySelector(':scope > .me-week'); if(wk) P.act.push(wk);
+  var wrap=root.querySelector(':scope > .sx-wrap');
+  if(wrap){
+    [].slice.call(wrap.children).forEach(function(c){
+      var h=c.querySelector('.sx-h b'), s=h?h.textContent:'';
+      if(/شاراتي/.test(s)) P.bdg.push(c); else if(/الشرف/.test(s)) P.hof.push(c); else if(/تنبيهات/.test(s)) P.set.push(c); else P.act.push(c);
+    });
+    if(!wrap.children.length) wrap.remove();
+  }
+  var fx=root.querySelector(':scope > .fx-me-vb'); if(fx) P.bdg.push(fx);
+  var avail=NAMES.filter(function(n){ return P[n[0]].length; });
+  if(!avail.length) return;
+  if(!P[TAB] || !P[TAB].length) TAB=avail[0][0];
+  var box=document.createElement('div'); box.className='mx-tabs';
+  var bar=document.createElement('div'); bar.className='mx-bar';
+  avail.forEach(function(n){ var b=document.createElement('button'); b.type='button'; b.className='mx-tb'+(n[0]===TAB?' on':''); b.setAttribute('data-mx',n[0]); b.textContent=n[1]; bar.appendChild(b); });
+  box.appendChild(bar);
+  avail.forEach(function(n){ var d=document.createElement('div'); d.className='mx-panel'+(n[0]===TAB?' on':''); d.setAttribute('data-mxp',n[0]); P[n[0]].forEach(function(e){ d.appendChild(e); }); box.appendChild(d); });
+  root.insertBefore(box, links);
+}
+document.addEventListener('click', function(e){
+  var b=e.target.closest && e.target.closest('.mx-tb'); if(!b) return;
+  TAB=b.getAttribute('data-mx');
+  document.querySelectorAll('.mx-tb').forEach(function(x){ x.classList.toggle('on', x===b); });
+  document.querySelectorAll('.mx-panel').forEach(function(x){ x.classList.toggle('on', x.getAttribute('data-mxp')===TAB); });
+});
+var _r=window.render;
+if(typeof _r==='function'){
+  window.render=function(){ var r=_r.apply(this,arguments); try{ build(); }catch(e){} setTimeout(function(){ try{ build(); }catch(e){} },80); return r; };
+}
+setTimeout(function(){ try{ build(); }catch(e){} },300);
+})();
+</script>
 </body>
 </html>
