@@ -6560,6 +6560,60 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes mcHint{from{transform:rotateY(180deg) scale(1);}to{transform:rotateY(180deg) scale(1.08);}}
   .memory-stats-row .xo-score-pill{flex:1; min-width:0; padding-inline:6px;}
 
+  /* ===== Memory game — premium theme ===== */
+  .memory-grid{gap:11px; max-width:350px;}
+  .memory-card{filter:drop-shadow(0 6px 10px rgba(0,0,0,.28));}
+  .memory-card .mc-inner{border-radius:16px; transition:transform .55s cubic-bezier(.3,1.25,.5,1);}
+  .memory-card:not(.flipped):not(:disabled):active .mc-inner{transform:scale(.95);}
+  .mc-back, .mc-front{border-radius:16px; overflow:hidden;}
+
+  /* الكارت المقفول: ليلي بنقش ذهبي */
+  .mc-back{font-size:0; color:transparent; border:1.5px solid rgba(244,183,64,.5);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(244,183,64,.20), transparent 58%),
+      repeating-linear-gradient(45deg, rgba(244,183,64,.07) 0 1.5px, transparent 1.5px 9px),
+      repeating-linear-gradient(-45deg, rgba(244,183,64,.07) 0 1.5px, transparent 1.5px 9px),
+      linear-gradient(155deg,#1F1A5C,#0C0A30);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05), inset 0 -14px 22px rgba(0,0,0,.35);}
+  .mc-back::before{content:''; position:absolute; inset:6px; border-radius:11px; border:1px solid rgba(244,183,64,.38);}
+  .mc-back::after{content:''; width:30%; aspect-ratio:1; transform:rotate(45deg); border-radius:4px;
+    border:1.5px solid var(--gold-2);
+    background:radial-gradient(circle, var(--gold-2) 0 2.5px, transparent 3.5px);
+    box-shadow:0 0 12px rgba(244,183,64,.55), inset 0 0 7px rgba(244,183,64,.35);}
+
+  /* الكارت المكشوف مؤقتاً: لؤلؤي ناصع */
+  .mc-front{font-size:30px; border:1.5px solid rgba(255,255,255,.7);
+    background:radial-gradient(circle at 30% 20%, #FFFFFF, #ECE6FA 70%, #DCD3F2);}
+  .memory-card.flipped:not(.matched) .mc-front{border-color:var(--gold-2);
+    box-shadow:0 0 0 3px rgba(244,183,64,.22), 0 10px 22px rgba(0,0,0,.4);}
+  .memory-card.mc-hint:not(.matched) .mc-front{border-color:#7C9CFF;
+    box-shadow:0 0 0 3px rgba(124,156,255,.35), 0 0 22px rgba(124,156,255,.85);}
+
+  /* الكارت اللي اتحل: ورق ذهب لامع + ختم زمردي */
+  .memory-card.matched .mc-inner{transform:rotateY(180deg) scale(.94); filter:none;}
+  .memory-card.matched .mc-front{opacity:1; border:1.5px solid rgba(255,244,205,.9);
+    background:linear-gradient(135deg,#FFF1BF 0%,#F8C95A 38%,#D99A22 72%,#F6D27A 100%);
+    box-shadow:0 8px 20px rgba(244,183,64,.38), inset 0 0 0 1px rgba(255,255,255,.45), inset 0 -10px 16px rgba(160,100,10,.28);}
+  .memory-card.matched .mc-front::after{content:''; position:absolute; top:-10%; bottom:-10%; left:0; width:38%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+    transform:translateX(-160%) skewX(-20deg); animation:mcShine 4.5s ease-in-out infinite;}
+  @keyframes mcShine{0%,55%{transform:translateX(-160%) skewX(-20deg);}100%{transform:translateX(380%) skewX(-20deg);}}
+  .memory-card.matched .mc-front{text-shadow:0 2px 3px rgba(110,64,0,.35);}
+  .mc-ok{top:5px; inset-inline-end:5px; width:17px; height:17px; border-radius:50%; display:grid; place-items:center;
+    background:linear-gradient(145deg,#27C48A,#0C7A55); color:#fff; font-size:10px; line-height:1; text-shadow:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.35), 0 0 0 1.5px rgba(255,255,255,.8);}
+
+  /* الإحصائيات والمستوى */
+  .mem-level{display:table; margin:-2px auto 10px; padding:4px 16px; border-radius:20px; font-size:12px; font-weight:800;
+    color:var(--gold-2); border:1px solid rgba(244,183,64,.35); background:rgba(244,183,64,.08); letter-spacing:.2px;}
+  .mem-stats{gap:8px; margin-bottom:10px;}
+  .mem-stats .xo-score-pill{border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid rgba(244,183,64,.25); backdrop-filter:blur(6px); flex-direction:column; gap:2px; padding-block:9px;}
+  .mem-stats .xo-score-pill span{font-size:11px; color:var(--text-muted); font-weight:700;}
+  .mem-stats .xo-score-pill b{font-size:19px; color:var(--gold-2);}
+  .mem-progress{height:5px; border-radius:4px; background:rgba(255,255,255,.08); overflow:hidden; margin:0 2px 10px;}
+  .mem-progress i{display:block; height:100%; border-radius:4px; background:linear-gradient(90deg,var(--gold),var(--gold-2)); transition:width .5s ease; box-shadow:0 0 8px rgba(244,183,64,.6);}
+
 
   .rps-battle{display:flex; align-items:center; justify-content:center; gap:18px; margin:10px 0 6px;}
   .rps-side{display:flex; flex-direction:column; align-items:center; gap:6px;}
@@ -14508,9 +14562,9 @@ function renderMemoryGame(){
   const g = state.memory;
   const elapsedNow = g.finished ? g.elapsed : Math.floor((Date.now()-g.startTs)/1000);
   const cellsHtml = g.cards.map((c,i)=>{
-    const shown = c.flipped || c.matched;
+    const shown = c.flipped || c.matched || c.hint;
     return `<button type="button" class="memory-card ${shown?'flipped':''} ${c.matched?'matched':''} ${c.hint?'mc-hint':''}" data-action="memory-card" data-idx="${i}" ${(g.locked||c.matched)?'disabled':''}>
-      <span class="mc-inner"><span class="mc-back">✨</span><span class="mc-front">${c.icon}${c.matched?'<i class="mc-ok">✓</i>':''}</span></span>
+      <span class="mc-inner"><span class="mc-back"></span><span class="mc-front">${c.icon}${c.matched?'<i class="mc-ok">✓</i>':''}</span></span>
     </button>`;
   }).join('');
   const stats = state.pid ? myGameStats(state.pid) : {};
@@ -14523,15 +14577,16 @@ function renderMemoryGame(){
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لعبة الذاكرة</div>
     </div>
-    <div class="hint" style="text-align:center;margin:-4px 0 8px;">المستوى ${g.level+1} • ${L.name} • ${g.pairs} أزواج</div>
-    <div class="memory-stats-row">
+    <div class="mem-level">المستوى ${g.level+1} • ${L.name} • ${g.pairs} أزواج</div>
+    <div class="memory-stats-row mem-stats">
       <div class="xo-score-pill"><span>حركات</span><b>${g.moves}</b></div>
       <div class="xo-score-pill draw"><span>أزواج</span><b>${g.matches}/${g.pairs}</b></div>
       <div class="xo-score-pill"><span>نقاط</span><b>${g.score}</b></div>
       <div class="xo-score-pill o"><span>⏱️</span><b id="memory-timer">${elapsedNow} ث</b></div>
     </div>
+    <div class="mem-progress"><i style="width:${Math.round(g.matches/g.pairs*100)}%"></i></div>
     ${endHtml}
-    <div class="hint" style="text-align:center;min-height:20px;margin-bottom:6px;">${g.note||(g.finished?'':'الكروت الخضرا ✓ اتحلّت — الدهبي ✨ لسه مجهولة')}</div>
+    <div class="hint" style="text-align:center;min-height:20px;margin-bottom:8px;">${g.note||(g.finished?'':'الكروت الذهبية اتحلّت ✓ — الداكنة لسه مجهولة')}</div>
     <div class="memory-grid" style="grid-template-columns:repeat(${g.cols},1fr);">${cellsHtml}</div>
     <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
     <div style="display:flex;gap:8px;margin-top:12px;">
@@ -24251,7 +24306,7 @@ function renderRoomMemory(){
     const isM = matched[i]!==undefined;
     const shown = isM || flipped.indexOf(i)>-1;
     return `<button type="button" class="memory-card ${shown?'flipped':''} ${isM?'matched':''}" data-action="room-memory-card" data-idx="${i}" ${(!myTurn || isM)?'disabled':''}>
-      <span class="mc-inner"><span class="mc-back">✨</span><span class="mc-front">${icon}</span></span>
+      <span class="mc-inner"><span class="mc-back"></span><span class="mc-front">${icon}</span></span>
     </button>`;
   }).join('');
   const pairs = Object.keys(matched).length/2;
