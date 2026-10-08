@@ -6552,6 +6552,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .mc-back{background:linear-gradient(155deg, var(--surface-2), var(--surface)); color:var(--gold); font-size:17px;}
   .mc-front{background:linear-gradient(155deg, var(--surface), var(--surface-2)); transform:rotateY(180deg); font-size:24px;}
   .memory-card.matched .mc-front{border-color:var(--good); box-shadow:0 0 12px rgba(95,224,164,.4);}
+  .memory-card.matched .mc-front{background:linear-gradient(155deg, rgba(95,224,164,.32), rgba(95,224,164,.1)); border-color:var(--good); opacity:.88;}
+  .memory-card.matched .mc-inner{transform:rotateY(180deg) scale(.9);}
+  .mc-ok{position:absolute; top:3px; inset-inline-end:5px; font-style:normal; font-size:11px; font-weight:900; color:var(--good);}
+  .memory-card.flipped:not(.matched) .mc-front{border-color:var(--gold); box-shadow:0 0 10px rgba(244,183,64,.35);}
+  .memory-card.mc-hint .mc-front{border-color:#7C9CFF; box-shadow:0 0 16px rgba(124,156,255,.8); animation:mcHint .6s ease-in-out infinite alternate;}
+  @keyframes mcHint{from{transform:rotateY(180deg) scale(1);}to{transform:rotateY(180deg) scale(1.08);}}
+  .memory-stats-row .xo-score-pill{flex:1; min-width:0; padding-inline:6px;}
+
 
   .rps-battle{display:flex; align-items:center; justify-content:center; gap:18px; margin:10px 0 6px;}
   .rps-side{display:flex; flex-direction:column; align-items:center; gap:6px;}
@@ -14360,12 +14368,24 @@ function shuffleArray(arr){
   for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
   return a;
 }
+/* ---- لعبة الذاكرة الذكية: مستويات تتكيّف مع أدائك + كومبو + تلميح ذكي ---- */
+const MEM_LEVELS = [
+  {pairs:6,  cols:3, flip:850, name:'مبتدئ'},
+  {pairs:8,  cols:4, flip:750, name:'عادي'},
+  {pairs:10, cols:4, flip:650, name:'متقدم'},
+  {pairs:12, cols:4, flip:550, name:'خبير'}
+];
+const MEM_ICONS = ['🎓','🏆','🎁','🎯','📿','🎡','🪪','⭐','🔔','📖','🕊️','🌿','🎵','🧩','🔑','💡','🎈','🏅','🧭','🌟','🍀','🛡️','🚀','🎨'];
+function memGetLevel(){ try{ const v=parseInt(localStorage.getItem('glv-mem-lvl'),10); return (v>=0&&v<MEM_LEVELS.length)?v:0; }catch(e){ return 0; } }
+function memSetLevel(v){ try{ localStorage.setItem('glv-mem-lvl', String(v)); }catch(e){} }
 function initMemoryGame(){
-  const icons = ['🎓','🏆','🎁','🎯','📿','🎡','🪪','⭐'];
+  const lvl = memGetLevel(), L = MEM_LEVELS[lvl];
+  const icons = shuffleArray(MEM_ICONS).slice(0, L.pairs);
   let cards = [];
-  icons.forEach((ic,i)=>{ cards.push({icon:ic}); cards.push({icon:ic}); });
-  cards = shuffleArray(cards).map(c=>({icon:c.icon, flipped:false, matched:false}));
-  state.memory = { cards, first:null, second:null, moves:0, matches:0, locked:false, startTs:Date.now(), finished:false, elapsed:0 };
+  icons.forEach(ic=>{ cards.push({icon:ic}); cards.push({icon:ic}); });
+  cards = shuffleArray(cards).map(c=>({icon:c.icon, flipped:false, matched:false, hint:false}));
+  state.memory = { cards, pairs:L.pairs, cols:L.cols, flipMs:L.flip, level:lvl, first:null, second:null, moves:0, matches:0, locked:false,
+    startTs:Date.now(), finished:false, elapsed:0, score:0, combo:0, bestCombo:0, hints:2, seen:{}, note:'', stars:0, levelMsg:'' };
 }
 async function saveMemoryBestIfNeeded(moves, seconds){
   if(!state.pid) return;
@@ -14376,13 +14396,51 @@ async function saveMemoryBestIfNeeded(moves, seconds){
     await saveGameStats(GAME_STATS);
   }
 }
+function memFinish(g){
+  g.finished = true;
+  g.elapsed = Math.round((Date.now()-g.startTs)/1000);
+  stopMemoryTicker();
+  const perfect = g.pairs, ratio = g.moves/perfect;
+  g.stars = ratio<=1.6 ? 3 : (ratio<=2.4 ? 2 : 1);
+  const timeBonus = Math.max(0, Math.round((g.pairs*8 - g.elapsed))*5);
+  g.score += timeBonus + g.stars*100;
+  let lvl = g.level, msg = '';
+  if(g.stars===3 && lvl < MEM_LEVELS.length-1){ lvl++; msg = '🚀 أداء ممتاز! المستوى الجاي: '+MEM_LEVELS[lvl].name; }
+  else if(g.stars===1 && lvl > 0){ lvl--; msg = '🌱 هنسهّلها شوية: المستوى الجاي: '+MEM_LEVELS[lvl].name; }
+  else msg = g.stars===3 ? '👑 وصلت لأعلى مستوى!' : 'هتفضل على نفس المستوى — حاول تاخد 3 نجوم عشان تترقى';
+  g.levelMsg = msg; memSetLevel(lvl);
+  launchConfetti(); SND.coinChime();
+  saveMemoryBestIfNeeded(g.moves, g.elapsed);
+}
+function memNoteSeen(g, idx){
+  const ic = g.cards[idx].icon; const arr = g.seen[ic] || (g.seen[ic]=[]);
+  if(arr.indexOf(idx)<0) arr.push(idx);
+}
+function doMemoryHint(){
+  const g = state.memory;
+  if(!g || g.locked || g.finished || g.first!==null) return;
+  if(g.hints<=0){ showToast('خلصت التلميحات', true); return; }
+  let found = null;
+  Object.keys(g.seen).forEach(ic=>{
+    if(found) return;
+    const arr = g.seen[ic].filter(i=>!g.cards[i].matched);
+    if(arr.length>=2) found = arr.slice(0,2);
+  });
+  if(!found){ g.note = '🤔 لسه ما شفتش زوج كامل — اكتشف كروت أكتر الأول'; render(); return; }
+  g.hints--; g.score = Math.max(0, g.score-30); g.combo = 0; g.locked = true;
+  found.forEach(i=>{ g.cards[i].hint = true; });
+  g.note = '💡 دول زوج شفتهم قبل كده!';
+  render();
+  setTimeout(()=>{ const g2 = state.memory; if(!g2) return; found.forEach(i=>{ g2.cards[i].hint = false; }); g2.locked = false; render(); }, 1400);
+}
 function doMemoryFlip(idx){
   const g = state.memory;
   if(!g || g.locked || g.finished) return;
   const card = g.cards[idx];
   if(!card || card.flipped || card.matched) return;
-  card.flipped = true;
+  card.flipped = true; g.note = '';
   SND.click();
+  memNoteSeen(g, idx);
   if(g.first===null){ g.first = idx; render(); return; }
   if(g.first===idx) return;
   g.second = idx;
@@ -14391,29 +14449,25 @@ function doMemoryFlip(idx){
   const a = g.cards[g.first], b = g.cards[g.second];
   if(a.icon===b.icon){
     a.matched = true; b.matched = true;
-    g.matches++;
+    g.matches++; g.combo++; if(g.combo>g.bestCombo) g.bestCombo = g.combo;
+    g.score += 100 + (g.combo-1)*50;
+    g.note = g.combo>1 ? '🔥 كومبو x'+g.combo+'!' : '✅ زوج صح';
     SND.cheer();
     g.first = null; g.second = null;
-    if(g.matches===8){
-      g.finished = true;
-      g.elapsed = Math.round((Date.now()-g.startTs)/1000);
-      stopMemoryTicker();
-      launchConfetti();
-      SND.coinChime();
-      saveMemoryBestIfNeeded(g.moves, g.elapsed);
-    }
+    if(g.matches===g.pairs) memFinish(g);
     render();
   } else {
-    g.locked = true;
+    g.locked = true; g.combo = 0; g.score = Math.max(0, g.score-10);
+    const fi = g.first, si = g.second;
     setTimeout(()=>{
       const g2 = state.memory;
-      if(!g2) return;
-      const a2 = g2.cards[g.first], b2 = g2.cards[g.second];
+      if(!g2 || g2!==g) return;
+      const a2 = g2.cards[fi], b2 = g2.cards[si];
       if(a2) a2.flipped = false;
       if(b2) b2.flipped = false;
       g2.first = null; g2.second = null; g2.locked = false;
       render();
-    }, 800);
+    }, g.flipMs || 800);
   }
 }
 let memoryTickInterval = null;
@@ -14433,26 +14487,35 @@ function renderMemoryGame(){
   const elapsedNow = g.finished ? g.elapsed : Math.floor((Date.now()-g.startTs)/1000);
   const cellsHtml = g.cards.map((c,i)=>{
     const shown = c.flipped || c.matched;
-    return `<button type="button" class="memory-card ${shown?'flipped':''} ${c.matched?'matched':''}" data-action="memory-card" data-idx="${i}" ${g.locked?'disabled':''}>
-      <span class="mc-inner"><span class="mc-back">✨</span><span class="mc-front">${c.icon}</span></span>
+    return `<button type="button" class="memory-card ${shown?'flipped':''} ${c.matched?'matched':''} ${c.hint?'mc-hint':''}" data-action="memory-card" data-idx="${i}" ${(g.locked||c.matched)?'disabled':''}>
+      <span class="mc-inner"><span class="mc-back">✨</span><span class="mc-front">${c.icon}${c.matched?'<i class="mc-ok">✓</i>':''}</span></span>
     </button>`;
   }).join('');
   const stats = state.pid ? myGameStats(state.pid) : {};
   const bestLine = stats.memoryBestMoves ? `أفضل نتيجة لك: ${stats.memoryBestMoves} حركة (${stats.memoryBestTime} ث)` : 'العب أول جولة لتسجيل أفضل نتيجة 🏅';
+  const L = MEM_LEVELS[g.level];
+  const stars = g.finished ? '⭐'.repeat(g.stars)+'☆'.repeat(3-g.stars) : '';
+  const endHtml = g.finished ? `<div class="xo-status">🎉 خلصت في ${g.moves} حركة و ${g.elapsed} ثانية!<br><span style="font-size:20px">${stars}</span><br>النتيجة: ${g.score} • أعلى كومبو: x${g.bestCombo}</div><div class="hint" style="text-align:center;margin-bottom:8px;">${g.levelMsg}</div>` : '';
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لعبة الذاكرة</div>
     </div>
+    <div class="hint" style="text-align:center;margin:-4px 0 8px;">المستوى ${g.level+1} • ${L.name} • ${g.pairs} أزواج</div>
     <div class="memory-stats-row">
       <div class="xo-score-pill"><span>حركات</span><b>${g.moves}</b></div>
-      <div class="xo-score-pill draw"><span>أزواج</span><b>${g.matches}/8</b></div>
-      <div class="xo-score-pill o"><span>⏱️ الوقت</span><b id="memory-timer">${elapsedNow} ث</b></div>
+      <div class="xo-score-pill draw"><span>أزواج</span><b>${g.matches}/${g.pairs}</b></div>
+      <div class="xo-score-pill"><span>نقاط</span><b>${g.score}</b></div>
+      <div class="xo-score-pill o"><span>⏱️</span><b id="memory-timer">${elapsedNow} ث</b></div>
     </div>
-    ${g.finished ? `<div class="xo-status">🎉 خلصت في ${g.moves} حركة و ${g.elapsed} ثانية!</div>` : ''}
-    <div class="memory-grid">${cellsHtml}</div>
+    ${endHtml}
+    <div class="hint" style="text-align:center;min-height:20px;margin-bottom:6px;">${g.note||(g.finished?'':'الكروت الخضرا ✓ اتحلّت — الدهبي ✨ لسه مجهولة')}</div>
+    <div class="memory-grid" style="grid-template-columns:repeat(${g.cols},1fr);">${cellsHtml}</div>
     <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
-    <button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="memory-reset">🔄 لعبة جديدة</button>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button type="button" class="btn btn-outline" style="flex:1;" data-action="memory-hint" ${(g.finished||g.hints<=0)?'disabled':''}>💡 تلميح (${g.hints})</button>
+      <button type="button" class="btn btn-outline" style="flex:1;" data-action="memory-reset">${g.finished?'▶ الجولة الجاية':'🔄 لعبة جديدة'}</button>
+    </div>
   `;
 }
 
@@ -29348,6 +29411,7 @@ document.addEventListener('click', (e)=>{
   }
   else if(action==='memory-card'){ doMemoryFlip(parseInt(el.dataset.idx,10)); }
   else if(action==='memory-reset'){ initMemoryGame(); render(); }
+  else if(action==='memory-hint'){ doMemoryHint(); }
   else if(action==='rps-pick'){ doRpsPick(el.dataset.choice); }
   else if(action==='reflex-start'){ showReflexRulesModal(); }
   else if(action==='reflex-tap'){ doReflexTap(); }
