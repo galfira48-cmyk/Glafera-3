@@ -6738,6 +6738,28 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     background:linear-gradient(180deg, var(--surface), var(--surface-2)); border:1.5px solid var(--border); color:var(--text);}
   .numguess-key:not(:disabled):active{transform:scale(.93);}
   .numguess-key:disabled{opacity:.5;}
+  .ng-levels{display:flex; gap:8px; margin:6px 0 10px;}
+  .ng-level{flex:1; padding:10px 4px; border-radius:14px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px;
+    background:var(--surface); border:1.5px solid var(--border); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:2px;}
+  .ng-level small{font-size:10px; font-weight:600; color:var(--text-muted);}
+  .ng-level.active{border-color:var(--gold); background:linear-gradient(180deg, var(--surface-2), var(--surface)); box-shadow:0 0 0 2px rgba(255,200,60,.18);}
+  .ng-tries{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; color:var(--text-muted); font-weight:700;}
+  .ng-dots{display:flex; gap:6px; flex:1; justify-content:center;}
+  .ng-dots i{width:12px; height:12px; border-radius:50%; background:var(--gold); transition:all .3s;}
+  .ng-dots i.used{background:var(--surface-2); border:1.5px solid var(--border); transform:scale(.8);}
+  .ng-range-text{text-align:center; font-size:14px; margin-bottom:8px; color:var(--text);}
+  .ng-range-text b{color:var(--gold); font-size:18px;}
+  .ng-range{position:relative; height:10px; border-radius:6px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden;}
+  .ng-range-fill{position:absolute; top:0; bottom:0; border-radius:6px; background:linear-gradient(90deg,#4FACFE,#00F2FE); transition:left .4s ease, width .4s ease;}
+  .ng-range-ends{display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;}
+  .ng-hist{display:flex; flex-direction:column; gap:6px; margin-top:12px;}
+  .ng-hist-item{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:8px 12px; animation:ngIn .3s ease;}
+  .ng-hist-item.win{border-color:var(--gold);}
+  .ng-hist-item .ng-hv{font-weight:900; font-size:18px; min-width:38px; color:var(--gold);}
+  .ng-hist-item b{flex:1; font-size:14px;}
+  .ng-heat{font-size:12px; font-weight:800; padding:3px 8px; border-radius:10px; background:var(--surface-2);}
+  .ng-heat.h4{color:#ff5a3c;} .ng-heat.h3{color:#ff9f43;} .ng-heat.h2{color:#f1c40f;} .ng-heat.h1{color:#5dade2;}
+  @keyframes ngIn{from{opacity:0; transform:translateY(-6px);}to{opacity:1; transform:none;}}
 
   .reflex-zone{width:212px; height:212px; max-width:74vw; max-height:74vw;
     font-family:'Cairo',sans-serif; text-align:center;
@@ -14825,35 +14847,58 @@ function renderReflexLeaderboard(){
 }
 
 /* ============================= GAMES: NUMBER GUESS ============================= */
-function initNumberGame(){
-  const maxTries = 6; /* عدد التخمينات ثابت = 6 */
-  state.numguess = { target: 1+Math.floor(Math.random()*100), tries:0, maxTries, guesses:[], finished:false, won:false, guessVal:'' };
+const NUMGUESS_LEVELS = {
+  easy:   {label:'سهل',  icon:'🟢', max:50,  tries:6, mult:0.5},
+  normal: {label:'عادي', icon:'🟡', max:100, tries:6, mult:1},
+  hard:   {label:'صعب',  icon:'🔴', max:200, tries:7, mult:2}
+};
+function numGuessLevel(){ return NUMGUESS_LEVELS[state.numguessLevel] ? state.numguessLevel : 'normal'; }
+function numGuessReward(level){
+  const base = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessReward)||0;
+  return Math.round(base * NUMGUESS_LEVELS[level].mult);
 }
-async function saveNumberBestIfNeeded(tries){
+function numGuessBestKey(level){ return level==='normal' ? 'numberBest' : 'numberBest_'+level; }
+function initNumberGame(level){
+  if(level && NUMGUESS_LEVELS[level]) state.numguessLevel = level;
+  const lv = numGuessLevel(), cfg = NUMGUESS_LEVELS[lv];
+  state.numguess = { level:lv, max:cfg.max, target: 1+Math.floor(Math.random()*cfg.max), tries:0, maxTries:cfg.tries,
+    guesses:[], finished:false, won:false, guessVal:'', lo:1, hi:cfg.max };
+}
+async function saveNumberBestIfNeeded(tries, level){
   if(!state.pid) return;
   const st = myGameStats(state.pid);
-  if(!st.numberBest || tries < st.numberBest){
-    st.numberBest = tries;
+  const key = numGuessBestKey(level||'normal');
+  if(!st[key] || tries < st[key]){
+    st[key] = tries;
     await saveGameStats(GAME_STATS);
   }
+}
+function numGuessHeat(diff, max){
+  const r = diff / max;
+  if(r <= 0.03) return {icon:'🔥', txt:'سخن نار!', cls:'h4'};
+  if(r <= 0.10) return {icon:'♨️', txt:'سخن', cls:'h3'};
+  if(r <= 0.25) return {icon:'🌤️', txt:'فاتر', cls:'h2'};
+  return {icon:'🥶', txt:'بارد', cls:'h1'};
 }
 function doNumberGuess(){
   const g = state.numguess;
   if(!g || g.finished) return;
   const val = parseInt(g.guessVal,10);
-  if(isNaN(val) || val<1 || val>100) return;
+  if(isNaN(val)) return;
+  if(val<1 || val>g.max){ g.guessVal=''; toast('اكتب رقم من 1 لـ '+g.max, true); render(); return; }
+  if(val<g.lo || val>g.hi){ g.guessVal=''; toast('الرقم ده مستبعد! الرقم بين '+g.lo+' و '+g.hi, true); render(); return; }
   g.tries++;
   let hint;
   if(val===g.target){ hint='win'; g.finished=true; g.won=true; }
-  else if(val<g.target) hint='up';
-  else hint='down';
-  g.guesses.unshift({val, hint});
+  else if(val<g.target){ hint='up'; g.lo = Math.max(g.lo, val+1); }
+  else { hint='down'; g.hi = Math.min(g.hi, val-1); }
+  const heat = numGuessHeat(Math.abs(val-g.target), g.max);
+  g.guesses.unshift({val, hint, heat});
   g.guessVal = '';
   SND.click();
   if(hint==='win'){
-    saveNumberBestIfNeeded(g.tries);
-    const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessReward)||0;
-    awardSoloGamePoints(reward, 'مبروك! خمّنت الرقم صح');
+    saveNumberBestIfNeeded(g.tries, g.level);
+    awardSoloGamePoints(numGuessReward(g.level), 'مبروك! خمّنت الرقم صح');
   } else if(g.tries>=g.maxTries){
     g.finished = true; g.won = false;
   }
@@ -14864,40 +14909,69 @@ function numberKeyTap(k){
   if(!g || g.finished) return;
   if(k==='back') g.guessVal = g.guessVal.slice(0,-1);
   else if(k==='go') doNumberGuess();
-  else if(g.guessVal.length<3) g.guessVal += k;
+  else if(g.guessVal.length < String(g.max).length) g.guessVal += k;
   render();
 }
+/* دعم الكيبورد على الكمبيوتر */
+document.addEventListener('keydown', function(e){
+  if(state.view!=='game-numguess') return;
+  const t = e.target && e.target.tagName;
+  if(t==='INPUT' || t==='TEXTAREA' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if(/^[0-9]$/.test(e.key)) numberKeyTap(e.key);
+  else if(e.key==='Backspace') numberKeyTap('back');
+  else if(e.key==='Enter') numberKeyTap('go');
+});
 function renderNumberGame(){
   if(!state.numguess) initNumberGame();
   const g = state.numguess;
-  const maxTries = g.maxTries || 6;
-  const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloNumGuessReward)||0;
+  const cfg = NUMGUESS_LEVELS[g.level];
+  const maxTries = g.maxTries;
+  const reward = numGuessReward(g.level);
   const stats = state.pid ? myGameStats(state.pid) : {};
-  const bestLine = stats.numberBest ? `أفضل نتيجة لك: ${stats.numberBest} محاولة` : `خمّن الرقم من ${maxTries} محاولات بس واكسب ${reward} نقطة 🏅`;
-  const historyHtml = g.guesses.slice(0,6).map(x=>{
-    const icon = x.hint==='win' ? '🎯 صح!' : x.hint==='up' ? '⬆️ أكبر' : '⬇️ أصغر';
-    return `<div class="xo-score-pill"><span>${x.val}</span><b>${icon}</b></div>`;
+  const best = stats[numGuessBestKey(g.level)];
+  const bestLine = best ? `أفضل نتيجة لك (${cfg.label}): ${best} محاولة` : `خمّن الرقم في ${maxTries} محاولات بس واكسب ${reward} نقطة 🏅`;
+  const historyHtml = g.guesses.map(x=>{
+    const dir = x.hint==='win' ? '🎯 صح!' : x.hint==='up' ? '⬆️ أكبر' : '⬇️ أصغر';
+    const heat = x.hint==='win' ? '' : `<small class="ng-heat ${x.heat.cls}">${x.heat.icon} ${x.heat.txt}</small>`;
+    return `<div class="ng-hist-item ${x.hint==='win'?'win':''}"><span class="ng-hv">${x.val}</span><b>${dir}</b>${heat}</div>`;
   }).join('');
   const remaining = Math.max(0, maxTries - g.tries);
+  const dots = Array.from({length:maxTries}, (_,i)=> `<i class="${i<g.tries?'used':''}"></i>`).join('');
   let statusHtml;
-  if(g.finished && g.won) statusHtml = `<div class="xo-status">🎉 عرفت الرقم في ${g.tries} محاولة! +${reward} نقطة</div>`;
-  else if(g.finished && !g.won) statusHtml = `<div class="xo-status">😢 خلصت محاولاتك الـ${maxTries}، الرقم كان ${g.target}</div>`;
-  else statusHtml = `<div class="hint" style="text-align:center;margin-bottom:6px;">محاولاتك المتبقية: ${remaining} من ${maxTries}</div>`;
+  if(g.finished && g.won){
+    const stars = g.tries <= Math.ceil(maxTries/3) ? 3 : g.tries <= Math.ceil(maxTries*2/3) ? 2 : 1;
+    statusHtml = `<div class="xo-status">🎉 عرفت الرقم في ${g.tries} محاولة! +${reward} نقطة<br><span style="font-size:22px;">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</span></div>`;
+  } else if(g.finished && !g.won){
+    statusHtml = `<div class="xo-status">😢 خلصت محاولاتك الـ${maxTries}، الرقم كان ${g.target}</div>`;
+  } else {
+    statusHtml = `<div class="ng-range-text">الرقم بين <b>${g.lo}</b> و <b>${g.hi}</b></div>`;
+  }
+  const left = ((g.lo-1)/g.max*100).toFixed(2), width = ((g.hi-g.lo+1)/g.max*100).toFixed(2);
+  const rangeBar = `<div class="ng-range" dir="ltr"><div class="ng-range-fill" style="left:${left}%;width:${width}%;"></div></div>
+    <div class="ng-range-ends" dir="ltr"><span>1</span><span>${g.max}</span></div>`;
+  const levelPicker = (g.tries===0 && !g.finished) ? `<div class="ng-levels">${
+    Object.keys(NUMGUESS_LEVELS).map(k=>{
+      const c = NUMGUESS_LEVELS[k];
+      return `<button type="button" class="ng-level ${k===g.level?'active':''}" data-action="numguess-level" data-level="${k}">${c.icon} ${c.label}<small>1–${c.max} · ${c.tries} محاولات</small></button>`;
+    }).join('')}</div>` : '';
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">تخمين الرقم</div>
     </div>
-    <div class="hint" style="text-align:center;margin:4px 0 10px;">فكرنا في رقم من 1 لـ 100 — قدامك ${maxTries} محاولات بس!</div>
+    ${levelPicker}
+    <div class="hint" style="text-align:center;margin:4px 0 6px;">فكرنا في رقم من 1 لـ ${g.max} — قدامك ${maxTries} محاولات بس!</div>
+    <div class="ng-tries"><span>المحاولات</span><div class="ng-dots">${dots}</div><span>${remaining} متبقي</span></div>
     <div class="numguess-display">${g.finished ? (g.won ? '🎉 '+g.target : '😅 '+g.target) : (g.guessVal || '؟')}</div>
     ${statusHtml}
-    <div class="numguess-keypad">
+    ${rangeBar}
+    <div class="numguess-keypad" style="margin-top:12px;">
       ${['1','2','3','4','5','6','7','8','9','⌫','0','دخول'].map(k=>{
         const action = k==='⌫' ? 'back' : k==='دخول' ? 'go' : k;
         return `<button type="button" class="numguess-key" data-action="numguess-key" data-key="${action}" ${g.finished?'disabled':''}>${k}</button>`;
       }).join('')}
     </div>
-    ${historyHtml ? `<div class="memory-stats-row" style="margin-top:12px;flex-wrap:wrap;">${historyHtml}</div>` : ''}
+    ${historyHtml ? `<div class="ng-hist">${historyHtml}</div>` : ''}
     <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
     <button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="numguess-reset">🔄 لعبة جديدة</button>
   `;
@@ -29312,6 +29386,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='snl-reset'){ doSnlReset(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
+  else if(action==='numguess-level'){ initNumberGame(el.dataset.level); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
   else if(action==='math-reset'){ initMathGame(); render(); }
   else if(action==='uno-play'){ doUnoPlay(el.dataset.cid); }
