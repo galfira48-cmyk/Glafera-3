@@ -13898,19 +13898,29 @@ document.addEventListener('keydown', (e)=>{
 /* ============================= GAMES: FRIENDS LEADERBOARD (ترتيب وتصنيف الأصدقاء) ============================= */
 function isFriendModeLockedForMe(){ return !!(CONF_SETTINGS.friendModeLocked) && state.pid!==GAMES_LOCK_REVIEWER_ID; }
 /* ===== كارت مركز الألعاب الذكي: بيتغير حسب حالة اللاعب ===== */
+const GX_W = {ready:false, at:0, busy:false};
+function gxRefreshWallet(pid){ /* بيجيب رصيد الفيزا لما تفتح مركز الألعاب من غير ما تدخل الفيزا */
+  if(GX_W.busy || (GX_W.ready && Date.now()-GX_W.at<20000)) return;
+  GX_W.busy = true;
+  loadWallet().then(w=>{
+    const before = WALLET[pid], first = !GX_W.ready; WALLET = w || {}; GX_W.ready = true; GX_W.at = Date.now(); GX_W.busy = false;
+    if(first || before!==WALLET[pid]){ try{ if(document.querySelector('.gx-stats')) render(); }catch(e){} }
+  }).catch(()=>{ GX_W.busy = false; GX_W.ready = true; });
+}
 function gxSmartHero(liveCount){
   const pid=state.pid, me=PARTICIPANTS.find(x=>x.id===pid)||{};
   const first=escapeHtml(String(me.name||'').trim().split(/\s+/)[0]||'');
   const h=new Date().getHours();
   const hi=h<5?'سهران ليه؟':h<12?'صباح الخير':h<18?'نهارك سعيد':'مساء الخير';
   const canVisa=hasVisa(pid), made=canVisa&&visaCreated(pid), expired=made&&visaExpired(pid);
+  gxRefreshWallet(pid); const wReady=GX_W.ready;
   const bal=WALLET[pid]||0, min=visaMin();
   let rows=[]; try{ rows=gsRows(); }catch(e){}
   const idx=rows.findIndex(x=>x.p.id===pid), mine=idx>=0?rows[idx]:null, ahead=idx>0?rows[idx-1]:null;
   let ic,t,sub,cta,act,tone='';
   if(canVisa&&!made){ ic='💳'; t='فعّل فيزتك الأول'; sub='من غيرها مش هتقدر تلعب ولا تدخل الغرف'; cta='إنشاء الفيزا'; act='open-visa'; tone='warn'; }
   else if(expired){ ic='⏳'; t='فيزتك انتهت'; sub='جدّدها وارجع للعب'; cta='تجديد الفيزا'; act='open-visa'; tone='warn'; }
-  else if(canVisa&&bal<=0){ ic='🪫'; t='رصيدك فاضي'; sub='أودع من نقاطك في الفيزا وابدأ العب'; cta='إيداع'; act='open-visa'; tone='warn'; }
+  else if(canVisa&&wReady&&bal<=0){ ic='🪫'; t='رصيدك فاضي'; sub='أودع من نقاطك في الفيزا وابدأ العب'; cta='إيداع'; act='open-visa'; tone='warn'; }
   else if(liveCount){ ic='🔴'; t=liveCount+(liveCount===1?' مباراة':' مباريات')+' لايف دلوقتي'; sub='اتفرج على أصحابك وشجّعهم'; cta='مشاهدة'; act='open-watch'; tone='live'; }
   else if(ahead&&mine){ const gap=Math.max(1,ahead.pts-mine.pts+1), nm=escapeHtml(String(ahead.p.name||'').trim().split(/\s+/)[0]);
     ic='🎯'; t='باقيلك '+gap+' نقطة وتتخطى '+nm; sub='ترتيبك دلوقتي #'+mine.rank+' — كل فوز بيقرّبك'; cta='العب ضد الجهاز'; act='open-solo'; }
@@ -13924,7 +13934,7 @@ function gxSmartHero(liveCount){
     <div class="gxs-card ${tone}"><span class="gxs-ic">${ic}</span><div class="gxs-tx"><b>${t}</b><span>${sub}</span></div></div>
     ${bar}
     <div class="gxs-act"><button type="button" class="gxs-cta" data-action="${act}">${cta}</button><button type="button" class="gxs-sec" data-action="open-rooms">🧑‍🤝‍🧑 غرفة مع صديق</button></div>
-    <div class="gx-stats">${stat(mine?'#'+mine.rank:'—','ترتيبك','open-gs')}${stat(liveCount,'غرفة لايف','open-watch')}${made?stat(bal,'رصيد الفيزا','open-visa'):stat(enabledGamesCatalog().length,'لعبة متاحة','open-solo')}</div>
+    <div class="gx-stats">${stat(mine?'#'+mine.rank:'—','ترتيبك','open-gs')}${stat(liveCount,'غرفة لايف','open-watch')}${made?stat(wReady?bal:'…','رصيد الفيزا','open-visa'):stat(enabledGamesCatalog().length,'لعبة متاحة','open-solo')}</div>
   </div>`;
 }
 
@@ -39701,21 +39711,12 @@ window.openRevWordGame=open;
 
 
 <style id="mx-compact-css">
-/* ===== صفحة ملفي: نسخة مضغوطة (تابات بدل صفحة طويلة) ===== */
-.me-cover{height:46px}
-.me-ring{width:88px;height:88px;margin:-44px auto 6px}
-.me-ring .me-av{inset:8px}
-.me-ring-tier{width:28px;height:28px;font-size:15px}
-.me-card{padding:0 14px 12px;margin:6px 0 10px}
-.me-name{font-size:18px}
-.me-chips{margin-top:6px;gap:6px}
-.me-chip{padding:3px 10px;font-size:11.5px}
+/* ===== صفحة ملفي: تابات — كارت الصورة والبيانات بحجمه الطولي الكامل ===== */
 .me-chip.add{border-style:dashed;background:transparent;cursor:pointer;font-family:inherit;color:var(--text-muted,inherit);opacity:.9}
 .me-chip.tel{text-decoration:none;color:inherit}
 .me-chip.bday{border-color:rgba(244,183,64,.55);background:rgba(244,183,64,.14)}
 .me-chip.gold.bday{animation:glxPulse 1.8s ease-in-out infinite}
 
-.me-edit-btn{margin:8px auto 0;padding:6px 16px;font-size:12px}
 .me-stats{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
 .me-stat{padding:9px 4px 8px;border-radius:16px}
 .me-stat .ico{display:none}
