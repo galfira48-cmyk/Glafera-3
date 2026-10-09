@@ -7362,6 +7362,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   #app.is-admin .cls-gm select.cls-move, #app.is-admin .cls-member select.cls-move{ width:auto; min-width:0; max-width:42%; height:auto; padding:5px 8px; font-size:11px; border-radius:9px; margin:0; margin-inline-start:auto; }
   #app.is-admin .cls-gm{ flex-wrap:nowrap; } .cls-gm .cls-gs-n{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #app.is-admin .cls-grp-ctl-btns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; } .cls-grp-ctl-btns .btn{ flex:1 1 140px; margin:0; }
+
+  .sv-card{ margin-bottom:10px; } .sv-top{ display:flex; align-items:center; gap:10px; } .sv-nm{ flex:1; min-width:0; display:flex; flex-direction:column; } .sv-nm b{ font-size:14px; } .sv-nm small{ color:var(--text-muted); font-size:11px; }
+  .sv-line{ font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.6; } .sv-acts{ display:flex; align-items:center; gap:8px; margin-top:10px; }
+  .sv-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; } .sv-chip{ padding:8px 14px; border-radius:99px; background:var(--bg-2); border:1px solid var(--border); color:var(--text); font:600 12.5px inherit; font-family:inherit; cursor:pointer; } .sv-chip.on{ background:var(--bg); color:var(--gold-2); border-color:var(--gold-2); }
 </style>
 <style id="su-plus-css">
 /* ===== تحسينات فورم إنشاء الحساب (su-plus v2) — من غير اهتزاز، بصوت هادي بدله ===== */
@@ -25908,7 +25912,7 @@ async function clsLoad(force){
   try{ CLS.care = clsParse(await window.storage.get(CLS_CARE_KEY, true)) || {}; }catch(e){ CLS.care = {}; }
   clsApplyMeta(); CLS.loaded = true; CLS.loading = false;
 }
-function clsEnsure(){ if(!CLS.loaded && !CLS.loading) clsLoad().then(()=>{ try{ render(); }catch(e){} }); }
+function clsEnsure(){ try{ svEnsure(); }catch(e){} if(!CLS.loaded && !CLS.loading) clsLoad().then(()=>{ try{ render(); }catch(e){} }); }
 async function clsSave(){ try{ await window.storage.set(CLS_KEY, JSON.stringify({meta:CLS.meta, log:CLS.log.slice(0,40), lastPromo:CLS.lastPromo, greeted:CLS.greeted, groups:CLS.groups}), true); }catch(e){} }
 async function clsSaveCare(pid, rec){
   let o = {}; try{ o = clsParse(await window.storage.get(CLS_CARE_KEY, true)) || {}; }catch(e){}
@@ -26324,6 +26328,7 @@ function clsServantsHtml(k){
   const one = (role, name, phone)=>`<span class="cls-sv"><b>${role}</b> ${escapeHtml(name)}${phone?` <a href="tel:${escapeHtml(phone)}" aria-label="اتصال">📞</a><a href="${escapeHtml(clsWa(phone,''))}" target="_blank" rel="noopener" aria-label="واتساب">💬</a>`:''}</span>`;
   if(m.leaderName) chips.push(one('الأمين', m.leaderName, m.leaderPhone));
   String(m.servants||'').split('\n').map(s=>s.trim()).filter(Boolean).forEach(line=>{ const [n,...r] = line.split(/\s*[-–—]\s*/); chips.push(one('خادم', n, r.join('').trim())); });
+  try{ SV.list.filter(x=>x.cls===k).forEach(x=>chips.push(one(x.role||'خادم', x.name, x.phone))); }catch(e){}
   return chips.length ? `<div class="card cls-svs">${chips.join('')}</div>` : '';
 }
 function renderAdminClassDetail(S, k){
@@ -26613,6 +26618,134 @@ async function clsAction(a, el){
   }
 }
 
+/* ============================= ADMIN: الخدام ============================= */
+const SV_KEY = 'glavera-servants-v1';
+let SV = {loaded:false, loading:false, list:[]};
+async function svLoad(force){
+  if(SV.loading || (SV.loaded && !force)) return;
+  SV.loading = true;
+  try{ const r = await window.storage.get(SV_KEY, true); const o = clsParse(r); SV.list = Array.isArray(o) ? o : []; }catch(e){ SV.list = []; }
+  SV.loaded = true; SV.loading = false;
+}
+function svEnsure(){ if(!SV.loaded && !SV.loading) svLoad().then(()=>{ try{ render(); }catch(e){} }); }
+async function svSave(){ try{ await window.storage.set(SV_KEY, JSON.stringify(SV.list), true); return true; }catch(e){ return false; } }
+function svClassLabel(k){ return k ? clsDef(k).label : 'بدون فصل'; }
+function svOf(k){ return SV.list.filter(s=>(s.cls||'')===k); }
+function svAddrSuggest(){
+  const cnt = {};
+  const add = a=>{ a = String(a||'').trim(); if(a.length>=2 && a.length<=30) cnt[a] = (cnt[a]||0)+1; };
+  CUSTOM_PARTICIPANTS.forEach(c=>add(c.address)); SV.list.forEach(s=>add(s.address));
+  return Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]).slice(0,8);
+}
+function svAvatar(s, sz){
+  return `<div class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz/3.2)}px;${s.photo?`background-image:url('${s.photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${s.photo?'':initials(s.name||'؟')}</div>`;
+}
+function renderAdminServantsTab(){
+  svEnsure();
+  if(state.svEdit) return renderSvForm();
+  const S = clsStats();
+  const f = state.svF || 'all';
+  const noCls = SV.list.filter(s=>!s.cls).length;
+  const bdN = SV.list.filter(s=>{ const d = clsBdayIn(s.birth); return d!==null && d<=7; }).length;
+  let list = SV.list.slice();
+  if(f==='none') list = list.filter(s=>!s.cls); else if(f!=='all') list = list.filter(s=>s.cls===f);
+  list.sort((a,b)=>String(a.name).localeCompare(String(b.name),'ar'));
+  const chips = [{k:'all',l:'الكل ('+SV.list.length+')'},{k:'none',l:'بدون فصل ('+noCls+')'}].concat(['1','2','3','4','grad'].map(k=>({k, l:clsDef(k).icon+' '+clsDef(k).short+' ('+svOf(k).length+')'})));
+  /* تغطية الفصول: خادم لكل كام مخدوم */
+  const cover = ['1','2','3','4','grad'].filter(k=>S.byClass[k].n>0 || svOf(k).length>0).map(k=>{
+    const n = S.byClass[k].n, sv = svOf(k).length, ratio = sv ? Math.ceil(n/sv) : null;
+    const flag = !sv ? '<span class="cls-tag ab">⚠️ من غير خادم</span>' : (ratio>10 ? '<span class="cls-tag rk">محتاج خدام</span>' : '<span class="cls-tag up">✓ تمام</span>');
+    return `<div class="cls-promo-row"><span>${clsDef(k).icon} ${clsDef(k).label}</span><span class="hint" style="margin:0">${n} مخدوم · ${sv} خادم${sv?` (1 لكل ${ratio})`:''}</span>${flag}</div>`;
+  }).join('');
+  const cards = list.map(s=>{
+    const bd = clsBdayIn(s.birth), age = clsAge(s.birth);
+    const call = s.phone ? `<a class="cls-act" href="tel:${escapeHtml(s.phone)}" aria-label="اتصال">📞</a><a class="cls-act" href="${escapeHtml(clsWa(s.phone,''))}" target="_blank" rel="noopener" aria-label="واتساب">💬</a>` : '';
+    return `<div class="card sv-card" data-search="${escapeHtml(attNormAr(s.name+' '+(s.phone||'')+' '+(s.role||'')+' '+svClassLabel(s.cls)))}">
+      <div class="sv-top">${svAvatar(s,48)}<div class="sv-nm"><b>${escapeHtml(s.name)}</b><small>${escapeHtml(s.role||'خادم')}${age!=null?' · '+age+' سنة':''}${s.job?' · '+escapeHtml(s.job):''}</small></div>
+        <span class="cls-gs-c" style="--c:${s.cls?clsDef(s.cls).color:'#8A8A9A'}">${s.cls?clsDef(s.cls).icon+' '+clsDef(s.cls).short:'بدون فصل'}</span></div>
+      ${bd!==null && bd<=7 ? `<div class="cls-tag bd" style="display:inline-block;margin:8px 0 0">🎂 ${bd===0?'عيد ميلاده النهارده':'عيد ميلاده بعد '+bd+' يوم'}</div>` : ''}
+      ${s.address?`<div class="sv-line">📍 ${escapeHtml(s.address)}</div>`:''}
+      ${s.notes?`<div class="sv-line">📝 ${escapeHtml(s.notes)}</div>`:''}
+      <div class="sv-acts">${call}<button type="button" class="btn btn-outline" style="margin:0;flex:1;padding:8px;" data-action="sv-edit" data-id="${escapeHtml(s.id)}">✏️ تعديل</button></div></div>`;
+  }).join('');
+  return `
+    ${adminKpis([{num:SV.list.length, lab:'خادم'},{num:noCls, lab:'بدون فصل'},{num:bdN, lab:'أعياد ميلاد قريبة'}])}
+    <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:12px;" data-action="sv-add">➕ إضافة خادم</button>
+    ${cover ? adminCollapse('sv-cover','🏫','تغطية الفصول','خادم لكل كام مخدوم',cover,!SV.list.length?false:true) : ''}
+    <div class="admin-tabs">${chips.map(c=>`<button type="button" class="admin-tab ${f===c.k?'active':''}" data-action="sv-filter" data-v="${c.k}">${c.l}</button>`).join('')}</div>
+    <input type="text" class="field admin-search-input" data-filter-target=".sv-card" placeholder="🔍 دوّر بالاسم أو الرقم أو الدور..." style="margin-bottom:10px;" />
+    ${list.length ? cards : adminEmptyState('🙏', SV.list.length?'مفيش خدام في الفلتر ده':'لسه ما ضفتش خدام', 'اضغط "إضافة خادم" وسجّل بياناتهم وفصلهم')}
+    ${SV.list.length ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:6px;" data-action="sv-export">📊 تصدير الخدام Excel</button>` : ''}`;
+}
+function renderSvForm(){
+  const isNew = state.svEdit==='new';
+  const s = isNew ? {cls:'', joined:new Date().toISOString().slice(0,10)} : (SV.list.find(x=>x.id===state.svEdit) || {cls:'', joined:''});
+  const photo = state.svPhotoTmp || s.photo || '';
+  const addrs = svAddrSuggest();
+  const clsChips = [{k:'',l:'بدون فصل'}].concat(['1','2','3','4','grad'].map(k=>({k,l:clsDef(k).icon+' '+clsDef(k).label})));
+  return `
+    <button type="button" class="admin-back-link" data-action="sv-cancel">${ICO.back} كل الخدام</button>
+    <div class="card">
+      <div class="admin-session-name" style="margin-bottom:10px;">${isNew?'➕ إضافة خادم':'✏️ تعديل خادم'}</div>
+      <div style="display:flex;align-items:center;gap:10px;"><div id="sv-prev" class="avatar" style="width:60px;height:60px;${photo?`background-image:url('${photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${photo?'':'؟'}</div><input type="file" id="sv-photo" accept="image/*" style="font-size:11px;flex:1;"/></div>
+      <label>الاسم بالكامل</label><input class="field" id="sv-name" placeholder="اسم الخادم" value="${escapeHtml(s.name||'')}"/>
+      <label>رقم الهاتف / واتساب</label><input class="field" id="sv-phone" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx" value="${escapeHtml(s.phone||'')}"/>
+      <label>تاريخ الميلاد</label><input class="field" id="sv-birth" type="date" value="${escapeHtml(s.birth||'')}" max="${new Date().toISOString().slice(0,10)}"/>
+      <label>الدور / المسؤولية</label><input class="field" id="sv-role" placeholder="مثال: مسؤول ميديا، خادم فصل، تسبحة..." value="${escapeHtml(s.role||'')}"/>
+      <label>المؤهل / الوظيفة</label><input class="field" id="sv-job" placeholder="مثال: مهندس، طبيب، معلم..." value="${escapeHtml(s.job||'')}"/>
+      <label>البريد الإلكتروني</label><input class="field" id="sv-email" type="email" dir="ltr" placeholder="example@email.com" value="${escapeHtml(s.email||'')}"/>
+      <label>العنوان</label><input class="field" id="sv-address" placeholder="اكتب العنوان يدويًا أو اختر من الاقتراحات" value="${escapeHtml(s.address||'')}"/>
+      ${addrs.length?`<div class="sv-chips">${addrs.map(a=>`<button type="button" class="sv-chip" data-sv-addr="${escapeHtml(a)}">${escapeHtml(a)}</button>`).join('')}</div>`:''}
+      <label>الفصل المسؤول عنه</label>
+      <div class="sv-chips" id="sv-cls">${clsChips.map(c=>`<button type="button" class="sv-chip ${(s.cls||'')===c.k?'on':''}" data-sv-cls="${c.k}">${c.l}</button>`).join('')}</div>
+      <label>تاريخ الالتحاق بالخدمة</label><input class="field" id="sv-joined" type="date" value="${escapeHtml(s.joined||'')}"/>
+      <label>ملاحظات</label><textarea class="field" id="sv-notes" rows="3" placeholder="ملاحظات إضافية" style="resize:vertical;">${escapeHtml(s.notes||'')}</textarea>
+      <div class="admin-edit-actions" style="margin-top:14px;"><button type="button" class="btn btn-primary" style="flex:1;" data-action="sv-save">حفظ</button><button type="button" class="btn btn-ghost" style="flex:1;" data-action="sv-cancel">إلغاء</button></div>
+      ${isNew?'':`<button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px;color:var(--danger);" data-action="sv-del" data-id="${escapeHtml(s.id)}">🗑️ حذف الخادم</button>`}
+    </div>`;
+}
+async function svAction(a, el){
+  const d = el.dataset || {};
+  if(a==='sv-add'){ state.svEdit='new'; state.svPhotoTmp=''; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(a==='sv-edit'){ state.svEdit=d.id; state.svPhotoTmp=''; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(a==='sv-cancel'){ state.svEdit=null; state.svPhotoTmp=''; render(); }
+  else if(a==='sv-filter'){ state.svF=d.v; render(); }
+  else if(a==='sv-save'){
+    const g = id=>{ const e = document.getElementById('sv-'+id); return e ? e.value.trim() : ''; };
+    const name = g('name'); if(!name){ showToast('اكتب اسم الخادم', true); return; }
+    const phone = normalizePhone(g('phone')) || g('phone');
+    const on = document.querySelector('#sv-cls .sv-chip.on'); const cls = on ? on.dataset.svCls : '';
+    const isNew = state.svEdit==='new';
+    if(phone && SV.list.some(x=>x.phone===phone && x.id!==state.svEdit) && !confirm('الرقم ده متسجل لخادم تاني. تكمّل؟')) return;
+    const old = isNew ? null : SV.list.find(x=>x.id===state.svEdit);
+    const rec = Object.assign({}, old||{}, {id: old ? old.id : 's'+Date.now(), name, phone, birth:g('birth'), role:g('role'), job:g('job'), email:g('email'), address:g('address'), cls, joined:g('joined'), notes:g('notes'), photo: state.svPhotoTmp || (old&&old.photo) || ''});
+    if(old) SV.list[SV.list.indexOf(old)] = rec; else SV.list.push(rec);
+    if(!(await svSave())){ showToast('معرفتش أحفظ', true); return; }
+    state.svEdit=null; state.svPhotoTmp=''; showToast(isNew?'اتضاف الخادم':'اتحفظت التعديلات'); render(); try{ window.scrollTo(0,0); }catch(e){}
+  }
+  else if(a==='sv-del'){
+    const s = SV.list.find(x=>x.id===d.id); if(!s || !confirm('تحذف '+s.name+'؟')) return;
+    SV.list = SV.list.filter(x=>x.id!==d.id); await svSave(); state.svEdit=null; showToast('اتحذف'); render();
+  }
+  else if(a==='sv-export'){
+    if(typeof XLSX==='undefined'){ showToast('تعذّر تجهيز ملف Excel', true); return; }
+    const rows = SV.list.map(s=>({'الاسم':s.name,'الهاتف':s.phone||'','تاريخ الميلاد':s.birth||'','الدور':s.role||'','المؤهل / الوظيفة':s.job||'','البريد':s.email||'','العنوان':s.address||'','الفصل':svClassLabel(s.cls),'تاريخ الالتحاق':s.joined||'','ملاحظات':s.notes||''}));
+    const ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'الخدام');
+    XLSX.writeFile(wb, `servants-${new Date().toISOString().slice(0,10)}.xlsx`); showToast('اتحمّل ملف الخدام');
+  }
+}
+document.addEventListener('click', (e)=>{
+  const c = e.target.closest && e.target.closest('[data-sv-cls],[data-sv-addr]'); if(!c) return;
+  if(c.dataset.svCls!==undefined){ c.parentNode.querySelectorAll('[data-sv-cls]').forEach(x=>x.classList.toggle('on', x===c)); }
+  else { const i = document.getElementById('sv-address'); if(i) i.value = c.dataset.svAddr; c.parentNode.querySelectorAll('[data-sv-addr]').forEach(x=>x.classList.toggle('on', x===c)); }
+});
+document.addEventListener('change', async (e)=>{
+  const t = e.target; if(!t || t.id!=='sv-photo') return;
+  const url = await readImageFileToDataUrl(t, 180); if(!url){ showToast('الصورة مش مقروءة', true); return; }
+  state.svPhotoTmp = url; const p = document.getElementById('sv-prev');
+  if(p){ p.style.backgroundImage = `url('${url}')`; p.style.backgroundSize='cover'; p.style.backgroundPosition='center'; p.textContent=''; }
+});
+
 const ADMIN_HUB_GROUPS = [
   {id:'live',    icon:'🔴', title:'التشغيل المباشر',      accent:'var(--coral)'},
   {id:'people',  icon:'👥', title:'المشاركون والتسجيل',   accent:'var(--teal)'},
@@ -26630,6 +26763,7 @@ const ADMIN_HUB_ITEMS = [
 
   {group:'people', tab:'participants', short:"الأسماء والأكواد والبيانات", desc:"إضافة وتعديل المشاركين وأكواد الدخول والتصدير", icon:'👤', label:'المشاركين', color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
   {group:'people', tab:'reg', short:"إنشاء الحساب وكارت الدخول", desc:"فتح/قفل إنشاء الحساب، فورم التسجيل، العناوين، إحصائيات وأمان التسجيل، كارت الدخول، التصدير", icon:'📝', label:'التسجيل والدخول', color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'people', tab:'servants', short:"بيانات الخدام وفصولهم", desc:"إضافة وتعديل الخدام (الاسم والدور والفصل المسؤول عنه) وتغطية كل فصل بالخدام", icon:'🙏', label:'الخدام', color:'linear-gradient(145deg,#F4B740,#FF7A59)'},
   {group:'people', tab:'classes', short:"الفرق ومين فيها", desc:"الفرقة الأولى والتانية والتالتة والرابعة والخريجين، ومين المخدومين في كل فصل وحضورهم ونقاطهم", icon:'🏫', label:'الفصول', color:'linear-gradient(145deg,#5FE0A4,#845EC2)'},
   {group:'people', tab:'structure', short:"الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
   {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين", icon:'💬', label:'آراء المشاركين', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
@@ -26727,6 +26861,7 @@ function adminInDetailView(){
     || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
     || (t==='opinions' && state.viewingOpinionId)
     || (t==='classes' && state.clsSel)
+    || (t==='servants' && state.svEdit)
     || (t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype'));
 }
 function adminPendingBadge(tab){
@@ -26773,6 +26908,7 @@ function renderAdmin(){
   else if(tab==='quizq') body = renderAdminQuizQuestionsTab();
   else if(tab==='structure') body = renderAdminStructureTab();
   else if(tab==='classes') body = renderAdminClassesTab();
+  else if(tab==='servants') body = renderAdminServantsTab();
   else if(window.FXADMIN && window.FXADMIN[tab]) body = window.FXADMIN[tab]();
   else if(tab==='attendance'){ body = renderAdminAttendanceTab(); if(!state.attNav || (!state.attNav.type && state.attNav.page!=='addtype')) body += adminSettingsGroup('attscan'); }
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
@@ -26797,6 +26933,8 @@ function renderAdmin(){
     else if(an && an.type && ATT_TYPES[an.type]){
       pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
     }
+  } else if(tab==='servants'){
+    if(state.svEdit) pageTitle = state.svEdit==='new' ? 'إضافة خادم' : ((SV.list.find(x=>x.id===state.svEdit)||{}).name || 'تعديل خادم');
   } else if(tab==='classes'){
     if(state.clsSel) pageTitle = 'الفصول — '+clsDef(state.clsSel).label;
   } else if(tab==='opinions'){
@@ -30086,6 +30224,7 @@ document.addEventListener('click', (e)=>{
     else if(t==='participants' && state.addingParticipant){ state.addingParticipant = false; }
     else if(t==='participants' && state.editingParticipantId){ state.editingParticipantId = null; }
     else if(t==='classes' && state.clsSel){ state.clsSel = null; }
+    else if(t==='servants' && state.svEdit){ state.svEdit = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
     else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = 'home'; }
     else if(t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype')){ state.attNav = {type:null, page:'home'}; }
@@ -30093,10 +30232,11 @@ document.addEventListener('click', (e)=>{
     render(); try{ window.scrollTo(0,0); }catch(e){}
   }
   else if(typeof action==='string' && action.indexOf('cls-')===0){ clsAction(action, el); }
+  else if(typeof action==='string' && action.indexOf('sv-')===0){ svAction(action, el); }
   else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
   else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
-  else if(action==='admin-hub-tile'){ state.clsSel = null; state.editingParticipantId = null; state.addingParticipant = false; state.attNav = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='admin-hub-tile'){ state.clsSel = null; state.svEdit = null; state.editingParticipantId = null; state.addingParticipant = false; state.attNav = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
