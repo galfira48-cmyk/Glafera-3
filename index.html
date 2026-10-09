@@ -11471,6 +11471,29 @@ function meAvatarHtml(p,cls){
   const st = p.photo ? `background-image:url('${p.photo}');` : `background:${AVATAR_COLOR};`;
   return `<div class="${cls}" style="${st}">${p.photo?'':escapeHtml(initials(p.name))}</div>`;
 }
+/* بطاقة الملف الذكية: عيد الميلاد (عدّ تنازلي/تهنئة/سن) + رقم قابل للاتصال + تنبيه للبيانات الناقصة */
+function meSmartChips(p){
+  const e=myExtra(p.id), cp=cpOf(p.id)||{}, bd=e.birth||cp.birth, ph=e.phone||cp.phone;
+  const ar=n=>Number(n).toLocaleString('ar-EG');
+  let out='';
+  const d0=bd?new Date(bd+'T00:00:00'):null;
+  if(d0 && !isNaN(d0)){
+    const now=new Date(); now.setHours(0,0,0,0);
+    let nx=new Date(now.getFullYear(),d0.getMonth(),d0.getDate());
+    if(nx<now) nx=new Date(now.getFullYear()+1,d0.getMonth(),d0.getDate());
+    const days=Math.round((nx-now)/864e5), hasYear=d0.getFullYear()>1920;
+    const age=hasYear?(nx.getFullYear()-d0.getFullYear()-(days===0?0:1)+(days===0?0:0)):0;
+    const dm=d0.toLocaleDateString('ar-EG',{day:'numeric',month:'long'});
+    if(days===0) out+=`<span class="me-chip gold bday">🎉 النهاردة عيد ميلادك${hasYear?' — '+ar(nx.getFullYear()-d0.getFullYear())+' سنة':''}!</span>`;
+    else if(days<=30) out+=`<span class="me-chip bday">🎂 ${escapeHtml(dm)} · بعد ${days===1?'يوم':ar(days)+(days<=10?' أيام':' يوم')}</span>`;
+    else out+=`<span class="me-chip">🎂 ${escapeHtml(dm)}${hasYear?' · '+ar(nx.getFullYear()-d0.getFullYear()-1)+' سنة':''}</span>`;
+  } else {
+    out+=`<button type="button" class="me-chip add" data-action="edit-my-profile">🎂 ضيف عيد ميلادك</button>`;
+  }
+  if(ph){ const tel=String(ph).replace(/[^\d+]/g,''); out+=`<a class="me-chip tel" dir="ltr" href="tel:${escapeHtml(tel)}">📞 ${escapeHtml(ph)}</a>`; }
+  else out+=`<button type="button" class="me-chip add" data-action="edit-my-profile">📞 ضيف رقمك</button>`;
+  return out;
+}
 /* ============================= RENDER: PERSONAL PROFILE PAGE ============================= */
 function renderMePage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -11509,7 +11532,7 @@ function renderMePage(){
       <div class="me-chips">
         <span class="me-chip gold">#${escapeHtml(p.id)}</span>
         ${title?`<span class="me-chip">🏷️ ${title}</span>`:''}
-        ${(()=>{ const e=myExtra(p.id), cp=cpOf(p.id)||{}, bd=e.birth||cp.birth, ph=e.phone||cp.phone; return (bd?`<span class="me-chip">🎂 ${escapeHtml(meFmtBirth(bd))}</span>`:'')+(ph?`<span class="me-chip" dir="ltr">📞 ${escapeHtml(ph)}</span>`:''); })()}
+        ${meSmartChips(p)}
       </div>
       ${myExtra(p.id).bio?`<div class="me-bio">${escapeHtml(myExtra(p.id).bio)}</div>`:''}
       <button type="button" class="me-edit-btn" data-action="edit-my-profile">✏️ تعديل بياناتي</button>
@@ -38945,6 +38968,11 @@ window.openRevWordGame=open;
 .me-name{font-size:18px}
 .me-chips{margin-top:6px;gap:6px}
 .me-chip{padding:3px 10px;font-size:11.5px}
+.me-chip.add{border-style:dashed;background:transparent;cursor:pointer;font-family:inherit;color:var(--text-muted,inherit);opacity:.9}
+.me-chip.tel{text-decoration:none;color:inherit}
+.me-chip.bday{border-color:rgba(244,183,64,.55);background:rgba(244,183,64,.14)}
+.me-chip.gold.bday{animation:glxPulse 1.8s ease-in-out infinite}
+
 .me-edit-btn{margin:8px auto 0;padding:6px 16px;font-size:12px}
 .me-stats{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
 .me-stat{padding:9px 4px 8px;border-radius:16px}
@@ -38962,6 +38990,23 @@ window.openRevWordGame=open;
 .mx-bar::-webkit-scrollbar{display:none}
 .mx-tb{flex:1 0 auto;padding:8px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted,inherit);font-family:'Cairo',Tahoma,sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap}
 .mx-tb.on{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.mx-smart{padding:14px;border-radius:22px;border:1px solid rgba(124,156,255,.4);background:linear-gradient(150deg,rgba(124,156,255,.18),var(--surface) 65%);box-shadow:0 12px 28px -18px rgba(124,156,255,.8)}
+.mx-smart.hot{border-color:#F4B740;background:linear-gradient(150deg,rgba(244,183,64,.2),var(--surface) 65%)}
+.mx-sm-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:14.5px;font-weight:900}
+.mx-sm-h span{font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:rgba(124,156,255,.2);color:var(--text-muted)}
+.mx-sm-hero{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.mx-sm-hero .ic{flex:none;width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:rgba(255,255,255,.08);border:1px solid var(--border)}
+.mx-sm-hero b{display:block;font-size:14px;font-weight:900;line-height:1.5}
+.mx-sm-hero small{display:block;font-size:12px;font-weight:700;color:var(--text-muted);line-height:1.5}
+.mx-sm-cta{display:block;width:100%;margin:0 0 12px;padding:11px;border:0;border-radius:14px;font-family:'Cairo',Tahoma,sans-serif;font-weight:900;font-size:13.5px;color:#221900;background:linear-gradient(95deg,var(--gold),var(--gold-2));cursor:pointer}
+.mx-sm-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mx-sm-chips div{padding:9px 6px;border-radius:14px;text-align:center;background:var(--surface);border:1px solid var(--border)}
+.mx-sm-chips b{display:block;font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+.mx-sm-chips small{display:block;font-size:10.5px;font-weight:800;color:var(--text-muted);margin-top:2px}
+.mx-sm-more{display:block;width:100%;margin-top:10px;padding:8px;border:0;background:none;color:var(--text-muted);font-family:'Cairo',Tahoma,sans-serif;font-weight:800;font-size:12px;cursor:pointer}
+.mx-sm-det{display:none;flex-direction:column;gap:10px;margin-top:6px}
+.mx-smart.open .mx-sm-det{display:flex}
+.mx-sm-det>*{margin:0 !important}
 .mx-panel{display:none;flex-direction:column;gap:10px}
 .mx-panel.on{display:flex}
 .mx-panel>*{margin:0 !important}
@@ -38975,6 +39020,41 @@ window.openRevWordGame=open;
 (function(){
 'use strict';
 var TAB='act';
+
+function tx(el,sel){ var n=el&&el.querySelector(sel); return n?n.textContent.replace(/\s+/g,' ').trim():''; }
+function smartCard(list){
+  var g=list.filter(function(e){ return e.classList.contains('glx-chal')||e.classList.contains('sx-card'); });
+  if(g.length<2) return list;
+  var rest=list.filter(function(e){ return g.indexOf(e)<0; });
+  var gl=null, streak=null, sch=null, rank=null;
+  g.forEach(function(e){
+    if(e.classList.contains('glx-chal')) gl=e;
+    else if(e.classList.contains('sx-chal')) sch=e;
+    else { var t=tx(e,'.sx-h b'); if(/سلسلة/.test(t)) streak=e; else if(/ترتيب/.test(t)) rank=e; }
+  });
+  var ic='📊', title='', sub='', cta='', hot=false;
+  var claimBtn=gl&&gl.querySelector('[data-glx-claim]');
+  var streakSub=tx(streak,'.sx-sub'), rivalT=tx(rank,'.sx-rt b'), rankSub=tx(rank,'.sx-sub');
+  var glCnt=tx(gl,'.cnt'), glTitle=tx(gl,'.top b').replace('🏆','').trim();
+  if(claimBtn){ ic='🎁'; title='مكافأة '+glTitle+' جاهزة!'; sub=tx(gl,'.top span')+' — استلمها دلوقتي'; cta=claimBtn.textContent.trim(); hot=true; }
+  else if(/⚠️/.test(streakSub)){ ic='⚠️'; title='سلسلتك في خطر'; sub='ما حضرتش الأسبوع ده لسه — احضر عشان ما تخسرش السلسلة'; hot=true; }
+  else if(sch && /ارجع لينا/.test(tx(sch,'.sx-h b')) && !sch.classList.contains('done')){ ic='💛'; title='وحشتنا! ارجع لينا'; sub='احضر مرة الأسبوع ده'; }
+  else if(gl && glCnt && !/^[٠0]\s*\//.test(glCnt) ){ ic='🏆'; title=glTitle+': '+glCnt; sub=tx(gl,'.glx-cb')||tx(gl,'small'); }
+  else if(rivalT){ ic='🎯'; title=rivalT; sub=tx(rank,'.sx-rt small'); }
+  else if(gl){ ic='🏆'; title=glTitle; sub=tx(gl,'small')+(tx(gl,'.glx-cb')?' • '+tx(gl,'.glx-cb'):''); }
+  else if(sch){ ic='🎯'; title=tx(sch,'.sx-h b'); sub=tx(sch,'.sx-sub'); }
+  else { title='كمّل نشاطك'; sub=streakSub||rankSub; }
+  var chal=gl?(glCnt||tx(gl,'.top span')):(sch?tx(sch,'.sx-pill'):'—');
+  var d=document.createElement('div'); d.className='mx-smart'+(hot?' hot':'');
+  function esc(x){ return String(x).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  d.innerHTML='<div class="mx-sm-h"><b>📊 إحصائيات</b><span>أهم حاجة ليك دلوقتي</span></div>'
+    +'<div class="mx-sm-hero"><div class="ic">'+ic+'</div><div><b>'+esc(title)+'</b><small>'+esc(sub)+'</small></div></div>'
+    +(claimBtn?'<button type="button" class="mx-sm-cta" data-glx-claim="1">'+esc(cta)+'</button>':'')
+    +'<div class="mx-sm-chips"><div><b>🔥 '+esc(tx(streak,'.sx-pill')||'٠')+'</b><small>السلسلة</small></div><div><b>🎯 '+esc(chal)+'</b><small>التحدي</small></div><div><b>🏁 '+esc(tx(rank,'.sx-pill').replace(/[▲▼].*$/,'').trim()||'—')+'</b><small>الترتيب</small></div></div>'
+    +'<button type="button" class="mx-sm-more" data-mx-more="1">عرض التفاصيل ▾</button><div class="mx-sm-det"></div>';
+  var det=d.querySelector('.mx-sm-det'); g.forEach(function(e){ det.appendChild(e); });
+  return [d].concat(rest);
+}
 var NAMES=[['act','🔥 نشاطي'],['bdg','🎖️ شاراتي'],['hof','🏛️ الشرف'],['set','🔔 إعدادات']];
 function build(){
   if(typeof state==='undefined' || state.view!=='me') return;
@@ -38994,6 +39074,7 @@ function build(){
     });
     if(!wrap.children.length) wrap.remove();
   }
+  try{ P.act=smartCard(P.act); }catch(e){}
   var fx=root.querySelector(':scope > .fx-me-vb'); if(fx) P.bdg.push(fx);
   var avail=NAMES.filter(function(n){ return P[n[0]].length; });
   if(!avail.length) return;
@@ -39006,6 +39087,8 @@ function build(){
   root.insertBefore(box, links);
 }
 document.addEventListener('click', function(e){
+  var m=e.target.closest && e.target.closest('[data-mx-more]');
+  if(m){ var c=m.closest('.mx-smart'); c.classList.toggle('open'); m.textContent=c.classList.contains('open')?'إخفاء التفاصيل ▴':'عرض التفاصيل ▾'; return; }
   var b=e.target.closest && e.target.closest('.mx-tb'); if(!b) return;
   TAB=b.getAttribute('data-mx');
   document.querySelectorAll('.mx-tb').forEach(function(x){ x.classList.toggle('on', x===b); });
