@@ -7512,6 +7512,11 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .att-wm .att-emo{ font-size:110px; filter:grayscale(1); }
   .att-glass-ico.att-prev{ width:64px; height:64px; border-radius:21px; }
   .aa-logo-card{ margin-top:14px; }
+  .aa-logo-size{ display:flex; align-items:center; gap:8px; margin:12px 0 4px; font-size:12.5px; font-weight:700; flex-wrap:wrap; }
+  .aa-logo-size input[type=range]{ flex:1; min-width:110px; accent-color:var(--gold,#F4B740); }
+  .aa-logo-size b{ min-width:44px; text-align:center; color:var(--gold,#F4B740); }
+  .aa-sz-b,.aa-sz-r{ appearance:none; font-family:inherit; font-weight:900; cursor:pointer; color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px 11px; font-size:15px; } .aa-sz-r{ font-size:11.5px; padding:5px 10px; }
+  .att-prev .att-logo{ transition:transform .12s; }
   .aa-logo-row{ display:flex; align-items:center; gap:14px; }
   .aa-logo-txt{ display:flex; flex-direction:column; gap:3px; min-width:0; }
   .aa-logo-txt small{ opacity:.7; font-size:12px; }
@@ -28562,7 +28567,7 @@ function attLogoCacheSave(){ try{ localStorage.setItem(ATT_LOGO_CACHE, JSON.stri
 function attLogoOf(k){ const v = ATT_LOGOS && ATT_LOGOS[k]; return (v && v.img) ? v : null; }
 function attIconHtml(k){
   const lg = attLogoOf(k);
-  if(lg) return '<img class="att-logo" src="'+lg.img+'" alt="" draggable="false">';
+  if(lg) return '<img class="att-logo" src="'+lg.img+'" alt="" draggable="false"'+((lg.z && lg.z!==100)?' style="transform:scale('+(lg.z/100)+')"':'')+'>';
   if(typeof ATT_ICO_SVG!=='undefined' && ATT_ICO_SVG[k]) return ATT_ICO_SVG[k];
   const t = ATT_TYPES[k]; return '<span class="att-emo">'+((t && t.icon) ? t.icon : '⭐')+'</span>';
 }
@@ -28654,12 +28659,31 @@ async function attLogoPicked(inp){
   const out = await attProcessLogo(f, state.attLogoAuto!==false);
   if(!out){ showToast('تعذر قراءة الصورة — جرّب صورة تانية', true); return; }
   const ts = Date.now();
-  const r1 = await window.storage.update(ATT_LOGO_PFX+type, ()=>JSON.stringify({img:out.img, c:out.c, ts}), true);
+  const r1 = await window.storage.update(ATT_LOGO_PFX+type, ()=>JSON.stringify({img:out.img, c:out.c, ts, z:(attLogoOf(type)||{}).z||100}), true);
   if(!(r1 && r1.value)){ showToast('تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', true); return; }
   const r2 = await window.storage.update(ATT_LOGOV_KEY, cur=>{ let o={}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o={}; } if(!o || typeof o!=='object') o={}; o[type] = ts; return JSON.stringify(o); }, true);
   if(!(r2 && r2.value)){ showToast('تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', true); return; }
-  ATT_LOGOS[type] = {img:out.img, c:out.c, ts}; attLogoCacheSave();
+  ATT_LOGOS[type] = {img:out.img, c:out.c, ts, z:(attLogoOf(type)||{}).z||100}; attLogoCacheSave();
   showToast('تم حفظ لوجو '+ATT_TYPES[type].label); render();
+}
+function attLogoApplyZ(type, z){
+  const lg = attLogoOf(type); if(!lg) return; lg.z = z;
+  document.querySelectorAll('.att-logo').forEach(im=>{ if(im.getAttribute('src')===lg.img) im.style.transform = z===100 ? '' : 'scale('+(z/100)+')'; });
+  const v = document.getElementById('att-logo-size-val'); if(v) v.textContent = z+'%';
+  const r = document.getElementById('att-logo-size'); if(r && +r.value!==z) r.value = z;
+}
+let _attZTimer = null;
+function attLogoSaveZ(type){
+  const lg = attLogoOf(type); if(!lg) return;
+  clearTimeout(_attZTimer);
+  _attZTimer = setTimeout(async ()=>{
+    const ts = Date.now(), z = lg.z||100;
+    const r1 = await window.storage.update(ATT_LOGO_PFX+type, ()=>JSON.stringify({img:lg.img, c:lg.c, ts, z}), true);
+    if(!(r1 && r1.value)){ showToast('تعذر حفظ الحجم — تحقق من الاتصال', true); return; }
+    const r2 = await window.storage.update(ATT_LOGOV_KEY, cur=>{ let o={}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o={}; } if(!o || typeof o!=='object') o={}; o[type] = ts; return JSON.stringify(o); }, true);
+    if(!(r2 && r2.value)){ showToast('تعذر حفظ الحجم — تحقق من الاتصال', true); return; }
+    lg.ts = ts; attLogoCacheSave(); showToast('تم حفظ حجم اللوجو');
+  }, 350);
 }
 function attLogoAdminCard(type){
   const t = ATT_TYPES[type], lg = attLogoOf(type), auto = state.attLogoAuto!==false;
@@ -28672,6 +28696,7 @@ function attLogoAdminCard(type){
       <label for="att-logo-file" class="btn btn-primary aa-logo-up">📤 ${lg?'تغيير اللوجو':'رفع لوجو'}</label>
       ${lg?`<button type="button" class="btn btn-ghost aa-logo-del" data-action="att-admin-logo-del" data-type="${type}">🗑️ حذف</button>`:''}
     </div>
+    ${lg?`<div class="aa-logo-size"><span>🔍 حجم اللوجو</span><button type="button" class="aa-sz-b" data-action="att-logo-step" data-type="${type}" data-d="-10" aria-label="تصغير">−</button><input type="range" id="att-logo-size" min="40" max="180" step="5" value="${lg.z||100}" data-type="${type}"><button type="button" class="aa-sz-b" data-action="att-logo-step" data-type="${type}" data-d="10" aria-label="تكبير">＋</button><b id="att-logo-size-val">${lg.z||100}%</b><button type="button" class="aa-sz-r" data-action="att-logo-step" data-type="${type}" data-d="0">إعادة</button></div>`:''}
     <label class="aa-logo-auto"><input type="checkbox" ${auto?'checked':''} data-action="att-admin-logo-auto" data-type="${type}"><span>تجهيز تلقائي: شيل الخلفية وقصّ الحواف</span></label>
     <input type="file" id="att-logo-file" accept="image/*" style="display:none">
   </div>`;
@@ -29828,6 +29853,7 @@ async function attAdminAction(action, el){
   if(action==='att-admin-backup'){ attDoBackup(); return; }
   if(action==='att-admin-restore'){ const f = document.getElementById('att-restore-file'); if(f){ f.onchange = ()=>{ if(f.files && f.files[0]) attDoRestore(f.files[0], type); f.value = ''; }; f.click(); } return; }
   if(action==='att-admin-page'){ state.attNav = state.attNav || {type, page:'home'}; state.attNav.page = el.dataset.page; if(el.dataset.page==='audit') attAuditLoad().then(()=>{ try{ render(); }catch(e){} }); render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-logo-step'){ const lg = attLogoOf(type); if(!lg) return; const d = +el.dataset.d; const z = d===0 ? 100 : Math.max(40, Math.min(180, (lg.z||100)+d)); attLogoApplyZ(type, z); attLogoSaveZ(type); return; }
   if(action==='att-admin-logo-auto'){ state.attLogoAuto = !!el.checked; return; }
   if(action==='att-admin-logo-del'){
     showConfirmDialog('هتحذف لوجو «'+t.label+'» ويرجع للأيقونة العادية.', async ()=>{
@@ -30677,7 +30703,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='empty-trash'){ confirmEmptyTrash(); }
 });
 
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='att-logo-size'){ attLogoApplyZ(e.target.dataset.type, +e.target.value); }
+});
 document.addEventListener('change', (e)=>{
+  if(e.target.id==='att-logo-size'){ attLogoApplyZ(e.target.dataset.type, +e.target.value); attLogoSaveZ(e.target.dataset.type); return; }
   if(e.target.id==='att-logo-file'){ attLogoPicked(e.target); return; }
   if(e.target.id==='kh-time'){ khSetTime(e.target.value); return; }
   if(e.target.id==='pulse-session-select'){
