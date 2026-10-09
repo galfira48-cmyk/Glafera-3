@@ -7286,6 +7286,43 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   body.data-saver .gh-tile::before{display:none;}
 
 
+
+  /* ---------- admin: الفصول ---------- */
+  .cls-overview{ display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+  .cls-donut{ width:132px; height:132px; flex:0 0 auto; }
+  .cls-donut-n{ font:800 26px 'Cairo',sans-serif; fill:var(--text); } .cls-donut-l{ font:600 10px 'Cairo',sans-serif; fill:var(--text-muted); }
+  .cls-legend{ display:flex; flex-direction:column; gap:7px; font-size:12px; flex:1; min-width:0; }
+  .cls-legend span{ display:flex; align-items:center; gap:7px; } .cls-legend i{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; } .cls-legend b{ margin-inline-start:auto; font-family:'Cairo',sans-serif; }
+  .cls-ins{ margin-bottom:12px; }
+  .cls-ins-row{ display:flex; align-items:center; gap:10px; width:100%; padding:9px 2px; font-size:12.5px; line-height:1.6; text-align:start; background:none; border:0; border-top:1px solid var(--border); color:var(--text); font-family:inherit; }
+  .cls-ins-row > span:nth-child(2){ flex:1; } .cls-ins-row b{ color:var(--gold-2); }
+  .cls-list{ display:flex; flex-direction:column; gap:10px; }
+  .cls-card{ position:relative; display:flex; align-items:center; gap:12px; width:100%; padding:13px 14px; text-align:start; font-family:inherit; color:var(--text); background:var(--a-card-bg); border:1px solid var(--border); border-inline-start:4px solid var(--c); border-radius:var(--a-r-md); cursor:pointer; }
+  .cls-card:active{ transform:scale(.98); }
+  .cls-card-ico{ width:46px; height:46px; flex:0 0 auto; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; background:color-mix(in srgb,var(--c) 22%,transparent); }
+  .cls-card-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+  .cls-card-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; }
+  .cls-card-meta,.cls-card-top{ font-size:11px; color:var(--text-muted); } .cls-card-meta b{ color:var(--c); font-size:13px; }
+  .cls-bar{ display:block; height:6px; border-radius:4px; background:var(--bg-2); overflow:hidden; } .cls-bar i{ display:block; height:100%; background:var(--c,var(--teal)); border-radius:4px; transition:width .5s ease; } .cls-bar.sm{ height:4px; margin-top:4px; } .cls-bar.sm i{ background:linear-gradient(90deg,var(--teal),var(--good)); }
+  .cls-card-flag{ font-size:11px; font-weight:800; color:var(--danger); background:color-mix(in srgb,var(--danger) 14%,transparent); padding:2px 8px; border-radius:99px; }
+  .cls-chev{ color:var(--text-muted); font-size:18px; }
+  .cls-podium{ display:flex; align-items:flex-end; justify-content:center; gap:10px; margin:6px 0 12px; }
+  .cls-pod{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; text-align:center; max-width:30%; } .cls-pod b{ font-size:11.5px; } .cls-pod span{ color:var(--gold-2); font-weight:800; }
+  .cls-pod.p1{ order:2; } .cls-pod.p2{ order:1; } .cls-pod.p3{ order:3; }
+  .cls-members{ display:flex; flex-direction:column; gap:8px; }
+  .cls-member{ display:flex; align-items:center; gap:6px; background:var(--a-card-bg); border:1px solid var(--border); border-radius:var(--a-r-md); padding:8px 10px; flex-wrap:wrap; }
+  .cls-member.is-absent{ border-inline-start:3px solid var(--danger); }
+  .cls-pick{ display:flex; align-items:center; padding:6px; } .cls-pick input{ width:18px; height:18px; accent-color:var(--gold-2); }
+  .cls-member-main{ flex:1; min-width:0; display:flex; align-items:center; gap:10px; background:none; border:0; padding:0; font-family:inherit; color:var(--text); text-align:start; cursor:pointer; }
+  .cls-member-txt{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .cls-member-name{ font-weight:700; font-size:13px; } .cls-member-sub{ font-size:10.5px; color:var(--text-muted); margin-top:2px; }
+  .cls-member-pts{ display:flex; flex-direction:column; align-items:center; font-size:10px; color:var(--text-muted); } .cls-member-pts b{ font:800 15px 'Cairo',sans-serif; color:var(--gold-2); }
+  .cls-tag{ display:inline-block; font-size:9.5px; font-weight:800; padding:1px 7px; border-radius:99px; margin-inline-start:4px; } .cls-tag.ab{ background:color-mix(in srgb,var(--danger) 16%,transparent); color:var(--danger); } .cls-tag.bd{ background:color-mix(in srgb,var(--gold-2) 18%,transparent); color:var(--gold-2); }
+  .cls-acts{ flex:1 0 100%; display:flex; align-items:center; gap:8px; padding-top:6px; border-top:1px dashed var(--border); }
+  .cls-act{ width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:var(--bg-2); text-decoration:none; font-size:15px; }
+  .cls-move{ margin-inline-start:auto; font-family:inherit; font-size:12px; padding:7px 10px; border-radius:10px; background:var(--bg-2); color:var(--text); border:1px solid var(--border); max-width:60%; }
+  .cls-bulk{ position:sticky; top:8px; z-index:20; display:flex; align-items:center; gap:10px; padding:10px 12px; margin-bottom:10px; border-radius:var(--a-r-md); background:var(--surface); border:1.5px solid var(--gold-2); box-shadow:0 10px 24px -10px rgba(0,0,0,.5); font-size:12.5px; }
+  .cls-bulk[hidden]{ display:none; } .cls-bulk .cls-move{ margin:0 auto 0 0; flex:1; max-width:none; }
 </style>
 <style id="su-plus-css">
 /* ===== تحسينات فورم إنشاء الحساب (su-plus v2) — من غير اهتزاز، بصوت هادي بدله ===== */
@@ -25808,6 +25845,229 @@ function renderAdminPointsTab(){
   `;
 }
 
+/* ============================= ADMIN: الفصول (الفرق الدراسية) ============================= */
+const CLS_DEFS = [
+  {k:'1',    label:'الفرقة الأولى',  short:'أولى',  icon:'🥇', color:'#5FE0A4'},
+  {k:'2',    label:'الفرقة الثانية', short:'تانية', icon:'🥈', color:'#3FDCC9'},
+  {k:'3',    label:'الفرقة الثالثة', short:'تالتة', icon:'🥉', color:'#9B8CFF'},
+  {k:'4',    label:'الفرقة الرابعة', short:'رابعة', icon:'🎓', color:'#F4B740'},
+  {k:'grad', label:'الخريجين',       short:'خريجين', icon:'🏛️', color:'#FF7A59'},
+  {k:'none', label:'غير مصنّفين',    short:'غير مصنّف', icon:'❔', color:'#8A8A9A'}
+];
+const CLS_ABSENT_DAYS = 21; /* غايب لو معملش حضور بقاله كده يوم (ولسه فيه أنشطة اتسجلت) — غيّر الرقم لو عايز */
+function clsDef(k){ return CLS_DEFS.find(c=>c.k===k) || CLS_DEFS[5]; }
+function clsOf(pid){
+  const cp = cpOf(pid);
+  if(!cp || !cp.stage) return 'none';
+  if(cp.stage==='grad') return 'grad';
+  const y = String(cp.year||'');
+  return ['1','2','3','4'].includes(y) ? y : 'none';
+}
+function clsAge(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return null;
+  const t = new Date(); let a = t.getFullYear()-(+m[1]);
+  if(t.getMonth()+1 < +m[2] || (t.getMonth()+1===+m[2] && t.getDate()<+m[3])) a--;
+  return (a>=0 && a<120) ? a : null;
+}
+function clsBdayIn(iso){ /* كام يوم لحد عيد الميلاد الجاي (0 = النهارده) */
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return null;
+  const t = new Date(); const today = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  let n = new Date(t.getFullYear(), +m[2]-1, +m[3]); if(n<today) n = new Date(t.getFullYear()+1, +m[2]-1, +m[3]);
+  return Math.round((n-today)/86400000);
+}
+/* كل أرقام الفصول بتتحسب مرة واحدة لكل رسم */
+function clsStats(){
+  const sess = {}, per = {}, last = {};
+  Object.values(ATT_RECORDS||{}).forEach(r=>{
+    if(!r || !r.pid) return;
+    const key = r.type+'|'+(r.sid||r.sessionId||'');
+    sess[key] = 1;
+    (per[r.pid] || (per[r.pid] = {}))[key] = 1;
+    if(!last[r.pid] || r.ts>last[r.pid]) last[r.pid] = r.ts;
+  });
+  const totalSess = Object.keys(sess).length;
+  const now = Date.now();
+  const byClass = {}; CLS_DEFS.forEach(c=>byClass[c.k] = {def:c, list:[], pts:0, att:0});
+  PARTICIPANTS.forEach(p=>{
+    const cp = cpOf(p.id) || {};
+    const k = clsOf(p.id);
+    const attended = per[p.id] ? Object.keys(per[p.id]).length : 0;
+    const rate = totalSess ? Math.round(attended/totalSess*100) : 0;
+    const lastTs = last[p.id] || 0;
+    const joinedTs = cp.joinDate ? Date.parse(cp.joinDate) : 0;
+    const isNew = !lastTs && joinedTs && (now-joinedTs) < CLS_ABSENT_DAYS*86400000; /* لسه مسجل جديد — مش غايب */
+    const absent = totalSess>0 && !isNew && (!lastTs || (now-lastTs) > CLS_ABSENT_DAYS*86400000);
+    const m = {id:p.id, name:p.name, photo:p.photo, cls:k, pts:participantTotal(p.id), attended, rate, lastTs, absent,
+      phone:cp.phone||'', birth:cp.birth||'', age:clsAge(cp.birth), bday:clsBdayIn(cp.birth), joined:cp.joinDate||''};
+    byClass[k].list.push(m); byClass[k].pts += m.pts; byClass[k].att += rate;
+  });
+  Object.values(byClass).forEach(b=>{
+    const n = b.list.length;
+    b.n = n; b.avgPts = n ? Math.round(b.pts/n) : 0; b.avgAtt = n ? Math.round(b.att/n) : 0;
+    b.absentN = b.list.filter(x=>x.absent).length;
+    b.top = b.list.slice().sort((x,y)=>y.pts-x.pts)[0] || null;
+  });
+  return {byClass, totalSess, total:PARTICIPANTS.length};
+}
+function clsDonut(S){
+  const parts = CLS_DEFS.map(c=>({c, n:S.byClass[c.k].n})).filter(x=>x.n>0);
+  const R = 52, C = 2*Math.PI*R; let off = 0;
+  const arcs = parts.map(x=>{
+    const len = S.total ? x.n/S.total*C : 0;
+    const a = `<circle r="${R}" cx="70" cy="70" fill="none" stroke="${x.c.color}" stroke-width="18" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
+    off += len; return a;
+  }).join('');
+  return `<svg viewBox="0 0 140 140" class="cls-donut" role="img" aria-label="توزيع المخدومين على الفصول">
+    <circle r="${R}" cx="70" cy="70" fill="none" stroke="var(--bg-2)" stroke-width="18"/>${arcs}
+    <text x="70" y="68" text-anchor="middle" class="cls-donut-n">${S.total}</text>
+    <text x="70" y="86" text-anchor="middle" class="cls-donut-l">مخدوم</text></svg>`;
+}
+function clsAvatar(m, sz){
+  return `<div class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz/3.2)}px;${m.photo?`background-image:url('${m.photo}');background-size:cover;background-position:center;`:`background:${AVATAR_COLOR};`}">${m.photo?'':initials(m.name)}</div>`;
+}
+function clsFmtLast(ts){
+  if(!ts) return 'لسه ماحضرش';
+  const d = Math.floor((Date.now()-ts)/86400000);
+  return d<=0 ? 'حضر النهارده' : d===1 ? 'آخر حضور امبارح' : d<30 ? `آخر حضور من ${d} يوم` : `آخر حضور من ${Math.floor(d/30)} شهر`;
+}
+function clsOptions(cur, withNone){
+  return CLS_DEFS.filter(c=>withNone || c.k!=='none').map(c=>`<option value="${c.k}" ${c.k===cur?'selected':''}>${c.label}</option>`).join('');
+}
+function clsInsights(S){
+  const out = [];
+  const real = CLS_DEFS.filter(c=>c.k!=='none' && S.byClass[c.k].n>0);
+  const un = S.byClass.none.n;
+  if(un) out.push({ico:'❔', txt:`<b>${un}</b> مخدوم لسه من غير فصل — صنّفهم عشان الإحصائيات تبقى دقيقة`, k:'none'});
+  if(real.length){
+    const big = real.slice().sort((a,b)=>S.byClass[b.k].n-S.byClass[a.k].n)[0];
+    out.push({ico:'👥', txt:`أكبر فصل: <b>${big.label}</b> (${S.byClass[big.k].n} مخدوم)`, k:big.k});
+    if(S.totalSess){
+      const best = real.slice().sort((a,b)=>S.byClass[b.k].avgAtt-S.byClass[a.k].avgAtt)[0];
+      if(S.byClass[best.k].avgAtt>0) out.push({ico:'🔥', txt:`أعلى التزام بالحضور: <b>${best.label}</b> (${S.byClass[best.k].avgAtt}%)`, k:best.k});
+      const worst = real.slice().sort((a,b)=>S.byClass[a.k].avgAtt-S.byClass[b.k].avgAtt)[0];
+      if(real.length>1 && worst.k!==best.k) out.push({ico:'📉', txt:`أقل حضور: <b>${worst.label}</b> (${S.byClass[worst.k].avgAtt}%) — يستاهل افتقاد`, k:worst.k});
+    }
+    const pts = real.slice().sort((a,b)=>S.byClass[b.k].avgPts-S.byClass[a.k].avgPts)[0];
+    if(S.byClass[pts.k].avgPts>0) out.push({ico:'🏆', txt:`أعلى متوسط نقاط: <b>${pts.label}</b> (${S.byClass[pts.k].avgPts} نقطة)`, k:pts.k});
+  }
+  const ab = CLS_DEFS.reduce((a,c)=>a+S.byClass[c.k].absentN,0);
+  if(ab) out.push({ico:'🚨', txt:`<b>${ab}</b> مخدوم غايبين من أكتر من ${CLS_ABSENT_DAYS} يوم`, k:null});
+  const bd = []; CLS_DEFS.forEach(c=>S.byClass[c.k].list.forEach(m=>{ if(m.bday!==null && m.bday<=7) bd.push(m); }));
+  if(bd.length) out.push({ico:'🎂', txt:`<b>${bd.length}</b> عيد ميلاد خلال أسبوع: ${bd.slice(0,3).map(m=>escapeHtml(m.name.split(' ')[0])).join('، ')}${bd.length>3?'…':''}`, k:null});
+  return out;
+}
+function renderAdminClassesTab(){
+  const S = clsStats();
+  const sel = state.clsSel;
+  if(sel && S.byClass[sel]) return renderAdminClassDetail(S, sel);
+  const classified = S.total - S.byClass.none.n;
+  const cards = CLS_DEFS.map(c=>{
+    const b = S.byClass[c.k];
+    if(c.k==='none' && !b.n) return '';
+    const pct = S.total ? Math.round(b.n/S.total*100) : 0;
+    return `<button type="button" class="cls-card" style="--c:${c.color}" data-action="cls-open" data-k="${c.k}">
+      <span class="cls-card-ico">${c.icon}</span>
+      <span class="cls-card-body">
+        <span class="cls-card-name">${c.label}</span>
+        <span class="cls-card-meta"><b>${b.n}</b> مخدوم${b.n?` · متوسط ${b.avgPts} نقطة${S.totalSess?` · حضور ${b.avgAtt}%`:''}`:''}</span>
+        <span class="cls-bar"><i style="width:${pct}%"></i></span>
+        ${b.top && b.top.pts>0 ? `<span class="cls-card-top">⭐ الأنشط: ${escapeHtml(b.top.name)}</span>` : ''}
+      </span>
+      ${b.absentN?`<span class="cls-card-flag" title="غايبين">🚨 ${b.absentN}</span>`:''}
+      <span class="cls-chev">‹</span>
+    </button>`;
+  }).join('');
+  const ins = clsInsights(S);
+  const insHtml = ins.length ? `<div class="card cls-ins"><div class="admin-session-name" style="margin-bottom:6px;">💡 ملاحظات ذكية</div>${ins.map(i=>
+    i.k ? `<button type="button" class="cls-ins-row" data-action="cls-open" data-k="${i.k}"><span>${i.ico}</span><span>${i.txt}</span><span class="cls-chev">‹</span></button>`
+        : `<div class="cls-ins-row"><span>${i.ico}</span><span>${i.txt}</span></div>`).join('')}</div>` : '';
+  return `
+    ${adminKpis([{num:S.total, lab:'مخدوم'},{num:classified, lab:'متصنّفين'},{num:S.byClass.none.n, lab:'من غير فصل', cls:S.byClass.none.n?'is-alert':''}])}
+    <div class="card cls-overview">
+      ${clsDonut(S)}
+      <div class="cls-legend">${CLS_DEFS.filter(c=>S.byClass[c.k].n>0).map(c=>`<span><i style="background:${c.color}"></i>${c.short} <b>${S.byClass[c.k].n}</b></span>`).join('') || '<span class="hint">لسه مفيش مخدومين</span>'}</div>
+    </div>
+    ${insHtml}
+    ${adminSectionTitle('🏫','الفصول')}
+    <div class="cls-list">${cards}</div>
+    <div class="hint" style="margin-top:12px;">الفصل بيتحدد من بيانات التسجيل (طالب جامعي + الفرقة / خريج). تقدر تنقل أي مخدوم من جوه الفصل أو من صفحته.</div>`;
+}
+function renderAdminClassDetail(S, k){
+  const c = clsDef(k), b = S.byClass[k];
+  const sort = state.clsSort || 'pts', onlyAbs = !!state.clsAbsent;
+  let list = b.list.slice();
+  if(onlyAbs) list = list.filter(m=>m.absent);
+  const cmp = {pts:(x,y)=>y.pts-x.pts, att:(x,y)=>y.rate-x.rate||y.pts-x.pts, name:(x,y)=>x.name.localeCompare(y.name,'ar'), age:(x,y)=>(y.age==null?-1:y.age)-(x.age==null?-1:x.age)}[sort] || ((x,y)=>y.pts-x.pts);
+  list.sort(cmp);
+  const chip = (id,lab)=>`<button type="button" class="admin-tab ${sort===id?'active':''}" data-action="cls-sort" data-v="${id}">${lab}</button>`;
+  const podium = (!onlyAbs && sort==='pts' && b.list.filter(m=>m.pts>0).length>=3 && k!=='none') ? `<div class="cls-podium">${list.slice(0,3).map((m,i)=>`<div class="cls-pod p${i+1}">${clsAvatar(m,i===0?54:44)}<b>${escapeHtml(m.name.split(' ').slice(0,2).join(' '))}</b><span>${['🥇','🥈','🥉'][i]} ${m.pts}</span></div>`).join('')}</div>` : '';
+  const rows = list.map(m=>{
+    const bd = m.bday!==null && m.bday<=7 ? `<span class="cls-tag bd">🎂 ${m.bday===0?'النهارده':'بعد '+m.bday+' يوم'}</span>` : '';
+    const ab = m.absent ? `<span class="cls-tag ab">🚨 غايب</span>` : '';
+    const call = m.phone ? `<a class="cls-act" href="tel:${escapeHtml(m.phone)}" aria-label="اتصال">📞</a><a class="cls-act" href="${escapeHtml(attWaLink(normalizePhone(m.phone)||m.phone,''))}" target="_blank" rel="noopener" aria-label="واتساب">💬</a>` : '';
+    return `<div class="cls-member ${m.absent?'is-absent':''}" data-search="${escapeHtml((m.name+' '+m.id+' '+m.phone).toLowerCase())}">
+      <label class="cls-pick"><input type="checkbox" class="cls-chk" value="${escapeHtml(m.id)}"></label>
+      <button type="button" class="cls-member-main" data-action="cls-member" data-pid="${escapeHtml(m.id)}">
+        ${clsAvatar(m,42)}
+        <span class="cls-member-txt"><span class="cls-member-name">${escapeHtml(m.name)} ${ab}${bd}</span>
+          <span class="cls-member-sub">${m.age!=null?m.age+' سنة · ':''}${S.totalSess?clsFmtLast(m.lastTs):'#'+escapeHtml(m.id)}</span>
+          ${S.totalSess?`<span class="cls-bar sm"><i style="width:${m.rate}%"></i></span>`:''}</span>
+        <span class="cls-member-pts"><b>${m.pts}</b><small>نقطة${S.totalSess?` · ${m.rate}%`:''}</small></span>
+      </button>
+      <span class="cls-acts">${call}<select class="cls-move" data-cls-move="${escapeHtml(m.id)}" aria-label="نقل لفصل">${clsOptions(k,true)}</select></span>
+    </div>`;
+  }).join('');
+  return `
+    <button type="button" class="admin-back-link" data-action="cls-back">${ICO.back} كل الفصول</button>
+    <div class="admin-hero" style="border-color:${c.color}">
+      <span class="admin-hub-ico" style="background:${c.color};width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;">${c.icon}</span>
+      <div class="admin-hero-body"><div class="admin-hero-name">${c.label}</div><div class="admin-hero-meta"><span class="admin-meta-chip">${b.n} مخدوم</span>${b.absentN?`<span class="admin-meta-chip">🚨 ${b.absentN} غايب</span>`:''}</div></div>
+    </div>
+    ${adminKpis([{num:b.n,lab:'مخدوم'},{num:b.avgPts,lab:'متوسط النقاط'},{num:S.totalSess?b.avgAtt+'%':'—',lab:'متوسط الحضور'},{num:b.absentN,lab:'غايبين',cls:b.absentN?'is-alert':''}])}
+    ${podium}
+    <div class="admin-tabs" style="margin-top:6px;">${chip('pts','🏆 النقاط')}${chip('att','✅ الحضور')}${chip('name','🔤 الاسم')}${chip('age','🎂 السن')}
+      <button type="button" class="admin-tab ${onlyAbs?'active':''}" data-action="cls-absent">🚨 الغايبين فقط</button></div>
+    <input type="text" class="field admin-search-input" data-filter-target=".cls-member" placeholder="🔍 دوّر بالاسم أو الرقم..." style="margin-bottom:10px;" />
+    <div class="cls-bulk" id="cls-bulk" hidden>
+      <span><b id="cls-bulk-n">0</b> محدد</span>
+      <select id="cls-bulk-to" class="cls-move">${clsOptions(k==='none'?'1':'',false).replace(`value="${k}"`,`value="${k}" disabled`)}</select>
+      <button type="button" class="btn btn-primary" data-action="cls-bulk-move" style="margin:0;padding:8px 14px;">نقل</button>
+    </div>
+    ${list.length ? `<div class="cls-members">${rows}</div>` : adminEmptyState(onlyAbs?'🎉':'📭', onlyAbs?'مفيش غايبين':'الفصل فاضي', onlyAbs?'كل المخدومين بيحضروا':'انقل مخدومين ليه من فصول تانية')}
+    ${b.n ? `<div class="admin-section-title"><span>📤</span><span>أدوات الفصل</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button type="button" class="btn btn-outline" style="flex:1;margin:0;" data-action="cls-export" data-k="${k}">📊 تصدير Excel</button>
+      <button type="button" class="btn btn-outline" style="flex:1;margin:0;" data-action="cls-copy-phones" data-k="${k}">📋 نسخ الأرقام</button>
+    </div>` : ''}`;
+}
+async function clsMove(ids, k){
+  const stage = k==='grad' ? 'grad' : (k==='none' ? '' : 'student');
+  const year = /^[1-4]$/.test(k) ? k : '';
+  let n = 0;
+  ids.forEach(id=>{ const cp = cpOf(id); if(cp){ cp.stage = stage; cp.year = year; n++; } });
+  if(!n){ showToast('معرفتش ألاقي بيانات المخدوم', true); return; }
+  try{ await saveCustomParticipants(CUSTOM_PARTICIPANTS); }catch(e){}
+  showToast(`اتنقل ${n} لـ ${clsDef(k).label}`);
+  render();
+}
+function clsExport(k){
+  if(typeof XLSX==='undefined'){ showToast('تعذّر تجهيز ملف Excel', true); return; }
+  const S = clsStats(), b = S.byClass[k];
+  const rows = b.list.slice().sort((x,y)=>y.pts-x.pts).map(m=>({'الكود':m.id,'الاسم':m.name,'الهاتف':m.phone,'السن':m.age==null?'':m.age,'تاريخ الميلاد':m.birth,'النقاط':m.pts,'نسبة الحضور %':m.rate,'آخر حضور':m.lastTs?new Date(m.lastTs).toISOString().slice(0,10):'','تاريخ الانضمام':m.joined}));
+  const ws = XLSX.utils.json_to_sheet(rows); ws['!cols'] = [{wch:9},{wch:26},{wch:15},{wch:7},{wch:13},{wch:9},{wch:13},{wch:12},{wch:13}];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, clsDef(k).label.slice(0,28));
+  XLSX.writeFile(wb, `class-${k}-${new Date().toISOString().slice(0,10)}.xlsx`); showToast('اتحمّل ملف الفصل');
+}
+document.addEventListener('change', async (e)=>{
+  const t = e.target; if(!t || !t.classList) return;
+  if(t.dataset && t.dataset.clsMove){ if(t.value) await clsMove([t.dataset.clsMove], t.value); return; }
+  if(t.classList.contains('cls-chk')){
+    const n = document.querySelectorAll('.cls-chk:checked').length;
+    const bar = document.getElementById('cls-bulk'), nn = document.getElementById('cls-bulk-n');
+    if(bar) bar.hidden = n===0; if(nn) nn.textContent = n;
+  }
+});
+
 const ADMIN_HUB_GROUPS = [
   {id:'live',    icon:'🔴', title:'التشغيل المباشر',      accent:'var(--coral)'},
   {id:'people',  icon:'👥', title:'المشاركون والتسجيل',   accent:'var(--teal)'},
@@ -25825,6 +26085,7 @@ const ADMIN_HUB_ITEMS = [
 
   {group:'people', tab:'participants', short:"الأسماء والأكواد والبيانات", desc:"إضافة وتعديل المشاركين وأكواد الدخول والتصدير", icon:'👤', label:'المشاركين', color:'linear-gradient(145deg,#3FDCC9,#5FE0A4)'},
   {group:'people', tab:'reg', short:"إنشاء الحساب وكارت الدخول", desc:"فتح/قفل إنشاء الحساب، فورم التسجيل، العناوين، إحصائيات وأمان التسجيل، كارت الدخول، التصدير", icon:'📝', label:'التسجيل والدخول', color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
+  {group:'people', tab:'classes', short:"الفرق ومين فيها", desc:"الفرقة الأولى والتانية والتالتة والرابعة والخريجين، ومين المخدومين في كل فصل وحضورهم ونقاطهم", icon:'🏫', label:'الفصول', color:'linear-gradient(145deg,#5FE0A4,#845EC2)'},
   {group:'people', tab:'structure', short:"الأمناء وأعضاء الأسر", desc:"أسماء وصور أمين الاجتماع والمساعد وأسر الخدمة", icon:'👥', label:'هيكلة الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF6A88)'},
   {group:'people', tab:'opinions', short:"تقييمات واقتراحات", desc:"تقييمات واقتراحات المشاركين", icon:'💬', label:'آراء المشاركين', color:'linear-gradient(145deg,#3FDCC9,#845EC2)'},
 
@@ -25920,6 +26181,7 @@ function adminInDetailView(){
   return (t==='sessions' && (state.editingSessionId || state.adminDayId))
     || (t==='participants' && (state.addingParticipant || state.editingParticipantId))
     || (t==='opinions' && state.viewingOpinionId)
+    || (t==='classes' && state.clsSel)
     || (t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype'));
 }
 function adminPendingBadge(tab){
@@ -25964,6 +26226,7 @@ function renderAdmin(){
   else if(tab==='cardshop') body = renderAdminCardShopTab();
   else if(tab==='quizq') body = renderAdminQuizQuestionsTab();
   else if(tab==='structure') body = renderAdminStructureTab();
+  else if(tab==='classes') body = renderAdminClassesTab();
   else if(window.FXADMIN && window.FXADMIN[tab]) body = window.FXADMIN[tab]();
   else if(tab==='attendance'){ body = renderAdminAttendanceTab(); if(!state.attNav || (!state.attNav.type && state.attNav.page!=='addtype')) body += adminSettingsGroup('attscan'); }
   const hubItem = ADMIN_HUB_ITEMS.find(it=>it.tab===tab);
@@ -25988,6 +26251,8 @@ function renderAdmin(){
     else if(an && an.type && ATT_TYPES[an.type]){
       pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
     }
+  } else if(tab==='classes'){
+    if(state.clsSel) pageTitle = 'الفصول — '+clsDef(state.clsSel).label;
   } else if(tab==='opinions'){
     if(state.viewingOpinionId){
       const o = OPINIONS.find(x=>x.id===state.viewingOpinionId);
@@ -26239,7 +26504,8 @@ function renderAdminParticipantDetail(p){
       ${profRow('📍','العنوان',cp.address)}
       ${profRow('🗓️','تاريخ الانضمام',cp.joinDate)}
     </div>` : '';
-    bodyHtml = profCard + `
+    const clsCard = cp ? `<div class="card" style="margin-bottom:12px;"><label style="margin-top:0;">🏫 الفصل</label><select class="field" data-cls-move="${escapeHtml(p.id)}">${clsOptions(clsOf(p.id),true)}</select></div>` : '';
+    bodyHtml = profCard + clsCard + `
     <div class="card">
       <label>الاسم</label>
       <input class="field" id="edit-pname-${p.id}" value="${escapeHtml(p.name)}" />
@@ -29273,16 +29539,25 @@ document.addEventListener('click', (e)=>{
     else if(t==='sessions' && state.adminDayId){ state.adminDayId = null; }
     else if(t==='participants' && state.addingParticipant){ state.addingParticipant = false; }
     else if(t==='participants' && state.editingParticipantId){ state.editingParticipantId = null; }
+    else if(t==='classes' && state.clsSel){ state.clsSel = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
     else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = 'home'; }
     else if(t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype')){ state.attNav = {type:null, page:'home'}; }
     else { state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
   }
+  else if(action==='cls-open'){ state.adminTab='classes'; state.adminHub=false; state.clsSel = el.dataset.k; state.clsAbsent=false; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='cls-member'){ state.adminTab='participants'; state.editingParticipantId = el.dataset.pid; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='cls-back'){ state.clsSel = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='cls-sort'){ state.clsSort = el.dataset.v; render(); }
+  else if(action==='cls-absent'){ state.clsAbsent = !state.clsAbsent; render(); }
+  else if(action==='cls-export'){ clsExport(el.dataset.k); }
+  else if(action==='cls-copy-phones'){ const ph = (clsStats().byClass[el.dataset.k].list).map(m=>m.phone).filter(Boolean).join('\n'); if(!ph){ showToast('مفيش أرقام متسجلة', true); } else { try{ navigator.clipboard.writeText(ph).then(()=>showToast('اتنسخت الأرقام'), ()=>showToast('معرفتش أنسخ', true)); }catch(e){ showToast('معرفتش أنسخ', true); } } }
+  else if(action==='cls-bulk-move'){ const ids = Array.from(document.querySelectorAll('.cls-chk:checked')).map(x=>x.value); const to = (document.getElementById('cls-bulk-to')||{}).value; if(ids.length && to) clsMove(ids, to); }
   else if(action==='admin-sub'){ state.adminSub = state.adminSub || {}; state.adminSub[el.dataset.k] = el.dataset.v; render(); }
   else if(action==='admin-collapse'){ state.adminOpen = state.adminOpen || {}; const k = el.dataset.k; const cur = (k in state.adminOpen) ? state.adminOpen[k] : false; state.adminOpen[k] = !cur; render(); }
   else if(action==='admin-q-filter'){ state.adminQFilter = el.dataset.f; render(); }
-  else if(action==='admin-hub-tile'){ state.editingParticipantId = null; state.addingParticipant = false; state.attNav = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
+  else if(action==='admin-hub-tile'){ state.clsSel = null; state.editingParticipantId = null; state.addingParticipant = false; state.attNav = null; state.adminTab = el.dataset.tab; state.adminHub = false; state.editingSessionId = null; state.adminDayId = null; state.viewingOpinionId = null; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(action==='open-admin-day'){ state.adminDayId = el.dataset.day; state.editingSessionId = null; render(); }
   else if(action==='close-admin-day'){ state.adminDayId = null; state.editingSessionId = null; render(); }
   else if(action==='admin-hub-back'){ state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; render(); }
