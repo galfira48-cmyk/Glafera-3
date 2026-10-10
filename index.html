@@ -7167,19 +7167,56 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .uno-mm-bar{height:6px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin:10px auto 0; max-width:220px;}
   .uno-mm-bar-fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--gold),var(--gold-2)); transition:width .5s ease;}
   @keyframes unoMmLive{0%{box-shadow:0 0 0 0 rgba(95,224,164,.55);}70%{box-shadow:0 0 0 7px rgba(95,224,164,0);}100%{box-shadow:0 0 0 0 rgba(95,224,164,0);}}
-  /* ===== خانة "في انتظار لاعب" (شكل جديد: حلقة دوّارة + نقط متحركة + لمعة) ===== */
-  .uno-lobby-row.empty{opacity:1; justify-content:flex-start; gap:12px; border:1.5px dashed rgba(160,150,255,.45); background:linear-gradient(90deg,rgba(124,108,255,.06),rgba(124,108,255,.14),rgba(124,108,255,.06)); background-size:200% 100%; animation:waitShimmer 2.6s linear infinite;}
-  .uno-lobby-row.empty:nth-of-type(2n){animation-delay:-.9s;}
-  .wait-ring{position:relative; flex:0 0 auto; width:36px; height:36px; border-radius:50%; border:2px dashed rgba(160,150,255,.5);}
-  .wait-ring::before{content:''; position:absolute; inset:-2px; border-radius:50%; border:3px solid transparent; border-top-color:var(--gold,#FFC21A); border-right-color:rgba(255,194,26,.35); animation:waitSpin 1.1s linear infinite;}
-  .wait-ring::after{content:'👤'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:15px; opacity:.55;}
-  .wait-txt{font-weight:800; font-size:14px; opacity:.8; letter-spacing:.2px;}
+  /* ===== خانات "في انتظار لاعب": دوائر بتلف بدل المستطيل ===== */
+  .uno-lobby-list{flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center;}
+  .uno-lobby-list > .uno-lobby-row:not(.empty){flex:1 1 100%;}
+  .uno-lobby-row.empty{flex:0 0 auto; width:74px; height:74px; padding:0; border-radius:50%; flex-direction:column; justify-content:center; align-items:center; gap:0; overflow:visible; opacity:1;
+    border:2px dashed rgba(160,150,255,.5); background:radial-gradient(circle at 50% 35%,rgba(124,108,255,.22),rgba(124,108,255,.05) 70%); animation:waitFloat 2.4s ease-in-out infinite;}
+  .uno-lobby-row.empty:nth-of-type(2n){animation-delay:-.8s;} .uno-lobby-row.empty:nth-of-type(3n){animation-delay:-1.6s;}
+  .wait-ring{position:absolute; inset:-5px; border-radius:50%; border:0; width:auto; height:auto; pointer-events:none;}
+  .wait-ring::before{content:''; position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:var(--gold,#FFC21A); border-right-color:rgba(255,194,26,.3); animation:waitSpin 1.2s linear infinite;}
+  .wait-ring::after{display:none;}
+  .wait-txt{display:flex; flex-direction:column; align-items:center; font-size:22px; line-height:1;}
+  .wait-txt::before{content:'👤'; opacity:.6; font-size:22px;}
+  .wait-txt em{display:none;}
+  .wait-dots{font-style:normal; font-size:18px; line-height:.7; margin-top:2px;}
   .wait-dots b{display:inline-block; font-weight:900; animation:waitDot 1.2s ease-in-out infinite;}
   .wait-dots b:nth-child(2){animation-delay:.2s;} .wait-dots b:nth-child(3){animation-delay:.4s;}
   @keyframes waitSpin{to{transform:rotate(360deg);}}
   @keyframes waitDot{0%,70%,100%{opacity:.2; transform:translateY(0);} 35%{opacity:1; transform:translateY(-3px);}}
-  @keyframes waitShimmer{from{background-position:200% 0;} to{background-position:-200% 0;}}
+  @keyframes waitFloat{0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);}}
   @media (prefers-reduced-motion:reduce){ .uno-lobby-row.empty,.wait-ring::before,.wait-dots b{animation:none !important;} }
+
+  /* ===== غرفة الانتظار بنفس أجواء "اختار نوع التحدي" (كارت كحلي + شريط ذهبي + مسكوت) ===== */
+  .room-waiting{position:relative; margin-top:92px; padding:14px 14px 18px; border-radius:30px; font-family:'Cairo',sans-serif; color:#eef1ff;
+    border:1.5px solid rgba(96,125,255,.38);
+    background:radial-gradient(120% 60% at 50% 0%, rgba(80,110,230,.2), transparent 60%), linear-gradient(165deg,#1a2650 0%,#101a3d 55%,#0c1431 100%);
+    box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,255,255,.03);}
+  .room-waiting::before{content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; padding:1.5px;
+    background:linear-gradient(135deg,rgba(255,200,60,.65),transparent 30%,transparent 70%,rgba(70,120,255,.7));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;}
+  .room-waiting > *:not(.ch-bg):not(.ch-mascot):not(.ch-bubble):not(.ch-bubble-crown){position:relative; z-index:1;}
+  .room-waiting > .ch-bg{z-index:0;}
+  .room-waiting > .ch-swords{width:76px; margin:4px auto 0;}
+  .room-waiting > .ch-ttl{height:62px;}
+  .room-waiting > .ch-ttl span{font-size:24px;}
+  .room-waiting .ch-bubble{font-size:11px;}
+  .room-waiting .hint{color:#dfe6ff; font-weight:700;}
+  .room-waiting .room-code-card{background:rgba(8,14,40,.55); border:1.5px solid rgba(96,125,255,.38); box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+  .room-waiting .room-code-eyebrow{color:#aebcf5;}
+  .room-waiting .room-code-value{color:#FFD43B; text-shadow:0 0 18px rgba(255,200,40,.55);}
+  .room-waiting .room-code-copy{background:rgba(40,60,130,.55); border:1.5px solid rgba(110,140,255,.5); color:#fff;}
+  .room-waiting .room-invite-btn{border:2px solid #2f7bff; border-radius:26px; color:#fff; font-weight:900; background:linear-gradient(180deg,rgba(32,50,110,.9),rgba(14,24,64,.95));
+    box-shadow:0 0 0 1px rgba(60,120,255,.25), 0 0 22px rgba(47,123,255,.4), inset 0 1px 0 rgba(255,255,255,.14);}
+  .room-waiting .uno-lobby-row:not(.empty){background:linear-gradient(180deg,rgba(32,50,110,.75),rgba(14,24,64,.85)); border:1.5px solid rgba(110,140,255,.4); color:#fff; border-radius:22px;}
+  .room-waiting .uno-lobby-row.empty{border-color:rgba(255,200,60,.55);}
+  .room-waiting .btn:not(.btn-primary){border:2px solid #2f7bff !important; border-radius:26px; color:#fff; font-weight:900; background:linear-gradient(180deg,rgba(32,50,110,.9),rgba(14,24,64,.95));
+    box-shadow:0 0 0 1px rgba(60,120,255,.25), 0 0 20px rgba(47,123,255,.35);}
+  .room-waiting .btn.btn-primary{border:0; border-radius:26px; color:#1b1328; font-weight:900; font-size:19px; padding:15px 12px; position:relative; overflow:hidden;
+    background:linear-gradient(180deg,#ffdc5a 0%,#fbbd1f 55%,#f59e0b 100%);
+    box-shadow:0 5px 0 #c27806, 0 16px 30px rgba(245,158,11,.38), inset 0 2px 0 rgba(255,255,255,.65), inset 0 -2px 6px rgba(190,100,0,.25);}
+  .room-waiting .btn.btn-primary:disabled{filter:grayscale(.55); opacity:.6;}
+  .room-waiting .btn:active{transform:translateY(2px) scale(.985);}
   .uno-lobby-row{position:relative; overflow:hidden;}
   .uno-lobby-row.uno-row-in{animation:unoRowIn .5s cubic-bezier(.34,1.56,.64,1) both;}
   @keyframes unoRowIn{from{opacity:0; transform:translateY(-10px) scale(.96);}to{opacity:1; transform:none;}}
@@ -22423,7 +22460,7 @@ function renderRoomUnoLobby(room){
   const seen = _unoLobbySeen[room.code];
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="uno-lobby-radar"></span>⏳ في انتظار لاعب...</div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     const isNew = !seen.has(p.id);
     seen.add(p.id);
     return `<div class="uno-lobby-row${isNew?' uno-row-in':''}">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div>${isNew?'<span class="uno-lobby-joined">انضم الآن ✅</span>':''}</div>`;
@@ -22432,12 +22469,13 @@ function renderRoomUnoLobby(room){
   const pct = Math.round((filled/4)*100);
   return `
     <div class="room-waiting">
+      ${roomWaitHead()}
       <div class="uno-mm-header">
         <div class="uno-mm-title">جاري تجهيز الطاولة...</div>
         <div class="uno-mm-count">${filled}/4 لاعبين انضموا</div>
         <div class="uno-mm-bar"><div class="uno-mm-bar-fill" style="width:${pct}%"></div></div>
       </div>
-      ${roomCodeCard(room.code, room.game)}
+      ${roomCodeCard(room.code, room.game, true)}
       <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
       <button type="button" class="btn btn-ghost uno-mm-share" style="width:100%;margin-bottom:12px;" data-action="room-uno-share" data-code="${room.code}">📤 شارك الكود مع صحابك</button>
       <div class="uno-lobby-list">${slots}</div>
@@ -22684,7 +22722,7 @@ function renderRoomQuizLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -22852,7 +22890,7 @@ function renderRoomMysteryLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -23044,7 +23082,7 @@ function renderRoomEbLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -23188,7 +23226,7 @@ function renderRoomPvLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -23401,7 +23439,7 @@ function renderRoomFhLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -23608,7 +23646,7 @@ function renderRoomFsLobby(room){
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
     const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
     return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
   }).join('');
   return `
@@ -23903,7 +23941,7 @@ function renderRoomFzLobby(room){
     const tag = isJ ? '⚖️ الحكم' : fzTeamDot(pi%2===0?'red':'blue');
     return `<div class="uno-lobby-row" ${canPick?`data-action="room-fz-setjudge" data-p="${escapeHtml(p.id)}" style="cursor:pointer;${isJ?'outline:2px solid #FFC21A;':''}"`:''}>${gameAvatar(p.id)}<div class="uno-lobby-pname">${tag} ${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div>${canPick&&!isJ?'<span style="font-size:12px;opacity:.7;">اجعله حكم</span>':''}</div>`;
   });
-  for(let i=ps.length;i<(judgeOn?5:4);i++) rows.push(`<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt">في انتظار لاعب<i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`);
+  for(let i=ps.length;i<(judgeOn?5:4);i++) rows.push(`<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`);
   const even = playing.length>=2 && playing.length%2===0;
   const modeBtn = isHost ? `<button type="button" class="btn" style="width:100%;margin-top:12px;border:2px solid var(--border);" data-action="room-fz-mode">⚖️ ${judgeOn?'الحكم شغّال (دوس لإلغائه)':'بدون حكم — اختيارات من 4 (دوس لتشغيل الحكم)'}</button>` : '';
   return `
@@ -25366,8 +25404,51 @@ function renderRoomGamesInCategory(){
     ${html}
   `;
 }
-function roomCodeCard(code, game){
+function roomWaitHead(){
   return `
+      <div class="ch-mascot"><svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="rwCr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#e8a012"/></linearGradient>
+          <radialGradient id="rwBd" cx=".35" cy=".25" r=".9"><stop offset="0" stop-color="#3a3647"/><stop offset=".55" stop-color="#17141f"/><stop offset="1" stop-color="#0c0a12"/></radialGradient>
+        </defs>
+        <ellipse cx="110" cy="96" rx="84" ry="54" fill="url(#rwBd)"/>
+        <ellipse cx="70" cy="70" rx="22" ry="9" fill="#fff" opacity=".1" transform="rotate(-25 70 70)"/>
+        <g transform="rotate(-9 112 50)">
+          <path d="M62 62 L66 22 L89 42 L112 12 L135 42 L158 22 L162 62 Q112 72 62 62Z" fill="url(#rwCr)" stroke="#b97708" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="66" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="112" cy="10" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="158" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/>
+          <path d="M72 56 Q112 64 152 56" stroke="#fff3b0" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+        </g>
+        <g class="ch-eyes"><path d="M54 82 Q56 70 70 72 L104 76 Q112 78 120 76 L154 72 Q168 70 170 82 Q170 104 148 104 L132 104 Q118 104 114 94 Q112 90 110 94 Q106 104 92 104 L76 104 Q54 104 54 82Z" fill="#050408"/>
+        <path d="M64 80 Q80 76 98 82" stroke="#fff" stroke-width="3" opacity=".25" fill="none" stroke-linecap="round"/>
+        <path d="M128 80 Q142 76 156 80" stroke="#fff" stroke-width="3" opacity=".2" fill="none" stroke-linecap="round"/></g>
+        <path d="M88 118 Q112 130 136 118" stroke="#050408" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+        <g fill="#fff" stroke="#c9ccd8" stroke-width="1.5">
+          <g class="ch-hl"><ellipse cx="46" cy="136" rx="26" ry="15"/></g><g class="ch-hr"><ellipse cx="174" cy="136" rx="26" ry="15"/></g>
+        </g>
+        <g stroke="#c9ccd8" stroke-width="1.6" stroke-linecap="round"><path d="M38 124 V134 M48 122 V134 M58 124 V134"/><path d="M162 124 V134 M172 122 V134 M182 124 V134"/></g>
+      </svg></div>
+      <svg class="ch-bubble-crown" viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#f7b92a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+<div class="ch-bubble">استنى أصحابك وابدأ اللعب!</div>
+<div class="ch-bg"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="ch-swords"><svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="rwBl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f6ff"/><stop offset=".5" stop-color="#b6c6e4"/><stop offset="1" stop-color="#7f93b8"/></linearGradient>
+          <linearGradient id="rwHl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#d98d0c"/></linearGradient></defs>
+          <path d="M60 4 L66 12 L60 18 L54 12Z" fill="url(#rwHl)"/><path d="M48 14 L60 4 L72 14 L70 20 L50 20Z" fill="url(#rwHl)" stroke="#b97708" stroke-width="1.2" stroke-linejoin="round"/>
+          <g transform="translate(60 58)">
+            <g transform="rotate(-42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#rwBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/></g>
+            <g transform="rotate(42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#rwBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/></g>
+          </g>
+        </svg></div>
+        <div class="ch-ttl">
+          <svg viewBox="0 0 300 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rwBr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd84f"/><stop offset="1" stop-color="#f6a712"/></linearGradient></defs>
+            <path d="M4 44 L22 38 L8 33 L44 26 L120 17 L204 15 L262 8 L296 12 L286 20 L298 27 L276 33 L292 42 L270 49 L284 58 L238 59 L150 66 L62 70 L18 67 L36 59 L6 55Z" fill="url(#rwBr)"/></svg>
+          <span>غرفة الانتظار</span>
+        </div>
+`;
+}
+function roomCodeCard(code, game, noHead){
+  return `
+    ${noHead ? '' : roomWaitHead()}
     <div class="room-code-card">
       <div class="room-code-eyebrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
