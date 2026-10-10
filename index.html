@@ -7569,6 +7569,73 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes fhPop{from{opacity:0; transform:translateY(10px) scale(.96);} to{opacity:1; transform:none;}}
   @media (prefers-reduced-motion:reduce){ .fh-grp{animation:none; opacity:1;} .fh-num{transition:none;} }
 </style>
+<style id="fz-css">
+  .fz{--ink:#1a1030; --cream:#FFF3D6; --fr:#E8342A; --fb:#2F6FE0; position:relative; border-radius:22px; padding:12px 10px 14px; margin-top:8px; overflow:hidden; border:3px solid var(--ink); font-family:'Cairo',sans-serif; color:var(--ink);
+    background:repeating-conic-gradient(from 0deg at 50% 30%, #FFD23F 0 7deg, #FFC21A 7deg 14deg);}
+  .fz.t-red{background:repeating-conic-gradient(from 0deg at 50% 30%, #F2492F 0 7deg, #E03A24 7deg 14deg);}
+  .fz.t-blue{background:repeating-conic-gradient(from 0deg at 50% 30%, #3E86F0 0 7deg, #2F6FE0 7deg 14deg);}
+  .fz-scores{display:flex; gap:10px; justify-content:space-between; margin-bottom:10px;}
+  .fz-sc{flex:1; background:var(--cream); border:3px solid var(--ink); border-radius:12px; box-shadow:0 4px 0 var(--ink); overflow:hidden; text-align:center; transition:transform .2s;}
+  .fz-sc.on{transform:translateY(-3px) scale(1.04);}
+  .fz-sc-l{font-weight:900; font-size:12px; color:#fff; padding:2px 0; border-bottom:3px solid var(--ink);}
+  .fz-sc.red .fz-sc-l{background:var(--fr);} .fz-sc.blue .fz-sc-l{background:var(--fb);}
+  .fz-sc-n{font-weight:900; font-size:24px; line-height:1.3;}
+  .fz-title{text-align:center; font-weight:900; font-size:26px; line-height:1.2; color:var(--ink); text-shadow:0 2px 0 rgba(255,255,255,.55); margin:2px 0 4px;}
+  .fz-sub{display:block; width:max-content; max-width:100%; margin:0 auto 10px; background:var(--ink); color:#FFD23F; font-weight:900; font-size:13px; padding:3px 14px; border-radius:10px; transform:rotate(-2deg);}
+  .fz-board{display:flex; flex-direction:column; gap:7px;}
+  .fz-row{display:flex; gap:6px; align-items:stretch;}
+  .fz-cat{flex:1.7; display:flex; align-items:center; justify-content:center; gap:5px; background:var(--cream); border:3px solid var(--ink); border-radius:10px; box-shadow:0 3px 0 var(--ink); font-weight:900; font-size:12.5px; padding:6px 4px; text-align:center; line-height:1.25;}
+  .fz-tile{flex:1; border:3px solid var(--ink); border-radius:10px; box-shadow:0 4px 0 var(--ink); background:var(--fb); color:#fff; font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; padding:7px 0; text-shadow:0 2px 0 rgba(0,0,0,.35); transition:transform .1s, box-shadow .1s;}
+  .fz-tile.r{background:var(--fr);}
+  .fz-tile:not(:disabled):active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink);}
+  .fz-tile:disabled:not(.used){opacity:.9;}
+  .fz-tile.used{background:#cfc9b8; color:#8a8470; box-shadow:none; transform:translateY(3px); text-shadow:none;}
+  .fz-turn{text-align:center; margin:10px 0 2px; font-weight:900; font-size:14px; background:var(--cream); border:3px solid var(--ink); border-radius:12px; padding:6px 8px; box-shadow:0 3px 0 var(--ink);}
+  .fz-roster{display:flex; justify-content:space-between; gap:8px; margin-top:10px;}
+  .fz-team{flex:1; background:rgba(255,255,255,.88); border:3px solid var(--ink); border-radius:12px; padding:6px; display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center;}
+  .fz-team.red{border-color:var(--fr);} .fz-team.blue{border-color:var(--fb);}
+  .fz-team b{width:100%; text-align:center; font-weight:900; font-size:11px;}
+  .fz-q{background:var(--cream); border:3px solid var(--ink); border-radius:16px; box-shadow:0 5px 0 var(--ink); padding:12px 12px 14px; position:relative; margin-top:6px;}
+  .fz-q-cat{font-weight:900; font-size:11.5px; opacity:.7;}
+  .fz-q-txt{font-weight:900; font-size:18px; line-height:1.55; margin-top:2px;}
+  .fz-val{position:absolute; top:-16px; left:10px; width:44px; height:44px; border-radius:50%; background:#FFC928; border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; transform:rotate(-8deg);}
+  .fz-timer{display:flex; align-items:center; gap:8px; margin:10px 0 2px;}
+  .fz-bar{flex:1; height:12px; background:rgba(0,0,0,.18); border:2.5px solid var(--ink); border-radius:8px; overflow:hidden;}
+  .fz-bar i{display:block; height:100%; width:100%; background:#FFD23F; transition:width .25s linear;}
+  .fz-count{width:38px; height:38px; border-radius:50%; background:var(--cream); border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:17px;}
+  .fz-steal{text-align:center; font-weight:900; font-size:27px; line-height:1.2; color:#fff; text-shadow:0 3px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink); margin:8px 0 2px; animation:fzShake .5s ease 1;}
+  .fz-steal small{display:block; font-size:12.5px; text-shadow:none; color:var(--ink); background:var(--cream); border:2.5px solid var(--ink); border-radius:10px; padding:2px 10px; width:max-content; max-width:100%; margin:6px auto 0;}
+  .fz-opts{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .fz-opt{display:block; width:100%; text-align:right; background:#fff; color:var(--ink); border:3px solid var(--ink); border-radius:12px; box-shadow:0 4px 0 var(--ink); font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; padding:9px 12px; transition:transform .1s, box-shadow .1s;}
+  .fz-opt:not(:disabled):active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink);}
+  .fz-opt:disabled{opacity:.8;}
+  .fz-opt.bad{background:#FFD0CB; text-decoration:line-through; opacity:.7;}
+  .fz-opt.right{background:#8FE3A3; opacity:1;}
+  .fz-opt.mine-bad{background:#FF9D95; opacity:1; text-decoration:none;}
+  .fz-opt em{font-style:normal; margin-inline-start:6px;}
+  .fz-mas-row{display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px; min-height:84px;}
+  .fz-mas-wrap{position:relative; width:84px;}
+  .fz-mas{width:84px; height:84px; display:block; animation:fzBob 2.4s ease-in-out infinite;}
+  .fz-bub{position:absolute; bottom:70px; background:#fff; border:3px solid var(--ink); border-radius:14px; padding:2px 10px; font-weight:900; font-size:13px; white-space:nowrap; animation:fzPop .35s ease both;}
+  .fz-mas-wrap.red .fz-bub{right:30px;} .fz-mas-wrap.blue .fz-bub{left:30px;}
+  .fz-res{text-align:center; font-weight:900; font-size:20px; line-height:1.4; background:var(--cream); border:3px solid var(--ink); border-radius:14px; box-shadow:0 4px 0 var(--ink); padding:8px 10px; margin-top:10px; animation:fzPop .4s ease both;}
+  .fz-res small{display:block; font-size:13px; opacity:.75;}
+  .fz-fin{font-weight:900; font-size:30px; text-align:center; color:#fff; text-shadow:0 3px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink); margin:6px 0 10px;}
+  .fz-end{display:block; margin:12px auto 0; background:transparent; border:2.5px dashed var(--ink); border-radius:10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:var(--ink); padding:4px 14px;}
+  .fz-prize{background:var(--good); color:#06281a; font-weight:900; font-size:11px; padding:1px 7px; border-radius:7px;}
+  .fz-lobby-teams{display:flex; gap:8px; margin:12px 0 4px;}
+  .fz-lobby-teams .fz-team{background:var(--surface); flex-direction:column; align-items:stretch;}
+  .fz-ans{margin-top:10px; background:#FFF; border:3px dashed var(--ink); border-radius:12px; padding:8px 10px; font-weight:800; font-size:13px; text-align:center;}
+  .fz-ans b{display:block; font-size:19px; font-weight:900; margin-top:2px;}
+  .fz-judge{display:flex; gap:10px; margin-top:10px;}
+  .fz-jb{flex:1; border:3px solid var(--ink); border-radius:12px; box-shadow:0 4px 0 var(--ink); font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; padding:10px 0; color:var(--ink);}
+  .fz-jb.ok{background:#8FE3A3;} .fz-jb.no{background:#FF9D95;}
+  .fz-jb:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink);}
+  @keyframes fzPop{from{opacity:0; transform:scale(.85) translateY(6px);} to{opacity:1; transform:none;}}
+  @keyframes fzBob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);}}
+  @keyframes fzShake{0%{transform:scale(.6) rotate(-6deg); opacity:0;} 60%{transform:scale(1.12) rotate(3deg); opacity:1;} 100%{transform:none;}}
+  @media (prefers-reduced-motion:reduce){ .fz-mas,.fz-steal,.fz-res,.fz-bub{animation:none;} .fz-bar i{transition:none;} }
+</style>
 <style id="fs-css">
   .fs-title{text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; color:var(--text); margin:10px 0 8px; line-height:1.5;}
   .fs-ring{width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:3px solid var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--text); box-shadow:0 0 0 4px rgba(244,183,64,.18);}
@@ -13840,7 +13907,7 @@ const GAME_CATEGORY_OF = {
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', revword:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
-  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', fahmeen:'party', placemem:'mind',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', fahmeen:'party', placemem:'mind', fazzura:'party',
 };
 /* rectangular category cards — tap one to open the games inside it */
 /* تحديث لحظي: لو الأدمن قفل/فتح لعبة، الشاشة بتتحدّث عند اللاعبين من غير ريفرش */
@@ -21715,6 +21782,8 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fh:null});
   } else if(gameType==='placemem'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fs:null});
+  } else if(gameType==='fazzura'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fz:null});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -21744,11 +21813,11 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='fahmeen' || room.game==='placemem'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
-      if(room.players.length>=4){ showToast('الغرفة دي مكتملة (4 لاعبين)', true); return; }
+      const _cap = (room.game==='fazzura' && room.fzJudge!==false) ? 5 : 4; if(room.players.length>=_cap){ showToast('الغرفة دي مكتملة ('+_cap+' لاعبين)', true); return; }
       room.players.push({id:state.pid, name:p ? p.name : 'لاعب'});
     }
     room.updatedAt = Date.now();
@@ -22285,6 +22354,7 @@ const ROOM_GAMES = [
   {id:'proverb',  sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر'},
   {id:'fahmeen',  sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم'},
   {id:'placemem', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر'},
+  {id:'fazzura', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!'},
 ];
 /* الألعاب دي متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
 const ROOM_ONLY_TILES = {
@@ -22294,6 +22364,7 @@ const ROOM_ONLY_TILES = {
   proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
   fahmeen: {id:'fahmeen', icon:'🤝', title:'فاهمين بعض؟', sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم', color:'linear-gradient(145deg,#6A1B9A,#E91E8C)'},
   placemem: {id:'placemem', icon:'🧠', title:'ذاكرة الأماكن', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#3B1F6E,#8E5BD1)'},
+  fazzura: {id:'fazzura', icon:'🎯', title:'فزورة — لوحة النقاط', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!', color:'linear-gradient(145deg,#E8342A,#FFC21A)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 /* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
@@ -23647,6 +23718,439 @@ function renderRoomFs(){
     <div class="fs-grid">${cells}</div>
     ${reveal ? fsNextBtn(F.r+':'+F.q) : ''}`;
 }
+/* ================= فزورة — لوحة النقاط: لعبة جماعية بفريقين (أحمر/أزرق) — 6 فئات × 3 قيم (200/400/600) ================= */
+/* الفريق صاحب الدور يختار سؤال ويجاوب، لو غلط أو الوقت خلص الفريق التاني «يخطفها». كل سؤال: [النص، الإجابة الصح، غلط1، غلط2، غلط3] */
+const FZ_TITLE = 'فزورة';
+const FZ_VALUES = [200, 400, 600];
+const FZ_SECS = 20;
+const FZ_CATS = [
+  {name:'كرة القدم', icon:'⚽', qs:[
+    [['كام لاعب بيلعبوا من كل فريق جوه الملعب؟','11','9','10','12'], ['لون كارت الطرد في ماتش الكورة؟','أحمر','أصفر','أخضر','أزرق']],
+    [['مين اللاعب المصري اللي اتلقّب بـ«الملك المصري» ولعب في ليفربول؟','محمد صلاح','محمد النني','أحمد حسام (ميدو)','محمود تريزيجيه'], ['مين فاز بكأس العالم 2022 في قطر؟','الأرجنتين','فرنسا','البرازيل','كرواتيا']],
+    [['أكتر منتخب فاز ببطولة كأس الأمم الأفريقية؟','مصر','الكاميرون','غانا','نيجيريا'], ['في أي سنة اتلعب أول كأس عالم؟','1930','1926','1934','1950']]
+  ]},
+  {name:'أفلام أجنبية', icon:'🎬', qs:[
+    [['اسم الكاوبوي في فيلم Toy Story؟','وودي','باز','ريكس','هام'], ['مين البطل الخارق اللي بيطلّع خيوط شبكة من إيده؟','سبايدر مان','باتمان','سوبرمان','أيرون مان']],
+    [['السفينة في فيلم تايتانيك غرقت بعد ما خبطت في إيه؟','جبل جليد','صخرة','سفينة تانية','حوت'], ['مين الساحر الصغير اللي عنده ندبة برق على جبهته؟','هاري بوتر','رون ويزلي','نيفيل','دراكو']],
+    [['مين مخرج فيلم Inception؟','كريستوفر نولان','ستيفن سبيلبرج','جيمس كاميرون','ريدلي سكوت'], ['كام فيلم في سلسلة «سيد الخواتم» الأساسية؟','3','2','4','5']]
+  ]},
+  {name:'مسلسلات عربية', icon:'📺', qs:[
+    [['مين بطل مسلسل «الكبير أوي»؟','أحمد مكي','كريم عبد العزيز','أحمد حلمي','محمد رمضان'], ['مين بطل مسلسل «رأفت الهجان»؟','محمود عبد العزيز','نور الشريف','يحيى الفخراني','عادل إمام']],
+    [['مين بطل مسلسل «لن أعيش في جلباب أبي»؟','نور الشريف','يحيى الفخراني','محمود عبد العزيز','صلاح السعدني'], ['مين بطلة مسلسل «ضمير أبلة حكمت»؟','فاتن حمامة','سعاد حسني','ليلى علوي','يسرا']],
+    [['مين كاتب مسلسل «ليالي الحلمية»؟','أسامة أنور عكاشة','وحيد حامد','يوسف السباعي','مصطفى محرم'], ['مين الكاتب اللي اتعمل عن قصصه مسلسل «رأفت الهجان»؟','صالح مرسي','وحيد حامد','أسامة أنور عكاشة','لينين الرملي']]
+  ]},
+  {name:'جغرافيا', icon:'🌍', qs:[
+    [['أطول نهر في أفريقيا؟','النيل','الكونغو','النيجر','الزامبيزي'], ['عاصمة فرنسا؟','باريس','ليون','مرسيليا','نيس']],
+    [['أكبر قارة في العالم مساحةً؟','آسيا','أفريقيا','أوروبا','أمريكا الشمالية'], ['أكبر محيط في العالم؟','الهادي','الأطلسي','الهندي','المتجمد الشمالي']],
+    [['عاصمة أستراليا؟','كانبرا','سيدني','ملبورن','بيرث'], ['كام دولة عضو في جامعة الدول العربية؟','22','18','20','25']]
+  ]},
+  {name:'تاريخ', icon:'🏛️', qs:[
+    [['مين اللي بنى الأهرامات؟','المصريين القدماء','الرومان','الإغريق','الفرس'], ['الملك المصري القديم اللي اتكشفت مقبرته سنة 1922 بكنوزها؟','توت عنخ آمون','رمسيس التاني','خوفو','أخناتون']],
+    [['مين أول رئيس لجمهورية مصر؟','محمد نجيب','جمال عبد الناصر','أنور السادات','حسني مبارك'], ['في أي سنة قامت ثورة 23 يوليو؟','1952','1919','1956','1967']],
+    [['مين القائد اللي عبر جبال الألب بالفيلة؟','حنبعل','يوليوس قيصر','الإسكندر الأكبر','نابليون'], ['في أي سنة بدأت الحرب العالمية الأولى؟','1914','1905','1918','1939']]
+  ]},
+  {name:'ألعاب فيديو', icon:'🎮', qs:[
+    [['اسم السباك الأحمر اللي بيجمع العملات ويقفز على الأعداء؟','ماريو','لويجي','سونيك','دونكي كونج'], ['اسم البوكيمون الأصفر اللي بيطلّع كهربا؟','بيكاتشو','شارماندر','سكويرتل','جيجلي بف']],
+    [['في لعبة Among Us، الشخص اللي بيخرّب على الطاقم اسمه إيه؟','المحتال (Impostor)','الطبيب','الحارس','الملاح'], ['في لعبة ماينكرافت، اسم الكائن الأخضر اللي بينفجر لما يقرّب منك؟','كريبر','زومبي','سكليتون','إندرمان']],
+    [['في لعبة The Legend of Zelda، اسم البطل اللي بيلعب بيه اللاعب؟','لينك','زيلدا','جانون','نافي'], ['مين الشركة اللي عملت لعبة ماريو؟','نينتندو','سوني','سيجا','أتاري']]
+  ]}
+];
+const FZ_TOTAL = FZ_CATS.length * FZ_VALUES.length;
+function fzOther(t){ return t==='red' ? 'blue' : 'red'; }
+function fzTeamName(t){ return t==='red' ? 'الأحمر' : 'الأزرق'; }
+function fzTeamDot(t){ return t==='red' ? '🔴' : '🔵'; }
+function fzNewState(players, judgeId){
+  const ps = (players || []).filter(p=>p.id!==judgeId);
+  const teams = {};
+  ps.forEach((p,i)=>{ teams[p.id] = (i%2===0) ? 'red' : 'blue'; });
+  const board = FZ_CATS.map(cat=> cat.qs.map(pair=>{
+    const x = pair[Math.floor(Math.random()*pair.length)];
+    const opts = shuffleArray([0,1,2,3]).map(i=>({t:x[1+i], ok:i===0}));
+    return {q:x[0], o:opts.map(o=>o.t), a:opts.findIndex(o=>o.ok)};
+  }));
+  return {board, teams, judge:judgeId||null, used:{}, turn:'red', phase:'pick', cur:null, stage:'own', wrong:[], firstMiss:null,
+    scores:{red:0, blue:0}, last:null, finished:false, seq:0};
+}
+function fzMyTeam(room){
+  if(state.roomSpectate) return null;
+  return (room && room.fz && room.fz.teams && room.fz.teams[state.pid]) || null;
+}
+function fzActiveTeam(F){ return F.stage==='own' ? F.turn : fzOther(F.turn); }
+function fzWinnerTeam(F){
+  if(F.scores.red===F.scores.blue) return 'draw';
+  return F.scores.red>F.scores.blue ? 'red' : 'blue';
+}
+/* جايزة الفيزا: أعضاء الفريق الكسبان بس بياخدوا جايزة المركز الأول (مفيش جايزة في التعادل أو لو الفريق ما جمعش نقط) */
+function fzPrizes(room, F){
+  const prizes = {}, w = fzWinnerTeam(F);
+  if(w==='draw' || !(F.scores[w]>0)) return prizes;
+  const pts = (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.first) || 0;
+  if(pts<=0) return prizes;
+  (room.players||[]).forEach(p=>{ if(F.teams[p.id]===w) prizes[p.id] = pts; });
+  return prizes;
+}
+async function awardFzPoints(room){
+  try{
+    const prizes = (room.fz && room.fz.prizes) || {};
+    const ids = Object.keys(prizes);
+    if(!ids.length) return;
+    WALLET = await loadWallet();
+    ids.forEach(id=>{ WALLET[id] = (WALLET[id]||0) + prizes[id]; });
+    await saveWallet(WALLET);
+    ids.forEach(id=> pushNotification(id, `🎯 فريقك كسب لعبة فزورة واخدت +${prizes[id]} نقطة`, '🏆'));
+    vtxLogSafe(ids.map(id=>({ pid:id, type:'game_win', amount:prizes[id], balAfter:(WALLET[id]||0), note:'فزورة' })));
+  }catch(e){}
+}
+/* ---- شخصيات الفريقين (الأحمر أرنب بكاب أحمر، الأزرق دايرة خضرا بكاب أزرق) ---- */
+function fzMascot(team, mood){
+  const cap = team==='red' ? '#E8342A' : '#2F6FE0';
+  const body = team==='red' ? '#FFF7EC' : '#7FD8B4';
+  const ears = team==='red'
+    ? `<ellipse cx="27" cy="12" rx="8" ry="19" fill="#FFF7EC" stroke="#1a1030" stroke-width="3.5"/><ellipse cx="73" cy="12" rx="8" ry="19" fill="#FFF7EC" stroke="#1a1030" stroke-width="3.5"/>` : '';
+  let eyes = `<circle cx="38" cy="56" r="5" fill="#1a1030"/><circle cx="62" cy="56" r="5" fill="#1a1030"/><circle cx="40" cy="54" r="1.8" fill="#fff"/><circle cx="64" cy="54" r="1.8" fill="#fff"/>`;
+  let mouth = `<ellipse cx="50" cy="71" rx="5" ry="4.5" fill="#2a1a2a"/>`;
+  if(mood==='happy'){
+    eyes = `<path d="M32 58 q6 -8 12 0 M56 58 q6 -8 12 0" stroke="#1a1030" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    mouth = `<path d="M38 66 q12 16 24 0z" fill="#fff" stroke="#1a1030" stroke-width="3" stroke-linejoin="round"/>`;
+  } else if(mood==='sad'){
+    mouth = `<path d="M40 76 q10 -9 20 0" stroke="#1a1030" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+    eyes += `<path d="M30 66 q-3 8 0 12" stroke="#5AB7FF" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  }
+  return `<svg class="fz-mas" viewBox="0 -8 100 110" aria-hidden="true">${ears}
+    <circle cx="50" cy="60" r="36" fill="${body}" stroke="#1a1030" stroke-width="4"/>
+    <path d="M15 52 q35 -34 70 0 l0 7 q-35 -22 -70 0z" fill="${cap}" stroke="#1a1030" stroke-width="3.5" stroke-linejoin="round"/>
+    <circle cx="27" cy="68" r="6" fill="#FF9DB0" opacity=".75"/><circle cx="73" cy="68" r="6" fill="#FF9DB0" opacity=".75"/>
+    ${eyes}${mouth}</svg>`;
+}
+function fzMascots(rm, rb, bubTeam, bubText){
+  const w = (t,mood)=>`<div class="fz-mas-wrap ${t}">${bubTeam===t?`<div class="fz-bub">${bubText}</div>`:''}${fzMascot(t,mood)}</div>`;
+  return `<div class="fz-mas-row">${w('red',rm)}${w('blue',rb)}</div>`;
+}
+function fzScoreBoard(F, activeTeam){
+  const box = t=>`<div class="fz-sc ${t}${activeTeam===t?' on':''}"><div class="fz-sc-l">${fzTeamName(t)}</div><div class="fz-sc-n">${F.scores[t]}</div></div>`;
+  return `<div class="fz-scores">${box('red')}${box('blue')}</div>`;
+}
+function fzRoster(room, F){
+  const col = t=>{
+    const mem = (room.players||[]).filter(p=>F.teams[p.id]===t);
+    return `<div class="fz-team ${t}"><b>${fzTeamDot(t)} الفريق ${fzTeamName(t)}</b>${mem.map(p=>gameAvatar(p.id)).join('')}</div>`;
+  };
+  return `<div class="fz-roster">${col('red')}${col('blue')}</div>`;
+}
+/* ---- اللوبي: بيتقسموا على فريقين بالترتيب (الأول والتالت أحمر، التاني والرابع أزرق) ---- */
+function fzJudgeOf(room){
+  if(room.fzJudge===false) return null;
+  const ps = room.players || [];
+  return (room.fzJudgeId && ps.some(p=>p.id===room.fzJudgeId)) ? room.fzJudgeId : room.hostId;
+}
+function renderRoomFzLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const judgeOn = room.fzJudge!==false;
+  const jid = fzJudgeOf(room);
+  const playing = ps.filter(p=>p.id!==jid);
+  const canPick = judgeOn && ps.some(p=>p.id===state.pid) && !state.roomSpectate;
+  const rows = ps.map(p=>{
+    const isJ = p.id===jid;
+    const pi = playing.findIndex(x=>x.id===p.id);
+    const tag = isJ ? '⚖️ الحكم' : fzTeamDot(pi%2===0?'red':'blue');
+    return `<div class="uno-lobby-row" ${canPick?`data-action="room-fz-setjudge" data-p="${escapeHtml(p.id)}" style="cursor:pointer;${isJ?'outline:2px solid #FFC21A;':''}"`:''}>${gameAvatar(p.id)}<div class="uno-lobby-pname">${tag} ${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div>${canPick&&!isJ?'<span style="font-size:12px;opacity:.7;">اجعله حكم</span>':''}</div>`;
+  });
+  for(let i=ps.length;i<(judgeOn?5:4);i++) rows.push(`<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`);
+  const even = playing.length>=2 && playing.length%2===0;
+  const modeBtn = isHost ? `<button type="button" class="btn" style="width:100%;margin-top:12px;border:2px solid var(--border);" data-action="room-fz-mode">⚖️ ${judgeOn?'الحكم شغّال (دوس لإلغائه)':'بدون حكم — اختيارات من 4 (دوس لتشغيل الحكم)'}</button>` : '';
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code, room.game)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">${judgeOn
+        ? 'شارك الكود مع أصحابك — دوسوا على اسم أي لاعب عشان يبقى هو الحكم ⚖️ (آخر اختيار هو اللي بيمشي)، والباقي 2 أو 4 لاعبين في فريقين 🔴🔵. الفريق يجاوب بصوت عالي والحكم يقول صح أو غلط، ولو غلطوا الفريق التاني يخطفها!'
+        : 'شارك الكود مع أصحابك — 2 أو 4 لاعبين في فريقين 🔴🔵. اختاروا سؤال وجازفوا، ولو غلطتوا الفريق التاني يخطفها!'}</div>
+      <div class="uno-lobby-list">${rows.join('')}</div>
+      ${modeBtn}
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:12px;" data-action="room-fz-start" ${even?'':'disabled'}>🎯 ابدأ اللعب (${playing.length}/4)</button>${even?'':'<div class="hint" style="text-align:center;margin-top:8px;">محتاجين 2 أو 4 لاعبين (غير الحكم) عشان الفريقين يبقوا متساويين</div>'}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
+    </div>`;
+}
+async function doRoomFzSetJudge(pid){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='fazzura' || room.status!=='waiting' || room.fzJudge===false || state.roomSpectate) return;
+  const ps = room.players || [];
+  if(!ps.some(p=>p.id===state.pid) || !ps.some(p=>p.id===pid)) return;
+  room.fzJudgeId = pid;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ vibrate(10); }catch(e){}
+  render();
+}
+async function doRoomFzMode(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='fazzura' || room.hostId!==state.pid || room.status!=='waiting') return;
+  if(room.fzJudge!==false){
+    if((room.players||[]).length>4){ showToast('الغرفة فيها أكتر من 4 لاعبين، مينفعش من غير حكم', true); return; }
+    room.fzJudge = false;
+  } else room.fzJudge = true;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomFzStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='fazzura' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  const judgeId = fzJudgeOf(room);
+  const playing = ps.filter(p=>p.id!==judgeId);
+  if(playing.length<2 || playing.length%2!==0){ showToast('محتاجين 2 أو 4 لاعبين (غير الحكم)', true); return; }
+  room.fz = fzNewState(ps, judgeId);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+/* الحكم بيسمع إجابة الفريق ويدوس صح أو غلط */
+async function doRoomFzJudge(okRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz || room.fz.finished || room.fz.phase!=='ask') { render(); return; }
+  const F = room.fz;
+  if(!F.judge || F.judge!==state.pid || state.roomSpectate) return;
+  const active = fzActiveTeam(F);
+  if(String(okRaw)==='1'){
+    F.scores[active] = (F.scores[active]||0) + FZ_VALUES[F.cur.v];
+    F.last = {ok:true, team:active, stolen:F.stage==='steal', pick:-1, by:null};
+    F.used[F.cur.c+'_'+F.cur.v] = true; F.phase = 'reveal'; F.seq = (F.seq||0)+1;
+    try{ SND.cheer(); }catch(e){}
+  } else {
+    fzMiss(F, null, false);
+    try{ vibrate(30); }catch(e){}
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+/* ---- اختيار سؤال من اللوحة (أي لاعب من الفريق صاحب الدور) ---- */
+async function doRoomFzTile(cRaw, vRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz || room.fz.finished || room.fz.phase!=='pick') { render(); return; }
+  const F = room.fz;
+  if(fzMyTeam(room)!==F.turn) return;
+  const c = parseInt(cRaw,10), v = parseInt(vRaw,10);
+  if(!F.board[c] || !F.board[c][v] || F.used[c+'_'+v]) return;
+  F.cur = {c, v}; F.phase = 'ask'; F.stage = 'own'; F.wrong = []; F.firstMiss = null; F.last = null; F.seq = (F.seq||0)+1;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ vibrate(10); }catch(e){}
+  render();
+}
+/* غلط أو الوقت خلص: لو ده الفريق الأول الفريق التاني يخطفها، ولو كان الخاطف محدش ياخد النقط */
+function fzMiss(F, pick, timeout){
+  const key = F.cur.c+'_'+F.cur.v;
+  if(F.stage==='own'){
+    F.firstMiss = {team:F.turn, timeout:!!timeout};
+    F.stage = 'steal';
+    F.wrong = (pick===null||pick===undefined) ? [] : [pick];
+  } else {
+    F.last = {ok:false, team:null, pick:(pick===null||pick===undefined)?-1:pick, timeout:!!timeout};
+    F.phase = 'reveal'; F.used[key] = true;
+  }
+  F.seq = (F.seq||0)+1;
+}
+async function doRoomFzPick(iRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz || room.fz.finished || room.fz.phase!=='ask') { render(); return; }
+  const F = room.fz, active = fzActiveTeam(F);
+  if(fzMyTeam(room)!==active) return;
+  const i = parseInt(iRaw,10), q = F.board[F.cur.c][F.cur.v];
+  if(!(i>=0 && i<q.o.length) || (F.wrong||[]).indexOf(i)>=0) return;
+  if(i===q.a){
+    F.scores[active] = (F.scores[active]||0) + FZ_VALUES[F.cur.v];
+    F.last = {ok:true, team:active, stolen:F.stage==='steal', pick:i, by:state.pid};
+    F.used[F.cur.c+'_'+F.cur.v] = true; F.phase = 'reveal'; F.seq = (F.seq||0)+1;
+    try{ SND.cheer(); }catch(e){}
+  } else {
+    fzMiss(F, i, false);
+    try{ vibrate(30); }catch(e){}
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+/* أول موبايل يوصل للصفر بيسجّل انتهاء الوقت (لو حد سبقه بيتجاهل لأن رقم المرحلة اتغيّر) */
+async function doRoomFzTimeout(seqAttr){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz || room.fz.finished || room.fz.phase!=='ask' || String(room.fz.seq)!==String(seqAttr)){ render(); return; }
+  fzMiss(room.fz, null, true);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomFzNext(sAttr){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz) return;
+  let F = room.fz, doAward = false;
+  if(F.finished){
+    if(sAttr!=='fin'){ render(); return; }
+    room.fz = fzNewState(room.players||[], F.judge);
+  } else {
+    if(F.phase!=='reveal' || String(F.seq)!==String(sAttr)){ render(); return; }
+    F.turn = fzOther(F.turn); F.cur = null; F.phase = 'pick'; F.stage = 'own'; F.wrong = []; F.firstMiss = null; F.seq = (F.seq||0)+1;
+    if(Object.keys(F.used).length>=FZ_TOTAL){ F.finished = true; F.prizes = fzPrizes(room, F); doAward = true; }
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.fz.finished){ try{ SND.coinChime(); }catch(e){} if(fzMyTeam(room)===fzWinnerTeam(room.fz)) launchConfetti(); if(doAward) awardFzPoints(room); }
+}
+async function doRoomFzEnd(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fz || room.hostId!==state.pid || room.fz.finished || room.fz.phase!=='pick') return;
+  const F = room.fz;
+  F.finished = true; F.prizes = fzPrizes(room, F); F.seq = (F.seq||0)+1;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  try{ SND.coinChime(); }catch(e){}
+  if(fzMyTeam(room)===fzWinnerTeam(F)) launchConfetti();
+  awardFzPoints(room);
+}
+/* ---- العداد: بيتحسب محلياً من أول ما اللاعب يشوف السؤال، عشان فرق الساعات بين الموبايلات ما تأثرش ---- */
+function fzLeftMs(room){
+  const F = room && room.fz; if(!F || F.finished || F.phase!=='ask') return 0;
+  state.fzSeen = state.fzSeen || {};
+  const key = room.code+':'+F.seq;
+  if(!state.fzSeen[key]) state.fzSeen[key] = Date.now();
+  return Math.max(0, FZ_SECS*1000 - (Date.now()-state.fzSeen[key]));
+}
+function fzScheduleTick(){
+  clearTimeout(state._fzTimer);
+  const tick = ()=>{
+    if(state.view!=='room-fazzura') return;
+    const room = GAME_ROOMS[state.roomCode];
+    if(!room || !room.fz || room.fz.phase!=='ask' || room.fz.finished) return;
+    const l = fzLeftMs(room);
+    const cnt = document.getElementById('fz-count'); if(cnt) cnt.textContent = Math.ceil(l/1000);
+    const bar = document.getElementById('fz-bar'); if(bar) bar.style.width = (l/(FZ_SECS*10))+'%';
+    if(l<=0){
+      const key = room.code+':'+room.fz.seq;
+      if((fzMyTeam(room) || (room.fz.judge===state.pid && !state.roomSpectate)) && state._fzTO!==key){ state._fzTO = key; doRoomFzTimeout(room.fz.seq); }
+      return;
+    }
+    state._fzTimer = setTimeout(tick, 250);
+  };
+  state._fzTimer = setTimeout(tick, 250);
+}
+function renderRoomFz(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(FZ_TITLE, room);
+  if(room.status==='waiting' || !room.fz) { clearTimeout(state._fzTimer); return roomHead(FZ_TITLE, room) + renderRoomFzLobby(room); }
+  const F = room.fz, ps = room.players || [];
+  const me = fzMyTeam(room);
+  const isJudge = !!F.judge && F.judge===state.pid && !state.roomSpectate;
+  const judgeP = F.judge ? ps.find(p=>p.id===F.judge) : null;
+  const judgeName = judgeP ? escapeHtml(judgeP.name) : '';
+  const head = roomHead(FZ_TITLE, room);
+  /* ----- النهاية ----- */
+  if(F.finished){
+    clearTimeout(state._fzTimer);
+    const w = fzWinnerTeam(F);
+    const title = w==='draw' ? '🤝 تعادل!' : `🏆 الفريق ${fzTeamName(w)} كسب!`;
+    const rows = ['red','blue'].map(t=>{
+      const mem = ps.filter(p=>F.teams[p.id]===t).map(p=>`<span style="display:inline-flex;align-items:center;gap:4px;margin:2px;">${gameAvatar(p.id)}${(F.prizes&&F.prizes[p.id])?`<span class="fz-prize">+${F.prizes[p.id]} 💰</span>`:''}</span>`).join('');
+      return `<div class="fz-team ${t}"><b>${fzTeamDot(t)} ${fzTeamName(t)} — ${F.scores[t]}</b>${mem}</div>`;
+    }).join('');
+    return `${head}<div class="fz t-red"><div class="fz-fin">${title}</div>${fzScoreBoard(F, w==='draw'?null:w)}
+      <div class="fz-roster">${rows}</div>
+      ${fzMascots(w==='red'?'happy':(w==='draw'?'happy':'sad'), w==='blue'?'happy':(w==='draw'?'happy':'sad'))}</div>
+      ${me!==null || !state.roomSpectate ? nextProBtn('room-fz-next').replace('data-action="room-fz-next"','data-action="room-fz-next" data-s="fin"') : ''}`;
+  }
+  /* ----- اللوحة: اختيار سؤال ----- */
+  if(F.phase==='pick'){
+    clearTimeout(state._fzTimer);
+    const canPick = me===F.turn;
+    const rows = FZ_CATS.map((cat,c)=>{
+      const tiles = FZ_VALUES.map((v,vi)=>{
+        const u = !!F.used[c+'_'+vi];
+        return `<button type="button" class="fz-tile${vi===2?' r':''}${u?' used':''}" data-action="room-fz-tile" data-c="${c}" data-v="${vi}" ${(u||!canPick)?'disabled':''}>${u?'—':v}</button>`;
+      }).join('');
+      return `<div class="fz-row"><div class="fz-cat"><span>${cat.icon}</span>${cat.name}</div>${tiles}</div>`;
+    }).join('');
+    const status = canPick
+      ? `${fzTeamDot(F.turn)} دور فريقك — اختاروا سؤال!`
+      : (me ? `⏳ استنوا الفريق ${fzTeamName(F.turn)} ${fzTeamDot(F.turn)} يختار سؤال` : `👀 بتتفرج — دور الفريق ${fzTeamName(F.turn)} ${fzTeamDot(F.turn)}`);
+    const left = FZ_TOTAL - Object.keys(F.used).length;
+    return `${head}<div class="fz">
+      ${fzScoreBoard(F, F.turn)}
+      <div class="fz-title">لوحة النقاط</div><span class="fz-sub">اختار سؤالك وجازف!</span>
+      ${F.judge?`<div class="fz-turn" style="margin:0 0 8px;">⚖️ الحكم: ${judgeName}${isJudge?' (انت)':''}</div>`:''}<div class="fz-board">${rows}</div>
+      <div class="fz-turn">${status}</div>
+      ${fzRoster(room, F)}
+      ${room.hostId===state.pid && left<FZ_TOTAL ? `<button type="button" class="fz-end" data-action="room-fz-end">🏁 إنهاء اللعبة وعرض النتيجة</button>` : ''}
+    </div>`;
+  }
+  /* ----- السؤال (الفريق صاحب الدور ثم الخاطف) أو النتيجة ----- */
+  const q = F.board[F.cur.c][F.cur.v], cat = FZ_CATS[F.cur.c], val = FZ_VALUES[F.cur.v];
+  const reveal = F.phase==='reveal';
+  const active = fzActiveTeam(F);
+  const isActiveMember = !reveal && me===active;
+  const theme = reveal ? (F.last && F.last.team ? F.last.team : 'blue') : active;
+  const qCard = `<div class="fz-q"><div class="fz-val">${val}</div><div class="fz-q-cat">${cat.icon} ${cat.name}</div><div class="fz-q-txt">${escapeHtml(q.q)}</div></div>`;
+  const optsHtml = q.o.map((t,i)=>{
+    let cls = 'fz-opt', mark = '';
+    if(reveal){
+      if(i===q.a){ cls += ' right'; mark = '✅'; }
+      else if(F.last && F.last.pick===i){ cls += ' mine-bad'; mark = '❌'; }
+      else if((F.wrong||[]).indexOf(i)>=0){ cls += ' bad'; }
+    } else if((F.wrong||[]).indexOf(i)>=0){ cls += ' bad'; }
+    return `<button type="button" class="${cls}" data-action="room-fz-pick" data-i="${i}" ${(!isActiveMember || reveal || (F.wrong||[]).indexOf(i)>=0)?'disabled':''}>${escapeHtml(t)}${mark?`<em>${mark}</em>`:''}</button>`;
+  }).join('');
+  if(reveal){
+    clearTimeout(state._fzTimer);
+    const L = F.last || {};
+    let res, moodR='sad', moodB='sad';
+    if(L.ok){
+      res = L.stolen ? `🏴 الفريق ${fzTeamName(L.team)} خطفها! +${val}` : `✅ الفريق ${fzTeamName(L.team)} جاوب صح! +${val}`;
+      if(L.team==='red') moodR='happy'; else moodB='happy';
+    } else {
+      res = `😅 محدش عرفها`;
+    }
+    const sub = (L.ok && !F.judge) ? '' : `<small>الإجابة الصح: ${escapeHtml(q.o[q.a])}${(!L.ok&&L.timeout)?' — الوقت خلص':''}</small>`;
+    const next = (me!==null || !state.roomSpectate) ? nextProBtn('room-fz-next').replace('data-action="room-fz-next"', `data-action="room-fz-next" data-s="${F.seq}"`) : '';
+    return `${head}<div class="fz t-${theme}">
+      ${fzScoreBoard(F, L.ok?L.team:null)}${qCard}
+      <div class="fz-res">${res}${sub}</div>
+      ${F.judge ? '' : `<div class="fz-opts">${optsHtml}</div>`}
+      ${fzMascots(moodR, moodB)}
+    </div>${next}`;
+  }
+  /* مرحلة الإجابة */
+  const steal = F.stage==='steal';
+  const left = fzLeftMs(room);
+  fzScheduleTick();
+  const banner = steal
+    ? `<div class="fz-steal">الفريق ${fzTeamName(active)} يخطفها! ${fzTeamDot(active)}<small>${F.firstMiss && F.firstMiss.timeout ? 'الفريق الأول ما لحقش يجاوب' : 'الفريق الأول جاوب غلط'}</small></div>`
+    : `<div class="fz-turn" style="margin-top:8px;">${fzTeamDot(active)} دور الفريق ${fzTeamName(active)}</div>`;
+  const status = isJudge ? '⚖️ إنت الحكم — اسمع الإجابة واحكم' : (isActiveMember ? (F.judge ? '🗣️ جاوبوا بصوت عالي!' : '⚡ اختار الإجابة بسرعة!') : (me ? `⏳ استنوا الفريق ${fzTeamName(active)}...` : `👀 بتتفرج`));
+  const judgeBlock = !F.judge ? '' : (isJudge
+    ? `<div class="fz-ans">⚖️ الإجابة الصح:<b>${escapeHtml(q.o[q.a])}</b></div><div class="fz-judge"><button type="button" class="fz-jb ok" data-action="room-fz-judge" data-ok="1">✅ صح</button><button type="button" class="fz-jb no" data-action="room-fz-judge" data-ok="0">❌ غلط</button></div>`
+    : `<div class="hint" style="text-align:center;margin-top:10px;font-weight:800;">🗣️ قولوا إجابتكم بصوت عالي — الحكم ⚖️ ${judgeName} هو اللي هيحكم</div>`);
+  return `${head}<div class="fz t-${active}">
+    ${fzScoreBoard(F, active)}${banner}${qCard}
+    <div class="fz-timer"><div class="fz-bar"><i id="fz-bar" style="width:${left/(FZ_SECS*10)}%"></i></div><div class="fz-count" id="fz-count">${Math.ceil(left/1000)}</div></div>
+    <div class="xo-status" style="margin:6px 0 0;">${status}</div>
+    ${F.judge ? judgeBlock : `<div class="fz-opts">${optsHtml}</div>`}
+    ${fzMascots('think','think', steal?active:null, 'أعرفها!')}
+  </div>`;
+}
+
 /* ================= ذاكرة الأماكن — الوضع الفردي (نفس المواضيع بتاعة وضع الغرف) ================= */
 const PM_LEVELS = {
   easy:  {icon:'🌱', label:'سهل',  cells:6,  secs:6, mult:0.6},
@@ -28308,6 +28812,7 @@ function render(){
   else if(state.view==='room-proverb') html = renderRoomPv();
   else if(state.view==='room-fahmeen') html = renderRoomFh();
   else if(state.view==='room-placemem') html = renderRoomFs();
+  else if(state.view==='room-fazzura') html = renderRoomFz();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='attendance' || state.view==='attendance-scan') html = featureLockedForMe('attendance') ? renderMaintenancePage('الحضور','✅') : (state.view==='attendance' ? renderAttendancePage() : renderAttendanceScanPage());
   else if(state.view==='stay') html = renderStayPage();
@@ -30864,7 +31369,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-fh-next','room-fs-next','pm-next',
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-fh-next','room-fs-next','room-fz-next','pm-next',
   'chess-reset','ck-reset','bg-reset','snl-reset'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
@@ -30880,6 +31385,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-pv-start','room-pv-pick','room-pv-next',
   'room-fh-start','room-fh-bet','room-fh-submit','room-fh-next',
   'room-fs-start','room-fs-pick','room-fs-next',
+  'room-fz-start','room-fz-tile','room-fz-pick','room-fz-next','room-fz-end','room-fz-judge','room-fz-mode','room-fz-setjudge',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
@@ -31288,6 +31794,14 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-fs-start'){ doRoomFsStart(); }
   else if(action==='room-fs-pick'){ doRoomFsPick(el.dataset.i); }
   else if(action==='room-fs-next'){ doRoomFsNext(el.dataset.r); }
+  else if(action==='room-fz-start'){ doRoomFzStart(); }
+  else if(action==='room-fz-tile'){ doRoomFzTile(el.dataset.c, el.dataset.v); }
+  else if(action==='room-fz-pick'){ doRoomFzPick(el.dataset.i); }
+  else if(action==='room-fz-next'){ doRoomFzNext(el.dataset.s); }
+  else if(action==='room-fz-end'){ doRoomFzEnd(); }
+  else if(action==='room-fz-judge'){ doRoomFzJudge(el.dataset.ok); }
+  else if(action==='room-fz-mode'){ doRoomFzMode(); }
+  else if(action==='room-fz-setjudge'){ doRoomFzSetJudge(el.dataset.p); }
   else if(action==='chess-sq'){ doChSquareClick(parseInt(el.dataset.r,10), parseInt(el.dataset.c,10)); }
   else if(action==='chess-mode'){ doChessMode(el.dataset.mode); }
   else if(action==='chess-reset'){ doChessReset(); }
