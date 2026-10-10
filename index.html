@@ -7569,6 +7569,22 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes fhPop{from{opacity:0; transform:translateY(10px) scale(.96);} to{opacity:1; transform:none;}}
   @media (prefers-reduced-motion:reduce){ .fh-grp{animation:none; opacity:1;} .fh-num{transition:none;} }
 </style>
+<style id="fs-css">
+  .fs-title{text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; color:var(--text); margin:10px 0 8px; line-height:1.5;}
+  .fs-ring{width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:3px solid var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--text); box-shadow:0 0 0 4px rgba(244,183,64,.18);}
+  .fs-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 6px;}
+  .fs-cell{position:relative; aspect-ratio:2/1.1; border-radius:12px; border:3px solid #fff; background:#EAE4F2; color:#14102e; display:flex; align-items:center; justify-content:center; overflow:hidden; font-family:'Cairo',sans-serif; transition:transform .12s, box-shadow .2s;}
+  .fs-cell:not(:disabled):active{transform:scale(.95);}
+  .fs-cell:disabled{opacity:1;}
+  .fs-num{font-weight:900; font-size:30px;}
+  .fs-emo{font-size:46px; line-height:1; animation:fsPop .35s ease;}
+  .fs-cell.right{border-color:var(--good); box-shadow:0 0 0 3px rgba(95,224,164,.35);}
+  .fs-cell.wrong{border-color:var(--danger); background:#F6DADA;}
+  .fs-x{position:absolute; top:4px; left:6px; font-size:16px;}
+  .fs-picks{position:absolute; bottom:3px; left:0; right:0; display:flex; justify-content:center; gap:3px; transform:scale(.62); transform-origin:center bottom;}
+  @keyframes fsPop{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
+  @media (prefers-reduced-motion:reduce){ .fs-emo{animation:none;} }
+</style>
 <style id="login-glow-up">
 /* ===== Saved account card only ===== */
 .sa-card{padding:20px 16px; border-radius:26px; border:1.5px solid rgba(244,183,64,.6); overflow:hidden;
@@ -9917,7 +9933,7 @@ async function loadGamePointsSettings(){
   const fallback = {first:100, second:50, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25,
     soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
-    soloNumGuessReward:100, soloNumGuessMaxTries:6,
+    soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
     soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
     soloSnlReward:30, soloSnlWinsNeeded:3,
     visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
@@ -10396,7 +10412,7 @@ let CONF_SETTINGS = {ended:false, verseText:null, verseRef:null, dailyVerses:{},
 let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoEntryFee:25, xoWinReward:50, xoWinsNeeded:3, roomCreateFee:25, roomJoinFee:25,
   soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
-  soloNumGuessReward:100, soloNumGuessMaxTries:6,
+  soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
   soloSnlReward:30, soloSnlWinsNeeded:3,
   soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
@@ -13824,7 +13840,7 @@ const GAME_CATEGORY_OF = {
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', revword:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
-  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', fahmeen:'party',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', fahmeen:'party', placemem:'mind',
 };
 /* rectangular category cards — tap one to open the games inside it */
 /* تحديث لحظي: لو الأدمن قفل/فتح لعبة، الشاشة بتتحدّث عند اللاعبين من غير ريفرش */
@@ -13896,6 +13912,7 @@ const GAMES_CATALOG = [
   {id:'memory', icon:'🧠', title:'لعبة الذاكرة', sub:'اقلب الكروت ولاقي الأزواج بأقل حركات', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
   {id:'rps', icon:'✊', title:'حجر ورقة مقص', sub:'جولة سريعة ضد الجهاز', color:'linear-gradient(145deg,#5FE0A4,#FFDE94)'},
   {id:'revword', icon:'🔄', title:'الكلمة المعكوسة', sub:'الحروف بتظهر حرف حرف بالعكس — اجمعها واكتب الكلمة قبل الوقت', color:'linear-gradient(145deg,#6C4DFF,#3FDCC9)'},
+  {id:'placemem', icon:'🧠', title:'ذاكرة الأماكن', sub:'احفظ أماكن الصور في ثواني وبعدين دوّر عليها — لوحدك أو مع أصحابك', color:'linear-gradient(145deg,#3B1F6E,#8E5BD1)'},
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 6 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم ولد وبنت وحيوان وجماد ونبات وبلد — رحلة من 3 مراحل، اختار وقت كل مرحلة وكل ما يقل تتضاعف النقط', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
@@ -13924,7 +13941,7 @@ function allToggleableGames(){
 }
 const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
-  memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 6 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
+  placemem:'احفظ أماكن الصور في ثواني وبعدين دوّر عليها — جاوب صح في 7 من 9 واكسب نقط', memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 6 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
   bus:'حرف عشوائي و6 خانات: اسم ولد واسم بنت وحيوان وجماد ونبات وبلد/دولة — رحلة من 3 مراحل، إنت بتختار وقت كل مرحلة: وقت أقل = نقط مضاعفة. لو جمعت أكتر من الجهاز تكسب مكافأة بتكبر مع المخاطرة',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
@@ -21696,6 +21713,8 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], pv:null});
   } else if(gameType==='fahmeen'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fh:null});
+  } else if(gameType==='placemem'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fs:null});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -21725,7 +21744,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='fahmeen'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='fahmeen' || room.game==='placemem'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -22265,6 +22284,7 @@ const ROOM_GAMES = [
   {id:'emojibible', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر'},
   {id:'proverb',  sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر'},
   {id:'fahmeen',  sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم'},
+  {id:'placemem', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر'},
 ];
 /* الألعاب دي متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
 const ROOM_ONLY_TILES = {
@@ -22273,6 +22293,7 @@ const ROOM_ONLY_TILES = {
   emojibible: {id:'emojibible', icon:'😇', title:'إيموجي تحدي', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#2E5A8C,#6FB1E8)'},
   proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
   fahmeen: {id:'fahmeen', icon:'🤝', title:'فاهمين بعض؟', sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم', color:'linear-gradient(145deg,#6A1B9A,#E91E8C)'},
+  placemem: {id:'placemem', icon:'🧠', title:'ذاكرة الأماكن', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#3B1F6E,#8E5BD1)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 /* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
@@ -23195,8 +23216,8 @@ function fhNewState(players){
   };
 }
 /* جوايز الفيزا: نفس جدول المراكز بتاع اللودو (الأول/التاني/التالت)، واللي يتعادلوا بياخدوا جايزة نفس المركز */
-function fhPrizes(room){
-  const F = room.fh, ps = room.players||[], prizes = {};
+function fhPrizes(room, FF){
+  const F = FF || room.fh, ps = room.players||[], prizes = {};
   const S = GAME_POINTS_SETTINGS || {};
   const table = [S.first||0, S.second||0, S.third||0];
   const sorted = ps.slice().sort((a,b)=>(F.scores[b.id]||0)-(F.scores[a.id]||0));
@@ -23420,6 +23441,345 @@ function renderRoomFh(){
     <input class="field fh-input" id="fh-ans" maxlength="24" autocomplete="off" placeholder="اكتب أول حاجة جت في بالك" value="${escapeHtml(state.fhDraft||'')}" />
     <button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="room-fh-submit">✅ تأكيد الإجابة</button>
     <div class="hint" style="text-align:center;margin-top:8px;">جاوبوا ${answered}/${ps.length}</div>`;
+}
+/* ================= ذاكرة الأماكن — لعبة جماعية (2-4 لاعبين): احفظ أماكن الصور في 5 ثواني وبعدين دوّر عليها ================= */
+/* 8 مربعات مرقّمة بتظهر فيها صور لمدة 5 ثواني وتختفي، وبعدين بيسأل "أين البرتقال؟" والكل يختار الرقم — الأسرع والصح ياخد نقط أكتر */
+const FS_THEMES = [
+  {label:'الفواكه', items:[['🍌','الموز'],['🍎','التفاح'],['🍊','البرتقال'],['🥝','الكيوي'],['🍇','العنب'],['🍓','الفراولة'],['🍉','البطيخ'],['🍍','الأناناس'],['🍒','الكرز'],['🍑','الخوخ'],['🍋','الليمون'],['🥭','المانجو'],['🍐','الكمثرى'],['🥥','جوز الهند']]},
+  {label:'الحيوانات', items:[['🐶','الكلب'],['🐱','القطة'],['🐘','الفيل'],['🦁','الأسد'],['🐵','القرد'],['🐼','الباندا'],['🐸','الضفدع'],['🐢','السلحفاة'],['🦒','الزرافة'],['🐧','البطريق'],['🐰','الأرنب'],['🐴','الحصان'],['🐮','البقرة'],['🐔','الفرخة']]},
+  {label:'الخضار', items:[['🥕','الجزر'],['🍅','الطماطم'],['🥔','البطاطس'],['🌽','الدرة'],['🥦','البروكلي'],['🍆','الباذنجان'],['🌶️','الفلفل'],['🧅','البصل'],['🥒','الخيار'],['🧄','الثوم'],['🍄','المشروم'],['🥬','الخس']]},
+  {label:'المواصلات', items:[['🚗','العربية'],['🚌','الأتوبيس'],['🚲','العجلة'],['🚂','القطر'],['✈️','الطيارة'],['🚁','الهليكوبتر'],['🚢','المركب'],['🛵','الاسكوتر'],['🚕','التاكسي'],['🚑','الإسعاف'],['🚒','عربية المطافي'],['🚜','الجرار']]},
+  {label:'الرياضة', items:[['⚽','الكورة'],['🏀','السلة'],['🎾','التنس'],['🏐','الطايرة'],['🏈','الكورة الأمريكاني'],['🎱','البلياردو'],['🏓','البينج بونج'],['🥊','الملاكمة'],['🏸','الريشة'],['⛳','الجولف'],['🎳','البولينج'],['🛹','سكيت بورد']]},
+  {label:'الأكل', items:[['🍕','البيتزا'],['🍔','الهامبورجر'],['🌭','الهوت دوج'],['🍟','البطاطس المقلية'],['🌮','التاكو'],['🍩','الدونات'],['🍦','الأيس كريم'],['🍪','البسكوت'],['🎂','التورتة'],['🍫','الشوكولاتة'],['🍿','الفشار'],['🥐','الكرواسون']]},
+  {label:'البيت', items:[['🛏️','السرير'],['🛋️','الكنبة'],['🚪','الباب'],['💡','اللمبة'],['🔑','المفتاح'],['⏰','المنبه'],['📺','التلفزيون'],['🪑','الكرسي'],['🧹','المكنسة'],['🚿','الدش'],['🕯️','الشمعة'],['📚','الكتب']]},
+  {label:'الطبيعة', items:[['☀️','الشمس'],['🌙','القمر'],['⭐','النجمة'],['☁️','السحابة'],['🌈','قوس قزح'],['⚡','البرق'],['❄️','الثلج'],['🌊','الموجة'],['🔥','النار'],['🌵','الصبار'],['🌸','الوردة'],['🌳','الشجرة']]},
+  {label:'الهدوم', items:[['👕','التيشيرت'],['👖','البنطلون'],['👗','الفستان'],['🧢','الكاب'],['👟','الجزمة'],['🧦','الشراب'],['🧣','الإيشارب'],['🧤','الجوانتي'],['👓','النضارة'],['🎒','الشنطة'],['👔','الكرافتة'],['🩳','الشورت']]},
+  {label:'الكنيسة', items:[['✝️','الصليب'],['🔔','الجرس'],['🕊️','الحمامة'],['📖','الكتاب المقدس'],['🕯️','الشمعة'],['⛪','الكنيسة'],['🌟','النجمة'],['🙏','الصلاة'],['🍇','العنب'],['🍞','الخبز'],['👑','التاج'],['🐑','الخروف']]}
+];
+const FS_ROUNDS = 3, FS_QPR = 3, FS_SHOW_MS = 5000, FS_TITLE = 'ذاكرة الأماكن';
+function fsNewState(players){
+  const themes = shuffleArray(FS_THEMES.slice()).slice(0, FS_ROUNDS);
+  const rounds = themes.map(t=>{
+    const picked = shuffleArray(t.items.slice()).slice(0,8);
+    const qs = shuffleArray([0,1,2,3,4,5,6,7]).slice(0, FS_QPR);
+    return {label:t.label, cells:picked.map(x=>x[0]), names:picked.map(x=>x[1]), qs};
+  });
+  return { rounds, r:0, q:0, phase:'ask', answers:{}, order:[], finished:false,
+    scores:Object.fromEntries((players||[]).map(p=>[p.id,0])) };
+}
+function fsWinner(room){
+  const F = room.fs; if(!F) return null;
+  let best=null, bestScore=-1, tie=false;
+  (room.players||[]).forEach(p=>{ const s=(F.scores||{})[p.id]||0; if(s>bestScore){ best=p.id; bestScore=s; tie=false; } else if(s===bestScore){ tie=true; } });
+  return tie ? 'draw' : best;
+}
+async function awardFsPoints(room){
+  try{
+    const prizes = (room.fs && room.fs.prizes) || {};
+    const ids = Object.keys(prizes);
+    if(!ids.length) return;
+    WALLET = await loadWallet();
+    ids.forEach(id=>{ WALLET[id] = (WALLET[id]||0) + prizes[id]; });
+    await saveWallet(WALLET);
+    ids.forEach(id=> pushNotification(id, `🧠 خلصت لعبة ذاكرة الأماكن واخدت +${prizes[id]} نقطة`, '🏆'));
+    vtxLogSafe(ids.map(id=>({ pid:id, type:'game_win', amount:prizes[id], balAfter:(WALLET[id]||0), note:'ذاكرة الأماكن' })));
+  }catch(e){}
+}
+function renderRoomFsLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty">⏳ في انتظار لاعب...</div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code, room.game)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🧠 — احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-fs-start" ${ps.length<2?'disabled':''}>🧠 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الأول</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
+    </div>`;
+}
+async function doRoomFsStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='placemem' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.fs = fsNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+/* مرحلة الحفظ: بتتحسب محلياً عند كل لاعب (5 ثواني من أول ما يشوف الجولة) عشان فرق الساعات بين الموبايلات ما تأثرش */
+function fsShowLeft(room){
+  const F = room && room.fs; if(!F || F.finished || F.q!==0 || F.phase!=='ask') return 0;
+  state.fsSeen = state.fsSeen || {};
+  const key = room.code+':'+F.r;
+  if(!state.fsSeen[key]) state.fsSeen[key] = Date.now();
+  return Math.max(0, FS_SHOW_MS - (Date.now()-state.fsSeen[key]));
+}
+function fsScheduleTick(left){
+  clearTimeout(state._fsTimer);
+  if(left<=0) return;
+  const tick = ()=>{
+    if(state.view!=='room-placemem') return;
+    const room = GAME_ROOMS[state.roomCode];
+    const l = fsShowLeft(room);
+    if(l<=0){ render(); return; }
+    const el = document.getElementById('fs-count'); if(el) el.textContent = Math.ceil(l/1000);
+    state._fsTimer = setTimeout(tick, 200);
+  };
+  state._fsTimer = setTimeout(tick, 200);
+}
+async function doRoomFsPick(iRaw){
+  const r0 = GAME_ROOMS[state.roomCode];
+  if(r0 && fsShowLeft(r0)>0) return;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fs || room.fs.finished || room.fs.phase!=='ask') return;
+  if(!(room.players||[]).some(p=>p.id===state.pid) || state.roomSpectate) return;
+  const F = room.fs;
+  F.answers = F.answers||{}; F.order = F.order||[]; F.scores = F.scores||{};
+  if(F.answers[state.pid]) return;
+  const cell = parseInt(iRaw,10);
+  const rd = F.rounds[F.r];
+  const ok = cell===rd.qs[F.q];
+  let pts = 0;
+  if(ok){
+    pts = QUIZ_RANK_POINTS[F.order.length]!==undefined ? QUIZ_RANK_POINTS[F.order.length] : 1;
+    F.order.push(state.pid);
+    F.scores[state.pid] = (F.scores[state.pid]||0) + pts;
+    try{ SND.cheer(); }catch(e){}
+  } else { try{ vibrate(30); }catch(e){} }
+  F.answers[state.pid] = {cell, ok, pts};
+  if((room.players||[]).every(p=>F.answers[p.id])) F.phase = 'reveal';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomFsNext(attr){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.fs) return;
+  const F = room.fs;
+  let doAward = false;
+  if(F.finished){
+    if(attr!=='fin'){ render(); return; }
+    room.fs = fsNewState(room.players||[]);
+  } else {
+    if(F.phase!=='reveal' || attr!==(F.r+':'+F.q)){ render(); return; }
+    F.q++;
+    if(F.q>=FS_QPR){ F.q = 0; F.r++; }
+    if(F.r>=F.rounds.length){ F.finished = true; F.prizes = fhPrizes(room, F); doAward = true; }
+    else { F.phase = 'ask'; F.answers = {}; F.order = []; }
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.fs.finished){ try{ SND.coinChime(); }catch(e){} if(fsWinner(room)===state.pid) launchConfetti(); if(doAward) awardFsPoints(room); }
+}
+function fsNextBtn(attr){
+  return nextProBtn('room-fs-next').replace('data-action="room-fs-next"', `data-action="room-fs-next" data-r="${attr}"`);
+}
+function renderRoomFs(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(FS_TITLE, room);
+  if(room.status==='waiting' || !room.fs) return roomHead(FS_TITLE, room) + renderRoomFsLobby(room);
+  const F = room.fs, ps = room.players || [];
+  F.answers = F.answers||{}; F.scores = F.scores||{};
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), F.scores[p.id]||0, '', false)).join('');
+  if(F.finished){
+    const w = fsWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(F.scores[b.id]||0)-(F.scores[a.id]||0));
+    const winnerP = PARTICIPANTS.find(x=>x.id===w);
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 فزت في ذاكرة الأماكن!' : `🏆 ${winnerP?escapeHtml(winnerP.name):'صاحبك'} كسب اللعبة`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${F.scores[p.id]||0}</b>${(F.prizes&&F.prizes[p.id])?`<span class="fh-gain">+${F.prizes[p.id]} 💰</span>`:''}
+      </div>`).join('');
+    return `${roomHead(FS_TITLE, room)}<div class="xo-status">${title}</div><div style="margin-top:14px;">${rows}</div>${fsNextBtn('fin')}`;
+  }
+  const rd = F.rounds[F.r];
+  const isMember = ps.some(p=>p.id===state.pid) && !state.roomSpectate;
+  const left = fsShowLeft(room);
+  const sub = `جولة ${F.r+1} من ${F.rounds.length}`;
+  if(left>0){
+    fsScheduleTick(left);
+    const cells = rd.cells.map((e,i)=>`<div class="fs-cell show"><span class="fs-emo">${e}</span></div>`).join('');
+    return `${roomHead(FS_TITLE, room)}
+      <div class="quiz-score-row">${scoreRow}</div>
+      <div class="fh-round">${sub}</div>
+      <div class="fs-title">${Math.ceil(FS_SHOW_MS/1000)} ثواني لتحفظ أماكن ${escapeHtml(rd.label)}</div>
+      <div class="fs-ring"><b id="fs-count">${Math.ceil(left/1000)}</b></div>
+      <div class="fs-grid">${cells}</div>`;
+  }
+  clearTimeout(state._fsTimer);
+  const target = rd.qs[F.q];
+  const mine = F.answers[state.pid];
+  const reveal = F.phase==='reveal';
+  const showAnswer = reveal || !!mine;
+  const answered = ps.filter(p=>F.answers[p.id]).length;
+  const cells = rd.cells.map((e,i)=>{
+    let cls = 'fs-cell', inner = `<span class="fs-num">${i+1}</span>`;
+    if(showAnswer && i===target){ cls += ' show right'; inner = `<span class="fs-emo">${e}</span>`; }
+    else if(mine && !mine.ok && mine.cell===i){ cls += ' wrong'; inner = `<span class="fs-num">${i+1}</span><span class="fs-x">❌</span>`; }
+    const picks = reveal ? ps.filter(p=>F.answers[p.id] && F.answers[p.id].cell===i).map(p=>gameAvatar(p.id)).join('') : '';
+    return `<button type="button" class="${cls}" data-action="room-fs-pick" data-i="${i}" ${(mine||!isMember||reveal)?'disabled':''}>${inner}${picks?`<span class="fs-picks">${picks}</span>`:''}</button>`;
+  }).join('');
+  let status;
+  if(!isMember) status = `👀 بتتفرج — جاوبوا ${answered}/${ps.length}`;
+  else if(mine) status = mine.ok ? `✅ صح! +${mine.pts} نقطة${reveal?'':` — استنى الباقيين (${answered}/${ps.length})`}` : `❌ غلط — مكانها كان رقم ${target+1}${reveal?'':` — استنى الباقيين (${answered}/${ps.length})`}`;
+  else status = `⚡ اختار الرقم بأسرع ما تقدر (${answered}/${ps.length})`;
+  return `${roomHead(FS_TITLE, room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="fh-round">${sub} • سؤال ${F.q+1}/${FS_QPR}</div>
+    <div class="fs-title">أين ${escapeHtml(rd.names[target])}؟</div>
+    <div class="xo-status" style="margin-top:6px;">${status}</div>
+    <div class="fs-grid">${cells}</div>
+    ${reveal ? fsNextBtn(F.r+':'+F.q) : ''}`;
+}
+/* ================= ذاكرة الأماكن — الوضع الفردي (نفس المواضيع بتاعة وضع الغرف) ================= */
+const PM_LEVELS = {
+  easy:  {icon:'🌱', label:'سهل',  cells:6,  secs:6, mult:0.6},
+  normal:{icon:'🧠', label:'عادي', cells:8,  secs:5, mult:1},
+  hard:  {icon:'🔥', label:'صعب',  cells:12, secs:4, mult:1.5}
+};
+function pmLevel(){ return PM_LEVELS[state.pmLevel] ? state.pmLevel : 'normal'; }
+function pmReward(lv){
+  const S = GAME_POINTS_SETTINGS || {};
+  const base = S.soloPlaceMemReward!==undefined ? S.soloPlaceMemReward : 40;
+  return Math.round(base * PM_LEVELS[lv].mult);
+}
+function pmBestKey(lv){ return 'placememBest_'+lv; }
+function initPlaceMemGame(level){
+  if(level && PM_LEVELS[level]) state.pmLevel = level;
+  const lv = pmLevel(), cfg = PM_LEVELS[lv];
+  clearTimeout(state._pmTimer);
+  const themes = shuffleArray(FS_THEMES.slice()).slice(0, FS_ROUNDS);
+  const rounds = themes.map(t=>{
+    const picked = shuffleArray(t.items.slice()).slice(0, cfg.cells);
+    const qs = shuffleArray(picked.map((_,i)=>i)).slice(0, FS_QPR);
+    return {label:t.label, cells:picked.map(x=>x[0]), names:picked.map(x=>x[1]), qs};
+  });
+  state.pmem = {level:lv, rounds, r:0, q:0, phase:'ready', showEnd:0, picked:null, correct:0, finished:false};
+}
+function pmStartShow(){
+  const G = state.pmem; if(!G) return;
+  G.phase = 'show'; G.showEnd = Date.now() + PM_LEVELS[G.level].secs*1000; G.picked = null;
+}
+function pmTick(){
+  clearTimeout(state._pmTimer);
+  const G = state.pmem;
+  if(!G || G.phase!=='show') return;
+  const step = ()=>{
+    if(state.view!=='game-placemem' || !state.pmem || state.pmem!==G || G.phase!=='show') return;
+    const left = G.showEnd - Date.now();
+    if(left<=0){ G.phase='ask'; render(); return; }
+    const el = document.getElementById('pm-count'); if(el) el.textContent = Math.ceil(left/1000);
+    state._pmTimer = setTimeout(step, 200);
+  };
+  state._pmTimer = setTimeout(step, 200);
+}
+function pmPick(iRaw){
+  const G = state.pmem;
+  if(!G || G.phase!=='ask') return;
+  const i = parseInt(iRaw,10);
+  const ok = i === G.rounds[G.r].qs[G.q];
+  G.picked = i;
+  if(ok){ G.correct++; try{ SND.cheer(); }catch(e){} } else { try{ vibrate(30); }catch(e){} }
+  G.phase = 'result';
+  render();
+}
+async function pmNext(){
+  const G = state.pmem;
+  if(!G || G.phase!=='result') return;
+  G.q++;
+  if(G.q>=FS_QPR){ G.q = 0; G.r++; }
+  if(G.r>=G.rounds.length){
+    G.finished = true; G.phase = 'done';
+    const total = G.rounds.length*FS_QPR;
+    const win = G.correct >= Math.ceil(total*0.75);
+    try{
+      if(state.pid){
+        const st = myGameStats(state.pid), key = pmBestKey(G.level);
+        if(!st[key] || G.correct>st[key]){ st[key] = G.correct; await saveGameStats(GAME_STATS); }
+      }
+    }catch(e){}
+    G.won = win;
+    render();
+    if(win){ try{ SND.coinChime(); }catch(e){} awardSoloGamePoints(pmReward(G.level), 'مبروك! ذاكرتك قوية 🧠'); }
+    return;
+  }
+  if(G.q===0) pmStartShow(); else { G.phase='ask'; G.picked=null; }
+  render();
+}
+function renderPlaceMemGame(){
+  if(!state.pmem) initPlaceMemGame();
+  const G = state.pmem, cfg = PM_LEVELS[G.level];
+  const total = G.rounds.length*FS_QPR;
+  const reward = pmReward(G.level);
+  const stats = state.pid ? myGameStats(state.pid) : {};
+  const best = stats[pmBestKey(G.level)];
+  const head = `<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">ذاكرة الأماكن</div></div>`;
+  if(G.phase==='show' && Date.now()>=G.showEnd) G.phase = 'ask';
+  if(G.phase!=='show') clearTimeout(state._pmTimer);
+  if(G.phase==='ready'){
+    const picker = Object.keys(PM_LEVELS).map(k=>{
+      const c = PM_LEVELS[k];
+      return `<button type="button" class="ng-level ${k===G.level?'active':''}" data-action="pm-level" data-level="${k}">${c.icon} ${c.label}<small>${c.cells} مربعات · ${c.secs} ثواني</small></button>`;
+    }).join('');
+    return `${head}
+      <div class="ng-levels">${picker}</div>
+      <div class="fs-title" style="margin-top:18px;">احفظ أماكن الصور وبعدين دوّر عليها 🧠</div>
+      <div class="hint" style="text-align:center;margin:4px 0 12px;">${G.rounds.length} جولات × ${FS_QPR} أسئلة — جاوب صح في ${Math.ceil(total*0.75)} من ${total} على الأقل واكسب ${reward} نقطة 🏅</div>
+      ${best?`<div class="hint" style="text-align:center;margin-bottom:12px;">أفضل نتيجة لك (${cfg.label}): ${best} من ${total}</div>`:''}
+      <button type="button" class="btn btn-primary" style="width:100%;" data-action="pm-start">▶️ ابدأ</button>`;
+  }
+  if(G.phase==='done'){
+    const stars = G.correct>=total ? 3 : G.correct>=Math.ceil(total*0.75) ? 2 : G.correct>=Math.ceil(total/2) ? 1 : 0;
+    const msg = G.won ? `🎉 جبت ${G.correct} من ${total}! +${reward} نقطة` : `😅 جبت ${G.correct} من ${total} — محتاج ${Math.ceil(total*0.75)} عشان تكسب`;
+    return `${head}
+      <div class="xo-status" style="margin-top:14px;">${msg}<br><span style="font-size:22px;">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</span></div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="pm-reset">🔄 لعبة جديدة</button>`;
+  }
+  const rd = G.rounds[G.r];
+  const sub = `جولة ${G.r+1} من ${G.rounds.length}`;
+  if(G.phase==='show'){
+    pmTick();
+    const left = Math.max(0, G.showEnd - Date.now());
+    const cells = rd.cells.map(e=>`<div class="fs-cell show"><span class="fs-emo">${e}</span></div>`).join('');
+    return `${head}
+      <div class="fh-round">${sub}</div>
+      <div class="fs-title">${cfg.secs} ثواني لتحفظ أماكن ${escapeHtml(rd.label)}</div>
+      <div class="fs-ring"><b id="pm-count">${Math.ceil(left/1000)}</b></div>
+      <div class="fs-grid">${cells}</div>`;
+  }
+  const target = rd.qs[G.q];
+  const res = G.phase==='result';
+  const ok = res && G.picked===target;
+  const cells = rd.cells.map((e,i)=>{
+    let cls = 'fs-cell', inner = `<span class="fs-num">${i+1}</span>`;
+    if(res && i===target){ cls += ' show right'; inner = `<span class="fs-emo">${e}</span>`; }
+    else if(res && G.picked===i){ cls += ' wrong'; inner = `<span class="fs-num">${i+1}</span><span class="fs-x">❌</span>`; }
+    return `<button type="button" class="${cls}" data-action="pm-pick" data-i="${i}" ${res?'disabled':''}>${inner}</button>`;
+  }).join('');
+  const last = (G.r===G.rounds.length-1 && G.q===FS_QPR-1);
+  const status = !res ? '⚡ اختار رقم المربع' : (ok ? '✅ صح!' : `❌ غلط — مكانها كان رقم ${target+1}`);
+  return `${head}
+    <div class="fh-round">${sub} • سؤال ${G.q+1}/${FS_QPR} • صح: ${G.correct}</div>
+    <div class="fs-title">أين ${escapeHtml(rd.names[target])}؟</div>
+    <div class="xo-status" style="margin-top:6px;">${status}</div>
+    <div class="fs-grid">${cells}</div>
+    ${res ? nextProBtn('pm-next', 'margin-top:12px;') : ''}`;
 }
 /* ================= الشطرنج (محرك كامل: كش ملك، تبييت، أسر بالمرور، ترقية) ================= */
 const CHESS_GLYPH = {wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟',bn:'♞',bb:'♝',br:'♜',bq:'♛',bk:'♚'};
@@ -27922,6 +28282,7 @@ function render(){
   else if(state.view==='game-rps') html = renderRpsGame();
   else if(state.view==='game-reflex') html = renderReflexGame();
   else if(state.view==='game-numguess') html = renderNumberGame();
+  else if(state.view==='game-placemem') html = renderPlaceMemGame();
   else if(state.view==='game-math') html = renderMathGame();
   else if(state.view==='game-bus') html = renderBusGame();
   else if(state.view==='game-uno') html = renderUnoGame();
@@ -27946,6 +28307,7 @@ function render(){
   else if(state.view==='room-emojibible') html = renderRoomEb();
   else if(state.view==='room-proverb') html = renderRoomPv();
   else if(state.view==='room-fahmeen') html = renderRoomFh();
+  else if(state.view==='room-placemem') html = renderRoomFs();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='attendance' || state.view==='attendance-scan') html = featureLockedForMe('attendance') ? renderMaintenancePage('الحضور','✅') : (state.view==='attendance' ? renderAttendancePage() : renderAttendanceScanPage());
   else if(state.view==='stay') html = renderStayPage();
@@ -30502,7 +30864,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-fh-next',
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-fh-next','room-fs-next','pm-next',
   'chess-reset','ck-reset','bg-reset','snl-reset'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
@@ -30517,6 +30879,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-eb-start','room-eb-pick','room-eb-next',
   'room-pv-start','room-pv-pick','room-pv-next',
   'room-fh-start','room-fh-bet','room-fh-submit','room-fh-next',
+  'room-fs-start','room-fs-pick','room-fs-next',
   'create-room','join-room','friend-tile-open','friend-join-show'
 ]);
 document.addEventListener('keydown', (e)=>{
@@ -30771,6 +31134,7 @@ document.addEventListener('click', (e)=>{
     else if(gid==='rps' && !state.rps) state.rps = { score:{win:0,lose:0,draw:0}, lastUser:null, lastCpu:null, resultText:null, spinning:false };
     else if(gid==='reflex') initReflexGame();
     else if(gid==='numguess') initNumberGame();
+    else if(gid==='placemem') initPlaceMemGame();
     else if(gid==='math') initMathGame();
     else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
     else if(gid==='chess'){ initChessGame(); }
@@ -30921,6 +31285,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-fh-bet'){ doRoomFhBet(el.dataset.n); }
   else if(action==='room-fh-submit'){ doRoomFhSubmit(); }
   else if(action==='room-fh-next'){ doRoomFhNext(el.dataset.r); }
+  else if(action==='room-fs-start'){ doRoomFsStart(); }
+  else if(action==='room-fs-pick'){ doRoomFsPick(el.dataset.i); }
+  else if(action==='room-fs-next'){ doRoomFsNext(el.dataset.r); }
   else if(action==='chess-sq'){ doChSquareClick(parseInt(el.dataset.r,10), parseInt(el.dataset.c,10)); }
   else if(action==='chess-mode'){ doChessMode(el.dataset.mode); }
   else if(action==='chess-reset'){ doChessReset(); }
@@ -30938,6 +31305,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='snl-reset'){ doSnlReset(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
+  else if(action==='pm-level'){ initPlaceMemGame(el.dataset.level); render(); }
+  else if(action==='pm-start'){ pmStartShow(); render(); }
+  else if(action==='pm-pick'){ pmPick(el.dataset.i); }
+  else if(action==='pm-next'){ pmNext(); }
+  else if(action==='pm-reset'){ initPlaceMemGame(); render(); }
   else if(action==='numguess-level'){ initNumberGame(el.dataset.level); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
   else if(action==='math-reset'){ initMathGame(); render(); }
